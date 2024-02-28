@@ -13,7 +13,7 @@ import Presupuestos from '../../pages/budget'; // Ajusta la ruta según tu estru
 import Clientes from '../../pages/client'; // Ajusta la ruta según tu estructura de carpetas
 import Maquinas from '../../pages/machines'; // Ajusta la ruta según tu estructura de carpetas
 import { useThemeContext } from '../../componemts/themeContext'; // Asegúrate de que la ruta sea correcta
-// import  {ParticlesContainer}  from './ParticlesFire';
+import  {ParticlesContainer}  from './ParticlesFire';
 
 
 const drawerWidth = 240;
@@ -38,9 +38,9 @@ const DashboardLayout: React.FC = () => {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      {/* <ParticlesContainer /> */}
+      <ParticlesContainer />
       <CssBaseline />
-      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+      <AppBar position="fixed" sx={{ zIndex: (theme:any) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
           <IconButton
             color="inherit"
