@@ -10,9 +10,10 @@ import {
 // import { loadFull } from "tsparticles"; // if you are going to use `loadFull`, install the "tsparticles" package too.
 import { loadSlim } from "@tsparticles/slim"; // if you are going to use `loadSlim`, install the "@tsparticles/slim" package too.
 // import { loadBasic } from "@tsparticles/basic"; // if you are going to use `loadBasic`, install the "@tsparticles/basic" package too.
-
+import { useThemeContext } from '../../componemts/themeContext'; 
 export const ParticlesContainer = () => {
   const [init, setInit] = useState(false);
+  const { mode } = useThemeContext();
 
   // this should be run only once per application lifetime
   useEffect(() => {
@@ -38,8 +39,8 @@ export const ParticlesContainer = () => {
     () => ({
       background: {
         color: {
-          value: "#0d47a1",
-        },
+            value: mode == 'dark' ? "#000000" : "#FFFFFF", // Fondo oscuro para modo oscuro, claro para modo claro
+          },
       },
       fpsLimit: 120,
       interactivity: {
@@ -65,10 +66,12 @@ export const ParticlesContainer = () => {
       },
       particles: {
         color: {
-          value: "#ffffff",
-        },
+            value: mode === 'dark' ? "#FFFFFF" : "#000000", // Partículas claras para modo oscuro, oscuras para modo claro
+          },
         links: {
-          color: "#ffffff",
+            color: {
+                value: mode === 'dark' ? "#FFFFFF" : "#000000", // Partículas claras para modo oscuro, oscuras para modo claro
+              },
           distance: 150,
           enable: true,
           opacity: 0.5,
@@ -81,7 +84,7 @@ export const ParticlesContainer = () => {
             default: "out",
           },
           random: false,
-          speed: 6,
+          speed: 1,
           straight: false,
         },
         number: {
@@ -102,7 +105,7 @@ export const ParticlesContainer = () => {
       },
       detectRetina: true,
     }),
-    [],
+    [mode],
   );
 
   if (init) {

@@ -3,6 +3,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 
 interface ThemeContextType {
+    mode: 'light' | 'dark'; // Asegúrate de que `mode` esté incluido aquí
     toggleColorMode: () => void;
 }
 
@@ -23,27 +24,21 @@ interface CustomThemeProviderProps {
 export const CustomThemeProvider: React.FC<CustomThemeProviderProps> = ({ children }) => {
     const [mode, setMode] = useState<'light' | 'dark'>('light');
 
-    const colorMode = useMemo<ThemeContextType>(
-        () => ({
-            toggleColorMode: () => {
-                setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
-            },
-        }),
-        [],
-    );
+    const colorMode = useMemo(() => ({
+        mode, // Asegúrate de incluir `mode` aquí
+        toggleColorMode: () => {
+            setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+        },
+    }), [mode]);
 
-    const theme = useMemo(
-        () =>
-            createTheme({
-                palette: {
-                    mode,
-                },
-            }),
-        [mode],
-    );
+    const theme = useMemo(() => createTheme({
+        palette: {
+            mode,
+        },
+    }), [mode]);
 
     return (
-        <ThemeContext.Provider value={colorMode}>
+        <ThemeContext.Provider value={colorMode}> {/* Aquí se pasa el objeto que incluye `mode` y `toggleColorMode` */}
             <ThemeProvider theme={theme}>
                 <CssBaseline />
                 {children}
