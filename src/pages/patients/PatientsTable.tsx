@@ -69,7 +69,7 @@ const PatientsTable = () => {
       label: 'Institución',
     },
     {
-      id: 3,
+      id: 4,
       label: 'Acciones',
     },
   ];
@@ -112,7 +112,7 @@ const PatientsTable = () => {
                 return (
                   <TableRow
                     key={p.id}
-                    className={`${index % 2 === 0 && mode === 'light' ? 'bg-slate-100' : 'white'}`}
+                    // className={`${index % 2 === 0 && mode === 'light' ? 'bg-slate-100' : 'white'}`}
                   >
                     <TableCell
                       style={{
