@@ -9,7 +9,7 @@ const PatientsPage = () => {
           <PatientsTable />
         </Card>
       </Grid>
-      <Grid item>
+      <Grid item xs={12}>
         <div>otra cosa</div>
       </Grid>
       <Grid item>

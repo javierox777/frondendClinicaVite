@@ -1,4 +1,5 @@
 import {
+  Button,
   Paper,
   Table,
   TableBody,
@@ -15,12 +16,16 @@ import { generalConfig } from '../../config';
 import { Person } from '../../interfaces/Person';
 import { useThemeContext } from '../../componemts/themeContext';
 import colors from '../../styles/colors';
+import TableSkeleton from '../../componemts/TableSkeleton';
+import { useNavigate } from 'react-router-dom';
 
 const PatientsTable = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const { mode } = useThemeContext();
+
+  const navigation = useNavigate();
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -63,13 +68,26 @@ const PatientsTable = () => {
       id: 3,
       label: 'Institución',
     },
+    {
+      id: 3,
+      label: 'Acciones',
+    },
   ];
+
+  if (isLoading) return <TableSkeleton />;
 
   return (
     <>
       <TableContainer component={Paper}>
         <Table>
-          <TableHead>
+          <TableHead
+            style={{
+              backgroundColor:
+                mode === 'light'
+                  ? colors.lightModeTableHead
+                  : colors.darkModeTableHead,
+            }}
+          >
             <TableRow>
               {tableHeadings.map((h) => {
                 return (
@@ -109,6 +127,19 @@ const PatientsTable = () => {
                     </TableCell>
                     <TableCell>{p.rut}</TableCell>
                     <TableCell>{p.institucion.nombre}</TableCell>
+                    <TableCell>
+                      <Button
+                        color="success"
+                        variant="outlined"
+                        onClick={() =>
+                          navigation('/detallespaciente', {
+                            state: { patient: p },
+                          })
+                        }
+                      >
+                        Editar
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 );
               })}

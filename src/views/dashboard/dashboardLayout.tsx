@@ -28,6 +28,7 @@ import { useThemeContext } from '../../componemts/themeContext'; // Asegúrate d
 import { ParticlesContainer } from './ParticlesFire';
 import { AssignmentInd } from '@mui/icons-material';
 import PatientsPage from '../../pages/patients/PatientsPage';
+import PatientDetailsPage from '../../pages/patients/PatientDetailsPage';
 
 const drawerWidth = 240;
 
@@ -165,6 +166,7 @@ const DashboardLayout: React.FC = () => {
         <Routes>
           <Route path="/inicio" element={<Inicio />} />
           <Route path="/pacientes" element={<PatientsPage />} />
+          <Route path="/detallespaciente" element={<PatientDetailsPage />} />
         </Routes>
       </Box>
     </Box>
