@@ -30,7 +30,7 @@ import { ParticlesContainer } from './ParticlesFire';
 const drawerWidth = 240;
 
 const DashboardLayout: React.FC = () => {
-  const { toggleColorMode } = useThemeContext();
+  const { toggleColorMode, mode } = useThemeContext();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [drawerOpen, setDrawerOpen] = useState(false); // Inicia con el drawer cerrado
   const open = Boolean(anchorEl);
@@ -97,7 +97,7 @@ const DashboardLayout: React.FC = () => {
             <MenuItem>
               <FormControlLabel
                 control={<Switch onChange={toggleColorMode} />}
-                label="Apariencia"
+                label={`Modo ${mode === 'light' ? 'oscuro' : 'claro'}`}
                 labelPlacement="start"
               />
             </MenuItem>

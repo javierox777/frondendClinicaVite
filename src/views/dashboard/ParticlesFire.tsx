@@ -40,6 +40,7 @@ export const ParticlesContainer = () => {
         color: {
           value: mode == 'dark' ? '#000000' : '#FFFFFF', // Fondo oscuro para modo oscuro, claro para modo claro
         },
+        opacity: 0,
       },
       fpsLimit: 120,
       interactivity: {
