@@ -1,16 +1,16 @@
-import { useEffect, useMemo, useState } from "react";
-import Particles, { initParticlesEngine } from "@tsparticles/react";
+import { useEffect, useMemo, useState } from 'react';
+import Particles, { initParticlesEngine } from '@tsparticles/react';
 import {
   type Container,
   type ISourceOptions,
   MoveDirection,
   OutMode,
-} from "@tsparticles/engine";
+} from '@tsparticles/engine';
 // import { loadAll } from "@/tsparticles/all"; // if you are going to use `loadAll`, install the "@tsparticles/all" package too.
 // import { loadFull } from "tsparticles"; // if you are going to use `loadFull`, install the "tsparticles" package too.
-import { loadSlim } from "@tsparticles/slim"; // if you are going to use `loadSlim`, install the "@tsparticles/slim" package too.
+import { loadSlim } from '@tsparticles/slim'; // if you are going to use `loadSlim`, install the "@tsparticles/slim" package too.
 // import { loadBasic } from "@tsparticles/basic"; // if you are going to use `loadBasic`, install the "@tsparticles/basic" package too.
-import { useThemeContext } from '../../componemts/themeContext'; 
+import { useThemeContext } from '../../componemts/themeContext';
 export const ParticlesContainer = () => {
   const [init, setInit] = useState(false);
   const { mode } = useThemeContext();
@@ -29,7 +29,6 @@ export const ParticlesContainer = () => {
       setInit(true);
     });
   }, []);
-  
 
   const particlesLoaded = async (container?: Container): Promise<void> => {
     console.log(container);
@@ -39,19 +38,19 @@ export const ParticlesContainer = () => {
     () => ({
       background: {
         color: {
-            value: mode == 'dark' ? "#000000" : "#FFFFFF", // Fondo oscuro para modo oscuro, claro para modo claro
-          },
+          value: mode == 'dark' ? '#000000' : '#FFFFFF', // Fondo oscuro para modo oscuro, claro para modo claro
+        },
       },
       fpsLimit: 120,
       interactivity: {
         events: {
           onClick: {
             enable: true,
-            mode: "push",
+            mode: 'push',
           },
           onHover: {
             enable: true,
-            mode: "repulse",
+            mode: 'repulse',
           },
         },
         modes: {
@@ -66,22 +65,22 @@ export const ParticlesContainer = () => {
       },
       particles: {
         color: {
-            value: mode === 'dark' ? "#FFFFFF" : "#000000", // Partículas claras para modo oscuro, oscuras para modo claro
-          },
+          value: mode === 'dark' ? '#FFFFFF' : '#000000', // Partículas claras para modo oscuro, oscuras para modo claro
+        },
         links: {
-            color: {
-                value: mode === 'dark' ? "#FFFFFF" : "#000000", // Partículas claras para modo oscuro, oscuras para modo claro
-              },
+          color: {
+            value: mode === 'dark' ? '#FFFFFF' : '#000000', // Partículas claras para modo oscuro, oscuras para modo claro
+          },
           distance: 150,
           enable: true,
-          opacity: 0.5,
+          opacity: 0.2,
           width: 1,
         },
         move: {
-          direction: "none",
+          direction: 'none',
           enable: true,
           outModes: {
-            default: "out",
+            default: 'out',
           },
           random: false,
           speed: 1,
@@ -94,10 +93,10 @@ export const ParticlesContainer = () => {
           value: 80,
         },
         opacity: {
-          value: 0.5,
+          value: 0.2,
         },
         shape: {
-          type: "circle",
+          type: 'circle',
         },
         size: {
           value: { min: 1, max: 5 },
@@ -105,7 +104,7 @@ export const ParticlesContainer = () => {
       },
       detectRetina: true,
     }),
-    [mode],
+    [mode]
   );
 
   if (init) {

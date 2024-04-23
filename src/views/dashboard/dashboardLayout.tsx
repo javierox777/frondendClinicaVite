@@ -1,6 +1,21 @@
 import React, { useState } from 'react';
 import {
-  Box, CssBaseline, Drawer, AppBar, Toolbar, List, Typography, Divider, ListItem, ListItemIcon, ListItemText, Switch, IconButton, Menu, MenuItem, FormControlLabel
+  Box,
+  CssBaseline,
+  Drawer,
+  AppBar,
+  Toolbar,
+  List,
+  Typography,
+  Divider,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Switch,
+  IconButton,
+  Menu,
+  MenuItem,
+  FormControlLabel,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu'; // Para el ícono del menú
 import HomeIcon from '@mui/icons-material/Home';
@@ -9,12 +24,8 @@ import PeopleIcon from '@mui/icons-material/People';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { Routes, Route, Link } from 'react-router-dom';
 import Inicio from '../../pages/home'; // Ajusta la ruta según tu estructura de carpetas
-import Presupuestos from '../../pages/budget'; // Ajusta la ruta según tu estructura de carpetas
-import Clientes from '../../pages/client'; // Ajusta la ruta según tu estructura de carpetas
-import Maquinas from '../../pages/machines'; // Ajusta la ruta según tu estructura de carpetas
 import { useThemeContext } from '../../componemts/themeContext'; // Asegúrate de que la ruta sea correcta
-import  {ParticlesContainer}  from './ParticlesFire';
-
+import { ParticlesContainer } from './ParticlesFire';
 
 const drawerWidth = 240;
 
@@ -40,7 +51,10 @@ const DashboardLayout: React.FC = () => {
     <Box sx={{ display: 'flex' }}>
       <ParticlesContainer />
       <CssBaseline />
-      <AppBar position="fixed" sx={{ zIndex: (theme:any) => theme.zIndex.drawer + 1 }}>
+      <AppBar
+        position="fixed"
+        sx={{ zIndex: (theme: any) => theme.zIndex.drawer + 1 }}
+      >
         <Toolbar>
           <IconButton
             color="inherit"
@@ -109,10 +123,23 @@ const DashboardLayout: React.FC = () => {
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            {['Inicio', 'Presupuestos', 'Clientes', 'Máquinas'].map((text, index) => (
-              <ListItem button key={text} component={Link} to={`/${text.toLowerCase()}`}>
+            {['Inicio'].map((text, index) => (
+              <ListItem
+                button
+                key={text}
+                component={Link}
+                to={`/${text.toLowerCase()}`}
+              >
                 <ListItemIcon>
-                  {index === 0 ? <HomeIcon /> : index === 1 ? <AccountBalanceWalletIcon /> : index === 2 ? <PeopleIcon /> : <SettingsIcon />}
+                  {index === 0 ? (
+                    <HomeIcon />
+                  ) : index === 1 ? (
+                    <AccountBalanceWalletIcon />
+                  ) : index === 2 ? (
+                    <PeopleIcon />
+                  ) : (
+                    <SettingsIcon />
+                  )}
                 </ListItemIcon>
                 <ListItemText primary={text} />
               </ListItem>
@@ -132,11 +159,7 @@ const DashboardLayout: React.FC = () => {
         <Toolbar />
         <Routes>
           <Route path="/inicio" element={<Inicio />} />
-          <Route path="/presupuestos" element={<Presupuestos />} />
-          <Route path="/clientes" element={<Clientes />} />
-          <Route path="/maquinas" element={<Maquinas />} />
-          </Routes>
-        
+        </Routes>
       </Box>
     </Box>
   );
