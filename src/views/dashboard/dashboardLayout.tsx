@@ -26,6 +26,8 @@ import { Routes, Route, Link } from 'react-router-dom';
 import Inicio from '../../pages/home'; // Ajusta la ruta según tu estructura de carpetas
 import { useThemeContext } from '../../componemts/themeContext'; // Asegúrate de que la ruta sea correcta
 import { ParticlesContainer } from './ParticlesFire';
+import { AssignmentInd } from '@mui/icons-material';
+import PatientsPage from '../../pages/patients/PatientsPage';
 
 const drawerWidth = 240;
 
@@ -53,7 +55,10 @@ const DashboardLayout: React.FC = () => {
       <CssBaseline />
       <AppBar
         position="fixed"
-        sx={{ zIndex: (theme: any) => theme.zIndex.drawer + 1 }}
+        sx={{
+          zIndex: (theme: any) => theme.zIndex.drawer + 1,
+          backgroundColor: mode === 'light' ? 'teal' : 'AppWorkspace',
+        }}
       >
         <Toolbar>
           <IconButton
@@ -123,7 +128,7 @@ const DashboardLayout: React.FC = () => {
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            {['Inicio'].map((text, index) => (
+            {['Inicio', 'Pacientes'].map((text, index) => (
               <ListItem
                 button
                 key={text}
@@ -134,7 +139,7 @@ const DashboardLayout: React.FC = () => {
                   {index === 0 ? (
                     <HomeIcon />
                   ) : index === 1 ? (
-                    <AccountBalanceWalletIcon />
+                    <AssignmentInd />
                   ) : index === 2 ? (
                     <PeopleIcon />
                   ) : (
@@ -159,6 +164,7 @@ const DashboardLayout: React.FC = () => {
         <Toolbar />
         <Routes>
           <Route path="/inicio" element={<Inicio />} />
+          <Route path="/pacientes" element={<PatientsPage />} />
         </Routes>
       </Box>
     </Box>
