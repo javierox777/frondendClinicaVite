@@ -37,6 +37,19 @@ const Transition = React.forwardRef(function Transition(
 });
 
 const PatientForm = ({ open, onClose }: Props) => {
+  //states
+
+  const [firstName, setFirstName] = useState('');
+  const [secondName, setSecondName] = useState('');
+  const [firstSurname, setFirstSurname] = useState('');
+  const [secondSurname, setSecondSurname] = useState('');
+  const [rut, setRut] = useState('');
+  const [nationality, setNationality] = useState('');
+  const [gender, setGender] = useState('');
+  const [birthday, setBirthday] = useState('');
+  const [selectedPrevision, setPrevision] = useState('');
+  const [institution, setInstitution] = useState('');
+
   //select queries
   const { data: nationalities } = useQuery({
     queryKey: ['nationalities'],
@@ -58,16 +71,25 @@ const PatientForm = ({ open, onClose }: Props) => {
     },
   });
 
-  //states
+  const { data: previsions } = useQuery({
+    queryKey: ['previsions'],
+    queryFn: async () => {
+      const response = await axios.get(`${generalConfig.baseUrl}/previsions`);
 
-  const [firstName, setFirstName] = useState('');
-  const [secondName, setSecondName] = useState('');
-  const [firstSurname, setFirstSurname] = useState('');
-  const [secondSurname, setSecondSurname] = useState('');
-  const [rut, setRut] = useState('');
-  const [nationality, setNationality] = useState('');
-  const [gender, setGender] = useState('');
-  const [birthday, setBirthday] = useState('');
+      return response.data.body;
+    },
+  });
+
+  const { data: institutions } = useQuery({
+    queryKey: ['institutions', selectedPrevision],
+    queryFn: async () => {
+      const response = await axios.get(`${generalConfig.baseUrl}/institutions`);
+
+      return response.data.body.filter((i: any) => {
+        return i.prevision_id === selectedPrevision;
+      });
+    },
+  });
 
   const handleSubmit = () => {
     console.log({
@@ -195,6 +217,51 @@ const PatientForm = ({ open, onClose }: Props) => {
                   return (
                     <MenuItem key={g.id} value={g.id}>
                       {g.nombre}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={6}>
+            <FormControl fullWidth>
+              <InputLabel id="prevision-select-label">Previsión</InputLabel>
+              <Select
+                label="prevision"
+                id="prevision-select"
+                labelId="prevision-select-label"
+                onChange={(e: SelectChangeEvent<string>) =>
+                  setPrevision(e.target.value)
+                }
+              >
+                {previsions?.map((p: any) => {
+                  return (
+                    <MenuItem key={p.id} value={p.id}>
+                      {p.nombre}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={6}>
+            <FormControl fullWidth>
+              <InputLabel id="institution-select-label">Institución</InputLabel>
+              <Select
+                label="institution"
+                id="institution-select"
+                labelId="institution-select-label"
+                onChange={(e: SelectChangeEvent<string>) =>
+                  setInstitution(e.target.value)
+                }
+              >
+                {selectedPrevision === '' && (
+                  <MenuItem>Seleccione previsión</MenuItem>
+                )}
+                {institutions?.map((i: any) => {
+                  return (
+                    <MenuItem key={i.id} value={i.id}>
+                      {i.nombre}
                     </MenuItem>
                   );
                 })}
