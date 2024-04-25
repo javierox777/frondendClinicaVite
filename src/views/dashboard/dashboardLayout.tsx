@@ -28,8 +28,9 @@ import { useThemeContext } from '../../componemts/themeContext'; // Asegúrate d
 import { ParticlesContainer } from './ParticlesFire';
 import { AssignmentInd } from '@mui/icons-material';
 import PatientsPage from '../../pages/patients/PatientsPage';
- import InstitutionForm from '../../pages/institucion/InstitutionForm';
+import InstitutionForm from '../../pages/institucion/InstitutionForm';
 import PatientDetailsPage from '../../pages/patients/PatientDetailsPage';
+import EditPatientPage from '../../pages/patients/EditPatientPage';
 import Sexo from '../../pages/sexo/SexoForm';
 
 const drawerWidth = 240;
@@ -171,6 +172,7 @@ const DashboardLayout: React.FC = () => {
           <Route path="/ingreso" element={<InstitutionForm />} />
           <Route path="/sexo" element={<Sexo />} />
           <Route path="/detallespaciente" element={<PatientDetailsPage />} />
+          <Route path="/editarpaciente" element={<EditPatientPage />} />
         </Routes>
       </Box>
     </Box>
