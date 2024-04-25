@@ -28,7 +28,9 @@ import { useThemeContext } from '../../componemts/themeContext'; // Asegúrate d
 import { ParticlesContainer } from './ParticlesFire';
 import { AssignmentInd } from '@mui/icons-material';
 import PatientsPage from '../../pages/patients/PatientsPage';
+ import InstitutionForm from '../../pages/institucion/InstitutionForm';
 import PatientDetailsPage from '../../pages/patients/PatientDetailsPage';
+import Sexo from '../../pages/sexo/SexoForm';
 
 const drawerWidth = 240;
 
@@ -129,7 +131,7 @@ const DashboardLayout: React.FC = () => {
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            {['Inicio', 'Pacientes'].map((text, index) => (
+            {['Inicio', 'Pacientes', 'Ingreso', 'Sexo'].map((text, index) => (
               <ListItem
                 button
                 key={text}
@@ -166,6 +168,8 @@ const DashboardLayout: React.FC = () => {
         <Routes>
           <Route path="/inicio" element={<Inicio />} />
           <Route path="/pacientes" element={<PatientsPage />} />
+          <Route path="/ingreso" element={<InstitutionForm />} />
+          <Route path="/sexo" element={<Sexo />} />
           <Route path="/detallespaciente" element={<PatientDetailsPage />} />
         </Routes>
       </Box>
