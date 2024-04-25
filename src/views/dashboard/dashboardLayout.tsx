@@ -29,6 +29,7 @@ import { ParticlesContainer } from './ParticlesFire';
 import { AssignmentInd } from '@mui/icons-material';
 import PatientsPage from '../../pages/patients/PatientsPage';
 import PatientDetailsPage from '../../pages/patients/PatientDetailsPage';
+import EditPatientPage from '../../pages/patients/EditPatientPage';
 
 const drawerWidth = 240;
 
@@ -167,6 +168,7 @@ const DashboardLayout: React.FC = () => {
           <Route path="/inicio" element={<Inicio />} />
           <Route path="/pacientes" element={<PatientsPage />} />
           <Route path="/detallespaciente" element={<PatientDetailsPage />} />
+          <Route path="/editarpaciente" element={<EditPatientPage />} />
         </Routes>
       </Box>
     </Box>

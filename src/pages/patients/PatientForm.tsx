@@ -19,13 +19,15 @@ import {
 import { TransitionProps } from '@mui/material/transitions';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { generalConfig } from '../../config';
 import toast, { Toaster } from 'react-hot-toast';
+import { Person } from '../../interfaces/Person';
 
 interface Props {
   open: boolean;
   onClose: CallableFunction;
+  patient?: Person;
 }
 
 const Transition = React.forwardRef(function Transition(
@@ -37,7 +39,7 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const PatientForm = ({ open, onClose }: Props) => {
+const PatientForm = ({ open, onClose, patient }: Props) => {
   //states
 
   const [firstName, setFirstName] = useState('');
@@ -110,27 +112,72 @@ const PatientForm = ({ open, onClose }: Props) => {
       dv: verificationDigit,
     };
 
-    const response = await axios.post(`${generalConfig.baseUrl}/persons`, data);
+    if (patient) {
+      const response = await axios.patch(
+        `${generalConfig.baseUrl}/persons/${patient.id}`,
+        data
+      );
 
-    if (response.data.message === 'success') {
-      toast.success('Se ha registrado un paciente.');
-      setFirstName('');
-      setSecondName('');
-      setFirstSurname('');
-      setSecondSurname('');
-      setRut('');
-      setNationality('');
-      setGender('');
-      setBirthday('');
-      setPrevision('');
-      setInstitution('');
-      setVerificationDigit('');
-      setSubmitting(false);
+      if (response.data.message === 'success') {
+        toast.success('Se ha actualizado paciente.');
+        setFirstName('');
+        setSecondName('');
+        setFirstSurname('');
+        setSecondSurname('');
+        setRut('');
+        setNationality('');
+        setGender('');
+        setBirthday('');
+        setPrevision('');
+        setInstitution('');
+        setVerificationDigit('');
+        setSubmitting(false);
+      } else {
+        setSubmitting(false);
+        toast.error('No se ha actualizado paciente, inténtelo nuevamente.');
+      }
     } else {
-      setSubmitting(false);
-      toast.error('No se ha registrado paciente, inténtelo nuevamente.');
+      const response = await axios.post(
+        `${generalConfig.baseUrl}/persons`,
+        data
+      );
+
+      if (response.data.message === 'success') {
+        toast.success('Se ha registrado un paciente.');
+        setFirstName('');
+        setSecondName('');
+        setFirstSurname('');
+        setSecondSurname('');
+        setRut('');
+        setNationality('');
+        setGender('');
+        setBirthday('');
+        setPrevision('');
+        setInstitution('');
+        setVerificationDigit('');
+        setSubmitting(false);
+      } else {
+        setSubmitting(false);
+        toast.error('No se ha registrado paciente, inténtelo nuevamente.');
+      }
     }
   };
+
+  useEffect(() => {
+    if (patient) {
+      setFirstName(patient.nombre1);
+      setSecondName(patient.nombre2);
+      setFirstSurname(patient.apellPat);
+      setSecondSurname(patient.apellMat);
+      setRut(patient.rut);
+      setNationality(patient.nacionalidad_id);
+      setGender(patient.sexo_id);
+      setBirthday(patient.fechaNac.toLocaleString());
+      setPrevision(patient.institucion.prevision_id);
+      setInstitution(patient.institucion_id);
+      setVerificationDigit(patient.dv);
+    }
+  }, [patient]);
 
   return (
     <>
@@ -141,7 +188,11 @@ const PatientForm = ({ open, onClose }: Props) => {
         fullScreen
       >
         <form onSubmit={handleSubmit}>
-          <Toolbar component={Paper} elevation={3}>
+          <Toolbar
+            component={Paper}
+            elevation={3}
+            style={{ backgroundColor: 'teal' }}
+          >
             <IconButton onClick={() => onClose()}>
               <Close />
             </IconButton>
@@ -244,6 +295,7 @@ const PatientForm = ({ open, onClose }: Props) => {
                     onChange={(e: SelectChangeEvent<string>) =>
                       setNationality(e.target.value)
                     }
+                    value={nationality}
                   >
                     {nationalities?.map((n: any) => {
                       return (
@@ -265,6 +317,7 @@ const PatientForm = ({ open, onClose }: Props) => {
                     onChange={(e: SelectChangeEvent<string>) =>
                       setGender(e.target.value)
                     }
+                    value={gender}
                   >
                     {genders?.map((g: any) => {
                       return (
@@ -334,7 +387,8 @@ const PatientForm = ({ open, onClose }: Props) => {
                     type="submit"
                     disabled={isSubmitting}
                   >
-                    Registrar nuevo paciente
+                    {!patient && 'Registrar nuevo paciente'}
+                    {patient && 'Actualizar paciente'}
                   </Button>
                 </FormControl>
               </Grid>
