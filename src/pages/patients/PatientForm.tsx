@@ -1,5 +1,6 @@
-import { Close } from '@mui/icons-material';
+import { AddCircleOutline, Close, PlusOne } from '@mui/icons-material';
 import {
+  Box,
   Button,
   Container,
   Dialog,
@@ -23,6 +24,8 @@ import React, { useEffect, useState } from 'react';
 import { generalConfig } from '../../config';
 import toast, { Toaster } from 'react-hot-toast';
 import { Person } from '../../interfaces/Person';
+import colors from '../../styles/colors';
+import { useThemeContext } from '../../componemts/themeContext';
 
 interface Props {
   open: boolean;
@@ -40,6 +43,8 @@ const Transition = React.forwardRef(function Transition(
 });
 
 const PatientForm = ({ open, onClose, patient }: Props) => {
+  const { mode } = useThemeContext();
+
   //states
 
   const [firstName, setFirstName] = useState('');
@@ -54,6 +59,54 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
   const [institution, setInstitution] = useState('');
   const [verificationDigit, setVerificationDigit] = useState('');
   const [isSubmitting, setSubmitting] = useState(false);
+
+  const [contacts, setContacts] = useState([
+    {
+      id: (Math.random() * 1000).toString(),
+      descripcion: '',
+      contacto_id: '',
+      fechaReg: '',
+      persona_id: '',
+    },
+  ]);
+  const [addresses, setAddresses] = useState([
+    {
+      id: (Math.random() * 1000).toString(),
+      tipoDireccion_id: '',
+      cuidad_id: '',
+      persona_id: '',
+      nombre: '',
+    },
+  ]);
+
+  //dynamic inputs functions
+
+  const handleAddContact = () => {
+    setContacts([
+      ...contacts,
+      {
+        id: (Math.random() * 1000).toString(),
+        descripcion: '',
+        contacto_id: '',
+        fechaReg: '',
+        persona_id: '',
+      },
+    ]);
+  };
+
+  const handleAddAddress = () => {
+    setAddresses([
+      ...addresses,
+      {
+        id: (Math.random() * 1000).toString(),
+        tipoDireccion_id: '',
+        cuidad_id: '',
+        persona_id: '',
+        nombre: '',
+      },
+    ]);
+  };
+  //dynamic inputs functions
 
   //select queries
   const { data: nationalities } = useQuery({
@@ -93,6 +146,35 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
       return response.data.body.filter((i: any) => {
         return i.prevision_id === selectedPrevision;
       });
+    },
+  });
+
+  const { data: cities } = useQuery({
+    queryKey: ['cities'],
+    queryFn: async () => {
+      const response = await axios.get(`${generalConfig.baseUrl}/cities`);
+
+      return response.data.body;
+    },
+  });
+
+  const { data: contactTypes } = useQuery({
+    queryKey: ['contactTypes'],
+    queryFn: async () => {
+      const response = await axios.get(`${generalConfig.baseUrl}/contacts`);
+
+      return response.data.body;
+    },
+  });
+
+  const { data: addressTypes } = useQuery({
+    queryKey: ['addressType'],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${generalConfig.baseUrl}/address-types`
+      );
+
+      return response.data.body;
     },
   });
 
@@ -378,6 +460,199 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                   </Select>
                 </FormControl>
               </Grid>
+              <Grid item xs={12}>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  style={{ marginBottom: 10 }}
+                >
+                  <Typography style={{ fontWeight: 'bold' }}>
+                    Contactos
+                  </Typography>
+                  <IconButton onClick={handleAddContact}>
+                    <AddCircleOutline />
+                  </IconButton>
+                </Box>
+                {contacts.length === 0 && (
+                  <Box>
+                    <Typography>
+                      Haz click en el icono para agregar contactos
+                    </Typography>
+                  </Box>
+                )}
+                {contacts.map((c: any) => {
+                  return (
+                    <Grid
+                      container
+                      key={c.id}
+                      spacing={2}
+                      style={{ marginBottom: 5 }}
+                      alignItems="center"
+                    >
+                      <Grid item xs={5}>
+                        <FormControl fullWidth>
+                          <InputLabel id="contacts-select-label">
+                            Tipo de contacto
+                          </InputLabel>
+                          <Select
+                            label="contacts"
+                            id="contacts-select"
+                            labelId="contacts-select-label"
+                            onChange={(e: SelectChangeEvent<string>) =>
+                              console.log('funcion')
+                            }
+                            // value={institution}
+                          >
+                            {/* {selectedPrevision === '' && (
+                              <MenuItem>Seleccione Tipo de contacto</MenuItem>
+                            )} */}
+                            {contactTypes?.map((c: any) => {
+                              return (
+                                <MenuItem key={c.id} value={c.id}>
+                                  {c.nombre}
+                                </MenuItem>
+                              );
+                            })}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <FormControl fullWidth>
+                          <TextField label="Contacto" />
+                        </FormControl>
+                      </Grid>
+                      <Grid item xs={1}>
+                        <IconButton
+                          onClick={() => {
+                            const updatedContacts = contacts.filter(
+                              (contact) => {
+                                return c.id !== contact.id;
+                              }
+                            );
+                            setContacts(updatedContacts);
+                          }}
+                        >
+                          <Close />
+                        </IconButton>
+                      </Grid>
+                    </Grid>
+                  );
+                })}
+              </Grid>
+              <Grid item xs={12}>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  style={{ marginBottom: 10 }}
+                >
+                  <Typography style={{ fontWeight: 'bold' }}>
+                    Libreta de dirección
+                  </Typography>
+                  <IconButton onClick={handleAddAddress}>
+                    <AddCircleOutline />
+                  </IconButton>
+                </Box>
+                {addresses.length === 0 && (
+                  <Box>
+                    <Typography>
+                      Haz click en el icono para agregar direcciones
+                    </Typography>
+                  </Box>
+                )}
+                {addresses.map((a: any) => {
+                  return (
+                    <Grid
+                      container
+                      key={a.id}
+                      spacing={2}
+                      className="rounded-md pb-2 pr-4 mb-10"
+                      style={{
+                        border: '1px solid',
+                        borderColor:
+                          mode === 'light'
+                            ? colors.lightModeBorder
+                            : colors.darkModeBorder,
+                      }}
+                      alignItems="center"
+                    >
+                      <Grid item xs={12}>
+                        <IconButton
+                          onClick={() => {
+                            const updatedAddresses = addresses.filter(
+                              (address) => {
+                                return a.id !== address.id;
+                              }
+                            );
+                            setAddresses(updatedAddresses);
+                          }}
+                        >
+                          <Close />
+                        </IconButton>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <FormControl fullWidth>
+                          <InputLabel id="contacts-select-label">
+                            Tipo de dirección
+                          </InputLabel>
+                          <Select
+                            label="contacts"
+                            id="contacts-select"
+                            labelId="contacts-select-label"
+                            onChange={(e: SelectChangeEvent<string>) =>
+                              console.log('funcion')
+                            }
+                            // value={institution}
+                          >
+                            {/* {selectedPrevision === '' && (
+                              <MenuItem>Seleccione Tipo de contacto</MenuItem>
+                            )} */}
+                            {addressTypes?.map((at: any) => {
+                              return (
+                                <MenuItem key={at.id} value={at.id}>
+                                  {at.nombre}
+                                </MenuItem>
+                              );
+                            })}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <FormControl fullWidth>
+                          <InputLabel id="contacts-select-label">
+                            Cuidad
+                          </InputLabel>
+                          <Select
+                            label="city"
+                            id="city-select"
+                            labelId="city-select-label"
+                            onChange={(e: SelectChangeEvent<string>) =>
+                              console.log('funcion')
+                            }
+                            // value={institution}
+                          >
+                            {/* {selectedPrevision === '' && (
+                              <MenuItem>Seleccione Tipo de contacto</MenuItem>
+                            )} */}
+                            {cities?.map((c: any) => {
+                              return (
+                                <MenuItem key={c.id} value={c.id}>
+                                  {c.nombre}
+                                </MenuItem>
+                              );
+                            })}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <FormControl fullWidth>
+                          <TextField label="Dirección" />
+                        </FormControl>
+                      </Grid>
+                    </Grid>
+                  );
+                })}
+              </Grid>
+              <Grid item xs={12}></Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth>
                   <Button
