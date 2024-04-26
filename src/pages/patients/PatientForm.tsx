@@ -20,7 +20,7 @@ import {
 import { TransitionProps } from '@mui/material/transitions';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { generalConfig } from '../../config';
 import toast, { Toaster } from 'react-hot-toast';
 import { Person } from '../../interfaces/Person';
@@ -73,14 +73,13 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
     {
       id: (Math.random() * 1000).toString(),
       tipoDireccion_id: '',
-      cuidad_id: '',
+      ciudad_id: '',
       persona_id: '',
       nombre: '',
     },
   ]);
 
   //dynamic inputs functions
-
   const handleAddContact = () => {
     setContacts([
       ...contacts,
@@ -100,11 +99,31 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
       {
         id: (Math.random() * 1000).toString(),
         tipoDireccion_id: '',
-        cuidad_id: '',
+        ciudad_id: '',
         persona_id: '',
         nombre: '',
       },
     ]);
+  };
+
+  const handleAddressChange = (
+    e: ChangeEvent<HTMLInputElement> | SelectChangeEvent<string>,
+    rowIndex: number,
+    field: 'tipoDireccion_id' | 'ciudad_id' | 'nombre'
+  ) => {
+    const updatedAddresses = [...addresses];
+    updatedAddresses[rowIndex][field] = (e.target as HTMLInputElement).value;
+    setAddresses(updatedAddresses);
+  };
+
+  const handleContactChange = (
+    e: ChangeEvent<HTMLInputElement> | SelectChangeEvent<string>,
+    rowIndex: number,
+    field: 'descripcion' | 'contacto_id'
+  ) => {
+    const updatedContacts = [...contacts];
+    updatedContacts[rowIndex][field] = (e.target as HTMLInputElement).value;
+    setContacts(updatedContacts);
   };
   //dynamic inputs functions
 
@@ -480,7 +499,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                     </Typography>
                   </Box>
                 )}
-                {contacts.map((c: any) => {
+                {contacts.map((c: any, index: number) => {
                   return (
                     <Grid
                       container
@@ -499,13 +518,10 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                             id="contacts-select"
                             labelId="contacts-select-label"
                             onChange={(e: SelectChangeEvent<string>) =>
-                              console.log('funcion')
+                              handleContactChange(e, index, 'contacto_id')
                             }
-                            // value={institution}
+                            value={c.contacto_id}
                           >
-                            {/* {selectedPrevision === '' && (
-                              <MenuItem>Seleccione Tipo de contacto</MenuItem>
-                            )} */}
                             {contactTypes?.map((c: any) => {
                               return (
                                 <MenuItem key={c.id} value={c.id}>
@@ -518,7 +534,13 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                       </Grid>
                       <Grid item xs={6}>
                         <FormControl fullWidth>
-                          <TextField label="Contacto" />
+                          <TextField
+                            label="Contacto"
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                              handleContactChange(e, index, 'descripcion');
+                              console.log(contacts);
+                            }}
+                          />
                         </FormControl>
                       </Grid>
                       <Grid item xs={1}>
@@ -559,7 +581,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                     </Typography>
                   </Box>
                 )}
-                {addresses.map((a: any) => {
+                {addresses.map((a: any, index) => {
                   return (
                     <Grid
                       container
@@ -591,21 +613,18 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                       </Grid>
                       <Grid item xs={6}>
                         <FormControl fullWidth>
-                          <InputLabel id="contacts-select-label">
+                          <InputLabel id="addresstype-select-label">
                             Tipo de dirección
                           </InputLabel>
                           <Select
-                            label="contacts"
-                            id="contacts-select"
-                            labelId="contacts-select-label"
-                            onChange={(e: SelectChangeEvent<string>) =>
-                              console.log('funcion')
-                            }
-                            // value={institution}
+                            label="addresstype"
+                            id="addresstype-select"
+                            labelId="addresstype-select-label"
+                            onChange={(e: SelectChangeEvent<string>) => {
+                              handleAddressChange(e, index, 'tipoDireccion_id');
+                            }}
+                            value={a.tipoDireccion_id}
                           >
-                            {/* {selectedPrevision === '' && (
-                              <MenuItem>Seleccione Tipo de contacto</MenuItem>
-                            )} */}
                             {addressTypes?.map((at: any) => {
                               return (
                                 <MenuItem key={at.id} value={at.id}>
@@ -625,9 +644,9 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                             label="city"
                             id="city-select"
                             labelId="city-select-label"
-                            onChange={(e: SelectChangeEvent<string>) =>
-                              console.log('funcion')
-                            }
+                            onChange={(e: SelectChangeEvent<string>) => {
+                              handleAddressChange(e, index, 'ciudad_id');
+                            }}
                             // value={institution}
                           >
                             {/* {selectedPrevision === '' && (
@@ -645,7 +664,12 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                       </Grid>
                       <Grid item xs={12}>
                         <FormControl fullWidth>
-                          <TextField label="Dirección" />
+                          <TextField
+                            label="Dirección"
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                              handleAddressChange(e, index, 'nombre');
+                            }}
+                          />
                         </FormControl>
                       </Grid>
                     </Grid>
