@@ -65,7 +65,6 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
       id: (Math.random() * 1000).toString(),
       descripcion: '',
       contacto_id: '',
-      fechaReg: '',
       persona_id: '',
     },
   ]);
@@ -87,7 +86,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
         id: (Math.random() * 1000).toString(),
         descripcion: '',
         contacto_id: '',
-        fechaReg: '',
+        // fechaReg: Date.now(),
         persona_id: '',
       },
     ]);
@@ -233,6 +232,23 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
         setInstitution('');
         setVerificationDigit('');
         setSubmitting(false);
+        setAddresses([
+          {
+            id: (Math.random() * 1000).toString(),
+            tipoDireccion_id: '',
+            ciudad_id: '',
+            persona_id: '',
+            nombre: '',
+          },
+        ]);
+        setContacts([
+          {
+            id: (Math.random() * 1000).toString(),
+            descripcion: '',
+            contacto_id: '',
+            persona_id: '',
+          },
+        ]);
       } else {
         setSubmitting(false);
         toast.error('No se ha actualizado paciente, inténtelo nuevamente.');
@@ -244,6 +260,17 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
       );
 
       if (response.data.message === 'success') {
+        contacts.forEach(async (c) => {
+          c.persona_id = response.data.body.id;
+
+          await axios.post(`${generalConfig.baseUrl}/contact-book`, c);
+        });
+
+        addresses.forEach(async (a) => {
+          a.persona_id = response.data.body.id;
+
+          await axios.post(`${generalConfig.baseUrl}/address-book`, a);
+        });
         toast.success('Se ha registrado un paciente.');
         setFirstName('');
         setSecondName('');
@@ -257,6 +284,23 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
         setInstitution('');
         setVerificationDigit('');
         setSubmitting(false);
+        setAddresses([
+          {
+            id: (Math.random() * 1000).toString(),
+            tipoDireccion_id: '',
+            ciudad_id: '',
+            persona_id: '',
+            nombre: '',
+          },
+        ]);
+        setContacts([
+          {
+            id: (Math.random() * 1000).toString(),
+            descripcion: '',
+            contacto_id: '',
+            persona_id: '',
+          },
+        ]);
       } else {
         setSubmitting(false);
         toast.error('No se ha registrado paciente, inténtelo nuevamente.');
@@ -540,6 +584,8 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                               handleContactChange(e, index, 'descripcion');
                               console.log(contacts);
                             }}
+                            value={c.descripcion}
+                            required
                           />
                         </FormControl>
                       </Grid>
@@ -624,6 +670,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                               handleAddressChange(e, index, 'tipoDireccion_id');
                             }}
                             value={a.tipoDireccion_id}
+                            required
                           >
                             {addressTypes?.map((at: any) => {
                               return (
@@ -647,7 +694,8 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                             onChange={(e: SelectChangeEvent<string>) => {
                               handleAddressChange(e, index, 'ciudad_id');
                             }}
-                            // value={institution}
+                            value={a.ciudad_id}
+                            required
                           >
                             {/* {selectedPrevision === '' && (
                               <MenuItem>Seleccione Tipo de contacto</MenuItem>
@@ -669,6 +717,8 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                             onChange={(e: ChangeEvent<HTMLInputElement>) => {
                               handleAddressChange(e, index, 'nombre');
                             }}
+                            value={a.nombre}
+                            required
                           />
                         </FormControl>
                       </Grid>
