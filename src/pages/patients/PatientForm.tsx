@@ -26,6 +26,10 @@ import toast, { Toaster } from 'react-hot-toast';
 import { Person } from '../../interfaces/Person';
 import colors from '../../styles/colors';
 import { useThemeContext } from '../../componemts/themeContext';
+import { Address } from '../../interfaces/Address';
+import { Contact } from '../../interfaces/Contact';
+
+import { format, compareAsc } from 'date-fns';
 
 interface Props {
   open: boolean;
@@ -45,7 +49,11 @@ const Transition = React.forwardRef(function Transition(
 const PatientForm = ({ open, onClose, patient }: Props) => {
   const { mode } = useThemeContext();
 
-  //states
+  // estados para enviar a la api
+  // ***********
+  // ***********
+  // ***********
+  // ***********
 
   const [firstName, setFirstName] = useState('');
   const [secondName, setSecondName] = useState('');
@@ -77,8 +85,17 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
       nombre: '',
     },
   ]);
+  // ***********
+  // ***********
+  // ***********
+  // ***********
+  // estados para enviar a la api
 
-  //dynamic inputs functions
+  //funciones que manejan los cambios de los inputs dinamicos de direcciones y contactos
+  // ***********
+  // ***********
+  // ***********
+  // ***********
   const handleAddContact = () => {
     setContacts([
       ...contacts,
@@ -124,9 +141,17 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
     updatedContacts[rowIndex][field] = (e.target as HTMLInputElement).value;
     setContacts(updatedContacts);
   };
-  //dynamic inputs functions
+  // ***********
+  // ***********
+  // ***********
+  // ***********
+  //funciones que manejan los cambios de los inputs dinamicos de direcciones y contactos
 
-  //select queries
+  //queries que hacen llamado a la api para traer la data de las listas de los select inputs
+  // ***********
+  // ***********
+  // ***********
+  // ***********
   const { data: nationalities } = useQuery({
     queryKey: ['nationalities'],
     queryFn: async () => {
@@ -196,6 +221,17 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
     },
   });
 
+  // ***********
+  // ***********
+  // ***********
+  // ***********
+  //queries que hacen llamado a la api para traer la data de las listas de los select inputs
+
+  //funcion que se ejecuta al hacer submit al formulario
+  // ***********
+  // ***********
+  // ***********
+  // ***********
   const handleSubmit = async (e: React.FormEvent) => {
     setSubmitting(true);
     e.preventDefault();
@@ -212,6 +248,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
       dv: verificationDigit,
     };
 
+    //en caso de que se este editando el paciente, se ejecuta esta parte del codigo
     if (patient) {
       const response = await axios.patch(
         `${generalConfig.baseUrl}/persons/${patient.id}`,
@@ -219,41 +256,28 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
       );
 
       if (response.data.message === 'success') {
+        contacts.forEach(async (c) => {
+          c.persona_id = response.data.body.id;
+
+          await axios.patch(`${generalConfig.baseUrl}/contact-book/${c.id}`, c);
+        });
+
+        addresses.forEach(async (a) => {
+          a.persona_id = response.data.body.id;
+
+          await axios.patch(`${generalConfig.baseUrl}/address-book/${a.id}`, a);
+        });
         toast.success('Se ha actualizado paciente.');
-        setFirstName('');
-        setSecondName('');
-        setFirstSurname('');
-        setSecondSurname('');
-        setRut('');
-        setNationality('');
-        setGender('');
-        setBirthday('');
-        setPrevision('');
-        setInstitution('');
-        setVerificationDigit('');
         setSubmitting(false);
-        setAddresses([
-          {
-            id: (Math.random() * 1000).toString(),
-            tipoDireccion_id: '',
-            ciudad_id: '',
-            persona_id: '',
-            nombre: '',
-          },
-        ]);
-        setContacts([
-          {
-            id: (Math.random() * 1000).toString(),
-            descripcion: '',
-            contacto_id: '',
-            persona_id: '',
-          },
-        ]);
+        //
       } else {
         setSubmitting(false);
         toast.error('No se ha actualizado paciente, inténtelo nuevamente.');
       }
-    } else {
+      //en caso de que se este editando el paciente, se ejecuta esta parte del codigo
+    }
+    //si el formulario esta enviando un nuevo paciente, se ejecuta esta parte del codigo que envia un llamado post en vez de un patch
+    else {
       const response = await axios.post(
         `${generalConfig.baseUrl}/persons`,
         data
@@ -301,15 +325,57 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
             persona_id: '',
           },
         ]);
-      } else {
+      }
+
+      //en caso de error, se ejecuta esta parte del codigo
+      else {
         setSubmitting(false);
         toast.error('No se ha registrado paciente, inténtelo nuevamente.');
       }
     }
   };
 
+  // ***********
+  // ***********
+  // ***********
+  // ***********
+  //funcion que se ejecuta al hacer submit al formulario
+
+  //efecto del componente en caso de que se este entrando al componente para editar algun usuario ya existente
+  // ***********
+  // ***********
+  // ***********
+  // ***********
+
+  //funciones que trate la libreta de contacto y de direccion del paciente a editar
+
+  const getPatientAddresses = async (patientId: string) => {
+    const response = await axios.get(`${generalConfig.baseUrl}/address-book`);
+
+    const addresses = response.data.body.filter((a: Address) => {
+      return a.persona_id === patientId;
+    });
+
+    setAddresses([...addresses]);
+  };
+
+  const getPatientContacts = async (patientId: string) => {
+    const response = await axios.get(`${generalConfig.baseUrl}/contact-book`);
+
+    const contacts = response.data.body.filter((c: Contact) => {
+      return c.persona_id === patientId;
+    });
+
+    setContacts([...contacts]);
+  };
+
+  //funciones que trate la libreta de contacto y de direccion del paciente a editar
+
   useEffect(() => {
     if (patient) {
+      getPatientAddresses(patient.id);
+      getPatientContacts(patient.id);
+
       setFirstName(patient.nombre1);
       setSecondName(patient.nombre2);
       setFirstSurname(patient.apellPat);
@@ -317,12 +383,21 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
       setRut(patient.rut);
       setNationality(patient.nacionalidad_id);
       setGender(patient.sexo_id);
-      setBirthday(patient.fechaNac.toLocaleString());
+      setBirthday(format(new Date(patient.fechaNac), 'yyyy-MM-dd'));
       setPrevision(patient.institucion.prevision_id);
       setInstitution(patient.institucion_id);
       setVerificationDigit(patient.dv);
     }
   }, [patient]);
+
+  // ***********
+  // ***********
+  // ***********
+  // ***********
+  //efecto del componente en caso de que se este entrando al componente para editar algun usuario ya existente
+
+  console.log(contacts);
+  console.log(addresses);
 
   return (
     <>
