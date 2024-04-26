@@ -1,4 +1,4 @@
-import { light } from "@mui/material/styles/createPalette";
+
 
 export default {
     lightModeTableText : '#48585d',
