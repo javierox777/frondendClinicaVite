@@ -132,7 +132,7 @@ const PatientsTable = () => {
                         color="success"
                         variant="outlined"
                         onClick={() =>
-                          navigation('/detallespaciente', {
+                          navigation('/editarpaciente', {
                             state: { patient: p },
                           })
                         }
