@@ -31,6 +31,14 @@ import PatientsPage from '../../pages/patients/PatientsPage';
  import InstitutionForm from '../../pages/institucion/InstitutionForm';
 import PatientDetailsPage from '../../pages/patients/PatientDetailsPage';
 import Sexo from '../../pages/sexo/SexoForm';
+import AtencionTipo from '../../pages/atencionTipo/AtencionTipo';
+import Ciudad from '../../pages/ciudad/AtencionTipo';
+import Contacto from '../../pages/contacto/Contacto';
+import Estado from '../../pages/estado/Estado';
+import Mensaje from '../../pages/mensaje/Mensaje';
+import PresupuestoTipo from '../../pages/presupuestoTipo/PresupuestoTipo';
+import Solicitario from '../../pages/solicitarioTipo/SolicitarioTipo';
+import TipoDireccion from '../../pages/tipoDireccion/TipoDireccion';
 
 const drawerWidth = 240;
 
@@ -131,7 +139,9 @@ const DashboardLayout: React.FC = () => {
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            {['Inicio', 'Pacientes', 'Ingreso', 'Sexo'].map((text, index) => (
+            {['Inicio', 'Pacientes', 'Ingreso', 'Sexo', 
+            'Atencion', 'Ciudad', 'Contacto', 'Estado', 
+            'Mensaje', 'Presupuesto', 'Sexo', 'Solicitario', 'Direccion'].map((text, index) => (
               <ListItem
                 button
                 key={text}
@@ -170,6 +180,15 @@ const DashboardLayout: React.FC = () => {
           <Route path="/pacientes" element={<PatientsPage />} />
           <Route path="/ingreso" element={<InstitutionForm />} />
           <Route path="/sexo" element={<Sexo />} />
+          <Route path="/atencion" element={<AtencionTipo />} />
+          <Route path="/ciudad" element={<Ciudad />} />
+          <Route path="/contacto" element={<Contacto />} />
+          <Route path="/estado" element={<Estado/>} />
+          <Route path="/mensaje" element={<Mensaje/>} />
+          <Route path="/presupuesto" element={<PresupuestoTipo/>} />
+          <Route path="/sexo" element={<Sexo/>} />
+          <Route path="/solicitario" element={<Solicitario/>} />
+          <Route path="/direccion" element={<TipoDireccion/>} />
           <Route path="/detallespaciente" element={<PatientDetailsPage />} />
         </Routes>
       </Box>
