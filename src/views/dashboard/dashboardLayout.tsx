@@ -139,31 +139,54 @@ const DashboardLayout: React.FC = () => {
       >
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
-          <List>
-            {['Inicio', 'Pacientes', 'Ingreso', 'Sexo', 
-            'Atencion', 'Ciudad', 'Contacto', 'Estado', 
-            'Mensaje', 'Presupuesto', 'Sexo', 'Solicitario', 'Direccion'].map((text, index) => (
-              <ListItem
-                button
-                key={text}
-                component={Link}
-                to={`/${text.toLowerCase()}`}
-              >
-                <ListItemIcon>
-                  {index === 0 ? (
-                    <HomeIcon />
-                  ) : index === 1 ? (
-                    <AssignmentInd />
-                  ) : index === 2 ? (
-                    <PeopleIcon />
-                  ) : (
-                    <SettingsIcon />
-                  )}
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItem>
-            ))}
-          </List>
+        <List>
+  {['Inicio', 'Pacientes', 'Ingreso'].map((text, index) => (
+    <ListItem
+      button
+      key={text}
+      component={Link}
+      to={`/${text.toLowerCase()}`}
+    >
+      <ListItemIcon>
+        {index === 0 ? (
+          <HomeIcon />
+        ) : index === 1 ? (
+          <AssignmentInd />
+        ) : (
+          <PeopleIcon />
+        )}
+      </ListItemIcon>
+      <ListItemText primary={text} />
+    </ListItem>
+  ))}
+  <List>
+    {[
+      'Sexo', 
+      'Atencion', 
+      'Ciudad', 
+      'Contacto', 
+      'Estado', 
+      'Mensaje', 
+      'Presupuesto', 
+      'Sexo', 
+      'Solicitario', 
+      'Direccion'
+    ].map((text, index) => (
+      <ListItem
+        button
+        key={text}
+        component={Link}
+        to={`/${text.toLowerCase()}`}
+        sx={{ pl: 4 }} // Añadimos un margen izquierdo para indentar las opciones del submenú
+      >
+        <ListItemIcon>
+          <SettingsIcon />
+        </ListItemIcon>
+        <ListItemText primary={text} />
+      </ListItem>
+    ))}
+  </List>
+</List>
           <Divider />
         </Box>
       </Drawer>
