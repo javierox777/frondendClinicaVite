@@ -1,5 +1,7 @@
 import {
   Button,
+  Input,
+  InputAdornment,
   Paper,
   Table,
   TableBody,
@@ -8,6 +10,7 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  TextField,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
@@ -18,10 +21,12 @@ import { useThemeContext } from '../../componemts/themeContext';
 import colors from '../../styles/colors';
 import TableSkeleton from '../../componemts/TableSkeleton';
 import { useNavigate } from 'react-router-dom';
+import { AccountCircle, Search } from '@mui/icons-material';
 
 const PatientsTable = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [searchText, setSearchText] = useState('');
 
   const { mode } = useThemeContext();
 
@@ -74,10 +79,34 @@ const PatientsTable = () => {
     },
   ];
 
+  const filteredPatients = patients?.filter((p: Person) => {
+    const rut = p.rut.toLowerCase();
+    const institution = p.institucion.nombre.toLowerCase();
+    const name = `${p.nombre1} ${p.apellPat}`.toLowerCase();
+    return (
+      rut.includes(searchText.toLowerCase()) ||
+      institution.includes(searchText.toLowerCase()) ||
+      name.includes(searchText.toLowerCase())
+    );
+  });
+
   if (isLoading) return <TableSkeleton />;
 
   return (
     <>
+      <TextField
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+        style={{ marginBlock: '16px', width: '30%' }}
+        placeholder="Buscar..."
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <Search />
+            </InputAdornment>
+          ),
+        }}
+      />
       <TableContainer component={Paper}>
         <Table>
           <TableHead
@@ -106,7 +135,7 @@ const PatientsTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {patients
+            {filteredPatients
               ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((p: Person, index: number) => {
                 return (
