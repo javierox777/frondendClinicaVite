@@ -7,6 +7,7 @@ import {
 import {
   Box,
   Button,
+  Card,
   Container,
   Dialog,
   FormControl,
@@ -680,65 +681,92 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                 )}
                 {contacts.map((c: any, index: number) => {
                   return (
-                    <Grid
-                      container
+                    <Card
                       key={c.id}
-                      spacing={2}
-                      style={{ marginBottom: 5 }}
-                      alignItems="center"
+                      style={{ marginBottom: 10, padding: 5 }}
+                      elevation={3}
                     >
-                      <Grid item xs={5}>
-                        <FormControl fullWidth>
-                          <InputLabel id="contacts-select-label">
-                            Tipo de contacto
-                          </InputLabel>
-                          <Select
-                            label="contacts"
-                            id="contacts-select"
-                            labelId="contacts-select-label"
-                            onChange={(e: SelectChangeEvent<string>) =>
-                              handleContactChange(e, index, 'contacto_id')
-                            }
-                            value={c.contacto_id}
-                          >
-                            {contactTypes?.map((c: any) => {
-                              return (
-                                <MenuItem key={c.id} value={c.id}>
-                                  {c.nombre}
-                                </MenuItem>
-                              );
-                            })}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <FormControl fullWidth>
-                          <TextField
-                            label="Contacto"
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                              handleContactChange(e, index, 'descripcion');
-                              console.log(contacts);
-                            }}
-                            value={c.descripcion}
-                            required
-                          />
-                        </FormControl>
-                      </Grid>
-                      <Grid item xs={1}>
-                        <IconButton
-                          onClick={() => {
-                            const updatedContacts = contacts.filter(
-                              (contact) => {
-                                return c.id !== contact.id;
-                              }
-                            );
-                            setContacts(updatedContacts);
-                          }}
+                      <Grid
+                        container
+                        spacing={2}
+                        style={{ marginBottom: 5 }}
+                        alignItems="center"
+                      >
+                        <Grid
+                          item
+                          xs={12}
+                          display="flex"
+                          justifyContent="space-between"
                         >
-                          <Close />
-                        </IconButton>
+                          <IconButton
+                            onClick={() => {
+                              const updatedContacts = contacts.filter(
+                                (contact) => {
+                                  return c.id !== contact.id;
+                                }
+                              );
+                              setContacts(updatedContacts);
+                            }}
+                          >
+                            <Close />
+                          </IconButton>
+                          <Box display="flex" alignItems="center">
+                            <InputLabel id="valid-switch">Válido</InputLabel>
+                            <Switch
+                              id="valid-switch"
+                              color={c.vigente === '1' ? 'success' : 'warning'}
+                              checked={c.vigente === '1'}
+                              onChange={() => {
+                                const updatedContacts = [...contacts];
+                                if (c.vigente === '1') {
+                                  updatedContacts[index].vigente = '2';
+                                } else if (c.vigente === '2') {
+                                  updatedContacts[index].vigente = '1';
+                                }
+                                setContacts(updatedContacts);
+                              }}
+                            />
+                          </Box>
+                        </Grid>
+                        <Grid item xs={5}>
+                          <FormControl fullWidth>
+                            <InputLabel id="contacts-select-label">
+                              Tipo de contacto
+                            </InputLabel>
+                            <Select
+                              label="contacts"
+                              id="contacts-select"
+                              labelId="contacts-select-label"
+                              onChange={(e: SelectChangeEvent<string>) =>
+                                handleContactChange(e, index, 'contacto_id')
+                              }
+                              value={c.contacto_id}
+                            >
+                              {contactTypes?.map((c: any) => {
+                                return (
+                                  <MenuItem key={c.id} value={c.id}>
+                                    {c.nombre}
+                                  </MenuItem>
+                                );
+                              })}
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <FormControl fullWidth>
+                            <TextField
+                              label="Contacto"
+                              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                handleContactChange(e, index, 'descripcion');
+                                console.log(contacts);
+                              }}
+                              value={c.descripcion}
+                              required
+                            />
+                          </FormControl>
+                        </Grid>
                       </Grid>
-                    </Grid>
+                    </Card>
                   );
                 })}
               </Grid>
@@ -764,117 +792,119 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                 )}
                 {addresses.map((a: any, index) => {
                   return (
-                    <Grid
-                      container
-                      key={a.id}
-                      spacing={2}
-                      className="rounded-md pb-2 pr-4 mb-10"
-                      style={{
-                        border: '1px solid',
-                        borderColor:
-                          mode === 'light'
-                            ? colors.lightModeBorder
-                            : colors.darkModeBorder,
-                      }}
-                      alignItems="center"
+                    <Card
+                      elevation={3}
+                      style={{ padding: 10, marginBottom: 10 }}
                     >
-                      <Grid item xs={12}>
-                        <IconButton
-                          onClick={() => {
-                            const updatedAddresses = addresses.filter(
-                              (address) => {
-                                return a.id !== address.id;
-                              }
-                            );
-                            setAddresses(updatedAddresses);
-                          }}
+                      <Grid container spacing={2} alignItems="center">
+                        <Grid
+                          item
+                          key={a.id}
+                          xs={12}
+                          display="flex"
+                          justifyContent="space-between"
                         >
-                          <Close />
-                        </IconButton>
-                        <Box display="flex" alignItems="center">
-                          <InputLabel id="valid-switch">Válido</InputLabel>
-                          <Switch
-                            id="valid-switch"
-                            color={a.vigente === '1' ? 'success' : 'warning'}
-                            checked={a.vigente === '1'}
-                            onChange={() => {
-                              const updatedAddreses = [...addresses];
-                              if (a.vigente === '1') {
-                                updatedAddreses[index].vigente = '2';
-                              } else if (a.vigente === '2') {
-                                updatedAddreses[index].vigente = '1';
-                              }
-                              setAddresses(updatedAddreses);
-                            }}
-                          />
-                        </Box>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <FormControl fullWidth>
-                          <InputLabel id="addresstype-select-label">
-                            Tipo de dirección
-                          </InputLabel>
-                          <Select
-                            label="addresstype"
-                            id="addresstype-select"
-                            labelId="addresstype-select-label"
-                            onChange={(e: SelectChangeEvent<string>) => {
-                              handleAddressChange(e, index, 'tipoDireccion_id');
-                            }}
-                            value={a.tipoDireccion_id}
-                            required
-                          >
-                            {addressTypes?.map((at: any) => {
-                              return (
-                                <MenuItem key={at.id} value={at.id}>
-                                  {at.nombre}
-                                </MenuItem>
+                          <IconButton
+                            onClick={() => {
+                              const updatedAddresses = addresses.filter(
+                                (address) => {
+                                  return a.id !== address.id;
+                                }
                               );
-                            })}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <FormControl fullWidth>
-                          <InputLabel id="contacts-select-label">
-                            Cuidad
-                          </InputLabel>
-                          <Select
-                            label="city"
-                            id="city-select"
-                            labelId="city-select-label"
-                            onChange={(e: SelectChangeEvent<string>) => {
-                              handleAddressChange(e, index, 'ciudad_id');
+                              setAddresses(updatedAddresses);
                             }}
-                            value={a.ciudad_id}
-                            required
                           >
-                            {/* {selectedPrevision === '' && (
+                            <Close />
+                          </IconButton>
+                          <Box display="flex" alignItems="center">
+                            <InputLabel id="valid-switch">Válido</InputLabel>
+                            <Switch
+                              id="valid-switch"
+                              color={a.vigente === '1' ? 'success' : 'warning'}
+                              checked={a.vigente === '1'}
+                              onChange={() => {
+                                const updatedAddreses = [...addresses];
+                                if (a.vigente === '1') {
+                                  updatedAddreses[index].vigente = '2';
+                                } else if (a.vigente === '2') {
+                                  updatedAddreses[index].vigente = '1';
+                                }
+                                setAddresses(updatedAddreses);
+                              }}
+                            />
+                          </Box>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <FormControl fullWidth>
+                            <InputLabel id="addresstype-select-label">
+                              Tipo de dirección
+                            </InputLabel>
+                            <Select
+                              label="addresstype"
+                              id="addresstype-select"
+                              labelId="addresstype-select-label"
+                              onChange={(e: SelectChangeEvent<string>) => {
+                                handleAddressChange(
+                                  e,
+                                  index,
+                                  'tipoDireccion_id'
+                                );
+                              }}
+                              value={a.tipoDireccion_id}
+                              required
+                            >
+                              {addressTypes?.map((at: any) => {
+                                return (
+                                  <MenuItem key={at.id} value={at.id}>
+                                    {at.nombre}
+                                  </MenuItem>
+                                );
+                              })}
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <FormControl fullWidth>
+                            <InputLabel id="contacts-select-label">
+                              Cuidad
+                            </InputLabel>
+                            <Select
+                              label="city"
+                              id="city-select"
+                              labelId="city-select-label"
+                              onChange={(e: SelectChangeEvent<string>) => {
+                                handleAddressChange(e, index, 'ciudad_id');
+                              }}
+                              value={a.ciudad_id}
+                              required
+                            >
+                              {/* {selectedPrevision === '' && (
                               <MenuItem>Seleccione Tipo de contacto</MenuItem>
                             )} */}
-                            {cities?.map((c: any) => {
-                              return (
-                                <MenuItem key={c.id} value={c.id}>
-                                  {c.nombre}
-                                </MenuItem>
-                              );
-                            })}
-                          </Select>
-                        </FormControl>
+                              {cities?.map((c: any) => {
+                                return (
+                                  <MenuItem key={c.id} value={c.id}>
+                                    {c.nombre}
+                                  </MenuItem>
+                                );
+                              })}
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <FormControl fullWidth>
+                            <TextField
+                              label="Dirección"
+                              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                handleAddressChange(e, index, 'nombre');
+                              }}
+                              value={a.nombre}
+                              required
+                            />
+                          </FormControl>
+                        </Grid>
                       </Grid>
-                      <Grid item xs={12}>
-                        <FormControl fullWidth>
-                          <TextField
-                            label="Dirección"
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                              handleAddressChange(e, index, 'nombre');
-                            }}
-                            value={a.nombre}
-                            required
-                          />
-                        </FormControl>
-                      </Grid>
-                    </Grid>
+                    </Card>
                   );
                 })}
               </Grid>
