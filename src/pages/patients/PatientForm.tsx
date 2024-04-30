@@ -795,11 +795,11 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                     <Card
                       elevation={3}
                       style={{ padding: 10, marginBottom: 10 }}
+                      key={a.id}
                     >
                       <Grid container spacing={2} alignItems="center">
                         <Grid
                           item
-                          key={a.id}
                           xs={12}
                           display="flex"
                           justifyContent="space-between"

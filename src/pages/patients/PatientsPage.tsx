@@ -2,6 +2,7 @@ import { Button, Card, Grid } from '@mui/material';
 import { useState } from 'react';
 import PatientForm from './PatientForm';
 import PatientsTable from './PatientsTable';
+import TotalPatients from './TotalPatients';
 
 const PatientsPage = () => {
   const [modalOpen, setModal] = useState(false);
@@ -18,13 +19,13 @@ const PatientsPage = () => {
             Registrar nuevo paciente
           </Button>
         </Grid>
+        <Grid item>
+          <TotalPatients />
+        </Grid>
         <Grid item xs={12}>
           <Card>
             <PatientsTable />
           </Card>
-        </Grid>
-        <Grid item>
-          <div>otra cosa</div>
         </Grid>
         <Grid item>
           <div>otra cosa</div>
