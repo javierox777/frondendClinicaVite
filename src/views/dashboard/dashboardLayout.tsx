@@ -140,20 +140,7 @@ const DashboardLayout: React.FC = () => {
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            {[
-              'Inicio',
-              'Pacientes',
-              'Ingreso',
-              'Atencion',
-              'Ciudad',
-              'Contacto',
-              'Estado',
-              'Mensaje',
-              'Presupuesto',
-              'Sexo',
-              'Solicitario',
-              'Direccion',
-            ].map((text, index) => (
+            {['Inicio', 'Pacientes', 'Ingreso'].map((text, index) => (
               <ListItem
                 button
                 key={text}
@@ -165,15 +152,40 @@ const DashboardLayout: React.FC = () => {
                     <HomeIcon />
                   ) : index === 1 ? (
                     <AssignmentInd />
-                  ) : index === 2 ? (
-                    <PeopleIcon />
                   ) : (
-                    <SettingsIcon />
+                    <PeopleIcon />
                   )}
                 </ListItemIcon>
                 <ListItemText primary={text} />
               </ListItem>
             ))}
+            <List>
+              {[
+                'Sexo',
+                'Atencion',
+                'Ciudad',
+                'Contacto',
+                'Estado',
+                'Mensaje',
+                'Presupuesto',
+                'Sexo',
+                'Solicitario',
+                'Direccion',
+              ].map((text, index) => (
+                <ListItem
+                  button
+                  key={text}
+                  component={Link}
+                  to={`/${text.toLowerCase()}`}
+                  sx={{ pl: 4 }} // Añadimos un margen izquierdo para indentar las opciones del submenú
+                >
+                  <ListItemIcon>
+                    <SettingsIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={text} />
+                </ListItem>
+              ))}
+            </List>
           </List>
           <Divider />
         </Box>
