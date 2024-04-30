@@ -168,7 +168,6 @@ const DashboardLayout: React.FC = () => {
                 'Estado',
                 'Mensaje',
                 'Presupuesto',
-                'Sexo',
                 'Solicitario',
                 'Direccion',
               ].map((text, index) => (
