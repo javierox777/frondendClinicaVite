@@ -1,4 +1,9 @@
-import { AddCircleOutline, Close, PlusOne } from '@mui/icons-material';
+import {
+  AddCircleOutline,
+  CheckCircle,
+  Close,
+  PlusOne,
+} from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -13,6 +18,7 @@ import {
   Select,
   SelectChangeEvent,
   Slide,
+  Switch,
   TextField,
   Toolbar,
   Typography,
@@ -74,6 +80,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
       descripcion: '',
       contacto_id: '',
       persona_id: '',
+      vigente: '1',
     },
   ]);
   const [addresses, setAddresses] = useState([
@@ -83,6 +90,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
       ciudad_id: '',
       persona_id: '',
       nombre: '',
+      vigente: '1',
     },
   ]);
   // ***********
@@ -105,6 +113,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
         contacto_id: '',
         // fechaReg: Date.now(),
         persona_id: '',
+        vigente: '1',
       },
     ]);
   };
@@ -118,6 +127,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
         ciudad_id: '',
         persona_id: '',
         nombre: '',
+        vigente: '1',
       },
     ]);
   };
@@ -366,6 +376,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
             ciudad_id: '',
             persona_id: '',
             nombre: '',
+            vigente: '1',
           },
         ]);
         setContacts([
@@ -374,6 +385,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
             descripcion: '',
             contacto_id: '',
             persona_id: '',
+            vigente: '1',
           },
         ]);
       }
@@ -779,6 +791,23 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                         >
                           <Close />
                         </IconButton>
+                        <Box display="flex" alignItems="center">
+                          <InputLabel id="valid-switch">Válido</InputLabel>
+                          <Switch
+                            id="valid-switch"
+                            color={a.vigente === '1' ? 'success' : 'warning'}
+                            checked={a.vigente === '1'}
+                            onChange={() => {
+                              const updatedAddreses = [...addresses];
+                              if (a.vigente === '1') {
+                                updatedAddreses[index].vigente = '2';
+                              } else if (a.vigente === '2') {
+                                updatedAddreses[index].vigente = '1';
+                              }
+                              setAddresses(updatedAddreses);
+                            }}
+                          />
+                        </Box>
                       </Grid>
                       <Grid item xs={6}>
                         <FormControl fullWidth>
