@@ -140,9 +140,20 @@ const DashboardLayout: React.FC = () => {
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            {['Inicio', 'Pacientes', 'Ingreso', 'Sexo', 
-            'Atencion', 'Ciudad', 'Contacto', 'Estado', 
-            'Mensaje', 'Presupuesto', 'Sexo', 'Solicitario', 'Direccion'].map((text, index) => (
+            {[
+              'Inicio',
+              'Pacientes',
+              'Ingreso',
+              'Atencion',
+              'Ciudad',
+              'Contacto',
+              'Estado',
+              'Mensaje',
+              'Presupuesto',
+              'Sexo',
+              'Solicitario',
+              'Direccion',
+            ].map((text, index) => (
               <ListItem
                 button
                 key={text}
@@ -184,12 +195,11 @@ const DashboardLayout: React.FC = () => {
           <Route path="/atencion" element={<AtencionTipo />} />
           <Route path="/ciudad" element={<Ciudad />} />
           <Route path="/contacto" element={<Contacto />} />
-          <Route path="/estado" element={<Estado/>} />
-          <Route path="/mensaje" element={<Mensaje/>} />
-          <Route path="/presupuesto" element={<PresupuestoTipo/>} />
-          <Route path="/sexo" element={<Sexo/>} />
-          <Route path="/solicitario" element={<Solicitario/>} />
-          <Route path="/direccion" element={<TipoDireccion/>} />
+          <Route path="/estado" element={<Estado />} />
+          <Route path="/mensaje" element={<Mensaje />} />
+          <Route path="/presupuesto" element={<PresupuestoTipo />} />
+          <Route path="/solicitario" element={<Solicitario />} />
+          <Route path="/direccion" element={<TipoDireccion />} />
           <Route path="/detallespaciente" element={<PatientDetailsPage />} />
           <Route path="/editarpaciente" element={<EditPatientPage />} />
         </Routes>

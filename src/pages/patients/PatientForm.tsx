@@ -256,20 +256,71 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
       );
 
       if (response.data.message === 'success') {
-        contacts.forEach(async (c) => {
-          c.persona_id = response.data.body.id;
+        //recuperar los contactos que ya existen del paciente
+        const existingContacts = (
+          await axios.get(`${generalConfig.baseUrl}/contact-book`)
+        ).data.body.filter((c: any) => c.persona_id === patient.id);
+
+        //filtrar de todos los contactos del formulario, los contactos que seran actualizados de los nuevos q se crearan
+        const contactsToUpdate = contacts.filter((c) => {
+          return existingContacts.some((ec: any) => {
+            return c.id === ec.id;
+          });
+        });
+
+        //actualizar contactos
+        contactsToUpdate.forEach(async (c) => {
+          c.persona_id = patient.id;
 
           await axios.patch(`${generalConfig.baseUrl}/contact-book/${c.id}`, c);
         });
 
-        addresses.forEach(async (a) => {
-          a.persona_id = response.data.body.id;
+        const existingAddresses = (
+          await axios.get(`${generalConfig.baseUrl}/address-book`)
+        ).data.body.filter((a: any) => a.persona_id === patient.id);
+
+        const addressesToUpdate = addresses.filter((a) => {
+          return existingAddresses.some((ea: any) => {
+            return a.id === ea.id;
+          });
+        });
+
+        addressesToUpdate.forEach(async (a: any) => {
+          a.persona_id = patient.id;
 
           await axios.patch(`${generalConfig.baseUrl}/address-book/${a.id}`, a);
         });
+
+        // //crear nuevas direcciones y contactos en caso de ser agregadas
+
+        const newContacts = contacts.filter(
+          (contact) =>
+            !existingContacts.some(
+              (existingContact: any) => existingContact.id === contact.id
+            )
+        );
+
+        newContacts.forEach(async (c) => {
+          c.persona_id = patient.id;
+
+          await axios.post(`${generalConfig.baseUrl}/contact-book`, c);
+        });
+
+        const newAddresses = addresses.filter(
+          (address) =>
+            !existingAddresses.some(
+              (existingAddress: any) => existingAddress.id === address.id
+            )
+        );
+
+        newAddresses.forEach(async (a) => {
+          a.persona_id = patient.id;
+
+          await axios.post(`${generalConfig.baseUrl}/address-book`, a);
+        });
+
         toast.success('Se ha actualizado paciente.');
         setSubmitting(false);
-        //
       } else {
         setSubmitting(false);
         toast.error('No se ha actualizado paciente, inténtelo nuevamente.');
@@ -395,9 +446,6 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
   // ***********
   // ***********
   //efecto del componente en caso de que se este entrando al componente para editar algun usuario ya existente
-
-  console.log(contacts);
-  console.log(addresses);
 
   return (
     <>
