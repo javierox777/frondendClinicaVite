@@ -27,12 +27,6 @@ const PatientsPage = () => {
             <PatientsTable />
           </Card>
         </Grid>
-        <Grid item>
-          <div>otra cosa</div>
-        </Grid>
-        <Grid item>
-          <div>otra cosa</div>
-        </Grid>
       </Grid>
       <PatientForm
         open={modalOpen}

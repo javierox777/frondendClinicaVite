@@ -1,12 +1,10 @@
+import { People } from '@mui/icons-material';
+import { Card, Container, Grid, Typography } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import React from 'react';
-import { generalConfig } from '../../config';
-import { Box, Card, Container, Grid, Typography } from '@mui/material';
-import { People } from '@mui/icons-material';
 import { useThemeContext } from '../../componemts/themeContext';
+import { generalConfig } from '../../config';
 import colors from '../../styles/colors';
-import { BackgroundMask } from '@tsparticles/engine';
 
 const TotalPatients = () => {
   const { mode } = useThemeContext();
