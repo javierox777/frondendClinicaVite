@@ -26,7 +26,7 @@ import { Routes, Route, Link } from 'react-router-dom';
 import Inicio from '../../pages/home'; // Ajusta la ruta según tu estructura de carpetas
 import { useThemeContext } from '../../componemts/themeContext'; // Asegúrate de que la ruta sea correcta
 import { ParticlesContainer } from './ParticlesFire';
-import { AssignmentInd } from '@mui/icons-material';
+import { AssignmentInd, ContactEmergency } from '@mui/icons-material';
 import PatientsPage from '../../pages/patients/PatientsPage';
 import InstitutionForm from '../../pages/institucion/InstitutionForm';
 import PatientDetailsPage from '../../pages/patients/PatientDetailsPage';
@@ -40,6 +40,7 @@ import Mensaje from '../../pages/mensaje/Mensaje';
 import PresupuestoTipo from '../../pages/presupuestoTipo/PresupuestoTipo';
 import Solicitario from '../../pages/solicitarioTipo/SolicitarioTipo';
 import TipoDireccion from '../../pages/tipoDireccion/TipoDireccion';
+import ProfessionalsPage from '../../pages/professionals/ProfessionalsPage';
 
 const drawerWidth = 240;
 
@@ -140,25 +141,29 @@ const DashboardLayout: React.FC = () => {
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            {['Inicio', 'Pacientes', 'Ingreso'].map((text, index) => (
-              <ListItem
-                button
-                key={text}
-                component={Link}
-                to={`/${text.toLowerCase()}`}
-              >
-                <ListItemIcon>
-                  {index === 0 ? (
-                    <HomeIcon />
-                  ) : index === 1 ? (
-                    <AssignmentInd />
-                  ) : (
-                    <PeopleIcon />
-                  )}
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItem>
-            ))}
+            {['Inicio', 'Pacientes', 'Profesionales', 'Ingreso'].map(
+              (text, index) => (
+                <ListItem
+                  button
+                  key={text}
+                  component={Link}
+                  to={`/${text.toLowerCase()}`}
+                >
+                  <ListItemIcon>
+                    {index === 0 ? (
+                      <HomeIcon />
+                    ) : index === 1 ? (
+                      <AssignmentInd />
+                    ) : index === 2 ? (
+                      <ContactEmergency />
+                    ) : (
+                      <PeopleIcon />
+                    )}
+                  </ListItemIcon>
+                  <ListItemText primary={text} />
+                </ListItem>
+              )
+            )}
             <List>
               {[
                 'Sexo',
@@ -213,6 +218,7 @@ const DashboardLayout: React.FC = () => {
           <Route path="/direccion" element={<TipoDireccion />} />
           <Route path="/detallespaciente" element={<PatientDetailsPage />} />
           <Route path="/editarpaciente" element={<EditPatientPage />} />
+          <Route path="/profesionales" element={<ProfessionalsPage />} />
         </Routes>
       </Box>
     </Box>
