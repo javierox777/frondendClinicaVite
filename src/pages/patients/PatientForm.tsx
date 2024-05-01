@@ -45,6 +45,7 @@ interface Props {
   open: boolean;
   onClose: CallableFunction;
   patient?: Person;
+  afterSubmit?: CallableFunction;
 }
 
 const Transition = React.forwardRef(function Transition(
@@ -56,7 +57,7 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const PatientForm = ({ open, onClose, patient }: Props) => {
+const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
   const { mode } = useThemeContext();
 
   // estados para enviar a la api
@@ -395,6 +396,9 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
             vigente: '1',
           },
         ]);
+      }
+      if (afterSubmit) {
+        afterSubmit();
       }
 
       //en caso de error, se ejecuta esta parte del codigo

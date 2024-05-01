@@ -6,6 +6,7 @@ import TotalPatients from './TotalPatients';
 
 const PatientsPage = () => {
   const [modalOpen, setModal] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   return (
     <>
@@ -24,7 +25,7 @@ const PatientsPage = () => {
           <TotalPatients />
         </Grid>
         <Grid item xs={12}>
-          <PatientsTable />
+          <PatientsTable refetch={formSubmitted} />
         </Grid>
       </Grid>
       <PatientForm
@@ -32,6 +33,7 @@ const PatientsPage = () => {
         onClose={() => {
           setModal(false);
         }}
+        afterSubmit={() => setFormSubmitted(!formSubmitted)}
       />
     </>
   );

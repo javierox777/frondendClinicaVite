@@ -23,7 +23,11 @@ import TableSkeleton from '../../componemts/TableSkeleton';
 import { useNavigate } from 'react-router-dom';
 import { AccountCircle, Search } from '@mui/icons-material';
 
-const PatientsTable = () => {
+interface Props {
+  refetch?: boolean;
+}
+
+const PatientsTable = ({ refetch }: Props) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchText, setSearchText] = useState('');
@@ -51,14 +55,13 @@ const PatientsTable = () => {
     error, // en caso que haya error, es true
     isLoading, //variable que se puede usar para mostrar loaders, es true mientras se hace la peticion
   } = useQuery({
-    queryKey: ['patients'],
+    queryKey: ['patients', refetch],
     queryFn: async () => {
       //funcion que hace fetching
       const response = await axios.get(`${generalConfig.baseUrl}/persons`);
 
       return response.data.body; // lo que se retorna aca, va a la variable data, que en este caso se le dio el alias de patients
     },
-    refetchOnMount: 'always',
   });
 
   const tableHeadings = [
