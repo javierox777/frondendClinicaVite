@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { generalConfig } from '../../config';
 import { Person } from '../../interfaces/Person';
 import { useThemeContext } from '../../componemts/themeContext';
@@ -58,6 +58,7 @@ const PatientsTable = () => {
 
       return response.data.body; // lo que se retorna aca, va a la variable data, que en este caso se le dio el alias de patients
     },
+    refetchOnMount: 'always',
   });
 
   const tableHeadings = [

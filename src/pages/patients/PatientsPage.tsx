@@ -1,4 +1,4 @@
-import { Button, Card, Grid } from '@mui/material';
+import { Button, Grid } from '@mui/material';
 import { useState } from 'react';
 import PatientForm from './PatientForm';
 import PatientsTable from './PatientsTable';
@@ -6,6 +6,7 @@ import TotalPatients from './TotalPatients';
 
 const PatientsPage = () => {
   const [modalOpen, setModal] = useState(false);
+
   return (
     <>
       <Grid container spacing={3}>
