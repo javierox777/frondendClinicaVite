@@ -23,9 +23,7 @@ const PatientsPage = () => {
           <TotalPatients />
         </Grid>
         <Grid item xs={12}>
-          <Card>
-            <PatientsTable />
-          </Card>
+          <PatientsTable />
         </Grid>
       </Grid>
       <PatientForm

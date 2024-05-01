@@ -1,4 +1,5 @@
 import {
+  Add,
   AddCircleOutline,
   CheckCircle,
   Close,
@@ -10,6 +11,7 @@ import {
   Card,
   Container,
   Dialog,
+  Fab,
   FormControl,
   Grid,
   IconButton,
@@ -37,6 +39,7 @@ import { Address } from '../../interfaces/Address';
 import { Contact } from '../../interfaces/Contact';
 
 import { format, compareAsc } from 'date-fns';
+import Subform from './subForms/Subform';
 
 interface Props {
   open: boolean;
@@ -74,6 +77,9 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
   const [institution, setInstitution] = useState('');
   const [verificationDigit, setVerificationDigit] = useState('');
   const [isSubmitting, setSubmitting] = useState(false);
+
+  //estado que avisa si se ha agregado algun dato ya sea nacionalidad o sexo
+  const [subFormSubmitted, setSubFormSubmitted] = useState(true);
 
   const [contacts, setContacts] = useState([
     {
@@ -164,7 +170,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
   // ***********
   // ***********
   const { data: nationalities } = useQuery({
-    queryKey: ['nationalities'],
+    queryKey: ['nationalities', subFormSubmitted],
     queryFn: async () => {
       const response = await axios.get(
         `${generalConfig.baseUrl}/nationalities`
@@ -175,7 +181,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
   });
 
   const { data: genders } = useQuery({
-    queryKey: ['genders'],
+    queryKey: ['genders', subFormSubmitted],
     queryFn: async () => {
       const response = await axios.get(`${generalConfig.baseUrl}/gender`);
 
@@ -204,7 +210,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
   });
 
   const { data: cities } = useQuery({
-    queryKey: ['cities'],
+    queryKey: ['cities', subFormSubmitted],
     queryFn: async () => {
       const response = await axios.get(`${generalConfig.baseUrl}/cities`);
 
@@ -213,7 +219,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
   });
 
   const { data: contactTypes } = useQuery({
-    queryKey: ['contactTypes'],
+    queryKey: ['contactTypes', subFormSubmitted],
     queryFn: async () => {
       const response = await axios.get(`${generalConfig.baseUrl}/contacts`);
 
@@ -222,7 +228,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
   });
 
   const { data: addressTypes } = useQuery({
-    queryKey: ['addressType'],
+    queryKey: ['addressType', subFormSubmitted],
     queryFn: async () => {
       const response = await axios.get(
         `${generalConfig.baseUrl}/address-types`
@@ -565,6 +571,14 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                 </FormControl>
               </Grid>
               <Grid item xs={6}>
+                <Box sx={{ marginBottom: 2 }}>
+                  <Subform
+                    title="Agregar nacionalidad"
+                    description="Agrega nueva nacionalidad"
+                    postRoute={`${generalConfig.baseUrl}/nationalities`}
+                    onFinish={() => setSubFormSubmitted(!subFormSubmitted)}
+                  />
+                </Box>
                 <FormControl fullWidth>
                   <InputLabel id="nationality-select-label">
                     Nacionalidad
@@ -589,6 +603,14 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                 </FormControl>
               </Grid>
               <Grid item xs={6}>
+                <Box sx={{ marginBottom: 2 }}>
+                  <Subform
+                    title="Agregar sexo"
+                    description="Agrega nuevo sexo"
+                    postRoute={`${generalConfig.baseUrl}/gender`}
+                    onFinish={() => setSubFormSubmitted(!subFormSubmitted)}
+                  />
+                </Box>
                 <FormControl fullWidth>
                   <InputLabel id="gender-select-label">Sexo</InputLabel>
                   <Select
@@ -728,7 +750,17 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                             />
                           </Box>
                         </Grid>
-                        <Grid item xs={5}>
+                        <Grid item xs={12}>
+                          <Box sx={{ marginBottom: 2 }}>
+                            <Subform
+                              title="Agregar tipo de contacto"
+                              description="Agrega nuevo tipo de contacto"
+                              postRoute={`${generalConfig.baseUrl}/contacts`}
+                              onFinish={() =>
+                                setSubFormSubmitted(!subFormSubmitted)
+                              }
+                            />
+                          </Box>
                           <FormControl fullWidth>
                             <InputLabel id="contacts-select-label">
                               Tipo de contacto
@@ -752,7 +784,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                             </Select>
                           </FormControl>
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid item xs={12}>
                           <FormControl fullWidth>
                             <TextField
                               label="Contacto"
@@ -834,7 +866,17 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                             />
                           </Box>
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid item xs={12}>
+                          <Box sx={{ marginBottom: 2 }}>
+                            <Subform
+                              title="Agregar tipo de dirección"
+                              description="Agrega nuevo tipo de dirección"
+                              postRoute={`${generalConfig.baseUrl}/address-types`}
+                              onFinish={() =>
+                                setSubFormSubmitted(!subFormSubmitted)
+                              }
+                            />
+                          </Box>
                           <FormControl fullWidth>
                             <InputLabel id="addresstype-select-label">
                               Tipo de dirección
@@ -863,7 +905,17 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                             </Select>
                           </FormControl>
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid item xs={12}>
+                          <Box sx={{ marginBottom: 2 }}>
+                            <Subform
+                              title="Agregar ciudad"
+                              description="Agrega nueva ciudad"
+                              postRoute={`${generalConfig.baseUrl}/cities`}
+                              onFinish={() =>
+                                setSubFormSubmitted(!subFormSubmitted)
+                              }
+                            />
+                          </Box>
                           <FormControl fullWidth>
                             <InputLabel id="contacts-select-label">
                               Cuidad
