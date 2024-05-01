@@ -1,8 +1,9 @@
+import { Search } from '@mui/icons-material';
 import {
   Button,
-  Input,
   InputAdornment,
   Paper,
+  Switch,
   Table,
   TableBody,
   TableCell,
@@ -14,14 +15,13 @@ import {
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import TableSkeleton from '../../componemts/TableSkeleton';
+import { useThemeContext } from '../../componemts/themeContext';
 import { generalConfig } from '../../config';
 import { Person } from '../../interfaces/Person';
-import { useThemeContext } from '../../componemts/themeContext';
 import colors from '../../styles/colors';
-import TableSkeleton from '../../componemts/TableSkeleton';
-import { useNavigate } from 'react-router-dom';
-import { AccountCircle, Search } from '@mui/icons-material';
 
 interface Props {
   refetch?: boolean;
@@ -31,6 +31,8 @@ const PatientsTable = ({ refetch }: Props) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchText, setSearchText] = useState('');
+
+  const [validUpdated, setValidUpdated] = useState(false);
 
   const { mode } = useThemeContext();
 
@@ -55,7 +57,7 @@ const PatientsTable = ({ refetch }: Props) => {
     error, // en caso que haya error, es true
     isLoading, //variable que se puede usar para mostrar loaders, es true mientras se hace la peticion
   } = useQuery({
-    queryKey: ['patients', refetch],
+    queryKey: ['patients', refetch, validUpdated],
     queryFn: async () => {
       //funcion que hace fetching
       const response = await axios.get(`${generalConfig.baseUrl}/persons`);
@@ -80,6 +82,10 @@ const PatientsTable = ({ refetch }: Props) => {
     {
       id: 4,
       label: 'Acciones',
+    },
+    {
+      id: 5,
+      label: 'Vigente',
     },
   ];
 
@@ -172,6 +178,21 @@ const PatientsTable = ({ refetch }: Props) => {
                       >
                         Editar
                       </Button>
+                    </TableCell>
+                    <TableCell>
+                      <Switch
+                        color="success"
+                        checked={p.vigente === '1'}
+                        onChange={async () => {
+                          await axios.patch(
+                            `${generalConfig.baseUrl}/persons/${p.id}`,
+                            {
+                              vigente: p.vigente === '1' ? '2' : '1',
+                            }
+                          );
+                          setValidUpdated(!validUpdated);
+                        }}
+                      />
                     </TableCell>
                   </TableRow>
                 );

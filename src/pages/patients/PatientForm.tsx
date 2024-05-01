@@ -737,7 +737,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                             <Close />
                           </IconButton>
                           <Box display="flex" alignItems="center">
-                            <InputLabel id="valid-switch">Válido</InputLabel>
+                            <InputLabel id="valid-switch">Vigente</InputLabel>
                             <Switch
                               id="valid-switch"
                               color={c.vigente === '1' ? 'success' : 'warning'}
@@ -853,7 +853,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                             <Close />
                           </IconButton>
                           <Box display="flex" alignItems="center">
-                            <InputLabel id="valid-switch">Válido</InputLabel>
+                            <InputLabel id="valid-switch">Vigente</InputLabel>
                             <Switch
                               id="valid-switch"
                               color={a.vigente === '1' ? 'success' : 'warning'}
