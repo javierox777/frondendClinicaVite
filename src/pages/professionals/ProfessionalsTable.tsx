@@ -19,9 +19,15 @@ import { generalConfig } from '../../config';
 import TableSkeleton from '../../componemts/TableSkeleton';
 import { Professional } from '../../interfaces/Professional';
 import { Search } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
-const ProfessionalsTable = () => {
+interface Props {
+  refetch?: boolean;
+}
+
+const ProfessionalsTable = ({ refetch }: Props) => {
   const { mode } = useThemeContext();
+  const navigation = useNavigate();
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -51,7 +57,7 @@ const ProfessionalsTable = () => {
   ];
 
   const { data: professionals, isLoading } = useQuery({
-    queryKey: ['professionals'],
+    queryKey: ['professionals', refetch],
     queryFn: async () => {
       const response = await axios.get(
         `${generalConfig.baseUrl}/professionals`
@@ -156,11 +162,11 @@ const ProfessionalsTable = () => {
                       <Button
                         color="success"
                         variant="outlined"
-                        // onClick={() =>
-                        //   navigation('/editarpaciente', {
-                        //     state: { patient: p },
-                        //   })
-                        // }
+                        onClick={() =>
+                          navigation('/editarprofesional', {
+                            state: { professional: p },
+                          })
+                        }
                       >
                         Editar
                       </Button>

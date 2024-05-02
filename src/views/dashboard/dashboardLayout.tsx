@@ -41,6 +41,7 @@ import PresupuestoTipo from '../../pages/presupuestoTipo/PresupuestoTipo';
 import Solicitario from '../../pages/solicitarioTipo/SolicitarioTipo';
 import TipoDireccion from '../../pages/tipoDireccion/TipoDireccion';
 import ProfessionalsPage from '../../pages/professionals/ProfessionalsPage';
+import EditProfessionalPage from '../../pages/professionals/EditProfessionalPage';
 
 const drawerWidth = 240;
 
@@ -219,6 +220,7 @@ const DashboardLayout: React.FC = () => {
           <Route path="/detallespaciente" element={<PatientDetailsPage />} />
           <Route path="/editarpaciente" element={<EditPatientPage />} />
           <Route path="/profesionales" element={<ProfessionalsPage />} />
+          <Route path="/editarprofesional" element={<EditProfessionalPage />} />
         </Routes>
       </Box>
     </Box>
