@@ -30,7 +30,7 @@ const ProfessionalsTable = ({ refetch }: Props) => {
   const navigation = useNavigate();
 
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchText, setSearchText] = useState('');
 
   const tableHeadings = [

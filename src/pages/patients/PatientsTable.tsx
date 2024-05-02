@@ -29,7 +29,7 @@ interface Props {
 
 const PatientsTable = ({ refetch }: Props) => {
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchText, setSearchText] = useState('');
 
   const [validUpdated, setValidUpdated] = useState(false);
