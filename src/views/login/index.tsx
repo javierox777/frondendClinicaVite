@@ -1,6 +1,6 @@
 import React, { useState, FormEvent, useEffect } from 'react';
 import { Button, Grid, TextField, Paper } from '@mui/material';
-import logo from '/logobusing.png'; // Asegúrate de que la ruta es correcta
+import logo from '/logo.png'; // Asegúrate de que la ruta es correcta
 import Axios from 'axios';
 import { generalConfig } from '../../config';
 import Swal from 'sweetalert2';
@@ -83,6 +83,7 @@ const Login: React.FC = () => {
         justifyContent: 'center',
         height: '100vh',
         width: '100vw',
+        background: 'linear-gradient(to right, #7f8c8d, #bdc3c7)',
       }}
     >
       <form onSubmit={login} style={{ maxWidth: '400px' }}>
@@ -95,7 +96,7 @@ const Login: React.FC = () => {
             alignItems: 'center',
             padding: '40px',
             borderRadius: '15px',
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            backgroundColor: '#fff', // Fondo blanco
             color: '#333',
             boxShadow: '0 12px 24px 0 rgba(0,0,0,0.2)',
             transition: 'transform 0.3s ease-in-out',
