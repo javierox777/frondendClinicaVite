@@ -15,16 +15,20 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
   FormControlLabel,
 } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu'; // Para el ícono del menú
+import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import PeopleIcon from '@mui/icons-material/People';
 import SettingsIcon from '@mui/icons-material/Settings';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // Icono de expansión
 import { Routes, Route, Link } from 'react-router-dom';
-import Inicio from '../../pages/home'; // Ajusta la ruta según tu estructura de carpetas
-import { useThemeContext } from '../../componemts/themeContext'; // Asegúrate de que la ruta sea correcta
+import Inicio from '../../pages/home';
+import { useThemeContext } from '../../componemts/themeContext';
 import { ParticlesContainer } from './ParticlesFire';
 import { AssignmentInd, ContactEmergency } from '@mui/icons-material';
 import PatientsPage from '../../pages/patients/PatientsPage';
@@ -48,7 +52,7 @@ const drawerWidth = 240;
 const DashboardLayout: React.FC = () => {
   const { toggleColorMode, mode } = useThemeContext();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [drawerOpen, setDrawerOpen] = useState(false); // Inicia con el drawer cerrado
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const open = Boolean(anchorEl);
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -142,6 +146,7 @@ const DashboardLayout: React.FC = () => {
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
+            {/* Menu items */}
             {['Inicio', 'Pacientes', 'Profesionales', 'Ingreso'].map(
               (text, index) => (
                 <ListItem
@@ -165,32 +170,40 @@ const DashboardLayout: React.FC = () => {
                 </ListItem>
               )
             )}
-            <List>
-              {[
-                'Sexo',
-                'Atencion',
-                'Ciudad',
-                'Contacto',
-                'Estado',
-                'Mensaje',
-                'Presupuesto',
-                'Solicitario',
-                'Direccion',
-              ].map((text, index) => (
-                <ListItem
-                  button
-                  key={text}
-                  component={Link}
-                  to={`/${text.toLowerCase()}`}
-                  sx={{ pl: 4 }} // Añadimos un margen izquierdo para indentar las opciones del submenú
-                >
-                  <ListItemIcon>
-                    <SettingsIcon />
-                  </ListItemIcon>
-                  <ListItemText primary={text} />
-                </ListItem>
-              ))}
-            </List>
+            {/* Submenu */}
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <ListItemIcon>
+                  <SettingsIcon />
+                </ListItemIcon>
+                <ListItemText primary="Configuraciones" />
+              </AccordionSummary>
+              <AccordionDetails>
+                <List>
+                  {[
+                    'Sexo',
+                    'Atencion',
+                    'Ciudad',
+                    'Contacto',
+                    'Estado',
+                    'Mensaje',
+                    'Presupuesto',
+                    'Solicitario',
+                    'Direccion',
+                  ].map((text, index) => (
+                    <ListItem
+                      button
+                      key={text}
+                      component={Link}
+                      to={`/${text.toLowerCase()}`}
+                      sx={{ pl: 4 }}
+                    >
+                      <ListItemText primary={text} />
+                    </ListItem>
+                  ))}
+                </List>
+              </AccordionDetails>
+            </Accordion>
           </List>
           <Divider />
         </Box>
@@ -205,22 +218,7 @@ const DashboardLayout: React.FC = () => {
       >
         <Toolbar />
         <Routes>
-          <Route path="/inicio" element={<Inicio />} />
-          <Route path="/pacientes" element={<PatientsPage />} />
-          <Route path="/ingreso" element={<InstitutionForm />} />
-          <Route path="/sexo" element={<Sexo />} />
-          <Route path="/atencion" element={<AtencionTipo />} />
-          <Route path="/ciudad" element={<Ciudad />} />
-          <Route path="/contacto" element={<Contacto />} />
-          <Route path="/estado" element={<Estado />} />
-          <Route path="/mensaje" element={<Mensaje />} />
-          <Route path="/presupuesto" element={<PresupuestoTipo />} />
-          <Route path="/solicitario" element={<Solicitario />} />
-          <Route path="/direccion" element={<TipoDireccion />} />
-          <Route path="/detallespaciente" element={<PatientDetailsPage />} />
-          <Route path="/editarpaciente" element={<EditPatientPage />} />
-          <Route path="/profesionales" element={<ProfessionalsPage />} />
-          <Route path="/editarprofesional" element={<EditProfessionalPage />} />
+          {/* Routes */}
         </Routes>
       </Box>
     </Box>
