@@ -37,7 +37,7 @@ import PatientDetailsPage from '../../pages/patients/PatientDetailsPage';
 import EditPatientPage from '../../pages/patients/EditPatientPage';
 import Sexo from '../../pages/sexo/SexoForm';
 import AtencionTipo from '../../pages/atencionTipo/AtencionTipo';
-import Ciudad from '../../pages/ciudad/AtencionTipo';
+import Ciudad from '../../pages/ciudad/CityTable';
 import Contacto from '../../pages/contacto/Contacto';
 import Estado from '../../pages/estado/Estado';
 import Mensaje from '../../pages/mensaje/Mensaje';
@@ -218,7 +218,22 @@ const DashboardLayout: React.FC = () => {
       >
         <Toolbar />
         <Routes>
-          {/* Routes */}
+        <Route path="/inicio" element={<Inicio />} />
+          <Route path="/pacientes" element={<PatientsPage />} />
+          <Route path="/ingreso" element={<InstitutionForm />} />
+          <Route path="/sexo" element={<Sexo />} />
+          <Route path="/atencion" element={<AtencionTipo />} />
+          <Route path="/ciudad" element={<Ciudad />} />
+          <Route path="/contacto" element={<Contacto />} />
+          <Route path="/estado" element={<Estado />} />
+          <Route path="/mensaje" element={<Mensaje />} />
+          <Route path="/presupuesto" element={<PresupuestoTipo />} />
+          <Route path="/solicitario" element={<Solicitario />} />
+          <Route path="/direccion" element={<TipoDireccion />} />
+          <Route path="/detallespaciente" element={<PatientDetailsPage />} />
+          <Route path="/editarpaciente" element={<EditPatientPage />} />
+          <Route path="/profesionales" element={<ProfessionalsPage />} />
+          <Route path="/editarprofesional" element={<EditProfessionalPage />} />
         </Routes>
       </Box>
     </Box>
