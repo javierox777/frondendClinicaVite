@@ -30,7 +30,11 @@ import { Routes, Route, Link } from 'react-router-dom';
 import Inicio from '../../pages/home';
 import { useThemeContext } from '../../componemts/themeContext';
 import { ParticlesContainer } from './ParticlesFire';
-import { AssignmentInd, ContactEmergency } from '@mui/icons-material';
+import {
+  AssignmentInd,
+  ContactEmergency,
+  RequestQuote,
+} from '@mui/icons-material';
 import PatientsPage from '../../pages/patients/PatientsPage';
 import InstitutionForm from '../../pages/institucion/InstitutionForm';
 import PatientDetailsPage from '../../pages/patients/PatientDetailsPage';
@@ -46,6 +50,7 @@ import Solicitario from '../../pages/solicitarioTipo/SolicitarioTipo';
 import TipoDireccion from '../../pages/tipoDireccion/TipoDireccion';
 import ProfessionalsPage from '../../pages/professionals/ProfessionalsPage';
 import EditProfessionalPage from '../../pages/professionals/EditProfessionalPage';
+import BudgetsPage from '../../pages/budgets/BudgetsPage';
 
 const drawerWidth = 240;
 
@@ -147,29 +152,35 @@ const DashboardLayout: React.FC = () => {
         <Box sx={{ overflow: 'auto' }}>
           <List>
             {/* Menu items */}
-            {['Inicio', 'Pacientes', 'Profesionales', 'Ingreso'].map(
-              (text, index) => (
-                <ListItem
-                  button
-                  key={text}
-                  component={Link}
-                  to={`/${text.toLowerCase()}`}
-                >
-                  <ListItemIcon>
-                    {index === 0 ? (
-                      <HomeIcon />
-                    ) : index === 1 ? (
-                      <AssignmentInd />
-                    ) : index === 2 ? (
-                      <ContactEmergency />
-                    ) : (
-                      <PeopleIcon />
-                    )}
-                  </ListItemIcon>
-                  <ListItemText primary={text} />
-                </ListItem>
-              )
-            )}
+            {[
+              'Inicio',
+              'Pacientes',
+              'Profesionales',
+              'Ingreso',
+              'Presupuestos',
+            ].map((text, index) => (
+              <ListItem
+                button
+                key={text}
+                component={Link}
+                to={`/${text.toLowerCase()}`}
+              >
+                <ListItemIcon>
+                  {index === 0 ? (
+                    <HomeIcon />
+                  ) : index === 1 ? (
+                    <AssignmentInd />
+                  ) : index === 2 ? (
+                    <ContactEmergency />
+                  ) : index === 3 ? (
+                    <PeopleIcon />
+                  ) : (
+                    <RequestQuote />
+                  )}
+                </ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItem>
+            ))}
             {/* Submenu */}
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -218,7 +229,7 @@ const DashboardLayout: React.FC = () => {
       >
         <Toolbar />
         <Routes>
-        <Route path="/inicio" element={<Inicio />} />
+          <Route path="/inicio" element={<Inicio />} />
           <Route path="/pacientes" element={<PatientsPage />} />
           <Route path="/ingreso" element={<InstitutionForm />} />
           <Route path="/sexo" element={<Sexo />} />
@@ -234,6 +245,7 @@ const DashboardLayout: React.FC = () => {
           <Route path="/editarpaciente" element={<EditPatientPage />} />
           <Route path="/profesionales" element={<ProfessionalsPage />} />
           <Route path="/editarprofesional" element={<EditProfessionalPage />} />
+          <Route path="/presupuestos" element={<BudgetsPage />} />
         </Routes>
       </Box>
     </Box>
