@@ -9,6 +9,7 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
 
 const StyledButton = styled(Button)(({ theme }) => ({
   margin: theme.spacing(1),
+ 
 }));
 
 const ModalContent = styled(Box)(({ theme }) => ({
@@ -56,7 +57,7 @@ const Ciudad = () => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Aquí puedes manejar la lógica para enviar el formulario
+
     console.log(formData);
     setOpen(false);
   };
@@ -128,7 +129,7 @@ const Ciudad = () => {
       </Modal>
 
       <CenteredContainer>
-        <StyledButton  style={{position: 'absolute',top: 0, left: 0, bottom: 250 }} onClick={handleOpen}>
+        <StyledButton  style={{position: 'absolute', left: 0 }} onClick={handleOpen}>
           Abrir Formulario
         </StyledButton>
       </CenteredContainer>
