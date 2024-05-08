@@ -2,10 +2,12 @@ import React from 'react';
 import { Budget } from '../../interfaces/Budget';
 import {
   Badge,
+  Box,
   Card,
   Container,
   Divider,
   Grid,
+  LinearProgress,
   Typography,
 } from '@mui/material';
 import StatusBadge from '../../componemts/StatusBadge';
@@ -154,9 +156,22 @@ const BudgetDetails = ({ budget }: Props) => {
               <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                 <Typography sx={{ fontWeight: 'bold' }}>Contacto</Typography>
                 <Grid container>
-                  {validContacts.map((c: any) => {
+                  {!validContacts && (
+                    <Box sx={{ width: '40%' }}>
+                      <LinearProgress />
+                    </Box>
+                  )}
+                  {validContacts?.map((c: any) => {
                     return (
-                      <Grid item key={c.id} sm={12} md={12} lg={6} xl={6}>
+                      <Grid
+                        item
+                        key={c.id}
+                        xs={12}
+                        sm={12}
+                        md={12}
+                        lg={6}
+                        xl={6}
+                      >
                         <Divider />
                         <Typography sx={{ fontWeight: 'bold' }}>
                           {' '}
@@ -173,9 +188,22 @@ const BudgetDetails = ({ budget }: Props) => {
               <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                 <Typography sx={{ fontWeight: 'bold' }}>Direcciones</Typography>
                 <Grid container>
-                  {validAddresses.map((a: any) => {
+                  {!validAddresses && (
+                    <Box sx={{ width: '40%' }}>
+                      <LinearProgress />
+                    </Box>
+                  )}
+                  {validAddresses?.map((a: any) => {
                     return (
-                      <Grid item key={a.id} sm={12} md={12} lg={6} xl={6}>
+                      <Grid
+                        item
+                        key={a.id}
+                        xs={12}
+                        sm={12}
+                        md={12}
+                        lg={6}
+                        xl={6}
+                      >
                         <Divider />
                         <Typography sx={{ fontWeight: 'bold' }}>
                           {' '}
