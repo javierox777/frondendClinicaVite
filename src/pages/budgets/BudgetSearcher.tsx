@@ -60,6 +60,7 @@ const BudgetSearcher = () => {
                     </InputAdornment>
                   ),
                 }}
+                required
               />
             </FormControl>
             <FormControl>
