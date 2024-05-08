@@ -9,6 +9,9 @@ import {
   Typography,
 } from '@mui/material';
 import StatusBadge from '../../componemts/StatusBadge';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import { generalConfig } from '../../config';
 
 interface Props {
   budget: Budget;
@@ -25,17 +28,41 @@ const BudgetDetails = ({ budget }: Props) => {
     profesional,
   } = budget;
 
-  console.log(persona);
+  const { data: contacts } = useQuery({
+    queryKey: ['contacts'],
+    queryFn: async () => {
+      const filteredContacts = (
+        await axios.get(`${generalConfig.baseUrl}/contact-book`)
+      ).data.body.filter((c: any) => c.persona.id === persona.id);
+      return filteredContacts;
+    },
+  });
+
+  const { data: addresses } = useQuery({
+    queryKey: ['addresses'],
+    queryFn: async () => {
+      const filteredAddresses = (
+        await axios.get(`${generalConfig.baseUrl}/address-book`)
+      ).data.body.filter((c: any) => c.persona.id === persona.id);
+      return filteredAddresses;
+    },
+  });
+
+  const validContacts = contacts?.filter((c: any) => c.vigente === '1');
+
+  const validAddresses = addresses?.filter((a: any) => a.vigente === '1');
 
   return (
     <Container>
       <Grid container direction="column" spacing={3}>
         {/* Datos del presupuesto */}
         <Grid item>
-          <Card elevation={3}>
-            <Grid container>
-              <Grid item>
-                <Typography>Estado</Typography>
+          <Card elevation={3} sx={{ padding: 2 }}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                <Typography sx={{ fontWeight: 'bold' }}>
+                  Estado del presupuesto
+                </Typography>
                 <StatusBadge
                   status={
                     estado.nombre === 'EN_PROCESO'
@@ -46,12 +73,34 @@ const BudgetDetails = ({ budget }: Props) => {
                   }
                   title={
                     estado.nombre === 'EN_PROCESO'
-                      ? 'en proceso'
+                      ? 'EN PROCESO'
                       : estado.nombre === 'FINALIZADO'
-                        ? 'finalizado'
-                        : 'validación pendiente'
+                        ? 'FINALIZADO'
+                        : 'VALIDACION PENDIENTE'
                   }
                 />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                <Typography sx={{ fontWeight: 'bold' }}>
+                  Fecha de registro
+                </Typography>
+                <Typography>
+                  {new Date(fechaRegistro).toLocaleDateString()}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                <Typography sx={{ fontWeight: 'bold' }}>
+                  Fecha válida
+                </Typography>
+                <Typography>
+                  {new Date(fechaRegistroValida).toLocaleDateString()}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                <Typography sx={{ fontWeight: 'bold' }}>
+                  Tipo de presupuesto
+                </Typography>
+                <Typography>{presupuestoTipo.nombre}</Typography>
               </Grid>
             </Grid>
           </Card>
@@ -81,10 +130,6 @@ const BudgetDetails = ({ budget }: Props) => {
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-                <Typography sx={{ fontWeight: 'bold' }}>Sexo</Typography>
-                <Typography>{persona.sexo.nombre}</Typography>
-              </Grid>
-              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <Typography sx={{ fontWeight: 'bold' }}>
                   Fecha de nacimiento
                 </Typography>
@@ -93,14 +138,46 @@ const BudgetDetails = ({ budget }: Props) => {
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-                <Typography sx={{ fontWeight: 'bold' }}>
-                  Nacionalidad
-                </Typography>
-                <Typography>{persona.nacionalidad.nombre}</Typography>
-              </Grid>
-              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <Typography sx={{ fontWeight: 'bold' }}>Institución</Typography>
                 <Typography>{persona.institucion.nombre}</Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <Typography sx={{ fontWeight: 'bold' }}>Contacto</Typography>
+                <Grid container>
+                  {validContacts.map((c: any) => {
+                    return (
+                      <Grid item key={c.id} sm={12} md={12} lg={6} xl={6}>
+                        <Divider />
+                        <Typography sx={{ fontWeight: 'bold' }}>
+                          {' '}
+                          {c.contacto.nombre}
+                        </Typography>
+                        <Typography>{c.descripcion}</Typography>
+                        <Divider />
+                      </Grid>
+                    );
+                  })}
+                  <Grid item xs={12}></Grid>
+                </Grid>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <Typography sx={{ fontWeight: 'bold' }}>Direcciones</Typography>
+                <Grid container>
+                  {validAddresses.map((a: any) => {
+                    return (
+                      <Grid item key={a.id} sm={12} md={12} lg={6} xl={6}>
+                        <Divider />
+                        <Typography sx={{ fontWeight: 'bold' }}>
+                          {' '}
+                          {a.tipoDireccion.nombre}
+                        </Typography>
+                        <Typography>{a.nombre}</Typography>
+                        <Divider />
+                      </Grid>
+                    );
+                  })}
+                  <Grid item xs={12}></Grid>
+                </Grid>
               </Grid>
               <Grid item xs={12}>
                 <Divider />
