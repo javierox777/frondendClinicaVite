@@ -102,6 +102,16 @@ const BudgetDetails = ({ budget }: Props) => {
                 </Typography>
                 <Typography>{presupuestoTipo.nombre}</Typography>
               </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                <Typography sx={{ fontWeight: 'bold' }}>Clínica</Typography>
+                <Typography>{empresa.razonSocial}</Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                <Typography sx={{ fontWeight: 'bold' }}>Dentista</Typography>
+                <Typography>
+                  {profesional.nombre1} {profesional.apellPat}
+                </Typography>
+              </Grid>
             </Grid>
           </Card>
         </Grid>
