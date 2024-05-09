@@ -1,14 +1,27 @@
-import { Container, Grid } from '@mui/material';
-import React from 'react';
+import { Button, Container, Grid } from '@mui/material';
+import React, { useState } from 'react';
 import BudgetSearcher from './BudgetSearcher';
+import { Add } from '@mui/icons-material';
+import BudgetForm from './BudgetForm';
 
 const BudgetsPage = () => {
+  const [formOpen, setOpen] = useState(false);
+
   return (
-    <Grid container>
-      <Grid item xs={12}>
-        <BudgetSearcher />
+    <>
+      <Grid container spacing={2}>
+        <Grid item>
+          <Button variant="outlined" onClick={() => setOpen(true)}>
+            <Add />
+            Generar presupuesto
+          </Button>
+        </Grid>
+        <Grid item xs={12}>
+          <BudgetSearcher />
+        </Grid>
       </Grid>
-    </Grid>
+      <BudgetForm open={formOpen} onClose={() => setOpen(false)} />
+    </>
   );
 };
 
