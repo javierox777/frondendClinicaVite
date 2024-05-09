@@ -6,6 +6,7 @@ import {
   Grid,
   LinearProgress,
   Paper,
+  Skeleton,
   Table,
   TableBody,
   TableCell,
@@ -25,6 +26,7 @@ import { BudgetDetail } from '../../interfaces/BudgetDetail';
 import { Contact } from '../../interfaces/Contact';
 import colors from '../../styles/colors';
 import { useThemeContext } from '../../componemts/themeContext';
+import TableSkeleton from '../../componemts/TableSkeleton';
 
 interface Props {
   budget: Budget;
@@ -277,51 +279,54 @@ const BudgetDetails = ({ budget }: Props) => {
 
         {/* Detalles del presupuesto  */}
         <Grid item>
-          <TableContainer>
-            <Table>
-              <TableHead
-                style={{
-                  backgroundColor:
-                    mode === 'light'
-                      ? colors.lightModeTableHead
-                      : colors.darkModeTableHead,
-                }}
-              >
-                <TableRow>
-                  {detailsTableHeadings.map(
-                    (h: { id: number; label: string }) => {
-                      return <TableCell key={h.id}>{h.label}</TableCell>;
-                    }
-                  )}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {details?.map((d: BudgetDetail) => {
-                  return (
-                    <TableRow key={d.id}>
-                      <TableCell>{d.objeto.nombre}</TableCell>
-                      <TableCell>{d.prestacion.nombre}</TableCell>
-                      <TableCell>$ {d.prestacion.precioUniNeto}</TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-              <TableFooter>
-                <TableRow>
-                  <TableCell>TOTAL A PAGAR</TableCell>
-                  <TableCell></TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>PAGADO</TableCell>
-                  <TableCell>1</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>PENDIENTE</TableCell>
-                  <TableCell>1</TableCell>
-                </TableRow>
-              </TableFooter>
-            </Table>
-          </TableContainer>
+          {!details && <TableSkeleton />}
+          {details && (
+            <TableContainer>
+              <Table>
+                <TableHead
+                  style={{
+                    backgroundColor:
+                      mode === 'light'
+                        ? colors.lightModeTableHead
+                        : colors.darkModeTableHead,
+                  }}
+                >
+                  <TableRow>
+                    {detailsTableHeadings.map(
+                      (h: { id: number; label: string }) => {
+                        return <TableCell key={h.id}>{h.label}</TableCell>;
+                      }
+                    )}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {details?.map((d: BudgetDetail) => {
+                    return (
+                      <TableRow key={d.id}>
+                        <TableCell>{d.objeto.nombre}</TableCell>
+                        <TableCell>{d.prestacion.nombre}</TableCell>
+                        <TableCell>$ {d.prestacion.precioUniNeto}</TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+                <TableFooter>
+                  <TableRow>
+                    <TableCell>TOTAL A PAGAR</TableCell>
+                    <TableCell>1</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>PAGADO</TableCell>
+                    <TableCell>1</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>PENDIENTE</TableCell>
+                    <TableCell>1</TableCell>
+                  </TableRow>
+                </TableFooter>
+              </Table>
+            </TableContainer>
+          )}{' '}
         </Grid>
         {/* Detalles del presupuesto  */}
       </Grid>
