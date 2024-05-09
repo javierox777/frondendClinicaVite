@@ -1,25 +1,61 @@
-import React from 'react';
-import { Budget } from '../../interfaces/Budget';
 import {
-  Badge,
   Box,
   Card,
   Container,
   Divider,
   Grid,
   LinearProgress,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableFooter,
+  TableHead,
+  TableRow,
   Typography,
 } from '@mui/material';
-import StatusBadge from '../../componemts/StatusBadge';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import StatusBadge from '../../componemts/StatusBadge';
 import { generalConfig } from '../../config';
+import { Address } from '../../interfaces/Address';
+import { Budget } from '../../interfaces/Budget';
+import { BudgetDetail } from '../../interfaces/BudgetDetail';
+import { Contact } from '../../interfaces/Contact';
+import colors from '../../styles/colors';
+import { useThemeContext } from '../../componemts/themeContext';
 
 interface Props {
   budget: Budget;
 }
 
+const detailsTableHeadings = [
+  {
+    id: 1,
+    label: 'DIENTE',
+  },
+  {
+    id: 2,
+    label: 'PRESTACIÓN/TRATAMIENTO',
+  },
+  // {
+  //   id: 3,
+  //   label: 'DESCRIPCIÓN',
+  // },
+  {
+    id: 4,
+    label: 'VALOR NETO',
+  },
+  // {
+  //   id: 5,
+  //   label: 'ESTADO',
+  // },
+];
+
 const BudgetDetails = ({ budget }: Props) => {
+  const { mode } = useThemeContext();
+
   const {
     empresa,
     estado,
@@ -35,7 +71,7 @@ const BudgetDetails = ({ budget }: Props) => {
     queryFn: async () => {
       const filteredContacts = (
         await axios.get(`${generalConfig.baseUrl}/contact-book`)
-      ).data.body.filter((c: any) => c.persona.id === persona.id);
+      ).data.body.filter((c: Contact) => c.persona.id === persona.id);
       return filteredContacts;
     },
   });
@@ -45,11 +81,25 @@ const BudgetDetails = ({ budget }: Props) => {
     queryFn: async () => {
       const filteredAddresses = (
         await axios.get(`${generalConfig.baseUrl}/address-book`)
-      ).data.body.filter((c: any) => c.persona.id === persona.id);
+      ).data.body.filter((a: Address) => a.persona.id === persona.id);
       return filteredAddresses;
     },
   });
 
+  const { data: details } = useQuery({
+    queryKey: ['details'],
+    queryFn: async () => {
+      const filteredDetails = (
+        await axios.get(`${generalConfig.baseUrl}/budget-details`)
+      ).data.body.filter((d: BudgetDetail) => {
+        return d.presupuesto_id === budget.id;
+      });
+
+      return filteredDetails;
+    },
+  });
+
+  console.log(details);
   const validContacts = contacts?.filter((c: any) => c.vigente === '1');
 
   const validAddresses = addresses?.filter((a: any) => a.vigente === '1');
@@ -161,7 +211,7 @@ const BudgetDetails = ({ budget }: Props) => {
                       <LinearProgress />
                     </Box>
                   )}
-                  {validContacts?.map((c: any) => {
+                  {validContacts?.map((c: Contact) => {
                     return (
                       <Grid
                         item
@@ -193,7 +243,7 @@ const BudgetDetails = ({ budget }: Props) => {
                       <LinearProgress />
                     </Box>
                   )}
-                  {validAddresses?.map((a: any) => {
+                  {validAddresses?.map((a: Address) => {
                     return (
                       <Grid
                         item
@@ -224,6 +274,56 @@ const BudgetDetails = ({ budget }: Props) => {
           </Card>
         </Grid>
         {/* Datos del paciente */}
+
+        {/* Detalles del presupuesto  */}
+        <Grid item>
+          <TableContainer>
+            <Table>
+              <TableHead
+                style={{
+                  backgroundColor:
+                    mode === 'light'
+                      ? colors.lightModeTableHead
+                      : colors.darkModeTableHead,
+                }}
+              >
+                <TableRow>
+                  {detailsTableHeadings.map(
+                    (h: { id: number; label: string }) => {
+                      return <TableCell key={h.id}>{h.label}</TableCell>;
+                    }
+                  )}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {details?.map((d: BudgetDetail) => {
+                  return (
+                    <TableRow key={d.id}>
+                      <TableCell>{d.objeto.nombre}</TableCell>
+                      <TableCell>{d.prestacion.nombre}</TableCell>
+                      <TableCell>$ {d.prestacion.precioUniNeto}</TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+              <TableFooter>
+                <TableRow>
+                  <TableCell>TOTAL A PAGAR</TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>PAGADO</TableCell>
+                  <TableCell>1</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>PENDIENTE</TableCell>
+                  <TableCell>1</TableCell>
+                </TableRow>
+              </TableFooter>
+            </Table>
+          </TableContainer>
+        </Grid>
+        {/* Detalles del presupuesto  */}
       </Grid>
     </Container>
   );

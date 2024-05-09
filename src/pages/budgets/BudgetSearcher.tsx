@@ -32,8 +32,7 @@ const BudgetSearcher = () => {
     e.preventDefault();
     const filteredBudgets = budgets.filter((b: any) => {
       const personRut = b.persona.rut;
-      const companyRut = b.empresa.rol;
-      return personRut === searchText || companyRut === searchText;
+      return personRut === searchText.trim();
     });
 
     setOptions(filteredBudgets);
