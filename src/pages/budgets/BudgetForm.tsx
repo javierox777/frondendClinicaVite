@@ -12,6 +12,10 @@ import {
   TextField,
   Select,
   Autocomplete,
+  Box,
+  MenuItem,
+  InputLabel,
+  SelectChangeEvent,
 } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
 import { useQuery } from '@tanstack/react-query';
@@ -21,6 +25,9 @@ import { generalConfig } from '../../config';
 import { Person } from '../../interfaces/Person';
 import { useThemeContext } from '../../componemts/themeContext';
 import colors from '../../styles/colors';
+import { Professional } from '../../interfaces/Professional';
+import Subform from '../patients/subForms/Subform';
+import { ShortModel } from '../../interfaces/ShortModel';
 
 interface Props {
   open: boolean;
@@ -51,6 +58,8 @@ const BudgetForm = ({ onClose, open }: Props) => {
   });
 
   const [patientId, setPatientId] = useState('');
+  const [professionalId, setProfessionalId] = useState('');
+  const [budgetTypeId, setBudgetTypeId] = useState('');
 
   const handleSubmit = () => {
     console.log('submitted');
@@ -80,7 +89,42 @@ const BudgetForm = ({ onClose, open }: Props) => {
             </Typography>
           </Container>
           <Container>
-            <Grid container>
+            <Grid container spacing={3} alignItems="end">
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                {data && (
+                  <>
+                    <Box sx={{ marginBottom: 2 }}>
+                      <Subform
+                        title="Agregar tipo de presupuesto"
+                        description="Agrega nuevo tipo de presupuesto"
+                        postRoute={`${generalConfig.baseUrl}/budget-types`}
+                      />
+                    </Box>
+                    <FormControl fullWidth>
+                      <InputLabel id="budget-type-label">
+                        Tipo de presupuesto
+                      </InputLabel>
+                      <Select
+                        label="budget-types"
+                        id="budget-type-select"
+                        labelId="budget-type-label"
+                        onChange={(e: SelectChangeEvent<string>) =>
+                          setBudgetTypeId(e.target.value)
+                        }
+                        // value={}
+                      >
+                        {data.budgetTypes.map((t: ShortModel) => {
+                          return (
+                            <MenuItem key={t.id} value={t.id}>
+                              {t.nombre}
+                            </MenuItem>
+                          );
+                        })}
+                      </Select>
+                    </FormControl>
+                  </>
+                )}
+              </Grid>
               <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 {data && (
                   <Autocomplete
@@ -119,6 +163,48 @@ const BudgetForm = ({ onClose, open }: Props) => {
                     }}
                     onChange={(event, patient: Person | null) => {
                       if (patient) setPatientId(patient.id);
+                    }}
+                  />
+                )}
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                {data && (
+                  <Autocomplete
+                    fullWidth
+                    disablePortal
+                    options={data?.professionals}
+                    renderInput={(params) => (
+                      <TextField {...params} label="Dentista" />
+                    )}
+                    renderOption={(props, professional: Professional) => (
+                      <li {...props}>
+                        <div className="flex justify-between w-full">
+                          <span>
+                            {professional.nombre1} {professional.apellPat}
+                          </span>
+                          <span
+                            style={{
+                              color:
+                                mode === 'light'
+                                  ? colors.ligthModeSoftText
+                                  : colors.darkModeSoftText,
+                            }}
+                          >
+                            {professional.rut}-{professional.dv}
+                          </span>
+                        </div>
+                      </li>
+                    )}
+                    getOptionLabel={(professional: Professional) => {
+                      // Value selected with enter, right from the input
+                      if (typeof professional === 'string') {
+                        return professional;
+                      }
+                      // Regular professional
+                      return `${professional.nombre1} ${professional.apellPat} ${professional.rut}-${professional.dv}`;
+                    }}
+                    onChange={(event, professional: Professional | null) => {
+                      if (professional) setProfessionalId(professional.id);
                     }}
                   />
                 )}
