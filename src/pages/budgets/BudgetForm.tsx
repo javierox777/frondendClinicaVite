@@ -28,6 +28,8 @@ import colors from '../../styles/colors';
 import { Professional } from '../../interfaces/Professional';
 import Subform from '../patients/subForms/Subform';
 import { ShortModel } from '../../interfaces/ShortModel';
+import { Form } from 'react-router-dom';
+import { Company } from '../../interfaces/Company';
 
 interface Props {
   open: boolean;
@@ -46,8 +48,16 @@ const Transition = React.forwardRef(function Transition(
 const BudgetForm = ({ onClose, open }: Props) => {
   const { mode } = useThemeContext();
 
+  const [subFormSubmitted, setSubFormSubmitted] = useState(false);
+  const [patientId, setPatientId] = useState('');
+  const [professionalId, setProfessionalId] = useState('');
+  const [budgetTypeId, setBudgetTypeId] = useState('');
+  const [clinicId, setClinicId] = useState('');
+  const [registerDate, setRegisterDate] = useState('');
+  const [validDate, setValidDate] = useState('');
+
   const { data } = useQuery({
-    queryKey: ['data'],
+    queryKey: ['data', subFormSubmitted],
     queryFn: async () => {
       const response = await axios.get(
         `${generalConfig.baseUrl}/budgets/generateform`
@@ -56,10 +66,6 @@ const BudgetForm = ({ onClose, open }: Props) => {
       return response.data.body;
     },
   });
-
-  const [patientId, setPatientId] = useState('');
-  const [professionalId, setProfessionalId] = useState('');
-  const [budgetTypeId, setBudgetTypeId] = useState('');
 
   const handleSubmit = () => {
     console.log('submitted');
@@ -84,12 +90,18 @@ const BudgetForm = ({ onClose, open }: Props) => {
             </IconButton>
           </Toolbar>
           <Container>
-            <Typography className="p-3">
-              Rellene los datos para generar un nuevo presupuesto.
-            </Typography>
-          </Container>
-          <Container>
             <Grid container spacing={3} alignItems="end">
+              <Grid item xs={12}>
+                <Typography
+                  sx={{
+                    fontSize: 20,
+                    fontWeight: 'lighter',
+                    paddingTop: 3,
+                  }}
+                >
+                  DATOS DE PRESUPUESTO
+                </Typography>
+              </Grid>
               <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 {data && (
                   <>
@@ -98,6 +110,7 @@ const BudgetForm = ({ onClose, open }: Props) => {
                         title="Agregar tipo de presupuesto"
                         description="Agrega nuevo tipo de presupuesto"
                         postRoute={`${generalConfig.baseUrl}/budget-types`}
+                        onFinish={() => setSubFormSubmitted(!subFormSubmitted)}
                       />
                     </Box>
                     <FormControl fullWidth>
@@ -127,87 +140,180 @@ const BudgetForm = ({ onClose, open }: Props) => {
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 {data && (
-                  <Autocomplete
-                    fullWidth
-                    disablePortal
-                    options={data?.persons}
-                    renderInput={(params) => (
-                      <TextField {...params} label="Paciente" />
-                    )}
-                    renderOption={(props, patient: Person) => (
-                      <li {...props}>
-                        <div className="flex justify-between w-full">
-                          <span>
-                            {patient.nombre1} {patient.apellPat}
-                          </span>
-                          <span
-                            style={{
-                              color:
-                                mode === 'light'
-                                  ? colors.ligthModeSoftText
-                                  : colors.darkModeSoftText,
-                            }}
-                          >
-                            {patient.rut}-{patient.dv}
-                          </span>
-                        </div>
-                      </li>
-                    )}
-                    getOptionLabel={(patient: Person) => {
-                      // Value selected with enter, right from the input
-                      if (typeof patient === 'string') {
-                        return patient;
-                      }
-                      // Regular patient
-                      return `${patient.nombre1} ${patient.apellPat} ${patient.rut}-${patient.dv}`;
-                    }}
-                    onChange={(event, patient: Person | null) => {
-                      if (patient) setPatientId(patient.id);
-                    }}
-                  />
+                  <>
+                    <Box sx={{ marginBottom: 2 }}>
+                      <Subform
+                        title="Agregar estado"
+                        description="Agrega nuevo estado"
+                        postRoute={`${generalConfig.baseUrl}/statuses`}
+                        onFinish={() => setSubFormSubmitted(!subFormSubmitted)}
+                      />
+                    </Box>
+                    <FormControl fullWidth>
+                      <InputLabel id="budget-type-label">Estado</InputLabel>
+                      <Select
+                        label="status"
+                        id="status-select"
+                        labelId="status-label"
+                        onChange={(e: SelectChangeEvent<string>) =>
+                          setBudgetTypeId(e.target.value)
+                        }
+                        // value={}
+                      >
+                        {data.statuses.map((s: ShortModel) => {
+                          return (
+                            <MenuItem key={s.id} value={s.id}>
+                              {s.nombre}
+                            </MenuItem>
+                          );
+                        })}
+                      </Select>
+                    </FormControl>
+                  </>
                 )}
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 {data && (
-                  <Autocomplete
-                    fullWidth
-                    disablePortal
-                    options={data?.professionals}
-                    renderInput={(params) => (
-                      <TextField {...params} label="Dentista" />
-                    )}
-                    renderOption={(props, professional: Professional) => (
-                      <li {...props}>
-                        <div className="flex justify-between w-full">
-                          <span>
-                            {professional.nombre1} {professional.apellPat}
-                          </span>
-                          <span
-                            style={{
-                              color:
-                                mode === 'light'
-                                  ? colors.ligthModeSoftText
-                                  : colors.darkModeSoftText,
-                            }}
-                          >
-                            {professional.rut}-{professional.dv}
-                          </span>
-                        </div>
-                      </li>
-                    )}
-                    getOptionLabel={(professional: Professional) => {
-                      // Value selected with enter, right from the input
-                      if (typeof professional === 'string') {
-                        return professional;
-                      }
-                      // Regular professional
-                      return `${professional.nombre1} ${professional.apellPat} ${professional.rut}-${professional.dv}`;
-                    }}
-                    onChange={(event, professional: Professional | null) => {
-                      if (professional) setProfessionalId(professional.id);
-                    }}
-                  />
+                  <FormControl fullWidth>
+                    <Autocomplete
+                      disablePortal
+                      options={data?.persons}
+                      renderInput={(params) => (
+                        <TextField {...params} label="Paciente" />
+                      )}
+                      renderOption={(props, patient: Person) => (
+                        <li {...props}>
+                          <div className="flex justify-between w-full">
+                            <span>
+                              {patient.nombre1} {patient.apellPat}
+                            </span>
+                            <span
+                              style={{
+                                color:
+                                  mode === 'light'
+                                    ? colors.ligthModeSoftText
+                                    : colors.darkModeSoftText,
+                              }}
+                            >
+                              {patient.rut}-{patient.dv}
+                            </span>
+                          </div>
+                        </li>
+                      )}
+                      getOptionLabel={(patient: Person) => {
+                        // Value selected with enter, right from the input
+                        if (typeof patient === 'string') {
+                          return patient;
+                        }
+                        // Regular patient
+                        return `${patient.nombre1} ${patient.apellPat} ${patient.rut}-${patient.dv}`;
+                      }}
+                      onChange={(event, patient: Person | null) => {
+                        if (patient) setPatientId(patient.id);
+                      }}
+                    />
+                  </FormControl>
                 )}
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                {data && (
+                  <FormControl fullWidth>
+                    <Autocomplete
+                      disablePortal
+                      options={data?.professionals}
+                      renderInput={(params) => (
+                        <TextField {...params} label="Emitido por" />
+                      )}
+                      renderOption={(props, professional: Professional) => (
+                        <li {...props}>
+                          <div className="flex justify-between w-full">
+                            <span>
+                              {professional.nombre1} {professional.apellPat}
+                            </span>
+                            <span
+                              style={{
+                                color:
+                                  mode === 'light'
+                                    ? colors.ligthModeSoftText
+                                    : colors.darkModeSoftText,
+                              }}
+                            >
+                              {professional.rut}-{professional.dv}
+                            </span>
+                          </div>
+                        </li>
+                      )}
+                      getOptionLabel={(professional: Professional) => {
+                        // Value selected with enter, right from the input
+                        if (typeof professional === 'string') {
+                          return professional;
+                        }
+                        // Regular professional
+                        return `${professional.nombre1} ${professional.apellPat} ${professional.rut}-${professional.dv}`;
+                      }}
+                      onChange={(event, professional: Professional | null) => {
+                        if (professional) setProfessionalId(professional.id);
+                      }}
+                    />
+                  </FormControl>
+                )}
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                {data && (
+                  <FormControl fullWidth>
+                    <Autocomplete
+                      disablePortal
+                      options={data?.clinics}
+                      renderInput={(params) => (
+                        <TextField {...params} label="Clínica" />
+                      )}
+                      renderOption={(props, clinic: Company) => (
+                        <li {...props}>
+                          <div className="flex justify-between w-full">
+                            <span>{clinic.razonSocial}</span>
+                          </div>
+                        </li>
+                      )}
+                      getOptionLabel={(clinic: Company) => {
+                        // Value selected with enter, right from the input
+                        if (typeof clinic === 'string') {
+                          return clinic;
+                        }
+                        // Regular clinic
+                        return `${clinic.razonSocial}`;
+                      }}
+                      onChange={(event, clinic: Company | null) => {
+                        if (clinic) setPatientId(clinic.id);
+                      }}
+                    />
+                  </FormControl>
+                )}
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                <FormControl fullWidth>
+                  <TextField
+                    label="Fecha de registro"
+                    InputLabelProps={{ shrink: true }}
+                    fullWidth
+                    type="date"
+                    onChange={(e) => setRegisterDate(e.target.value)}
+                    value={registerDate}
+                    required
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                <FormControl fullWidth>
+                  <TextField
+                    label="Válido hasta"
+                    InputLabelProps={{ shrink: true }}
+                    fullWidth
+                    type="date"
+                    onChange={(e) => setValidDate(e.target.value)}
+                    value={validDate}
+                    required
+                  />
+                </FormControl>
               </Grid>
             </Grid>
           </Container>

@@ -43,7 +43,7 @@ const BudgetSearcher = () => {
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Typography>
-            Ingresa RUT de paciente o de empresa para buscar presupuestos
+            Ingresa RUT de paciente para buscar presupuestos
           </Typography>
           <form onSubmit={handleSubmit}>
             <FormControl fullWidth>
