@@ -2,6 +2,7 @@ import { AttachMoney, Close } from '@mui/icons-material';
 import {
   Autocomplete,
   Box,
+  Button,
   Card,
   Container,
   Dialog,
@@ -101,8 +102,8 @@ const BudgetForm = ({ onClose, open }: Props) => {
     },
   });
 
-  const handleSubmit = () => {
-    console.log('submitted');
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
   };
 
   return (
@@ -158,6 +159,7 @@ const BudgetForm = ({ onClose, open }: Props) => {
                               Tipo de presupuesto
                             </InputLabel>
                             <Select
+                              required
                               label="budget-types"
                               id="budget-type-select"
                               labelId="budget-type-label"
@@ -197,6 +199,7 @@ const BudgetForm = ({ onClose, open }: Props) => {
                             </InputLabel>
                             <Select
                               label="status"
+                              required
                               id="status-select"
                               labelId="status-label"
                               onChange={(e: SelectChangeEvent<string>) =>
@@ -427,6 +430,11 @@ const BudgetForm = ({ onClose, open }: Props) => {
                 </Card>
               </Grid>
               {/* FOOTER DE PRESUPUESTO CON LOS PRECIOS A PAGAR */}
+              <Grid item xs={12}>
+                <Button fullWidth variant="contained" type="submit">
+                  GENERAR PRESUPUESTO
+                </Button>
+              </Grid>
             </Grid>
           </Container>
         </form>

@@ -118,6 +118,7 @@ const DetailsForm = ({
                   <FormControl fullWidth>
                     <InputLabel id="budget-type-label">Descripción</InputLabel>
                     <Select
+                      required
                       label="budget-types"
                       id="budget-type-select"
                       labelId="budget-type-label"
@@ -140,6 +141,7 @@ const DetailsForm = ({
                   <FormControl fullWidth>
                     <InputLabel id="service-type-label">Prestación</InputLabel>
                     <Select
+                      required
                       label="service-types"
                       id="service-type-select"
                       labelId="service-type-label"
