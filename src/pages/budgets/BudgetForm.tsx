@@ -30,6 +30,9 @@ import { Professional } from '../../interfaces/Professional';
 import { ShortModel } from '../../interfaces/ShortModel';
 import colors from '../../styles/colors';
 import Subform from '../patients/subForms/Subform';
+import DetailsForm from './DetailsForm';
+import { ServiceInterface } from '../../interfaces/ServiceInterface';
+import { Budget } from '../../interfaces/Budget';
 
 interface Props {
   open: boolean;
@@ -45,6 +48,21 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
+interface BudgetDetailType {
+  id: string;
+  presupuesto_id: string;
+  objeto_id: string;
+  valorTotalNeto: number;
+  valorUniNeto: number;
+  valorTotalIva: number;
+  valorUniIva: number;
+  prestacion_id: string;
+  cantidad: string;
+  prestacion?: ServiceInterface;
+  presupuesto?: Budget;
+  objeto?: ShortModel;
+}
+
 const BudgetForm = ({ onClose, open }: Props) => {
   const { mode } = useThemeContext();
 
@@ -55,6 +73,20 @@ const BudgetForm = ({ onClose, open }: Props) => {
   const [clinicId, setClinicId] = useState('');
   const [registerDate, setRegisterDate] = useState('');
   const [validDate, setValidDate] = useState('');
+
+  const [budgetDetails, setDetails] = useState<BudgetDetailType[]>([
+    {
+      id: (Math.random() * 1000).toString(),
+      presupuesto_id: '',
+      objeto_id: '',
+      valorTotalNeto: 0,
+      valorUniNeto: 0,
+      valorTotalIva: 0,
+      valorUniIva: 0,
+      prestacion_id: '',
+      cantidad: '',
+    },
+  ]);
 
   const { data } = useQuery({
     queryKey: ['data', subFormSubmitted],
@@ -339,22 +371,13 @@ const BudgetForm = ({ onClose, open }: Props) => {
               {/* DATOS DE  PRESUPUESTO */}
 
               {/* DETALLES DE PRESUPUESTO        */}
-              <Grid item>
-                <Card elevation={3} sx={{ padding: 3 }}>
-                  <Grid container>
-                    <Grid item xs={12}>
-                      <Typography
-                        sx={{
-                          fontSize: 20,
-                          fontWeight: 'lighter',
-                          paddingTop: 3,
-                        }}
-                      >
-                        DETALLES DE PRESUPUESTO
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </Card>
+              <Grid item xs={12}>
+                <DetailsForm
+                  budgetDetails={budgetDetails}
+                  setDetails={setDetails}
+                  objects={data?.objects}
+                  services={data?.services}
+                />
               </Grid>
               {/* DETALLES DE PRESUPUESTO        */}
             </Grid>

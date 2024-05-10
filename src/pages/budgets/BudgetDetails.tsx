@@ -101,7 +101,7 @@ const BudgetDetails = ({ budget }: Props) => {
     },
   });
 
-  console.log(details);
+  console.log(budget);
   const validContacts = contacts?.filter((c: any) => c.vigente === '1');
 
   const validAddresses = addresses?.filter((a: any) => a.vigente === '1');
@@ -161,7 +161,7 @@ const BudgetDetails = ({ budget }: Props) => {
                 <Typography>{empresa.razonSocial}</Typography>
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
-                <Typography sx={{ fontWeight: 'bold' }}>Dentista</Typography>
+                <Typography sx={{ fontWeight: 'bold' }}>Emitido</Typography>
                 <Typography>
                   {profesional.nombre1} {profesional.apellPat}
                 </Typography>
@@ -202,8 +202,11 @@ const BudgetDetails = ({ budget }: Props) => {
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-                <Typography sx={{ fontWeight: 'bold' }}>Institución</Typography>
-                <Typography>{persona.institucion.nombre}</Typography>
+                <Typography sx={{ fontWeight: 'bold' }}>Previsión</Typography>
+                <Typography>
+                  {persona.institucion.prevision.nombre}{' '}
+                  {persona.institucion.nombre}
+                </Typography>
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                 <Typography sx={{ fontWeight: 'bold' }}>Contacto</Typography>
