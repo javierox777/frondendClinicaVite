@@ -5,6 +5,7 @@ import {
   FormControl,
   Grid,
   IconButton,
+  InputAdornment,
   InputLabel,
   MenuItem,
   Select,
@@ -12,11 +13,12 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { ChangeEvent, Dispatch, SetStateAction } from 'react';
 import { BudgetDetail } from '../../interfaces/BudgetDetail';
 import { ShortModel } from '../../interfaces/ShortModel';
 import { ServiceInterface } from '../../interfaces/ServiceInterface';
-import { AddCircle, Close } from '@mui/icons-material';
+import { AddCircle, AttachMoney, Close, Money } from '@mui/icons-material';
+import colors from '../../styles/colors';
 
 interface Props {
   budgetDetails: any[];
@@ -48,15 +50,25 @@ const DetailsForm = ({
     ]);
   };
 
+  const handleStringValuechange = (
+    e: ChangeEvent<HTMLInputElement> | SelectChangeEvent<string>,
+    rowIndex: number,
+    field: 'objeto_id' | 'prestacion_id'
+  ) => {
+    const updatedDetails = [...budgetDetails];
+    updatedDetails[rowIndex][field] = e.target.value;
+    setDetails(updatedDetails);
+  };
+
   return (
     <Card elevation={3} sx={{ padding: 3 }}>
-      <Grid container spacing={3}>
+      <Grid container spacing={1}>
         <Grid item xs={12}>
           <Typography
             sx={{
               fontSize: 20,
               fontWeight: 'lighter',
-              paddingTop: 3,
+              paddingTop: 2,
             }}
           >
             DETALLES DE PRESUPUESTO
@@ -65,55 +77,18 @@ const DetailsForm = ({
             <AddCircle />
           </IconButton>
         </Grid>
-        {budgetDetails.map((b: BudgetDetail) => {
+        {budgetDetails.length === 0 && (
+          <Grid item xs={12}>
+            <Typography sx={{ color: colors.ligthModeSoftText }}>
+              Haz click en el icono para agregar detalle
+            </Typography>
+          </Grid>
+        )}
+        {budgetDetails.map((b: BudgetDetail, index: number) => {
           return (
             <Grid item xs={12} key={b.id}>
-              <Grid container spacing={1} alignItems="center">
-                <Grid item xs={5}>
-                  <FormControl fullWidth>
-                    <InputLabel id="budget-type-label">Descripción</InputLabel>
-                    <Select
-                      label="budget-types"
-                      id="budget-type-select"
-                      labelId="budget-type-label"
-                      onChange={(e: SelectChangeEvent<string>) =>
-                        console.log('algo')
-                      }
-                      // value={}
-                    >
-                      {objects?.map((o: ShortModel) => {
-                        return (
-                          <MenuItem key={o.id} value={o.id}>
-                            {o.nombre}
-                          </MenuItem>
-                        );
-                      })}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={5}>
-                  <FormControl fullWidth>
-                    <InputLabel id="service-type-label">Prestación</InputLabel>
-                    <Select
-                      label="service-types"
-                      id="service-type-select"
-                      labelId="service-type-label"
-                      onChange={(e: SelectChangeEvent<string>) =>
-                        console.log('algo')
-                      }
-                      // value={}
-                    >
-                      {services?.map((s: ServiceInterface) => {
-                        return (
-                          <MenuItem key={s.id} value={s.id}>
-                            {s.nombre}
-                          </MenuItem>
-                        );
-                      })}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={12} display="flex" justifyContent="end">
                   <Box>
                     <IconButton
                       onClick={() => {
@@ -127,6 +102,102 @@ const DetailsForm = ({
                     </IconButton>
                   </Box>
                 </Grid>
+                <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                  <FormControl fullWidth>
+                    <InputLabel id="budget-type-label">Descripción</InputLabel>
+                    <Select
+                      label="budget-types"
+                      id="budget-type-select"
+                      labelId="budget-type-label"
+                      onChange={(e: SelectChangeEvent<string>) =>
+                        handleStringValuechange(e, index, 'objeto_id')
+                      }
+                      // value={}
+                    >
+                      {objects?.map((o: ShortModel) => {
+                        return (
+                          <MenuItem key={o.id} value={o.id}>
+                            {o.nombre}
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                  <FormControl fullWidth>
+                    <InputLabel id="service-type-label">Prestación</InputLabel>
+                    <Select
+                      label="service-types"
+                      id="service-type-select"
+                      labelId="service-type-label"
+                      onChange={(e: SelectChangeEvent<string>) =>
+                        handleStringValuechange(e, index, 'prestacion_id')
+                      }
+                      // value={}
+                    >
+                      {services?.map((s: ServiceInterface) => {
+                        return (
+                          <MenuItem key={s.id} value={s.id}>
+                            {s.nombre}
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                {b.prestacion_id !== '' && (
+                  <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                    {services?.map((s: ServiceInterface) => {
+                      if (s.id === b.prestacion_id) {
+                        return (
+                          <TextField
+                            disabled
+                            fullWidth
+                            label="valor unitario NETO"
+                            key={s.id}
+                            value={s.precioUniNeto}
+                            InputLabelProps={{ shrink: true }}
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <AttachMoney />
+                                </InputAdornment>
+                              ),
+                            }}
+                          />
+                        );
+                      }
+                    })}
+                  </Grid>
+                )}
+
+                {b.prestacion_id !== '' && (
+                  <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                    {services?.map((s: ServiceInterface) => {
+                      if (s.id === b.prestacion_id) {
+                        return (
+                          <TextField
+                            label="valor unitario IVA"
+                            fullWidth
+                            key={s.id}
+                            value={s.precioUniIva}
+                            InputLabelProps={{ shrink: true }}
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <AttachMoney />
+                                </InputAdornment>
+                              ),
+                            }}
+                            disabled
+                          />
+                        );
+                      }
+                    })}
+                  </Grid>
+                )}
               </Grid>
             </Grid>
           );
