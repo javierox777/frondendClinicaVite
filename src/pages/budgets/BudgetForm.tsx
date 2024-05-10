@@ -1,10 +1,11 @@
-import { Close } from '@mui/icons-material';
+import { AttachMoney, Close } from '@mui/icons-material';
 import {
   Autocomplete,
   Box,
   Card,
   Container,
   Dialog,
+  Divider,
   FormControl,
   Grid,
   IconButton,
@@ -33,6 +34,7 @@ import Subform from '../patients/subForms/Subform';
 import DetailsForm from './DetailsForm';
 import { ServiceInterface } from '../../interfaces/ServiceInterface';
 import { Budget } from '../../interfaces/Budget';
+import { BudgetDetail } from '../../interfaces/BudgetDetail';
 
 interface Props {
   open: boolean;
@@ -380,6 +382,51 @@ const BudgetForm = ({ onClose, open }: Props) => {
                 />
               </Grid>
               {/* DETALLES DE PRESUPUESTO        */}
+              {/* FOOTER DE PRESUPUESTO CON LOS PRECIOS A PAGAR */}
+              <Grid item xs={12}>
+                <Card sx={{ padding: 3 }} elevation={3}>
+                  <Grid container alignItems="center" spacing={3}>
+                    <Grid item xs={12}>
+                      <Grid item xs={6}>
+                        <Typography sx={{ fontSize: 20, fontWeight: 'bold' }}>
+                          TOTAL A PAGAR IVA INCLUIDO
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Typography
+                          sx={{ fontSize: 30, fontWeight: 'lighter' }}
+                        >
+                          <AttachMoney />
+                          {budgetDetails.reduce((acc, d: any) => {
+                            return d.valorUniIva + acc;
+                          }, 0)}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Divider />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Grid item xs={6}>
+                        <Typography sx={{ fontSize: 20, fontWeight: 'bold' }}>
+                          TOTAL A PAGAR NETO
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Typography
+                          sx={{ fontSize: 30, fontWeight: 'lighter' }}
+                        >
+                          <AttachMoney />
+                          {budgetDetails.reduce((acc, d: any) => {
+                            return d.valorUniNeto + acc;
+                          }, 0)}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                </Card>
+              </Grid>
+              {/* FOOTER DE PRESUPUESTO CON LOS PRECIOS A PAGAR */}
             </Grid>
           </Container>
         </form>

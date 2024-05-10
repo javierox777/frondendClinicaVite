@@ -57,6 +57,18 @@ const DetailsForm = ({
   ) => {
     const updatedDetails = [...budgetDetails];
     updatedDetails[rowIndex][field] = e.target.value;
+
+    if (field === 'prestacion_id') {
+      const service = services.filter(
+        (s: ServiceInterface) => s.id === e.target.value
+      );
+
+      updatedDetails[rowIndex].valorUniNeto = service[0].precioUniNeto;
+      updatedDetails[rowIndex].valorTotalNeto = service[0].precioUniNeto;
+      updatedDetails[rowIndex].valorUniIva = service[0].precioUniIva;
+      updatedDetails[rowIndex].valorTotalIva = service[0].precioUniIva;
+    }
+
     setDetails(updatedDetails);
   };
 
