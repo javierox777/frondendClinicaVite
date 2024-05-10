@@ -23,7 +23,10 @@ import {
 import { TransitionProps } from '@mui/material/transitions';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, {
+  DO_NOT_USE_OR_YOU_WILL_BE_FIRED_EXPERIMENTAL_REACT_NODES,
+  useState,
+} from 'react';
 import { useThemeContext } from '../../componemts/themeContext';
 import { generalConfig } from '../../config';
 import { Company } from '../../interfaces/Company';
@@ -60,7 +63,7 @@ interface BudgetDetailType {
   valorTotalIva: number;
   valorUniIva: number;
   prestacion_id: string;
-  cantidad: string;
+  cantidad: DO_NOT_USE_OR_YOU_WILL_BE_FIRED_EXPERIMENTAL_REACT_NODES;
   prestacion?: ServiceInterface;
   presupuesto?: Budget;
   objeto?: ShortModel;
@@ -74,6 +77,7 @@ const BudgetForm = ({ onClose, open }: Props) => {
   const [professionalId, setProfessionalId] = useState('');
   const [budgetTypeId, setBudgetTypeId] = useState('');
   const [clinicId, setClinicId] = useState('');
+  const [statusId, setStatusId] = useState('');
   const [registerDate, setRegisterDate] = useState('');
   const [validDate, setValidDate] = useState('');
 
@@ -87,7 +91,7 @@ const BudgetForm = ({ onClose, open }: Props) => {
       valorTotalIva: 0,
       valorUniIva: 0,
       prestacion_id: '',
-      cantidad: '',
+      cantidad: 1,
     },
   ]);
 
@@ -102,8 +106,22 @@ const BudgetForm = ({ onClose, open }: Props) => {
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const data = {
+      estado_id: statusId,
+      profesional_id: professionalId,
+      empresa_id: clinicId,
+      fechaRegistro: new Date(registerDate).toISOString(),
+      fechaRegistroValida: new Date(validDate).toISOString(),
+      persona_id: patientId,
+      presupuestoTipo_id: budgetTypeId,
+      budgetDetails,
+    };
+
+    console.log(data);
+
+    await axios.post(`${generalConfig.baseUrl}/budgets`, data);
   };
 
   return (
@@ -166,7 +184,7 @@ const BudgetForm = ({ onClose, open }: Props) => {
                               onChange={(e: SelectChangeEvent<string>) =>
                                 setBudgetTypeId(e.target.value)
                               }
-                              // value={}
+                              value={statusId}
                             >
                               {data.budgetTypes.map((t: ShortModel) => {
                                 return (
@@ -194,18 +212,16 @@ const BudgetForm = ({ onClose, open }: Props) => {
                             />
                           </Box>
                           <FormControl fullWidth>
-                            <InputLabel id="budget-type-label">
-                              Estado
-                            </InputLabel>
+                            <InputLabel id="status-label">Estado</InputLabel>
                             <Select
                               label="status"
                               required
                               id="status-select"
                               labelId="status-label"
                               onChange={(e: SelectChangeEvent<string>) =>
-                                setBudgetTypeId(e.target.value)
+                                setStatusId(e.target.value)
                               }
-                              // value={}
+                              value={statusId}
                             >
                               {data.statuses.map((s: ShortModel) => {
                                 return (
@@ -338,7 +354,7 @@ const BudgetForm = ({ onClose, open }: Props) => {
                               return `${clinic.razonSocial}`;
                             }}
                             onChange={(event, clinic: Company | null) => {
-                              if (clinic) setPatientId(clinic.id);
+                              if (clinic) setClinicId(clinic.id);
                             }}
                           />
                         </FormControl>
@@ -431,9 +447,11 @@ const BudgetForm = ({ onClose, open }: Props) => {
               </Grid>
               {/* FOOTER DE PRESUPUESTO CON LOS PRECIOS A PAGAR */}
               <Grid item xs={12}>
-                <Button fullWidth variant="contained" type="submit">
-                  GENERAR PRESUPUESTO
-                </Button>
+                <FormControl fullWidth>
+                  <Button fullWidth variant="contained" type="submit">
+                    GENERAR PRESUPUESTO
+                  </Button>
+                </FormControl>
               </Grid>
             </Grid>
           </Container>

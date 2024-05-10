@@ -45,7 +45,7 @@ const DetailsForm = ({
         valorTotalIva: 0,
         valorUniIva: 0,
         prestacion_id: '',
-        cantidad: '',
+        cantidad: 1,
       },
     ]);
   };
