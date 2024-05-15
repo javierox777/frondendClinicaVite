@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Card,
   Container,
   Divider,
@@ -27,6 +28,7 @@ import { Contact } from '../../interfaces/Contact';
 import colors from '../../styles/colors';
 import { useThemeContext } from '../../componemts/themeContext';
 import TableSkeleton from '../../componemts/TableSkeleton';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   budget: Budget;
@@ -57,6 +59,7 @@ const detailsTableHeadings = [
 
 const BudgetDetails = ({ budget }: Props) => {
   const { mode } = useThemeContext();
+  const navigate = useNavigate();
 
   const {
     empresa,
@@ -165,6 +168,19 @@ const BudgetDetails = ({ budget }: Props) => {
                 <Typography>
                   {profesional.nombre1} {profesional.apellPat}
                 </Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                <Button
+                  onClick={() =>
+                    navigate('/editarpresupuesto', {
+                      state: { budget: budget },
+                    })
+                  }
+                  color="success"
+                  variant="outlined"
+                >
+                  Editar
+                </Button>
               </Grid>
             </Grid>
           </Card>

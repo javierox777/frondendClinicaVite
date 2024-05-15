@@ -23,7 +23,7 @@ import {
 import { TransitionProps } from '@mui/material/transitions';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useThemeContext } from '../../componemts/themeContext';
 import { generalConfig } from '../../config';
 import { Company } from '../../interfaces/Company';
@@ -37,10 +37,12 @@ import { ServiceInterface } from '../../interfaces/ServiceInterface';
 import { Budget } from '../../interfaces/Budget';
 import { BudgetDetail } from '../../interfaces/BudgetDetail';
 import BudgetFormSkeleton from './BudgetFormSkeleton';
+import { format } from 'date-fns';
 
 interface Props {
   open: boolean;
   onClose: CallableFunction;
+  budget?: Budget;
 }
 
 const Transition = React.forwardRef(function Transition(
@@ -67,7 +69,7 @@ interface BudgetDetailType {
   objeto?: ShortModel;
 }
 
-const BudgetForm = ({ onClose, open }: Props) => {
+const BudgetForm = ({ onClose, open, budget }: Props) => {
   const { mode } = useThemeContext();
 
   const [subFormSubmitted, setSubFormSubmitted] = useState(false);
@@ -121,6 +123,17 @@ const BudgetForm = ({ onClose, open }: Props) => {
 
     await axios.post(`${generalConfig.baseUrl}/budgets`, data);
   };
+
+  useEffect(() => {
+    if (budget) {
+      setPatientId(budget.persona_id);
+      setProfessionalId(budget.profesional_id);
+      setBudgetTypeId(budget.presupuestoTipo_id);
+      setStatusId(budget.estado_id);
+      setClinicId(budget.empresa_id);
+      setRegisterDate(format(new Date(budget.fechaRegistro), 'yyyy-MM-dd'));
+    }
+  }, [budget]);
 
   if (isLoading) {
     return (
@@ -204,7 +217,7 @@ const BudgetForm = ({ onClose, open }: Props) => {
                               onChange={(e: SelectChangeEvent<string>) =>
                                 setBudgetTypeId(e.target.value)
                               }
-                              value={statusId}
+                              value={budgetTypeId}
                             >
                               {data.budgetTypes.map((t: ShortModel) => {
                                 return (
@@ -261,6 +274,7 @@ const BudgetForm = ({ onClose, open }: Props) => {
                           <Autocomplete
                             disablePortal
                             options={data?.persons}
+                            value={budget?.persona}
                             renderInput={(params) => (
                               <TextField {...params} label="Paciente" />
                             )}
@@ -303,6 +317,7 @@ const BudgetForm = ({ onClose, open }: Props) => {
                         <FormControl fullWidth>
                           <Autocomplete
                             disablePortal
+                            value={budget?.profesional}
                             options={data?.professionals}
                             renderInput={(params) => (
                               <TextField {...params} label="Emitido por" />
@@ -354,6 +369,7 @@ const BudgetForm = ({ onClose, open }: Props) => {
                         <FormControl fullWidth>
                           <Autocomplete
                             disablePortal
+                            value={budget?.empresa}
                             options={data?.clinics}
                             renderInput={(params) => (
                               <TextField {...params} label="Clínica" />
@@ -389,19 +405,6 @@ const BudgetForm = ({ onClose, open }: Props) => {
                           type="date"
                           onChange={(e) => setRegisterDate(e.target.value)}
                           value={registerDate}
-                          required
-                        />
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-                      <FormControl fullWidth>
-                        <TextField
-                          label="Válido hasta"
-                          InputLabelProps={{ shrink: true }}
-                          fullWidth
-                          type="date"
-                          onChange={(e) => setValidDate(e.target.value)}
-                          value={validDate}
                           required
                         />
                       </FormControl>
