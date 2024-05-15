@@ -23,10 +23,7 @@ import {
 import { TransitionProps } from '@mui/material/transitions';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import React, {
-  DO_NOT_USE_OR_YOU_WILL_BE_FIRED_EXPERIMENTAL_REACT_NODES,
-  useState,
-} from 'react';
+import React, { useState } from 'react';
 import { useThemeContext } from '../../componemts/themeContext';
 import { generalConfig } from '../../config';
 import { Company } from '../../interfaces/Company';
@@ -39,6 +36,7 @@ import DetailsForm from './DetailsForm';
 import { ServiceInterface } from '../../interfaces/ServiceInterface';
 import { Budget } from '../../interfaces/Budget';
 import { BudgetDetail } from '../../interfaces/BudgetDetail';
+import BudgetFormSkeleton from './BudgetFormSkeleton';
 
 interface Props {
   open: boolean;
@@ -63,7 +61,7 @@ interface BudgetDetailType {
   valorTotalIva: number;
   valorUniIva: number;
   prestacion_id: string;
-  cantidad: DO_NOT_USE_OR_YOU_WILL_BE_FIRED_EXPERIMENTAL_REACT_NODES;
+  cantidad: number;
   prestacion?: ServiceInterface;
   presupuesto?: Budget;
   objeto?: ShortModel;
@@ -95,7 +93,7 @@ const BudgetForm = ({ onClose, open }: Props) => {
     },
   ]);
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['data', subFormSubmitted],
     queryFn: async () => {
       const response = await axios.get(
@@ -123,6 +121,28 @@ const BudgetForm = ({ onClose, open }: Props) => {
 
     await axios.post(`${generalConfig.baseUrl}/budgets`, data);
   };
+
+  if (isLoading) {
+    return (
+      <Dialog
+        open={open}
+        TransitionComponent={Transition}
+        onClose={() => onClose()}
+        fullScreen
+      >
+        <Toolbar
+          component={Paper}
+          elevation={3}
+          style={{ backgroundColor: 'teal' }}
+        >
+          <IconButton onClick={() => onClose()}>
+            <Close />
+          </IconButton>
+        </Toolbar>
+        <BudgetFormSkeleton />
+      </Dialog>
+    );
+  }
 
   return (
     <>
