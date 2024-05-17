@@ -19,6 +19,7 @@ import { ShortModel } from '../../interfaces/ShortModel';
 import { ServiceInterface } from '../../interfaces/ServiceInterface';
 import { AddCircle, AttachMoney, Close, Money } from '@mui/icons-material';
 import colors from '../../styles/colors';
+import { useThemeContext } from '../../componemts/themeContext';
 
 interface Props {
   budgetDetails: any[];
@@ -33,6 +34,8 @@ const DetailsForm = ({
   objects,
   services,
 }: Props) => {
+  const { mode } = useThemeContext();
+
   const handleAddRow = () => {
     setDetails([
       ...budgetDetails,
@@ -114,6 +117,37 @@ const DetailsForm = ({
             </Typography>
           </Grid>
         )}
+        <Grid item xs={12}>
+          <Grid
+            container
+            sx={{
+              backgroundColor:
+                mode === 'light'
+                  ? colors.lightModeTableHead
+                  : colors.darkModeTableHead,
+            }}
+          >
+            <Grid item xs={3}>
+              <Typography sx={{ fontWeight: 'bold' }}>Descripción</Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <Typography sx={{ fontWeight: 'bold' }}>Prestación</Typography>
+            </Grid>
+            <Grid item xs={2}>
+              <Typography sx={{ fontWeight: 'bold' }}>
+                Valor unitario NETO
+              </Typography>
+            </Grid>
+            <Grid item xs={2}>
+              <Typography sx={{ fontWeight: 'bold' }}>
+                Valor unitario IVA
+              </Typography>
+            </Grid>
+            <Grid item xs={2}>
+              <Typography sx={{ fontWeight: 'bold' }}>Acciones</Typography>
+            </Grid>
+          </Grid>
+        </Grid>
         {budgetDetails.map((b: BudgetDetail, index: number) => {
           return (
             <Grid item xs={12} key={b.id}>
