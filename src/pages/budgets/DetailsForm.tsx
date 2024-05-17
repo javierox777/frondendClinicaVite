@@ -200,62 +200,56 @@ const DetailsForm = ({
                     </Select>
                   </FormControl>
                 </Grid>
-
-                {b.prestacion_id !== '' && (
-                  <Grid item xs={12} sm={12} md={12} lg={2} xl={2}>
-                    {services?.map((s: ServiceInterface) => {
-                      if (s.id === b.prestacion_id) {
-                        return (
-                          <TextField
-                            fullWidth
-                            label="valor unitario NETO"
-                            key={s.id}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                              handlePriceChange(e, index, 'valorUniNeto');
-                            }}
-                            value={b.valorUniNeto}
-                            InputLabelProps={{ shrink: true }}
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <AttachMoney />
-                                </InputAdornment>
-                              ),
-                            }}
-                          />
-                        );
-                      }
-                    })}
-                  </Grid>
-                )}
-
-                {b.prestacion_id !== '' && (
-                  <Grid item xs={12} sm={12} md={12} lg={2} xl={2}>
-                    {services?.map((s: ServiceInterface) => {
-                      if (s.id === b.prestacion_id) {
-                        return (
-                          <TextField
-                            label="valor unitario IVA"
-                            fullWidth
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                              handlePriceChange(e, index, 'valorUniIva');
-                            }}
-                            key={s.id}
-                            value={b.valorUniIva}
-                            InputLabelProps={{ shrink: true }}
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <AttachMoney />
-                                </InputAdornment>
-                              ),
-                            }}
-                          />
-                        );
-                      }
-                    })}
-                  </Grid>
-                )}
+                <Grid item xs={12} sm={12} md={12} lg={2} xl={2}>
+                  {services?.map((s: ServiceInterface) => {
+                    if (s.id === b.prestacion_id) {
+                      return (
+                        <TextField
+                          fullWidth
+                          label="valor unitario NETO"
+                          key={s.id}
+                          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                            handlePriceChange(e, index, 'valorUniNeto');
+                          }}
+                          value={b.valorUniNeto}
+                          InputLabelProps={{ shrink: true }}
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <AttachMoney />
+                              </InputAdornment>
+                            ),
+                          }}
+                        />
+                      );
+                    }
+                  })}
+                </Grid>
+                <Grid item xs={12} sm={12} md={12} lg={2} xl={2}>
+                  {services?.map((s: ServiceInterface) => {
+                    if (s.id === b.prestacion_id) {
+                      return (
+                        <TextField
+                          label="valor unitario IVA"
+                          fullWidth
+                          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                            handlePriceChange(e, index, 'valorUniIva');
+                          }}
+                          key={s.id}
+                          value={b.valorUniIva}
+                          InputLabelProps={{ shrink: true }}
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <AttachMoney />
+                              </InputAdornment>
+                            ),
+                          }}
+                        />
+                      );
+                    }
+                  })}
+                </Grid>
                 <Grid item xs={2} display="flex" justifyContent="end">
                   <Box>
                     <IconButton
