@@ -174,7 +174,6 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
     setDetails(response);
   };
 
-  console.log('aca lo q busco', budgetTypeId);
   useEffect(() => {
     if (budget) {
       setPatientId(budget.persona_id);
@@ -208,6 +207,8 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
       </Dialog>
     );
   }
+
+  console.log(budgetDetails);
 
   return (
     <>
@@ -507,7 +508,7 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
                           sx={{ fontSize: 30, fontWeight: 'lighter' }}
                         >
                           <AttachMoney />
-                          {budgetDetails.reduce((acc, d: any) => {
+                          {budgetDetails.reduce((acc, d: BudgetDetailType) => {
                             return d.valorUniNeto + acc;
                           }, 0)}
                         </Typography>

@@ -72,6 +72,24 @@ const DetailsForm = ({
     setDetails(updatedDetails);
   };
 
+  const handlePriceChange = (
+    e: ChangeEvent<HTMLInputElement> | SelectChangeEvent<string>,
+    rowIndex: number,
+    field: 'valorUniNeto' | 'valorUniIva'
+  ) => {
+    const inputValue = e.target.value;
+
+    const newValue =
+      inputValue === '0' || (!isNaN(Number(inputValue)) && inputValue !== '')
+        ? String(Number(inputValue))
+        : '0';
+
+    const updatedDetails = [...budgetDetails];
+    updatedDetails[rowIndex][field] = parseInt(newValue);
+
+    setDetails(updatedDetails);
+  };
+
   return (
     <Card elevation={3} sx={{ padding: 3 }}>
       <Grid container spacing={1}>
@@ -158,7 +176,10 @@ const DetailsForm = ({
                             fullWidth
                             label="valor unitario NETO"
                             key={s.id}
-                            value={s.precioUniNeto}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                              handlePriceChange(e, index, 'valorUniNeto');
+                            }}
+                            value={b.valorUniNeto}
                             InputLabelProps={{ shrink: true }}
                             InputProps={{
                               startAdornment: (
@@ -182,8 +203,11 @@ const DetailsForm = ({
                           <TextField
                             label="valor unitario IVA"
                             fullWidth
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                              handlePriceChange(e, index, 'valorUniIva');
+                            }}
                             key={s.id}
-                            value={s.precioUniIva}
+                            value={b.valorUniIva}
                             InputLabelProps={{ shrink: true }}
                             InputProps={{
                               startAdornment: (
