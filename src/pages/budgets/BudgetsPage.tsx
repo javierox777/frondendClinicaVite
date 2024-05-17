@@ -3,9 +3,22 @@ import React, { useState } from 'react';
 import BudgetSearcher from './BudgetSearcher';
 import { Add } from '@mui/icons-material';
 import BudgetForm from './BudgetForm';
+import BudgetVisualizer from './BudgetVisualizer';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import { generalConfig } from '../../config';
 
 const BudgetsPage = () => {
   const [formOpen, setOpen] = useState(false);
+
+  const { data: budgets } = useQuery({
+    queryKey: ['budgets'],
+    queryFn: async () => {
+      const response = await axios.get(`${generalConfig.baseUrl}/budgets`);
+
+      return response.data.body;
+    },
+  });
 
   return (
     <>
@@ -17,7 +30,7 @@ const BudgetsPage = () => {
           </Button>
         </Grid>
         <Grid item xs={12}>
-          <BudgetSearcher />
+          <BudgetVisualizer budgets={budgets} />
         </Grid>
       </Grid>
       <BudgetForm open={formOpen} onClose={() => setOpen(false)} />

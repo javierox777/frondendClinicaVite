@@ -3,15 +3,17 @@ import {
   Container,
   Grid,
   IconButton,
+  InputAdornment,
   TablePagination,
+  TextField,
   Typography,
 } from '@mui/material';
 import React, { useState } from 'react';
 import { useThemeContext } from '../../componemts/themeContext';
 import { Budget } from '../../interfaces/Budget';
 import colors from '../../styles/colors';
+import { Edit, Search } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { Edit } from '@mui/icons-material';
 
 interface Props {
   budgets: Budget[];
@@ -22,6 +24,7 @@ const BudgetVisualizer = ({ budgets }: Props) => {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [searchText, setSearchText] = useState('');
 
   const navigation = useNavigate();
 
@@ -58,7 +61,7 @@ const BudgetVisualizer = ({ budgets }: Props) => {
     setPage(0);
   };
 
-  if (budgets.length === 0) {
+  if (budgets?.length === 0) {
     return (
       <Container>
         <Typography>No hay presupuestos que mostrar</Typography>
@@ -66,8 +69,32 @@ const BudgetVisualizer = ({ budgets }: Props) => {
     );
   }
 
+  const filteredBudgets = budgets?.filter((b: Budget) => {
+    const rut = b.persona.rut.toLowerCase();
+    const institution = b.presupuestoTipo.nombre.toLowerCase();
+    const name = `${b.persona.nombre1} ${b.persona.apellPat}`.toLowerCase();
+    return (
+      rut.includes(searchText.toLowerCase()) ||
+      institution.includes(searchText.toLowerCase()) ||
+      name.includes(searchText.toLowerCase())
+    );
+  });
+
   return (
-    <Card elevation={3} sx={{ padding: 3 }}>
+    <Card elevation={3} sx={{ padding: 0 }}>
+      <TextField
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+        style={{ marginBlock: '16px', width: '30%' }}
+        placeholder="Buscar..."
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <Search />
+            </InputAdornment>
+          ),
+        }}
+      />
       <Grid container>
         <Grid
           item
@@ -77,6 +104,7 @@ const BudgetVisualizer = ({ budgets }: Props) => {
               mode === 'light'
                 ? colors.lightModeTableHead
                 : colors.darkModeTableHead,
+            padding: 3,
           }}
         >
           <Grid container direction="row" justifyContent="space-between">
@@ -89,7 +117,7 @@ const BudgetVisualizer = ({ budgets }: Props) => {
             })}
           </Grid>
         </Grid>
-        {budgets
+        {filteredBudgets
           ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
           .map((b: Budget) => {
             return (
@@ -97,7 +125,7 @@ const BudgetVisualizer = ({ budgets }: Props) => {
                 container
                 key={b.id}
                 justifyContent="space-between"
-                sx={{ paddingBlock: 3 }}
+                sx={{ padding: 3 }}
                 className="hover:scale-[1.01] transition-all duration-500 cursor-pointer"
                 onClick={() => {
                   navigation('/presupuestodetalle', {
