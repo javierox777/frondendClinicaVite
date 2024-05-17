@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Table, TableHead, TableRow, TableCell, TableBody, Button } from '@mui/material';
+import { Table, TableHead, TableRow, TableCell, TableBody, Button, IconButton } from '@mui/material';
+import { Edit, Delete } from '@mui/icons-material'; // Importa los iconos de Material-UI
 import City from './Ciudad';
 
 const CiudadTable = () => {
@@ -29,15 +30,14 @@ const CiudadTable = () => {
 
   const handleOpenForm = () => {
     setShowForm(true);
-   
   };
 
   return (
     <>
       {showForm && <City />}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100vh', paddingTop: '20px' }}>
-        
-        <Table style={{ width: '80%', maxWidth: '800px', marginTop: '20px' }}>
+      <div style={{ overflowX: 'auto' }}> 
+       
+        <Table style={{ minWidth: 600, marginTop:"5%" }}> 
           <TableHead>
             <TableRow>
               <TableCell>ID</TableCell>
@@ -53,7 +53,12 @@ const CiudadTable = () => {
                 <TableCell>{ciudad.nombre}</TableCell>
                 <TableCell>{ciudad.vigente}</TableCell>
                 <TableCell>
-                 {}
+                  <IconButton onClick={handleOpenForm}> {/* Agrega un botón de edición */}
+                    <Edit />
+                  </IconButton>
+                  <IconButton> {/* Agrega un botón de eliminación */}
+                    <Delete />
+                  </IconButton>
                 </TableCell>
               </TableRow>
             ))}

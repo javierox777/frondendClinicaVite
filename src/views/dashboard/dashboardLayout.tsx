@@ -82,7 +82,7 @@ const DashboardLayout: React.FC = () => {
         position="fixed"
         sx={{
           zIndex: (theme: any) => theme.zIndex.drawer + 1,
-          backgroundColor: mode === 'light' ? 'teal' : 'AppWorkspace',
+          backgroundColor: mode === 'light' ? 'dark' : 'AppWorkspace',
         }}
       >
         <Toolbar>
@@ -147,6 +147,7 @@ const DashboardLayout: React.FC = () => {
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
+            background: 'transparent 20%', // Establecer el fondo del Drawer como transparente
           },
         }}
       >
@@ -229,28 +230,39 @@ const DashboardLayout: React.FC = () => {
           p: 3,
         }}
       >
-        <Toolbar />
-        <Routes>
-          <Route path="/inicio" element={<Inicio />} />
-          <Route path="/pacientes" element={<PatientsPage />} />
-          <Route path="/ingreso" element={<InstitutionForm />} />
-          <Route path="/sexo" element={<Sexo />} />
-          <Route path="/atencion" element={<AtencionTipo />} />
-          <Route path="/ciudad" element={<Ciudad />} />
-          <Route path="/contacto" element={<Contacto />} />
-          <Route path="/estado" element={<Estado />} />
-          <Route path="/mensaje" element={<Mensaje />} />
-          <Route path="/presupuesto" element={<PresupuestoTipo />} />
-          <Route path="/solicitario" element={<Solicitario />} />
-          <Route path="/direccion" element={<TipoDireccion />} />
-          <Route path="/detallespaciente" element={<PatientDetailsPage />} />
-          <Route path="/editarpaciente" element={<EditPatientPage />} />
-          <Route path="/profesionales" element={<ProfessionalsPage />} />
-          <Route path="/editarprofesional" element={<EditProfessionalPage />} />
-          <Route path="/presupuestos" element={<BudgetsPage />} />
-          <Route path="/presupuestodetalle" element={<BudgetDetailsPage />} />
-          <Route path="/editarpresupuesto" element={<EditBudgetPage />} />
-        </Routes>
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            bgcolor: 'background.default',
+            p: 3,
+            transition: 'margin-left 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
+            marginLeft: drawerOpen ? '240px' : '0px', // Ajusta el margen izquierdo según si el Drawer está abierto o cerrado
+          }}
+        >
+          <Toolbar />
+          <Routes>
+            <Route path="/inicio" element={<Inicio />} />
+            <Route path="/pacientes" element={<PatientsPage />} />
+            <Route path="/ingreso" element={<InstitutionForm />} />
+            <Route path="/sexo" element={<Sexo />} />
+            <Route path="/atencion" element={<AtencionTipo />} />
+            <Route path="/ciudad" element={<Ciudad />} />
+            <Route path="/contacto" element={<Contacto />} />
+            <Route path="/estado" element={<Estado />} />
+            <Route path="/mensaje" element={<Mensaje />} />
+            <Route path="/presupuesto" element={<PresupuestoTipo />} />
+            <Route path="/solicitario" element={<Solicitario />} />
+            <Route path="/direccion" element={<TipoDireccion />} />
+            <Route path="/detallespaciente" element={<PatientDetailsPage />} />
+            <Route path="/editarpaciente" element={<EditPatientPage />} />
+            <Route path="/profesionales" element={<ProfessionalsPage />} />
+            <Route
+              path="/editarprofesional"
+              element={<EditProfessionalPage />}
+            />
+          </Routes>
+        </Box>
       </Box>
     </Box>
   );
