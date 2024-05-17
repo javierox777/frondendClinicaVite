@@ -38,6 +38,7 @@ import { Budget } from '../../interfaces/Budget';
 import { BudgetDetail } from '../../interfaces/BudgetDetail';
 import BudgetFormSkeleton from './BudgetFormSkeleton';
 import { format } from 'date-fns';
+import toast, { Toaster } from 'react-hot-toast';
 
 interface Props {
   open: boolean;
@@ -80,6 +81,7 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
   const [statusId, setStatusId] = useState('');
   const [registerDate, setRegisterDate] = useState('');
   const [validDate, setValidDate] = useState('');
+  const [isSubmitting, setSubmitting] = useState(false);
 
   const [budgetDetails, setDetails] = useState<BudgetDetailType[]>([
     {
@@ -113,17 +115,66 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
       profesional_id: professionalId,
       empresa_id: clinicId,
       fechaRegistro: new Date(registerDate).toISOString(),
-      fechaRegistroValida: new Date(validDate).toISOString(),
       persona_id: patientId,
       presupuestoTipo_id: budgetTypeId,
       budgetDetails,
     };
 
-    console.log(data);
+    if (budget) {
+      try {
+        setSubmitting(true);
+        const response = await axios.patch(
+          `${generalConfig.baseUrl}/budgets/${budget.id}`,
+          data
+        );
+        console.log(response.data);
+        if (response.data.message === 'success') {
+          toast.success('Presupueto actualizado');
+          setSubmitting(false);
+        }
+      } catch (error) {
+        console.log(error);
+        toast.error('No se pudo actualizar presupuesto.');
+        setSubmitting(false);
+      }
+    } else {
+      try {
+        setSubmitting(true);
+        const response = await axios.post(
+          `${generalConfig.baseUrl}/budgets`,
+          data
+        );
+        if (response.data.message === 'success') {
+          setPatientId('');
+          setProfessionalId('');
+          setBudgetTypeId('');
+          setStatusId('');
+          setClinicId('');
+          setRegisterDate('');
+          setDetails([]);
 
-    await axios.post(`${generalConfig.baseUrl}/budgets`, data);
+          toast.success('Presupueto registrado');
+          setSubmitting(false);
+        }
+      } catch (error) {
+        console.log(error);
+        toast.error('Presupuesto no pudo ser registrado.');
+        setSubmitting(false);
+      }
+    }
   };
 
+  const getBudgetDetails = async () => {
+    const response = (
+      await axios.get(`${generalConfig.baseUrl}/budget-details`)
+    ).data.body.filter((d: BudgetDetail) => d.presupuesto_id === budget?.id);
+
+    console.log(response);
+
+    setDetails(response);
+  };
+
+  console.log('aca lo q busco', budgetTypeId);
   useEffect(() => {
     if (budget) {
       setPatientId(budget.persona_id);
@@ -132,6 +183,7 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
       setStatusId(budget.estado_id);
       setClinicId(budget.empresa_id);
       setRegisterDate(format(new Date(budget.fechaRegistro), 'yyyy-MM-dd'));
+      getBudgetDetails();
     }
   }, [budget]);
 
@@ -179,238 +231,234 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
           <Container sx={{ paddingTop: 3 }}>
             <Grid container spacing={3}>
               <Grid item>
-                <Card sx={{ padding: 3 }} elevation={3}>
-                  <Grid container spacing={3} alignItems="end">
-                    <Grid item xs={12}>
-                      <Typography
-                        sx={{
-                          fontSize: 20,
-                          fontWeight: 'lighter',
-                          paddingTop: 3,
-                        }}
-                      >
-                        DATOS DE PRESUPUESTO
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-                      {data && (
-                        <>
-                          <Box sx={{ marginBottom: 2 }}>
-                            <Subform
-                              title="Agregar tipo de presupuesto"
-                              description="Agrega nuevo tipo de presupuesto"
-                              postRoute={`${generalConfig.baseUrl}/budget-types`}
-                              onFinish={() =>
-                                setSubFormSubmitted(!subFormSubmitted)
-                              }
-                            />
-                          </Box>
-                          <FormControl fullWidth>
-                            <InputLabel id="budget-type-label">
-                              Tipo de presupuesto
-                            </InputLabel>
-                            <Select
-                              required
-                              label="budget-types"
-                              id="budget-type-select"
-                              labelId="budget-type-label"
-                              onChange={(e: SelectChangeEvent<string>) =>
-                                setBudgetTypeId(e.target.value)
-                              }
-                              value={budgetTypeId}
-                            >
-                              {data.budgetTypes.map((t: ShortModel) => {
-                                return (
-                                  <MenuItem key={t.id} value={t.id}>
-                                    {t.nombre}
-                                  </MenuItem>
-                                );
-                              })}
-                            </Select>
-                          </FormControl>
-                        </>
-                      )}
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-                      {data && (
-                        <>
-                          <Box sx={{ marginBottom: 2 }}>
-                            <Subform
-                              title="Agregar estado"
-                              description="Agrega nuevo estado"
-                              postRoute={`${generalConfig.baseUrl}/statuses`}
-                              onFinish={() =>
-                                setSubFormSubmitted(!subFormSubmitted)
-                              }
-                            />
-                          </Box>
-                          <FormControl fullWidth>
-                            <InputLabel id="status-label">Estado</InputLabel>
-                            <Select
-                              label="status"
-                              required
-                              id="status-select"
-                              labelId="status-label"
-                              onChange={(e: SelectChangeEvent<string>) =>
-                                setStatusId(e.target.value)
-                              }
-                              value={statusId}
-                            >
-                              {data.statuses.map((s: ShortModel) => {
-                                return (
-                                  <MenuItem key={s.id} value={s.id}>
-                                    {s.nombre}
-                                  </MenuItem>
-                                );
-                              })}
-                            </Select>
-                          </FormControl>
-                        </>
-                      )}
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-                      {data && (
-                        <FormControl fullWidth>
-                          <Autocomplete
-                            disablePortal
-                            options={data?.persons}
-                            value={budget?.persona}
-                            renderInput={(params) => (
-                              <TextField {...params} label="Paciente" />
-                            )}
-                            renderOption={(props, patient: Person) => (
-                              <li {...props}>
-                                <div className="flex justify-between w-full">
-                                  <span>
-                                    {patient.nombre1} {patient.apellPat}
-                                  </span>
-                                  <span
-                                    style={{
-                                      color:
-                                        mode === 'light'
-                                          ? colors.ligthModeSoftText
-                                          : colors.darkModeSoftText,
-                                    }}
-                                  >
-                                    {patient.rut}-{patient.dv}
-                                  </span>
-                                </div>
-                              </li>
-                            )}
-                            getOptionLabel={(patient: Person) => {
-                              // Value selected with enter, right from the input
-                              if (typeof patient === 'string') {
-                                return patient;
-                              }
-                              // Regular patient
-                              return `${patient.nombre1} ${patient.apellPat} ${patient.rut}-${patient.dv}`;
-                            }}
-                            onChange={(event, patient: Person | null) => {
-                              if (patient) setPatientId(patient.id);
-                            }}
+                {/* <Card sx={{ padding: 3 }} elevation={3}> */}
+                <Grid container spacing={3} alignItems="end">
+                  <Grid item xs={12}>
+                    <Typography
+                      sx={{
+                        fontSize: 20,
+                        fontWeight: 'lighter',
+                        paddingTop: 3,
+                      }}
+                    >
+                      DATOS DE PRESUPUESTO
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                    {data && (
+                      <>
+                        <Box sx={{ marginBottom: 2 }}>
+                          <Subform
+                            title="Agregar tipo de presupuesto"
+                            description="Agrega nuevo tipo de presupuesto"
+                            postRoute={`${generalConfig.baseUrl}/budget-types`}
+                            onFinish={() =>
+                              setSubFormSubmitted(!subFormSubmitted)
+                            }
                           />
-                        </FormControl>
-                      )}
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-                      {data && (
+                        </Box>
                         <FormControl fullWidth>
-                          <Autocomplete
-                            disablePortal
-                            value={budget?.profesional}
-                            options={data?.professionals}
-                            renderInput={(params) => (
-                              <TextField {...params} label="Emitido por" />
-                            )}
-                            renderOption={(
-                              props,
-                              professional: Professional
-                            ) => (
-                              <li {...props}>
-                                <div className="flex justify-between w-full">
-                                  <span>
-                                    {professional.nombre1}{' '}
-                                    {professional.apellPat}
-                                  </span>
-                                  <span
-                                    style={{
-                                      color:
-                                        mode === 'light'
-                                          ? colors.ligthModeSoftText
-                                          : colors.darkModeSoftText,
-                                    }}
-                                  >
-                                    {professional.rut}-{professional.dv}
-                                  </span>
-                                </div>
-                              </li>
-                            )}
-                            getOptionLabel={(professional: Professional) => {
-                              // Value selected with enter, right from the input
-                              if (typeof professional === 'string') {
-                                return professional;
-                              }
-                              // Regular professional
-                              return `${professional.nombre1} ${professional.apellPat} ${professional.rut}-${professional.dv}`;
-                            }}
-                            onChange={(
-                              event,
-                              professional: Professional | null
-                            ) => {
-                              if (professional)
-                                setProfessionalId(professional.id);
-                            }}
-                          />
+                          <InputLabel id="budget-type-label">
+                            Tipo de presupuesto
+                          </InputLabel>
+                          <Select
+                            required
+                            label="budget-types"
+                            id="budget-type-select"
+                            labelId="budget-type-label"
+                            onChange={(e: SelectChangeEvent<string>) =>
+                              setBudgetTypeId(e.target.value)
+                            }
+                            value={budgetTypeId}
+                          >
+                            {data.budgetTypes.map((t: ShortModel) => {
+                              return (
+                                <MenuItem key={t.id} value={t.id}>
+                                  {t.nombre}
+                                </MenuItem>
+                              );
+                            })}
+                          </Select>
                         </FormControl>
-                      )}
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-                      {data && (
+                      </>
+                    )}
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                    {data && (
+                      <>
+                        <Box sx={{ marginBottom: 2 }}>
+                          <Subform
+                            title="Agregar estado"
+                            description="Agrega nuevo estado"
+                            postRoute={`${generalConfig.baseUrl}/statuses`}
+                            onFinish={() =>
+                              setSubFormSubmitted(!subFormSubmitted)
+                            }
+                          />
+                        </Box>
                         <FormControl fullWidth>
-                          <Autocomplete
-                            disablePortal
-                            value={budget?.empresa}
-                            options={data?.clinics}
-                            renderInput={(params) => (
-                              <TextField {...params} label="Clínica" />
-                            )}
-                            renderOption={(props, clinic: Company) => (
-                              <li {...props}>
-                                <div className="flex justify-between w-full">
-                                  <span>{clinic.razonSocial}</span>
-                                </div>
-                              </li>
-                            )}
-                            getOptionLabel={(clinic: Company) => {
-                              // Value selected with enter, right from the input
-                              if (typeof clinic === 'string') {
-                                return clinic;
-                              }
-                              // Regular clinic
-                              return `${clinic.razonSocial}`;
-                            }}
-                            onChange={(event, clinic: Company | null) => {
-                              if (clinic) setClinicId(clinic.id);
-                            }}
-                          />
+                          <InputLabel id="status-label">Estado</InputLabel>
+                          <Select
+                            label="status"
+                            required
+                            id="status-select"
+                            labelId="status-label"
+                            onChange={(e: SelectChangeEvent<string>) =>
+                              setStatusId(e.target.value)
+                            }
+                            value={statusId}
+                          >
+                            {data.statuses.map((s: ShortModel) => {
+                              return (
+                                <MenuItem key={s.id} value={s.id}>
+                                  {s.nombre}
+                                </MenuItem>
+                              );
+                            })}
+                          </Select>
                         </FormControl>
-                      )}
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                      </>
+                    )}
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                    {data && (
                       <FormControl fullWidth>
-                        <TextField
-                          label="Fecha de registro"
-                          InputLabelProps={{ shrink: true }}
-                          fullWidth
-                          type="date"
-                          onChange={(e) => setRegisterDate(e.target.value)}
-                          value={registerDate}
-                          required
+                        <Autocomplete
+                          disablePortal
+                          options={data?.persons}
+                          defaultValue={budget?.persona}
+                          renderInput={(params) => (
+                            <TextField {...params} label="Paciente" />
+                          )}
+                          renderOption={(props, patient: Person) => (
+                            <li {...props}>
+                              <div className="flex justify-between w-full">
+                                <span>
+                                  {patient.nombre1} {patient.apellPat}
+                                </span>
+                                <span
+                                  style={{
+                                    color:
+                                      mode === 'light'
+                                        ? colors.ligthModeSoftText
+                                        : colors.darkModeSoftText,
+                                  }}
+                                >
+                                  {patient.rut}-{patient.dv}
+                                </span>
+                              </div>
+                            </li>
+                          )}
+                          getOptionLabel={(patient: Person) => {
+                            // Value selected with enter, right from the input
+                            if (typeof patient === 'string') {
+                              return patient;
+                            }
+                            // Regular patient
+                            return `${patient.nombre1} ${patient.apellPat} ${patient.rut}-${patient.dv}`;
+                          }}
+                          onChange={(event, patient: Person | null) => {
+                            if (patient) setPatientId(patient.id);
+                          }}
                         />
                       </FormControl>
-                    </Grid>
+                    )}
                   </Grid>
-                </Card>
+                  <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                    {data && (
+                      <FormControl fullWidth>
+                        <Autocomplete
+                          disablePortal
+                          defaultValue={budget?.profesional}
+                          options={data?.professionals}
+                          renderInput={(params) => (
+                            <TextField {...params} label="Emitido por" />
+                          )}
+                          renderOption={(props, professional: Professional) => (
+                            <li {...props}>
+                              <div className="flex justify-between w-full">
+                                <span>
+                                  {professional.nombre1} {professional.apellPat}
+                                </span>
+                                <span
+                                  style={{
+                                    color:
+                                      mode === 'light'
+                                        ? colors.ligthModeSoftText
+                                        : colors.darkModeSoftText,
+                                  }}
+                                >
+                                  {professional.rut}-{professional.dv}
+                                </span>
+                              </div>
+                            </li>
+                          )}
+                          getOptionLabel={(professional: Professional) => {
+                            // Value selected with enter, right from the input
+                            if (typeof professional === 'string') {
+                              return professional;
+                            }
+                            // Regular professional
+                            return `${professional.nombre1} ${professional.apellPat} ${professional.rut}-${professional.dv}`;
+                          }}
+                          onChange={(
+                            event,
+                            professional: Professional | null
+                          ) => {
+                            if (professional)
+                              setProfessionalId(professional.id);
+                          }}
+                        />
+                      </FormControl>
+                    )}
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                    {data && (
+                      <FormControl fullWidth>
+                        <Autocomplete
+                          disablePortal
+                          defaultValue={budget?.empresa}
+                          options={data?.clinics}
+                          renderInput={(params) => (
+                            <TextField {...params} label="Clínica" />
+                          )}
+                          renderOption={(props, clinic: Company) => (
+                            <li {...props}>
+                              <div className="flex justify-between w-full">
+                                <span>{clinic.razonSocial}</span>
+                              </div>
+                            </li>
+                          )}
+                          getOptionLabel={(clinic: Company) => {
+                            // Value selected with enter, right from the input
+                            if (typeof clinic === 'string') {
+                              return clinic;
+                            }
+                            // Regular clinic
+                            return `${clinic.razonSocial}`;
+                          }}
+                          onChange={(event, clinic: Company | null) => {
+                            if (clinic) setClinicId(clinic.id);
+                          }}
+                        />
+                      </FormControl>
+                    )}
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                    <FormControl fullWidth>
+                      <TextField
+                        label="Fecha de registro"
+                        InputLabelProps={{ shrink: true }}
+                        fullWidth
+                        type="date"
+                        onChange={(e) => setRegisterDate(e.target.value)}
+                        value={registerDate}
+                        required
+                      />
+                    </FormControl>
+                  </Grid>
+                </Grid>
+                {/* </Card> */}
               </Grid>
               {/* DATOS DE  PRESUPUESTO */}
 
@@ -471,8 +519,15 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
               {/* FOOTER DE PRESUPUESTO CON LOS PRECIOS A PAGAR */}
               <Grid item xs={12}>
                 <FormControl fullWidth>
-                  <Button fullWidth variant="contained" type="submit">
-                    GENERAR PRESUPUESTO
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    type="submit"
+                    color={budget ? 'success' : 'primary'}
+                    disabled={isSubmitting}
+                  >
+                    {!budget && 'GENERAR PRESUPUESTO'}
+                    {budget && 'ACTUALIZAR PRESUPUESTO'}
                   </Button>
                 </FormControl>
               </Grid>
@@ -480,6 +535,7 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
           </Container>
         </form>
       </Dialog>
+      <Toaster />
     </>
   );
 };

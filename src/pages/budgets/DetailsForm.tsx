@@ -99,25 +99,12 @@ const DetailsForm = ({
         {budgetDetails.map((b: BudgetDetail, index: number) => {
           return (
             <Grid item xs={12} key={b.id}>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs={12} display="flex" justifyContent="end">
-                  <Box>
-                    <IconButton
-                      onClick={() => {
-                        const filtered = budgetDetails.filter(
-                          (d: BudgetDetail) => d.id !== b.id
-                        );
-                        setDetails(filtered);
-                      }}
-                    >
-                      <Close />
-                    </IconButton>
-                  </Box>
-                </Grid>
+              <Grid container spacing={1} alignItems="center">
                 <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
                   <FormControl fullWidth>
                     <InputLabel id="budget-type-label">Descripción</InputLabel>
                     <Select
+                      value={b.objeto_id}
                       required
                       label="budget-types"
                       id="budget-type-select"
@@ -141,6 +128,7 @@ const DetailsForm = ({
                   <FormControl fullWidth>
                     <InputLabel id="service-type-label">Prestación</InputLabel>
                     <Select
+                      value={b.prestacion_id}
                       required
                       label="service-types"
                       id="service-type-select"
@@ -162,12 +150,11 @@ const DetailsForm = ({
                 </Grid>
 
                 {b.prestacion_id !== '' && (
-                  <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                  <Grid item xs={12} sm={12} md={12} lg={2} xl={2}>
                     {services?.map((s: ServiceInterface) => {
                       if (s.id === b.prestacion_id) {
                         return (
                           <TextField
-                            disabled
                             fullWidth
                             label="valor unitario NETO"
                             key={s.id}
@@ -188,7 +175,7 @@ const DetailsForm = ({
                 )}
 
                 {b.prestacion_id !== '' && (
-                  <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                  <Grid item xs={12} sm={12} md={12} lg={2} xl={2}>
                     {services?.map((s: ServiceInterface) => {
                       if (s.id === b.prestacion_id) {
                         return (
@@ -205,13 +192,26 @@ const DetailsForm = ({
                                 </InputAdornment>
                               ),
                             }}
-                            disabled
                           />
                         );
                       }
                     })}
                   </Grid>
                 )}
+                <Grid item xs={2} display="flex" justifyContent="end">
+                  <Box>
+                    <IconButton
+                      onClick={() => {
+                        const filtered = budgetDetails.filter(
+                          (d: BudgetDetail) => d.id !== b.id
+                        );
+                        setDetails(filtered);
+                      }}
+                    >
+                      <Close />
+                    </IconButton>
+                  </Box>
+                </Grid>
               </Grid>
             </Grid>
           );
