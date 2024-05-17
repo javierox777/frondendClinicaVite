@@ -154,11 +154,11 @@ const DetailsForm = ({
               <Grid container spacing={1} alignItems="center">
                 <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
                   <FormControl fullWidth>
-                    <InputLabel id="budget-type-label">Descripción</InputLabel>
+                    {/* <InputLabel id="budget-type-label">Descripción</InputLabel> */}
                     <Select
                       value={b.objeto_id}
                       required
-                      label="budget-types"
+                      // label="budget-types"
                       id="budget-type-select"
                       labelId="budget-type-label"
                       onChange={(e: SelectChangeEvent<string>) =>
@@ -178,11 +178,11 @@ const DetailsForm = ({
                 </Grid>
                 <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
                   <FormControl fullWidth>
-                    <InputLabel id="service-type-label">Prestación</InputLabel>
+                    {/* <InputLabel id="service-type-label">Prestación</InputLabel> */}
                     <Select
                       value={b.prestacion_id}
                       required
-                      label="service-types"
+                      // label="service-types"
                       id="service-type-select"
                       labelId="service-type-label"
                       onChange={(e: SelectChangeEvent<string>) =>
@@ -206,7 +206,7 @@ const DetailsForm = ({
                       return (
                         <TextField
                           fullWidth
-                          label="valor unitario NETO"
+                          // label="valor unitario NETO"
                           key={s.id}
                           onChange={(e: ChangeEvent<HTMLInputElement>) => {
                             handlePriceChange(e, index, 'valorUniNeto');
@@ -230,7 +230,7 @@ const DetailsForm = ({
                     if (s.id === b.prestacion_id) {
                       return (
                         <TextField
-                          label="valor unitario IVA"
+                          // label="valor unitario IVA"
                           fullWidth
                           onChange={(e: ChangeEvent<HTMLInputElement>) => {
                             handlePriceChange(e, index, 'valorUniIva');
