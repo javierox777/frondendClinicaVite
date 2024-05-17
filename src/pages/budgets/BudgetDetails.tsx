@@ -51,10 +51,10 @@ const detailsTableHeadings = [
     id: 4,
     label: 'VALOR NETO',
   },
-  // {
-  //   id: 5,
-  //   label: 'ESTADO',
-  // },
+  {
+    id: 5,
+    label: 'VALOR IVA',
+  },
 ];
 
 const BudgetDetails = ({ budget }: Props) => {
@@ -324,7 +324,8 @@ const BudgetDetails = ({ budget }: Props) => {
                       <TableRow key={d.id}>
                         <TableCell>{d.objeto.nombre}</TableCell>
                         <TableCell>{d.prestacion.nombre}</TableCell>
-                        <TableCell>$ {d.prestacion.precioUniNeto}</TableCell>
+                        <TableCell>$ {d.valorUniNeto}</TableCell>
+                        <TableCell>$ {d.valorUniIva}</TableCell>
                       </TableRow>
                     );
                   })}
@@ -332,7 +333,11 @@ const BudgetDetails = ({ budget }: Props) => {
                 <TableFooter>
                   <TableRow>
                     <TableCell>TOTAL A PAGAR</TableCell>
-                    <TableCell>1</TableCell>
+                    <TableCell>
+                      {details?.reduce((acc: number, d: BudgetDetail) => {
+                        return d.valorUniIva + acc;
+                      }, 0)}
+                    </TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell>PAGADO</TableCell>

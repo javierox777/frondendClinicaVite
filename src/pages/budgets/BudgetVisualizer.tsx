@@ -4,6 +4,7 @@ import {
   Grid,
   IconButton,
   InputAdornment,
+  LinearProgress,
   TablePagination,
   TextField,
   Typography,
@@ -17,9 +18,10 @@ import { useNavigate } from 'react-router-dom';
 
 interface Props {
   budgets: Budget[];
+  isLoading?: boolean;
 }
 
-const BudgetVisualizer = ({ budgets }: Props) => {
+const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
   const { mode } = useThemeContext();
 
   const [page, setPage] = useState(0);
@@ -61,14 +63,6 @@ const BudgetVisualizer = ({ budgets }: Props) => {
     setPage(0);
   };
 
-  if (budgets?.length === 0) {
-    return (
-      <Container>
-        <Typography>No hay presupuestos que mostrar</Typography>
-      </Container>
-    );
-  }
-
   const filteredBudgets = budgets?.filter((b: Budget) => {
     const rut = b.persona.rut.toLowerCase();
     const institution = b.presupuestoTipo.nombre.toLowerCase();
@@ -79,6 +73,20 @@ const BudgetVisualizer = ({ budgets }: Props) => {
       name.includes(searchText.toLowerCase())
     );
   });
+  if (isLoading) {
+    return (
+      <Container>
+        <LinearProgress />
+        <Typography
+          sx={{
+            color: colors.ligthModeSoftText,
+          }}
+        >
+          Cargando datos...
+        </Typography>
+      </Container>
+    );
+  }
 
   return (
     <Card elevation={3} sx={{ padding: 0 }}>
