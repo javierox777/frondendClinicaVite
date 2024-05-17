@@ -257,6 +257,10 @@ const DashboardLayout: React.FC = () => {
             <Route path="/detallespaciente" element={<PatientDetailsPage />} />
             <Route path="/editarpaciente" element={<EditPatientPage />} />
             <Route path="/profesionales" element={<ProfessionalsPage />} />
+            <Route path="/presupuestos" element={<BudgetsPage />} />
+            <Route path="/editarpresupuesto" element={<EditBudgetPage />} />
+            <Route path="/presupuestodetalle" element={<BudgetDetailsPage />} />
+            <Route path="/profesionales" element={<ProfessionalsPage />} />
             <Route
               path="/editarprofesional"
               element={<EditProfessionalPage />}
