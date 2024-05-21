@@ -2,12 +2,11 @@ import { Person } from "./Person";
 import { ShortModel } from "./ShortModel";
 
 export interface Contact {
-    id: string;
+    _id: string;
     descripcion: string;
-    contacto_id: string;
+    contacto: string;
     fechaReg: Date;
-    persona_id:string;
+    persona:string;
     vigente:string;
-    contacto: ShortModel
-    persona: Person;
+ 
 }

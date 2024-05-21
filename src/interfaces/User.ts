@@ -1,5 +1,5 @@
 export interface User {
-    id: string;
+    _id: string;
     vigencia: string;
     fechaRegistro: Date;
     login: string;

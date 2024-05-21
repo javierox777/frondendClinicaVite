@@ -1,5 +1,5 @@
 export interface ShortModel {
-    id: string;
+    _id: string;
     vigencia: string;
     nombre: string;
 }

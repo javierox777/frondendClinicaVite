@@ -1,5 +1,5 @@
 export interface Professional {
- id: string;
+ _id: string;
  rut: string;
  dv: string;
  apellMat: string;

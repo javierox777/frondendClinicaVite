@@ -4,18 +4,14 @@ import { Professional } from "./Professional";
 import { ShortModel } from "./ShortModel";
 
 export interface Budget {
-    id: string;
-    estado_id: string;
-    profesional_id: string;
-    empresa_id : string;
+    _id: string;
+    estado: string;
+    profesional: string;
+    empresa : string;
     fechaRegistro: Date;
-    persona_id: string;
-    presupuestoTipo_id: string;
+    persona: string;
+    presupuestoTipo: string;
     fechaRegistroValida: string;
 
-    estado: ShortModel;
-    profesional: Professional;
-    empresa: Company;
-    persona: Person;
-    presupuestoTipo: ShortModel;
+  
 }

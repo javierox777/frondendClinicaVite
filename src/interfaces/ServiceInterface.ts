@@ -1,11 +1,10 @@
 import { ServiceType } from "./ServiceType";
 
 export interface ServiceInterface {
-    id: string;
+    _id: string;
     precioUniIva: number;
     vigencia: string;
-    prestacionesTipo_id: string;
+    prestacionesTipo: string;
     precioUniNeto: number;
     nombre: string;
-    prestacionesTipo: ServiceType
 }

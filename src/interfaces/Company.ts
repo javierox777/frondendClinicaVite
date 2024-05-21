@@ -1,5 +1,5 @@
 export interface Company {
-    id: string;
+    _id: string;
     vigencia: string;
     dv: string;
     razonSocial: string;

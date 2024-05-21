@@ -2,6 +2,7 @@ import { Institution } from "./Institution";
 import { ShortModel } from "./ShortModel";
 
 export interface Person {
+    _id:string
     nombre1: string;
     nombre2: string;
     dv: string;
@@ -11,10 +12,8 @@ export interface Person {
     id:string;
     fechaNac:Date;
     vigente:string;
-    institucion_id:string;
-    nacionalidad_id:string;
-    sexo_id:string
-    institucion: Institution;
-    sexo: ShortModel;
-    nacionalidad: ShortModel
+    institucion:string;
+    nacionalidad:string;
+    sexo:string
+
 }
