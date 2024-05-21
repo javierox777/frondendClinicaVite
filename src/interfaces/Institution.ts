@@ -1,7 +1,8 @@
 import { ShortModel } from "./ShortModel";
 
 export interface Institution {
-    prevision:string;
+    _id:string
+    prevision:ShortModel;
     vigente:string;
     nombre:string;
 }

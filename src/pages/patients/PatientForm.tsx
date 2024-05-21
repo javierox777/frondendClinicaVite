@@ -40,6 +40,8 @@ import { Contact } from '../../interfaces/Contact';
 
 import { format, compareAsc } from 'date-fns';
 import Subform from './subForms/Subform';
+import { ShortModel } from '../../interfaces/ShortModel';
+import { Institution } from '../../interfaces/Institution';
 
 interface Props {
   open: boolean;
@@ -79,12 +81,13 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
   const [verificationDigit, setVerificationDigit] = useState('');
   const [isSubmitting, setSubmitting] = useState(false);
 
+  const [correspondingInstitutions, setCorrespondingInst] = useState([]);
   //estado que avisa si se ha agregado algun dato ya sea nacionalidad o sexo
   const [subFormSubmitted, setSubFormSubmitted] = useState(true);
 
   const [contacts, setContacts] = useState([
     {
-      id: (Math.random() * 1000).toString(),
+      _id: (Math.random() * 1000).toString(),
       descripcion: '',
       contacto_id: '',
       persona_id: '',
@@ -93,7 +96,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
   ]);
   const [addresses, setAddresses] = useState([
     {
-      id: (Math.random() * 1000).toString(),
+      _id: (Math.random() * 1000).toString(),
       tipoDireccion_id: '',
       ciudad_id: '',
       persona_id: '',
@@ -116,7 +119,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
     setContacts([
       ...contacts,
       {
-        id: (Math.random() * 1000).toString(),
+        _id: (Math.random() * 1000).toString(),
         descripcion: '',
         contacto_id: '',
         // fechaReg: Date.now(),
@@ -130,7 +133,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
     setAddresses([
       ...addresses,
       {
-        id: (Math.random() * 1000).toString(),
+        _id: (Math.random() * 1000).toString(),
         tipoDireccion_id: '',
         ciudad_id: '',
         persona_id: '',
@@ -165,85 +168,16 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
   // ***********
   //funciones que manejan los cambios de los inputs dinamicos de direcciones y contactos
 
-  //queries que hacen llamado a la api para traer la data de las listas de los select inputs
-  // ***********
-  // ***********
-  // ***********
-  // ***********
-  const { data: nationalities } = useQuery({
-    queryKey: ['nationalities', subFormSubmitted],
+  const { data: formData } = useQuery({
+    queryKey: ['formData', subFormSubmitted],
     queryFn: async () => {
       const response = await axios.get(
-        `${generalConfig.baseUrl}/nationalities`
+        `${generalConfig.baseUrl}/persons/generateform`
       );
 
       return response.data.body;
     },
   });
-
-  const { data: genders } = useQuery({
-    queryKey: ['genders', subFormSubmitted],
-    queryFn: async () => {
-      const response = await axios.get(`${generalConfig.baseUrl}/gender`);
-
-      return response.data.body;
-    },
-  });
-
-  const { data: previsions } = useQuery({
-    queryKey: ['previsions'],
-    queryFn: async () => {
-      const response = await axios.get(`${generalConfig.baseUrl}/previsions`);
-
-      return response.data.body;
-    },
-  });
-
-  const { data: institutions } = useQuery({
-    queryKey: ['institutions', selectedPrevision],
-    queryFn: async () => {
-      const response = await axios.get(`${generalConfig.baseUrl}/institutions`);
-
-      return response.data.body.filter((i: any) => {
-        return i.prevision_id === selectedPrevision;
-      });
-    },
-  });
-
-  const { data: cities } = useQuery({
-    queryKey: ['cities', subFormSubmitted],
-    queryFn: async () => {
-      const response = await axios.get(`${generalConfig.baseUrl}/cities`);
-
-      return response.data.body;
-    },
-  });
-
-  const { data: contactTypes } = useQuery({
-    queryKey: ['contactTypes', subFormSubmitted],
-    queryFn: async () => {
-      const response = await axios.get(`${generalConfig.baseUrl}/contacts`);
-
-      return response.data.body;
-    },
-  });
-
-  const { data: addressTypes } = useQuery({
-    queryKey: ['addressType', subFormSubmitted],
-    queryFn: async () => {
-      const response = await axios.get(
-        `${generalConfig.baseUrl}/address-types`
-      );
-
-      return response.data.body;
-    },
-  });
-
-  // ***********
-  // ***********
-  // ***********
-  // ***********
-  //queries que hacen llamado a la api para traer la data de las listas de los select inputs
 
   //funcion que se ejecuta al hacer submit al formulario
   // ***********
@@ -282,7 +216,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
         //filtrar de todos los contactos del formulario, los contactos que seran actualizados de los nuevos q se crearan
         const contactsToUpdate = contacts.filter((c) => {
           return existingContacts.some((ec: any) => {
-            return c.id === ec.id;
+            return c._id === ec.id;
           });
         });
 
@@ -290,7 +224,10 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
         contactsToUpdate.forEach(async (c) => {
           c.persona_id = patient.id;
 
-          await axios.patch(`${generalConfig.baseUrl}/contact-book/${c.id}`, c);
+          await axios.patch(
+            `${generalConfig.baseUrl}/contact-book/${c._id}`,
+            c
+          );
         });
 
         const existingAddresses = (
@@ -299,7 +236,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
 
         const addressesToUpdate = addresses.filter((a) => {
           return existingAddresses.some((ea: any) => {
-            return a.id === ea.id;
+            return a._id === ea.id;
           });
         });
 
@@ -314,7 +251,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
         const newContacts = contacts.filter(
           (contact) =>
             !existingContacts.some(
-              (existingContact: any) => existingContact.id === contact.id
+              (existingContact: any) => existingContact.id === contact._id
             )
         );
 
@@ -327,7 +264,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
         const newAddresses = addresses.filter(
           (address) =>
             !existingAddresses.some(
-              (existingAddress: any) => existingAddress.id === address.id
+              (existingAddress: any) => existingAddress.id === address._id
             )
         );
 
@@ -379,7 +316,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
         setSubmitting(false);
         setAddresses([
           {
-            id: (Math.random() * 1000).toString(),
+            _id: (Math.random() * 1000).toString(),
             tipoDireccion_id: '',
             ciudad_id: '',
             persona_id: '',
@@ -389,7 +326,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
         ]);
         setContacts([
           {
-            id: (Math.random() * 1000).toString(),
+            _id: (Math.random() * 1000).toString(),
             descripcion: '',
             contacto_id: '',
             persona_id: '',
@@ -423,46 +360,53 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
 
   //funciones que trate la libreta de contacto y de direccion del paciente a editar
 
-  const getPatientAddresses = async (patientId: string) => {
-    const response = await axios.get(`${generalConfig.baseUrl}/address-book`);
+  // const getPatientAddresses = async (patientId: string) => {
+  //   const response = await axios.get(`${generalConfig.baseUrl}/address-book`);
 
-    const addresses = response.data.body.filter((a: Address) => {
-      return a.persona_id === patientId;
-    });
+  //   const addresses = response.data.body.filter((a: Address) => {
+  //     return a.persona_id === patientId;
+  //   });
 
-    setAddresses([...addresses]);
-  };
+  //   setAddresses([...addresses]);
+  // };
 
-  const getPatientContacts = async (patientId: string) => {
-    const response = await axios.get(`${generalConfig.baseUrl}/contact-book`);
+  // const getPatientContacts = async (patientId: string) => {
+  //   const response = await axios.get(`${generalConfig.baseUrl}/contact-book`);
 
-    const contacts = response.data.body.filter((c: Contact) => {
-      return c.persona_id === patientId;
-    });
+  //   const contacts = response.data.body.filter((c: Contact) => {
+  //     return c.persona_id === patientId;
+  //   });
 
-    setContacts([...contacts]);
-  };
+  //   setContacts([...contacts]);
+  // };
 
   //funciones que trate la libreta de contacto y de direccion del paciente a editar
 
   useEffect(() => {
     if (patient) {
-      getPatientAddresses(patient.id);
-      getPatientContacts(patient.id);
-
+      // getPatientAddresses(patient.id);
+      // getPatientContacts(patient.id);
       setFirstName(patient.nombre1);
       setSecondName(patient.nombre2);
       setFirstSurname(patient.apellPat);
       setSecondSurname(patient.apellMat);
       setRut(patient.rut);
-      setNationality(patient.nacionalidad_id);
-      setGender(patient.sexo_id);
+      setNationality(patient.nacionalidad._id);
+      setGender(patient.sexo._id);
       setBirthday(format(new Date(patient.fechaNac), 'yyyy-MM-dd'));
-      setPrevision(patient.institucion.prevision_id);
-      setInstitution(patient.institucion_id);
+      setPrevision(patient.institucion.prevision._id);
+      setInstitution(patient.institucion._id);
       setVerificationDigit(patient.dv);
     }
   }, [patient]);
+
+  useEffect(() => {
+    console.log('nsansansanc');
+    const institutions = formData?.institutions.filter((i: any) => {
+      return i.prevision === selectedPrevision;
+    });
+    setCorrespondingInst(institutions);
+  }, [selectedPrevision]);
 
   // ***********
   // ***********
@@ -596,9 +540,9 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                     }
                     value={nationality}
                   >
-                    {nationalities?.map((n: any) => {
+                    {formData?.nationalities.map((n: ShortModel) => {
                       return (
-                        <MenuItem key={n.id} value={n.id}>
+                        <MenuItem key={n._id} value={n._id}>
                           {n.nombre}
                         </MenuItem>
                       );
@@ -626,9 +570,9 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                     }
                     value={gender}
                   >
-                    {genders?.map((g: any) => {
+                    {formData?.genders.map((g: ShortModel) => {
                       return (
-                        <MenuItem key={g.id} value={g.id}>
+                        <MenuItem key={g._id} value={g._id}>
                           {g.nombre}
                         </MenuItem>
                       );
@@ -648,9 +592,9 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                     }
                     value={selectedPrevision}
                   >
-                    {previsions?.map((p: any) => {
+                    {formData?.previsions.map((p: ShortModel) => {
                       return (
-                        <MenuItem key={p.id} value={p.id}>
+                        <MenuItem key={p._id} value={p._id}>
                           {p.nombre}
                         </MenuItem>
                       );
@@ -675,9 +619,9 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                     {selectedPrevision === '' && (
                       <MenuItem>Seleccione previsión</MenuItem>
                     )}
-                    {institutions?.map((i: any) => {
+                    {correspondingInstitutions?.map((i: Institution) => {
                       return (
-                        <MenuItem key={i.id} value={i.id}>
+                        <MenuItem key={i._id} value={i._id}>
                           {i.nombre}
                         </MenuItem>
                       );
@@ -708,7 +652,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                 {contacts.map((c: any, index: number) => {
                   return (
                     <Card
-                      key={c.id}
+                      key={c._id}
                       style={{ marginBottom: 10, padding: 5 }}
                       elevation={3}
                     >
@@ -728,7 +672,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                             onClick={() => {
                               const updatedContacts = contacts.filter(
                                 (contact) => {
-                                  return c.id !== contact.id;
+                                  return c.id !== contact._id;
                                 }
                               );
                               setContacts(updatedContacts);
@@ -778,9 +722,9 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                               }
                               value={c.contacto_id}
                             >
-                              {contactTypes?.map((c: any) => {
+                              {formData?.contactTypes.map((c: ShortModel) => {
                                 return (
-                                  <MenuItem key={c.id} value={c.id}>
+                                  <MenuItem key={c._id} value={c._id}>
                                     {c.nombre}
                                   </MenuItem>
                                 );
@@ -831,7 +775,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                     <Card
                       elevation={3}
                       style={{ padding: 10, marginBottom: 10 }}
-                      key={a.id}
+                      key={a._id}
                     >
                       <Grid container spacing={2} alignItems="center">
                         <Grid
@@ -844,7 +788,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                             onClick={() => {
                               const updatedAddresses = addresses.filter(
                                 (address) => {
-                                  return a.id !== address.id;
+                                  return a._id !== address._id;
                                 }
                               );
                               setAddresses(updatedAddresses);
@@ -896,12 +840,12 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                                   'tipoDireccion_id'
                                 );
                               }}
-                              value={a.tipoDireccion_id}
+                              value={a.tipoDireccion?._id}
                               required
                             >
-                              {addressTypes?.map((at: any) => {
+                              {formData?.addressTypes.map((at: ShortModel) => {
                                 return (
-                                  <MenuItem key={at.id} value={at.id}>
+                                  <MenuItem key={at._id} value={at._id}>
                                     {at.nombre}
                                   </MenuItem>
                                 );
@@ -937,9 +881,9 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                               {/* {selectedPrevision === '' && (
                               <MenuItem>Seleccione Tipo de contacto</MenuItem>
                             )} */}
-                              {cities?.map((c: any) => {
+                              {formData?.cities.map((c: ShortModel) => {
                                 return (
-                                  <MenuItem key={c.id} value={c.id}>
+                                  <MenuItem key={c._id} value={c._id}>
                                     {c.nombre}
                                   </MenuItem>
                                 );

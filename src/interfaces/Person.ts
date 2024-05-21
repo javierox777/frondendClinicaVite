@@ -12,8 +12,8 @@ export interface Person {
     id:string;
     fechaNac:Date;
     vigente:string;
-    institucion:string;
-    nacionalidad:string;
-    sexo:string
+    institucion:Institution;
+    nacionalidad:ShortModel;
+    sexo:ShortModel
 
 }

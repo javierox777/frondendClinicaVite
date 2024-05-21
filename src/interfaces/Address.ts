@@ -3,9 +3,9 @@ import { ShortModel } from "./ShortModel";
 
 export interface Address {
     _id: string;
-    tipoDireccion: string;
-    ciudad: string;
-    persona: string;
+    tipoDireccion: ShortModel;
+    ciudad: ShortModel;
+    persona: Person;
     vigente: string;
     nombre: string;
 }
