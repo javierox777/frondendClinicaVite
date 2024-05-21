@@ -89,17 +89,17 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
     {
       _id: (Math.random() * 1000).toString(),
       descripcion: '',
-      contacto_id: '',
-      persona_id: '',
+      contacto: '',
+      persona: '',
       vigente: '1',
     },
   ]);
   const [addresses, setAddresses] = useState([
     {
       _id: (Math.random() * 1000).toString(),
-      tipoDireccion_id: '',
-      ciudad_id: '',
-      persona_id: '',
+      tipoDireccion: '',
+      ciudad: '',
+      persona: '',
       nombre: '',
       vigente: '1',
     },
@@ -121,9 +121,9 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
       {
         _id: (Math.random() * 1000).toString(),
         descripcion: '',
-        contacto_id: '',
+        contacto: '',
         // fechaReg: Date.now(),
-        persona_id: '',
+        persona: '',
         vigente: '1',
       },
     ]);
@@ -134,9 +134,9 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
       ...addresses,
       {
         _id: (Math.random() * 1000).toString(),
-        tipoDireccion_id: '',
-        ciudad_id: '',
-        persona_id: '',
+        tipoDireccion: '',
+        ciudad: '',
+        persona: '',
         nombre: '',
         vigente: '1',
       },
@@ -146,7 +146,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
   const handleAddressChange = (
     e: ChangeEvent<HTMLInputElement> | SelectChangeEvent<string>,
     rowIndex: number,
-    field: 'tipoDireccion_id' | 'ciudad_id' | 'nombre'
+    field: 'tipoDireccion' | 'ciudad' | 'nombre'
   ) => {
     const updatedAddresses = [...addresses];
     updatedAddresses[rowIndex][field] = (e.target as HTMLInputElement).value;
@@ -156,7 +156,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
   const handleContactChange = (
     e: ChangeEvent<HTMLInputElement> | SelectChangeEvent<string>,
     rowIndex: number,
-    field: 'descripcion' | 'contacto_id'
+    field: 'descripcion' | 'contacto'
   ) => {
     const updatedContacts = [...contacts];
     updatedContacts[rowIndex][field] = (e.target as HTMLInputElement).value;
@@ -185,165 +185,25 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
   // ***********
   // ***********
   const handleSubmit = async (e: React.FormEvent) => {
-    setSubmitting(true);
     e.preventDefault();
-    const data = {
+    const newPerson = {
       nombre1: firstName,
       nombre2: secondName,
       apellPat: firstSurname,
       apellMat: secondSurname,
-      fechaNac: new Date(birthday).toISOString(),
-      institucion_id: institution,
-      sexo_id: gender,
-      nacionalidad_id: nationality,
       rut: rut,
       dv: verificationDigit,
+      fechaNac: new Date(birthday).toISOString(),
+      institucion: institution,
+      nacionalidad: nationality,
+      sexo: gender,
+      contactos: contacts,
+      direcciones: addresses,
     };
-
-    //en caso de que se este editando el paciente, se ejecuta esta parte del codigo
-    if (patient) {
-      const response = await axios.patch(
-        `${generalConfig.baseUrl}/persons/${patient.id}`,
-        data
-      );
-
-      if (response.data.message === 'success') {
-        //recuperar los contactos que ya existen del paciente
-        const existingContacts = (
-          await axios.get(`${generalConfig.baseUrl}/contact-book`)
-        ).data.body.filter((c: any) => c.persona_id === patient.id);
-
-        //filtrar de todos los contactos del formulario, los contactos que seran actualizados de los nuevos q se crearan
-        const contactsToUpdate = contacts.filter((c) => {
-          return existingContacts.some((ec: any) => {
-            return c._id === ec.id;
-          });
-        });
-
-        //actualizar contactos
-        contactsToUpdate.forEach(async (c) => {
-          c.persona_id = patient.id;
-
-          await axios.patch(
-            `${generalConfig.baseUrl}/contact-book/${c._id}`,
-            c
-          );
-        });
-
-        const existingAddresses = (
-          await axios.get(`${generalConfig.baseUrl}/address-book`)
-        ).data.body.filter((a: any) => a.persona_id === patient.id);
-
-        const addressesToUpdate = addresses.filter((a) => {
-          return existingAddresses.some((ea: any) => {
-            return a._id === ea.id;
-          });
-        });
-
-        addressesToUpdate.forEach(async (a: any) => {
-          a.persona_id = patient.id;
-
-          await axios.patch(`${generalConfig.baseUrl}/address-book/${a.id}`, a);
-        });
-
-        // //crear nuevas direcciones y contactos en caso de ser agregadas
-
-        const newContacts = contacts.filter(
-          (contact) =>
-            !existingContacts.some(
-              (existingContact: any) => existingContact.id === contact._id
-            )
-        );
-
-        newContacts.forEach(async (c) => {
-          c.persona_id = patient.id;
-
-          await axios.post(`${generalConfig.baseUrl}/contact-book`, c);
-        });
-
-        const newAddresses = addresses.filter(
-          (address) =>
-            !existingAddresses.some(
-              (existingAddress: any) => existingAddress.id === address._id
-            )
-        );
-
-        newAddresses.forEach(async (a) => {
-          a.persona_id = patient.id;
-
-          await axios.post(`${generalConfig.baseUrl}/address-book`, a);
-        });
-
-        toast.success('Se ha actualizado paciente.');
-        setSubmitting(false);
-      } else {
-        setSubmitting(false);
-        toast.error('No se ha actualizado paciente, inténtelo nuevamente.');
-      }
-      //en caso de que se este editando el paciente, se ejecuta esta parte del codigo
-    }
-    //si el formulario esta enviando un nuevo paciente, se ejecuta esta parte del codigo que envia un llamado post en vez de un patch
-    else {
-      const response = await axios.post(
-        `${generalConfig.baseUrl}/persons`,
-        data
-      );
-
-      if (response.data.message === 'success') {
-        contacts.forEach(async (c) => {
-          c.persona_id = response.data.body.id;
-
-          await axios.post(`${generalConfig.baseUrl}/contact-book`, c);
-        });
-
-        addresses.forEach(async (a) => {
-          a.persona_id = response.data.body.id;
-
-          await axios.post(`${generalConfig.baseUrl}/address-book`, a);
-        });
-        toast.success('Se ha registrado un paciente.');
-        setFirstName('');
-        setSecondName('');
-        setFirstSurname('');
-        setSecondSurname('');
-        setRut('');
-        setNationality('');
-        setGender('');
-        setBirthday('');
-        setPrevision('');
-        setInstitution('');
-        setVerificationDigit('');
-        setSubmitting(false);
-        setAddresses([
-          {
-            _id: (Math.random() * 1000).toString(),
-            tipoDireccion_id: '',
-            ciudad_id: '',
-            persona_id: '',
-            nombre: '',
-            vigente: '1',
-          },
-        ]);
-        setContacts([
-          {
-            _id: (Math.random() * 1000).toString(),
-            descripcion: '',
-            contacto_id: '',
-            persona_id: '',
-            vigente: '1',
-          },
-        ]);
-      }
-      if (afterSubmit) {
-        afterSubmit();
-      }
-
-      //en caso de error, se ejecuta esta parte del codigo
-      else {
-        setSubmitting(false);
-        toast.error('No se ha registrado paciente, inténtelo nuevamente.');
-      }
-    }
+    const response = await axios.post(
+      `${generalConfig.baseUrl}/persons`,
+      newPerson
+    );
   };
 
   // ***********
@@ -360,32 +220,34 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
 
   //funciones que trate la libreta de contacto y de direccion del paciente a editar
 
-  // const getPatientAddresses = async (patientId: string) => {
-  //   const response = await axios.get(`${generalConfig.baseUrl}/address-book`);
+  const getPatientAddresses = async (patientId: string) => {
+    const response = await axios.get(`${generalConfig.baseUrl}/address-book`);
 
-  //   const addresses = response.data.body.filter((a: Address) => {
-  //     return a.persona_id === patientId;
-  //   });
+    const addresses = response.data.body.filter((a: Address) => {
+      return a.persona._id === patientId;
+    });
 
-  //   setAddresses([...addresses]);
-  // };
+    setAddresses([...addresses]);
+  };
 
-  // const getPatientContacts = async (patientId: string) => {
-  //   const response = await axios.get(`${generalConfig.baseUrl}/contact-book`);
+  const getPatientContacts = async (patientId: string) => {
+    const response = await axios.get(`${generalConfig.baseUrl}/contact-book`);
 
-  //   const contacts = response.data.body.filter((c: Contact) => {
-  //     return c.persona_id === patientId;
-  //   });
+    const contacts = response.data.body.filter((c: Contact) => {
+      return c.persona._id === patientId;
+    });
 
-  //   setContacts([...contacts]);
-  // };
+    setContacts([...contacts]);
+  };
 
   //funciones que trate la libreta de contacto y de direccion del paciente a editar
 
+  // console.log('contactos', contacts);
+
   useEffect(() => {
     if (patient) {
-      // getPatientAddresses(patient.id);
-      // getPatientContacts(patient.id);
+      getPatientAddresses(patient._id);
+      getPatientContacts(patient._id);
       setFirstName(patient.nombre1);
       setSecondName(patient.nombre2);
       setFirstSurname(patient.apellPat);
@@ -401,7 +263,6 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
   }, [patient]);
 
   useEffect(() => {
-    console.log('nsansansanc');
     const institutions = formData?.institutions.filter((i: any) => {
       return i.prevision === selectedPrevision;
     });
@@ -718,9 +579,9 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                               id="contacts-select"
                               labelId="contacts-select-label"
                               onChange={(e: SelectChangeEvent<string>) =>
-                                handleContactChange(e, index, 'contacto_id')
+                                handleContactChange(e, index, 'contacto')
                               }
-                              value={c.contacto_id}
+                              value={c.contacto?._id}
                             >
                               {formData?.contactTypes.map((c: ShortModel) => {
                                 return (
@@ -834,11 +695,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                               id="addresstype-select"
                               labelId="addresstype-select-label"
                               onChange={(e: SelectChangeEvent<string>) => {
-                                handleAddressChange(
-                                  e,
-                                  index,
-                                  'tipoDireccion_id'
-                                );
+                                handleAddressChange(e, index, 'tipoDireccion');
                               }}
                               value={a.tipoDireccion?._id}
                               required
@@ -873,9 +730,9 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                               id="city-select"
                               labelId="city-select-label"
                               onChange={(e: SelectChangeEvent<string>) => {
-                                handleAddressChange(e, index, 'ciudad_id');
+                                handleAddressChange(e, index, 'ciudad');
                               }}
-                              value={a.ciudad_id}
+                              value={a.ciudad?._id}
                               required
                             >
                               {/* {selectedPrevision === '' && (
@@ -912,7 +769,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                 <FormControl fullWidth>
                   <Button
                     variant="contained"
-                    color="primary"
+                    color={patient ? 'success' : 'primary'}
                     fullWidth
                     type="submit"
                     disabled={isSubmitting}

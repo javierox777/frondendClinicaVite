@@ -4,9 +4,9 @@ import { ShortModel } from "./ShortModel";
 export interface Contact {
     _id: string;
     descripcion: string;
-    contacto: string;
+    contacto:  ShortModel;
     fechaReg: Date;
-    persona:string;
+    persona:  Person;
     vigente:string;
  
 }

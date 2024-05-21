@@ -150,7 +150,7 @@ const PatientsTable = ({ refetch }: Props) => {
               .map((p: Person, index: number) => {
                 return (
                   <TableRow
-                    key={p.id}
+                    key={p._id}
                     // className={`${index % 2 === 0 && mode === 'light' ? 'bg-slate-100' : 'white'}`}
                   >
                     <TableCell
