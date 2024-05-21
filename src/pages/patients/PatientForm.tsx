@@ -200,10 +200,35 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
       contactos: contacts,
       direcciones: addresses,
     };
-    const response = await axios.post(
-      `${generalConfig.baseUrl}/persons`,
-      newPerson
-    );
+
+    try {
+      setSubmitting(true);
+
+      if (patient) {
+        const response = await axios.patch(
+          `${generalConfig.baseUrl}/persons/${patient._id}`,
+          newPerson
+        );
+
+        if (response.data.message === 'success') {
+          toast.success('Paciente actualizado');
+          setSubmitting(false);
+        }
+      } else {
+        const response = await axios.post(
+          `${generalConfig.baseUrl}/persons`,
+          newPerson
+        );
+
+        if (response.data.message === 'success') {
+          toast.success('Paciente registrado');
+          setSubmitting(false);
+        }
+      }
+    } catch (error) {
+      toast.error('Los datos no pudieron ser registrados.');
+      setSubmitting(false);
+    }
   };
 
   // ***********
