@@ -86,7 +86,7 @@ const BudgetDetails = ({ budget }: Props) => {
     queryFn: async () => {
       const filteredAddresses = (
         await axios.get(`${generalConfig.baseUrl}/address-book`)
-      ).data.body.filter((a: Address) => a.persona.id === persona.id);
+      ).data.body.filter((a: Address) => a.persona._id === persona._id);
       return filteredAddresses;
     },
   });
@@ -94,20 +94,19 @@ const BudgetDetails = ({ budget }: Props) => {
   const { data: details } = useQuery({
     queryKey: ['details'],
     queryFn: async () => {
-      const filteredDetails = (
-        await axios.get(`${generalConfig.baseUrl}/budget-details`)
-      ).data.body.filter((d: BudgetDetail) => {
-        return d.presupuesto_id === budget.id;
-      });
+      const response = await axios.get(
+        `${generalConfig.baseUrl}/budget-details/getdetails/${budget._id}`
+      );
 
-      return filteredDetails;
+      return response.data.body;
     },
   });
 
-  console.log(budget);
   const validContacts = contacts?.filter((c: any) => c.vigente === '1');
 
   const validAddresses = addresses?.filter((a: any) => a.vigente === '1');
+
+  console.log(details);
 
   return (
     <Container>
@@ -236,7 +235,7 @@ const BudgetDetails = ({ budget }: Props) => {
                     return (
                       <Grid
                         item
-                        key={c.id}
+                        key={c._id}
                         xs={12}
                         sm={12}
                         md={12}
@@ -268,7 +267,7 @@ const BudgetDetails = ({ budget }: Props) => {
                     return (
                       <Grid
                         item
-                        key={a.id}
+                        key={a._id}
                         xs={12}
                         sm={12}
                         md={12}
@@ -321,7 +320,7 @@ const BudgetDetails = ({ budget }: Props) => {
                 <TableBody>
                   {details?.map((d: BudgetDetail) => {
                     return (
-                      <TableRow key={d.id}>
+                      <TableRow key={d._id}>
                         <TableCell>{d.objeto.nombre}</TableCell>
                         <TableCell>{d.prestacion.nombre}</TableCell>
                         <TableCell>$ {d.valorUniNeto}</TableCell>

@@ -56,18 +56,15 @@ const Transition = React.forwardRef(function Transition(
 });
 
 interface BudgetDetailType {
-  id: string;
-  presupuesto_id: string;
-  objeto_id: string;
+  _id: string;
+  presupuesto: string;
+  objeto: string;
   valorTotalNeto: number;
   valorUniNeto: number;
   valorTotalIva: number;
   valorUniIva: number;
-  prestacion_id: string;
+  prestacion: string;
   cantidad: number;
-  prestacion?: ServiceInterface;
-  presupuesto?: Budget;
-  objeto?: ShortModel;
 }
 
 const BudgetForm = ({ onClose, open, budget }: Props) => {
@@ -85,14 +82,14 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
 
   const [budgetDetails, setDetails] = useState<BudgetDetailType[]>([
     {
-      id: (Math.random() * 1000).toString(),
-      presupuesto_id: '',
-      objeto_id: '',
+      _id: (Math.random() * 1000).toString(),
+      presupuesto: '',
+      objeto: '',
       valorTotalNeto: 0,
       valorUniNeto: 0,
       valorTotalIva: 0,
       valorUniIva: 0,
-      prestacion_id: '',
+      prestacion: '',
       cantidad: 1,
     },
   ]);
@@ -111,12 +108,12 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const data = {
-      estado_id: statusId,
-      profesional_id: professionalId,
-      empresa_id: clinicId,
+      estado: statusId,
+      profesional: professionalId,
+      empresa: clinicId,
       fechaRegistro: new Date(registerDate).toISOString(),
-      persona_id: patientId,
-      presupuestoTipo_id: budgetTypeId,
+      persona: patientId,
+      presupuestoTipo: budgetTypeId,
       budgetDetails,
     };
 
@@ -124,7 +121,7 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
       try {
         setSubmitting(true);
         const response = await axios.patch(
-          `${generalConfig.baseUrl}/budgets/${budget.id}`,
+          `${generalConfig.baseUrl}/budgets/${budget._id}`,
           data
         );
         console.log(response.data);
@@ -165,22 +162,20 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
   };
 
   const getBudgetDetails = async () => {
-    const response = (
-      await axios.get(`${generalConfig.baseUrl}/budget-details`)
-    ).data.body.filter((d: BudgetDetail) => d.presupuesto_id === budget?.id);
+    const response = await axios.get(
+      `${generalConfig.baseUrl}/budget-details/getdetails/${budget?._id}`
+    );
 
-    console.log(response);
-
-    setDetails(response);
+    setDetails(response.data.body);
   };
 
   useEffect(() => {
     if (budget) {
-      setPatientId(budget.persona_id);
-      setProfessionalId(budget.profesional_id);
-      setBudgetTypeId(budget.presupuestoTipo_id);
-      setStatusId(budget.estado_id);
-      setClinicId(budget.empresa_id);
+      setPatientId(budget.persona._id);
+      setProfessionalId(budget.profesional._id);
+      setBudgetTypeId(budget.presupuestoTipo._id);
+      setStatusId(budget.estado._id);
+      setClinicId(budget.empresa._id);
       setRegisterDate(format(new Date(budget.fechaRegistro), 'yyyy-MM-dd'));
       getBudgetDetails();
     }
@@ -274,7 +269,7 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
                           >
                             {data.budgetTypes.map((t: ShortModel) => {
                               return (
-                                <MenuItem key={t.id} value={t.id}>
+                                <MenuItem key={t._id} value={t._id}>
                                   {t.nombre}
                                 </MenuItem>
                               );
@@ -311,7 +306,7 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
                           >
                             {data.statuses.map((s: ShortModel) => {
                               return (
-                                <MenuItem key={s.id} value={s.id}>
+                                <MenuItem key={s._id} value={s._id}>
                                   {s.nombre}
                                 </MenuItem>
                               );
@@ -359,7 +354,7 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
                             return `${patient.nombre1} ${patient.apellPat} ${patient.rut}-${patient.dv}`;
                           }}
                           onChange={(event, patient: Person | null) => {
-                            if (patient) setPatientId(patient.id);
+                            if (patient) setPatientId(patient._id);
                           }}
                         />
                       </FormControl>
@@ -407,7 +402,7 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
                             professional: Professional | null
                           ) => {
                             if (professional)
-                              setProfessionalId(professional.id);
+                              setProfessionalId(professional._id);
                           }}
                         />
                       </FormControl>
@@ -439,7 +434,7 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
                             return `${clinic.razonSocial}`;
                           }}
                           onChange={(event, clinic: Company | null) => {
-                            if (clinic) setClinicId(clinic.id);
+                            if (clinic) setClinicId(clinic._id);
                           }}
                         />
                       </FormControl>

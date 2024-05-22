@@ -5,12 +5,12 @@ import { ShortModel } from "./ShortModel";
 
 export interface Budget {
     _id: string;
-    estado: string;
-    profesional: string;
-    empresa : string;
+    estado: ShortModel;
+    profesional: Professional;
+    empresa : Company;
     fechaRegistro: Date;
-    persona: string;
-    presupuestoTipo: string;
+    persona: Person;
+    presupuestoTipo: ShortModel;
     fechaRegistroValida: string;
 
   

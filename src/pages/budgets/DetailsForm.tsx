@@ -40,14 +40,14 @@ const DetailsForm = ({
     setDetails([
       ...budgetDetails,
       {
-        id: (Math.random() * 1000).toString(),
-        presupuesto_id: '',
-        objeto_id: '',
+        _id: (Math.random() * 1000).toString(),
+        presupuesto: '',
+        objeto: '',
         valorTotalNeto: 0,
         valorUniNeto: 0,
         valorTotalIva: 0,
         valorUniIva: 0,
-        prestacion_id: '',
+        prestacion: '',
         cantidad: 1,
       },
     ]);
@@ -56,14 +56,14 @@ const DetailsForm = ({
   const handleStringValuechange = (
     e: ChangeEvent<HTMLInputElement> | SelectChangeEvent<string>,
     rowIndex: number,
-    field: 'objeto_id' | 'prestacion_id'
+    field: 'objeto' | 'prestacion'
   ) => {
     const updatedDetails = [...budgetDetails];
     updatedDetails[rowIndex][field] = e.target.value;
 
-    if (field === 'prestacion_id') {
+    if (field === 'prestacion') {
       const service = services.filter(
-        (s: ServiceInterface) => s.id === e.target.value
+        (s: ServiceInterface) => s._id === e.target.value
       );
 
       updatedDetails[rowIndex].valorUniNeto = service[0].precioUniNeto;
@@ -150,25 +150,25 @@ const DetailsForm = ({
         </Grid>
         {budgetDetails.map((b: BudgetDetail, index: number) => {
           return (
-            <Grid item xs={12} key={b.id}>
+            <Grid item xs={12} key={b._id}>
               <Grid container spacing={1} alignItems="center">
                 <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
                   <FormControl fullWidth>
                     {/* <InputLabel id="budget-type-label">Descripción</InputLabel> */}
                     <Select
-                      value={b.objeto_id}
+                      value={b.objeto._id}
                       required
                       // label="budget-types"
                       id="budget-type-select"
                       labelId="budget-type-label"
                       onChange={(e: SelectChangeEvent<string>) =>
-                        handleStringValuechange(e, index, 'objeto_id')
+                        handleStringValuechange(e, index, 'objeto')
                       }
                       // value={}
                     >
                       {objects?.map((o: ShortModel) => {
                         return (
-                          <MenuItem key={o.id} value={o.id}>
+                          <MenuItem key={o._id} value={o._id}>
                             {o.nombre}
                           </MenuItem>
                         );
@@ -180,19 +180,19 @@ const DetailsForm = ({
                   <FormControl fullWidth>
                     {/* <InputLabel id="service-type-label">Prestación</InputLabel> */}
                     <Select
-                      value={b.prestacion_id}
+                      value={b.prestacion._id}
                       required
                       // label="service-types"
                       id="service-type-select"
                       labelId="service-type-label"
                       onChange={(e: SelectChangeEvent<string>) =>
-                        handleStringValuechange(e, index, 'prestacion_id')
+                        handleStringValuechange(e, index, 'prestacion')
                       }
                       // value={}
                     >
                       {services?.map((s: ServiceInterface) => {
                         return (
-                          <MenuItem key={s.id} value={s.id}>
+                          <MenuItem key={s._id} value={s._id}>
                             {s.nombre}
                           </MenuItem>
                         );
@@ -202,12 +202,12 @@ const DetailsForm = ({
                 </Grid>
                 <Grid item xs={12} sm={12} md={12} lg={2} xl={2}>
                   {services?.map((s: ServiceInterface) => {
-                    if (s.id === b.prestacion_id) {
+                    if (s._id === b.prestacion._id) {
                       return (
                         <TextField
                           fullWidth
                           // label="valor unitario NETO"
-                          key={s.id}
+                          key={s._id}
                           onChange={(e: ChangeEvent<HTMLInputElement>) => {
                             handlePriceChange(e, index, 'valorUniNeto');
                           }}
@@ -227,7 +227,7 @@ const DetailsForm = ({
                 </Grid>
                 <Grid item xs={12} sm={12} md={12} lg={2} xl={2}>
                   {services?.map((s: ServiceInterface) => {
-                    if (s.id === b.prestacion_id) {
+                    if (s._id === b.prestacion._id) {
                       return (
                         <TextField
                           // label="valor unitario IVA"
@@ -235,7 +235,7 @@ const DetailsForm = ({
                           onChange={(e: ChangeEvent<HTMLInputElement>) => {
                             handlePriceChange(e, index, 'valorUniIva');
                           }}
-                          key={s.id}
+                          key={s._id}
                           value={b.valorUniIva}
                           InputLabelProps={{ shrink: true }}
                           InputProps={{
@@ -255,7 +255,7 @@ const DetailsForm = ({
                     <IconButton
                       onClick={() => {
                         const filtered = budgetDetails.filter(
-                          (d: BudgetDetail) => d.id !== b.id
+                          (d: BudgetDetail) => d._id !== b._id
                         );
                         setDetails(filtered);
                       }}

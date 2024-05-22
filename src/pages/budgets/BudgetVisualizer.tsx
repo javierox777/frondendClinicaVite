@@ -131,7 +131,7 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
             return (
               <Grid
                 container
-                key={b.id}
+                key={b._id}
                 justifyContent="space-between"
                 sx={{ padding: 3 }}
                 className="hover:scale-[1.01] transition-all duration-500 cursor-pointer"
