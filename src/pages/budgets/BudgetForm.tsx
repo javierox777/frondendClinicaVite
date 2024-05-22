@@ -180,6 +180,8 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
     }
   }, [budget]);
 
+  console.log('aca lo q busco', budgetDetails);
+
   if (isLoading) {
     return (
       <Dialog
