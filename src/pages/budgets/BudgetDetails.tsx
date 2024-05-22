@@ -106,7 +106,7 @@ const BudgetDetails = ({ budget }: Props) => {
 
   const validAddresses = addresses?.filter((a: any) => a.vigente === '1');
 
-  console.log(details);
+  console.log(budget);
 
   return (
     <Container>
@@ -146,10 +146,12 @@ const BudgetDetails = ({ budget }: Props) => {
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
                 <Typography sx={{ fontWeight: 'bold' }}>
-                  Fecha válida
+                  Fecha de validaciónå
                 </Typography>
                 <Typography>
-                  {new Date(fechaRegistroValida).toLocaleDateString()}
+                  {budget.fechaRegistroValida
+                    ? new Date(fechaRegistroValida).toLocaleDateString()
+                    : 'Validación pendiente'}
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>

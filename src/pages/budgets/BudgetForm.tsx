@@ -124,7 +124,6 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
           `${generalConfig.baseUrl}/budgets/${budget._id}`,
           data
         );
-        console.log(response.data);
         if (response.data.message === 'success') {
           toast.success('Presupueto actualizado');
           setSubmitting(false);
@@ -202,8 +201,6 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
       </Dialog>
     );
   }
-
-  console.log(budgetDetails);
 
   return (
     <>
