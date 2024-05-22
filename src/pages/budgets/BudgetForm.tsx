@@ -244,7 +244,7 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
                           <Subform
                             title="Agregar tipo de presupuesto"
                             description="Agrega nuevo tipo de presupuesto"
-                            postRoute={`${generalConfig.baseUrl}/budget-types`}
+                            postRoute={`${generalConfig.baseUrl}/budget-type`}
                             onFinish={() =>
                               setSubFormSubmitted(!subFormSubmitted)
                             }

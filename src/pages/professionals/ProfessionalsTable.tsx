@@ -143,7 +143,7 @@ const ProfessionalsTable = ({ refetch }: Props) => {
               ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((p: Professional) => {
                 return (
-                  <TableRow key={p.id}>
+                  <TableRow key={p._id}>
                     <TableCell
                       style={{
                         fontWeight: 'bold',

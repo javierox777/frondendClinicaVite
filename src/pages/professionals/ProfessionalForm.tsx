@@ -85,7 +85,7 @@ const ProfessionalForm = ({
     if (professional) {
       try {
         const response = await axios.patch(
-          `${generalConfig.baseUrl}/professionals/${professional.id}`,
+          `${generalConfig.baseUrl}/professionals/${professional._id}`,
           data
         );
         if (response.data.message === 'success') {
