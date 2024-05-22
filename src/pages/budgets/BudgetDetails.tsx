@@ -74,20 +74,22 @@ const BudgetDetails = ({ budget }: Props) => {
   const { data: contacts } = useQuery({
     queryKey: ['contacts'],
     queryFn: async () => {
-      const filteredContacts = (
-        await axios.get(`${generalConfig.baseUrl}/contact-book`)
-      ).data.body.filter((c: Contact) => c.persona.id === persona.id);
-      return filteredContacts;
+      const response = await axios.get(
+        `${generalConfig.baseUrl}/contact-book/getcontacts/${budget.persona._id}`
+      );
+
+      return response.data.body;
     },
   });
 
   const { data: addresses } = useQuery({
     queryKey: ['addresses'],
     queryFn: async () => {
-      const filteredAddresses = (
-        await axios.get(`${generalConfig.baseUrl}/address-book`)
-      ).data.body.filter((a: Address) => a.persona._id === persona._id);
-      return filteredAddresses;
+      const response = await axios.get(
+        `${generalConfig.baseUrl}/address-book/getaddresses/${budget.persona._id}`
+      );
+
+      return response.data.body;
     },
   });
 
