@@ -59,10 +59,11 @@ interface BudgetDetailType {
   _id: string;
   presupuesto: string;
   objeto: string;
-  valorTotalNeto: number;
-  valorUniNeto: number;
-  valorTotalIva: number;
-  valorUniIva: number;
+  // valorTotalNeto: number;
+  // valorUniNeto: number;
+  // valorTotalIva: number;
+  // valorUniIva: number;
+  valor: number;
   prestacion: string;
   cantidad: number;
 }
@@ -85,10 +86,11 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
       _id: (Math.random() * 1000).toString(),
       presupuesto: '',
       objeto: '',
-      valorTotalNeto: 0,
-      valorUniNeto: 0,
-      valorTotalIva: 0,
-      valorUniIva: 0,
+      // valorTotalNeto: 0,
+      // valorUniNeto: 0,
+      // valorTotalIva: 0,
+      valor: 0,
+      // valorUniIva: 0,
       prestacion: '',
       cantidad: 1,
     },
@@ -472,7 +474,7 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
                     <Grid item xs={12}>
                       <Grid item xs={6}>
                         <Typography sx={{ fontSize: 20, fontWeight: 'bold' }}>
-                          TOTAL A PAGAR IVA INCLUIDO
+                          TOTAL A PAGAR
                         </Typography>
                       </Grid>
                       <Grid item xs={6}>
@@ -480,8 +482,8 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
                           sx={{ fontSize: 30, fontWeight: 'lighter' }}
                         >
                           <AttachMoney />
-                          {budgetDetails.reduce((acc, d: any) => {
-                            return d.valorUniIva + acc;
+                          {budgetDetails.reduce((acc, d: BudgetDetailType) => {
+                            return d.valor + acc;
                           }, 0)}
                         </Typography>
                       </Grid>
@@ -489,7 +491,7 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
                     <Grid item xs={12}>
                       <Divider />
                     </Grid>
-                    <Grid item xs={12}>
+                    {/* <Grid item xs={12}>
                       <Grid item xs={6}>
                         <Typography sx={{ fontSize: 20, fontWeight: 'bold' }}>
                           TOTAL A PAGAR NETO
@@ -505,7 +507,7 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
                           }, 0)}
                         </Typography>
                       </Grid>
-                    </Grid>
+                    </Grid> */}
                   </Grid>
                 </Card>
               </Grid>

@@ -7,11 +7,12 @@ export interface BudgetDetail {
     _id: string;
     presupuesto: Budget;
     objeto: ShortModel;
-    valorTotalNeto: number;
-    valorUniNeto: number;
-    valorTotalIva:number;
+    // valorTotalNeto: number;
+    // valorUniNeto: number;
+    // valorTotalIva:number;
+    // valorUniIva: number;
+    valor:number;
     prestacion: ShortModel;
-    valorUniIva: number;
     cantidad: number
 
 }

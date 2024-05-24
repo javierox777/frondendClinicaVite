@@ -43,10 +43,11 @@ const DetailsForm = ({
         _id: (Math.random() * 1000).toString(),
         presupuesto: '',
         objeto: '',
-        valorTotalNeto: 0,
-        valorUniNeto: 0,
-        valorTotalIva: 0,
-        valorUniIva: 0,
+        // valorTotalNeto: 0,
+        // valorUniNeto: 0,
+        // valorTotalIva: 0,
+        // valorUniIva: 0,
+        valor: 0,
         prestacion: '',
         cantidad: 1,
       },
@@ -66,11 +67,13 @@ const DetailsForm = ({
         (s: ServiceInterface) => s._id === e.target.value
       );
 
-      updatedDetails[rowIndex].valorUniNeto = service[0].precioUniNeto;
-      updatedDetails[rowIndex].valorTotalNeto = service[0].precioUniNeto;
-      updatedDetails[rowIndex].valorUniIva = service[0].precioUniIva;
-      updatedDetails[rowIndex].valorTotalIva = service[0].precioUniIva;
+      updatedDetails[rowIndex].valor = service[0].valor;
+      // updatedDetails[rowIndex].valorTotalNeto = service[0].precioUniNeto;
+      // updatedDetails[rowIndex].valorUniIva = service[0].precioUniIva;
+      // updatedDetails[rowIndex].valorTotalIva = service[0].precioUniIva;
     }
+
+    console.log(updatedDetails);
 
     setDetails(updatedDetails);
   };
@@ -78,7 +81,7 @@ const DetailsForm = ({
   const handlePriceChange = (
     e: ChangeEvent<HTMLInputElement> | SelectChangeEvent<string>,
     rowIndex: number,
-    field: 'valorUniNeto' | 'valorUniIva'
+    field: 'valor'
   ) => {
     const inputValue = e.target.value;
 
@@ -133,17 +136,15 @@ const DetailsForm = ({
             <Grid item xs={3}>
               <Typography sx={{ fontWeight: 'bold' }}>Prestación</Typography>
             </Grid>
-            <Grid item xs={2}>
+            {/* <Grid item xs={2}>
               <Typography sx={{ fontWeight: 'bold' }}>
                 Valor unitario NETO
               </Typography>
+            </Grid> */}
+            <Grid item xs={3}>
+              <Typography sx={{ fontWeight: 'bold' }}>Valor</Typography>
             </Grid>
-            <Grid item xs={2}>
-              <Typography sx={{ fontWeight: 'bold' }}>
-                Valor unitario IVA
-              </Typography>
-            </Grid>
-            <Grid item xs={2}>
+            <Grid item xs={3}>
               <Typography sx={{ fontWeight: 'bold' }}>Acciones</Typography>
             </Grid>
           </Grid>
@@ -202,16 +203,21 @@ const DetailsForm = ({
                 </Grid>
                 <Grid item xs={12} sm={12} md={12} lg={2} xl={2}>
                   {services?.map((s: ServiceInterface) => {
-                    if (s._id === b.prestacion._id) {
+                    if (
+                      (typeof b.prestacion !== 'string' &&
+                        s._id === b.prestacion._id) ||
+                      (typeof b.prestacion === 'string' &&
+                        s._id === b.prestacion)
+                    ) {
                       return (
                         <TextField
                           fullWidth
                           // label="valor unitario NETO"
                           key={s._id}
                           onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                            handlePriceChange(e, index, 'valorUniNeto');
+                            handlePriceChange(e, index, 'valor');
                           }}
-                          value={b.valorUniNeto}
+                          value={b.valor}
                           InputLabelProps={{ shrink: true }}
                           InputProps={{
                             startAdornment: (
@@ -225,7 +231,7 @@ const DetailsForm = ({
                     }
                   })}
                 </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={2} xl={2}>
+                {/* <Grid item xs={12} sm={12} md={12} lg={2} xl={2}>
                   {services?.map((s: ServiceInterface) => {
                     if (s._id === b.prestacion._id) {
                       return (
@@ -249,7 +255,7 @@ const DetailsForm = ({
                       );
                     }
                   })}
-                </Grid>
+                </Grid> */}
                 <Grid item xs={2} display="flex" justifyContent="end">
                   <Box>
                     <IconButton

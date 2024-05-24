@@ -2,9 +2,10 @@ import { ServiceType } from "./ServiceType";
 
 export interface ServiceInterface {
     _id: string;
-    precioUniIva: number;
+    // precioUniIva: number;
+    valor:number;
     vigencia: string;
     prestacionesTipo: string;
-    precioUniNeto: number;
+    // precioUniNeto: number;
     nombre: string;
 }
