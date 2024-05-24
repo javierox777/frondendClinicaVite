@@ -10,9 +10,10 @@ import { generalConfig } from '../../config';
 
 const BudgetsPage = () => {
   const [formOpen, setOpen] = useState(false);
+  const [formSubmitted, setSubmitted] = useState(false);
 
   const { data: budgets, isLoading } = useQuery({
-    queryKey: ['budgets'],
+    queryKey: ['budgets', formSubmitted],
     queryFn: async () => {
       const response = await axios.get(`${generalConfig.baseUrl}/budgets`);
 
@@ -33,7 +34,11 @@ const BudgetsPage = () => {
           <BudgetVisualizer budgets={budgets} isLoading={isLoading} />
         </Grid>
       </Grid>
-      <BudgetForm open={formOpen} onClose={() => setOpen(false)} />
+      <BudgetForm
+        open={formOpen}
+        onClose={() => setOpen(false)}
+        afterSubmit={() => setSubmitted(!formSubmitted)}
+      />
     </>
   );
 };

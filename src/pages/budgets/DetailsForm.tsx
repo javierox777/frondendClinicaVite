@@ -157,7 +157,7 @@ const DetailsForm = ({
                   <FormControl fullWidth>
                     {/* <InputLabel id="budget-type-label">Descripción</InputLabel> */}
                     <Select
-                      value={b.objeto._id}
+                      value={b.objeto?._id}
                       required
                       // label="budget-types"
                       id="budget-type-select"
@@ -233,7 +233,12 @@ const DetailsForm = ({
                 </Grid>
                 {/* <Grid item xs={12} sm={12} md={12} lg={2} xl={2}>
                   {services?.map((s: ServiceInterface) => {
-                    if (s._id === b.prestacion._id) {
+                    if (
+                      (typeof b.prestacion !== 'string' &&
+                        s._id === b.prestacion._id) ||
+                      (typeof b.prestacion === 'string' &&
+                        s._id === b.prestacion)
+                    ) {
                       return (
                         <TextField
                           // label="valor unitario IVA"

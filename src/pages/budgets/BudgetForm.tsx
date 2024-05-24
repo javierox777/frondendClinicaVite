@@ -44,6 +44,7 @@ interface Props {
   open: boolean;
   onClose: CallableFunction;
   budget?: Budget;
+  afterSubmit?: CallableFunction;
 }
 
 const Transition = React.forwardRef(function Transition(
@@ -68,7 +69,7 @@ interface BudgetDetailType {
   cantidad: number;
 }
 
-const BudgetForm = ({ onClose, open, budget }: Props) => {
+const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
   const { mode } = useThemeContext();
 
   const [subFormSubmitted, setSubFormSubmitted] = useState(false);
@@ -129,6 +130,9 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
         if (response.data.message === 'success') {
           toast.success('Presupueto actualizado');
           setSubmitting(false);
+          if (afterSubmit) {
+            afterSubmit();
+          }
         }
       } catch (error) {
         console.log(error);
@@ -153,6 +157,9 @@ const BudgetForm = ({ onClose, open, budget }: Props) => {
 
           toast.success('Presupueto registrado');
           setSubmitting(false);
+          if (afterSubmit) {
+            afterSubmit();
+          }
         }
       } catch (error) {
         console.log(error);
