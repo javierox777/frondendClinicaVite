@@ -1,21 +1,30 @@
-import React, { useState, FormEvent, useEffect } from 'react';
+import React, { useState, FormEvent, useEffect, useContext } from 'react';
 import { Button, Grid, TextField, Paper } from '@mui/material';
 import logo from '/logo.png'; // Asegúrate de que la ruta es correcta
 import Axios from 'axios';
 import { generalConfig } from '../../config';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
+import { UserContext, useUser } from '../../auth/userContext';
 
 const baseUrl = generalConfig.baseUrl;
 
 interface LoginResponse {
-  _id: string;
-  name: string;
+  data: {
+    _id: string;
+    login: string;
+    vigencia: string;
+    fechaRegistro: string;
+  };
   token?: string;
   message: string;
 }
 
 const Login: React.FC = () => {
+  const { user, setUser } = useUser();
+
+  console.log('usuario', user);
+
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const navigate = useNavigate();
@@ -37,7 +46,10 @@ const Login: React.FC = () => {
         usuario
       );
       const message = data.message;
-      console.log('data por aca', data.message);
+
+      if (message === 'Bienvenido') {
+        setUser(data.data);
+      }
 
       if (message !== 'Bienvenido') {
         Swal.fire({
@@ -54,13 +66,13 @@ const Login: React.FC = () => {
           timer: 1500,
         });
 
-        const token = data.token;
-        const id = data._id;
-        const name = data.name;
+        // const token = data.token;
+        // const id = data._id;
+        // const name = data.name;
 
-        sessionStorage.setItem('token', token ?? '');
-        sessionStorage.setItem('id', id ?? '');
-        sessionStorage.setItem('name', name ?? '');
+        // sessionStorage.setItem('token', token ?? '');
+        // sessionStorage.setItem('id', id ?? '');
+        // sessionStorage.setItem('name', name ?? '');
 
         navigate('/dashboard');
       }

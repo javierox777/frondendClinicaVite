@@ -6,6 +6,7 @@ import Login from './views/login'; // Ajusta la ruta según tu estructura de car
 import DashboardLayout from './views/dashboard/dashboardLayout';
 import { CustomThemeProvider } from './componemts/themeContext'; // Ajusta la ruta según tu estructura de carpetas
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { UserProvider } from './auth/userContext';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Failed to find the root element');
@@ -16,15 +17,17 @@ const queryClient = new QueryClient();
 
 root.render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <CustomThemeProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="*" element={<DashboardLayout />} />
-          </Routes>
-        </BrowserRouter>
-      </CustomThemeProvider>
-    </QueryClientProvider>
+    <UserProvider>
+      <QueryClientProvider client={queryClient}>
+        <CustomThemeProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="*" element={<DashboardLayout />} />
+            </Routes>
+          </BrowserRouter>
+        </CustomThemeProvider>
+      </QueryClientProvider>
+    </UserProvider>
   </React.StrictMode>
 );
