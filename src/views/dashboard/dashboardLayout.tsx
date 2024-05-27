@@ -54,7 +54,7 @@ import BudgetsPage from '../../pages/budgets/BudgetsPage';
 import BudgetDetailsPage from '../../pages/budgets/BudgetDetailsPage';
 import EditBudgetPage from '../../pages/budgets/EditBudgetPage';
 import authStorage from '../../auth/storage';
-import { UserContext, useUser } from '../../auth/userContext';
+import { LoggedUser, UserContext, useUser } from '../../auth/userContext';
 
 const drawerWidth = 240;
 
@@ -110,7 +110,7 @@ const DashboardLayout: React.FC = () => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            Dashboard
+            {user && (user as LoggedUser).nombre}
           </Typography>
           <IconButton
             size="large"

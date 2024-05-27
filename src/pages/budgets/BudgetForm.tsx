@@ -112,6 +112,10 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      toast.error('No se ha iniciado sesión.');
+    } // solo para desarrollo, al protejer las rutas, quitar esto
+
     const data = {
       estado: statusId,
       profesional: (user as LoggedUser).profesionalId,
