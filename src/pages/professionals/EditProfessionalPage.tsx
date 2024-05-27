@@ -16,6 +16,7 @@ const EditProfessionalPage = () => {
         navigation('/profesionales');
       }}
       professional={professional}
+      edit
     />
   );
 };

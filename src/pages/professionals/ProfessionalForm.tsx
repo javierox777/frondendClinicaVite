@@ -26,6 +26,7 @@ interface Props {
   onClose: CallableFunction;
   professional?: Professional;
   afterSubmit?: CallableFunction;
+  edit?: boolean;
 }
 
 const Transition = React.forwardRef(function Transition(
@@ -42,6 +43,7 @@ const ProfessionalForm = ({
   onClose,
   professional,
   afterSubmit,
+  edit,
 }: Props) => {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -87,13 +89,25 @@ const ProfessionalForm = ({
       celular: phone,
       direccion: address,
       email: email,
+      login: username,
+      password: password,
     };
 
     if (professional) {
       try {
         const response = await axios.patch(
           `${generalConfig.baseUrl}/professionals/${professional._id}`,
-          data
+          {
+            nombre1: firstName,
+            nombre2: secondName,
+            apellPat: firstSurname,
+            apellMat: secondSurname,
+            rut: rut,
+            dv: verificationDigit,
+            celular: phone,
+            direccion: address,
+            email: email,
+          }
         );
         if (response.data.message === 'success') {
           toast.success('Se han actualizado los datos.');
@@ -124,6 +138,8 @@ const ProfessionalForm = ({
           setPhone('');
           setAddress('');
           setVerificationDigit('');
+          setUsername('');
+          setPassword('');
           setSubmitting(false);
           if (afterSubmit) {
             afterSubmit();
@@ -265,52 +281,60 @@ const ProfessionalForm = ({
                   />
                 </FormControl>
               </Grid>
-              <Grid item xs={12}>
-                <Typography className="p-3">DATOS DE USUARIO</Typography>
-                <Typography
-                  className="p-3 italic"
-                  style={{ color: colors.ligthModeSoftText }}
-                >
-                  Rellene los datos para crear el usuario correspondiente al
-                  profesional.
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <FormControl fullWidth>
-                  <TextField
-                    label="Nombre de usuario"
-                    fullWidth
-                    onChange={(e) => setUsername(e.target.value)}
-                    value={username}
-                    required
-                  />
-                </FormControl>
-              </Grid>
-              <Grid item xs={6}>
-                <FormControl fullWidth>
-                  <TextField
-                    label="Contraseña"
-                    fullWidth
-                    onChange={(e) => setPassword(e.target.value)}
-                    value={password}
-                    required
-                    type={showPassword ? 'text' : 'password'}
-                    InputProps={{
-                      // <-- This is where the toggle button is added.
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={() => setShowPassword(!showPassword)}
-                          >
-                            {showPassword ? <Visibility /> : <VisibilityOff />}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </FormControl>
-              </Grid>
+              {!edit && (
+                <>
+                  <Grid item xs={12}>
+                    <Typography className="p-3">DATOS DE USUARIO</Typography>
+                    <Typography
+                      className="p-3 italic"
+                      style={{ color: colors.ligthModeSoftText }}
+                    >
+                      Rellene los datos para crear el usuario correspondiente al
+                      profesional.
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <FormControl fullWidth>
+                      <TextField
+                        label="Nombre de usuario"
+                        fullWidth
+                        onChange={(e) => setUsername(e.target.value)}
+                        value={username}
+                        required
+                      />
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <FormControl fullWidth>
+                      <TextField
+                        label="Contraseña"
+                        fullWidth
+                        onChange={(e) => setPassword(e.target.value)}
+                        value={password}
+                        required
+                        type={showPassword ? 'text' : 'password'}
+                        InputProps={{
+                          // <-- This is where the toggle button is added.
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton
+                                aria-label="toggle password visibility"
+                                onClick={() => setShowPassword(!showPassword)}
+                              >
+                                {showPassword ? (
+                                  <Visibility />
+                                ) : (
+                                  <VisibilityOff />
+                                )}
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </FormControl>
+                  </Grid>
+                </>
+              )}
               <Grid item xs={12}>
                 <FormControl fullWidth>
                   <Button

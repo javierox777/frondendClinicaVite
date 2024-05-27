@@ -16,6 +16,8 @@ interface LoginResponse {
     login: string;
     vigencia: string;
     fechaRegistro: string;
+    nombre: string;
+    professionalId: string;
   };
   token?: string;
   message: string;

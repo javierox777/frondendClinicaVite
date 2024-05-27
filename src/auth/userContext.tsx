@@ -11,6 +11,8 @@ interface User {
   login: string;
   vigencia: string;
   fechaRegistro: string;
+  nombre: string;
+  professionalId: string;
 }
 
 interface UserContextType {
