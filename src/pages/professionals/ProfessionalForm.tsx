@@ -5,6 +5,7 @@ import {
   FormControl,
   Grid,
   IconButton,
+  InputAdornment,
   Paper,
   Slide,
   TextField,
@@ -14,10 +15,11 @@ import {
 import React, { useEffect, useState } from 'react';
 import { Professional } from '../../interfaces/Professional';
 import { TransitionProps } from '@mui/material/transitions';
-import { Close } from '@mui/icons-material';
+import { Close, Visibility, VisibilityOff } from '@mui/icons-material';
 import toast, { Toaster } from 'react-hot-toast';
 import axios from 'axios';
 import { generalConfig } from '../../config';
+import colors from '../../styles/colors';
 
 interface Props {
   open: boolean;
@@ -41,6 +43,8 @@ const ProfessionalForm = ({
   professional,
   afterSubmit,
 }: Props) => {
+  const [showPassword, setShowPassword] = useState(false);
+
   const [firstName, setFirstName] = useState('');
   const [secondName, setSecondName] = useState('');
   const [firstSurname, setFirstSurname] = useState('');
@@ -50,6 +54,9 @@ const ProfessionalForm = ({
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   const [isSubmitting, setSubmitting] = useState(false);
 
@@ -149,9 +156,15 @@ const ProfessionalForm = ({
             </IconButton>
           </Toolbar>
           <Container>
-            <Typography className="p-3">
-              Rellene todos los datos para registrar nuevo profesional
-            </Typography>
+            <Grid item xs={12}>
+              <Typography className="p-3">DATOS PERSONALES</Typography>
+              <Typography
+                className="p-3 italic"
+                style={{ color: colors.ligthModeSoftText }}
+              >
+                Rellene todos los datos requeridos
+              </Typography>
+            </Grid>
             <Grid container spacing={5}>
               <Grid item xs={6}>
                 <FormControl fullWidth>
@@ -249,6 +262,52 @@ const ProfessionalForm = ({
                     onChange={(e) => setPhone(e.target.value)}
                     value={phone}
                     required
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography className="p-3">DATOS DE USUARIO</Typography>
+                <Typography
+                  className="p-3 italic"
+                  style={{ color: colors.ligthModeSoftText }}
+                >
+                  Rellene los datos para crear el usuario correspondiente al
+                  profesional.
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <FormControl fullWidth>
+                  <TextField
+                    label="Nombre de usuario"
+                    fullWidth
+                    onChange={(e) => setUsername(e.target.value)}
+                    value={username}
+                    required
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item xs={6}>
+                <FormControl fullWidth>
+                  <TextField
+                    label="Contraseña"
+                    fullWidth
+                    onChange={(e) => setPassword(e.target.value)}
+                    value={password}
+                    required
+                    type={showPassword ? 'text' : 'password'}
+                    InputProps={{
+                      // <-- This is where the toggle button is added.
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? <Visibility /> : <VisibilityOff />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </FormControl>
               </Grid>
