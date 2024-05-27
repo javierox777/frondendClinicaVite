@@ -6,6 +6,7 @@ import { generalConfig } from '../../config';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { UserContext, useUser } from '../../auth/userContext';
+import authStorage from '../../auth/storage';
 
 const baseUrl = generalConfig.baseUrl;
 
@@ -66,18 +67,14 @@ const Login: React.FC = () => {
           timer: 1500,
         });
 
-        // const token = data.token;
+        const token = data.token;
         // const id = data._id;
         // const name = data.name;
-
-        // sessionStorage.setItem('token', token ?? '');
-        // sessionStorage.setItem('id', id ?? '');
-        // sessionStorage.setItem('name', name ?? '');
+        if (token) authStorage.storeToken(token);
 
         navigate('/dashboard');
       }
     } catch (error) {
-      console.log('entro al error');
       Swal.fire({
         icon: 'error',
         title: `Contraseña o nombre de usuario incorrecto`,

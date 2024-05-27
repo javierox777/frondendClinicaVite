@@ -1,3 +1,4 @@
+import { JwtPayload } from 'jwt-decode';
 import React, {
   createContext,
   PropsWithChildren,
@@ -13,14 +14,14 @@ interface User {
 }
 
 interface UserContextType {
-  user: User | null;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  user: User | null | JwtPayload;
+  setUser: React.Dispatch<React.SetStateAction<User | null | JwtPayload>>;
 }
 
 export const UserContext = createContext<UserContextType | null>(null);
 
 export const UserProvider = ({ children }: PropsWithChildren) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null | JwtPayload>(null);
 
   return (
     <UserContext.Provider value={{ user, setUser }}>

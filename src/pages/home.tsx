@@ -5,6 +5,7 @@ import { useUser } from '../auth/userContext';
 const Inicio: React.FC = () => {
   const { user } = useUser();
 
+  console.log(user);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Typography variant="h4" gutterBottom>
