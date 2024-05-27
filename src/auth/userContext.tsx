@@ -6,24 +6,24 @@ import React, {
   useState,
 } from 'react';
 
-interface User {
+export interface LoggedUser {
   _id: string;
   login: string;
   vigencia: string;
   fechaRegistro: string;
   nombre: string;
-  professionalId: string;
+  profesionalId: string;
 }
 
 interface UserContextType {
-  user: User | null | JwtPayload;
-  setUser: React.Dispatch<React.SetStateAction<User | null | JwtPayload>>;
+  user: LoggedUser | null | JwtPayload;
+  setUser: React.Dispatch<React.SetStateAction<LoggedUser | null | JwtPayload>>;
 }
 
 export const UserContext = createContext<UserContextType | null>(null);
 
 export const UserProvider = ({ children }: PropsWithChildren) => {
-  const [user, setUser] = useState<User | null | JwtPayload>(null);
+  const [user, setUser] = useState<LoggedUser | null | JwtPayload>(null);
 
   return (
     <UserContext.Provider value={{ user, setUser }}>

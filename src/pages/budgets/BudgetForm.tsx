@@ -39,6 +39,7 @@ import { BudgetDetail } from '../../interfaces/BudgetDetail';
 import BudgetFormSkeleton from './BudgetFormSkeleton';
 import { format } from 'date-fns';
 import toast, { Toaster } from 'react-hot-toast';
+import { LoggedUser, useUser } from '../../auth/userContext';
 
 interface Props {
   open: boolean;
@@ -71,10 +72,11 @@ interface BudgetDetailType {
 
 const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
   const { mode } = useThemeContext();
+  const { user } = useUser();
 
   const [subFormSubmitted, setSubFormSubmitted] = useState(false);
   const [patientId, setPatientId] = useState('');
-  const [professionalId, setProfessionalId] = useState('');
+  // const [professionalId, setProfessionalId] = useState('');
   const [budgetTypeId, setBudgetTypeId] = useState('');
   const [clinicId, setClinicId] = useState('');
   const [statusId, setStatusId] = useState('');
@@ -112,13 +114,15 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
     e.preventDefault();
     const data = {
       estado: statusId,
-      profesional: professionalId,
+      profesional: (user as LoggedUser).profesionalId,
       empresa: clinicId,
       fechaRegistro: new Date(registerDate).toISOString(),
       persona: patientId,
       presupuestoTipo: budgetTypeId,
       budgetDetails,
     };
+
+    console.log(data);
 
     if (budget) {
       try {
@@ -148,7 +152,7 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
         );
         if (response.data.message === 'success') {
           setPatientId('');
-          setProfessionalId('');
+          // setProfessionalId('');
           setBudgetTypeId('');
           setStatusId('');
           setClinicId('');
@@ -180,7 +184,7 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
   useEffect(() => {
     if (budget) {
       setPatientId(budget.persona._id);
-      setProfessionalId(budget.profesional._id);
+      // setProfessionalId(budget.profesional._id);
       setBudgetTypeId(budget.presupuestoTipo._id);
       setStatusId(budget.estado._id);
       setClinicId(budget.empresa._id);
@@ -366,7 +370,7 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
                       </FormControl>
                     )}
                   </Grid>
-                  <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                  {/* <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                     {data && (
                       <FormControl fullWidth>
                         <Autocomplete
@@ -413,7 +417,7 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
                         />
                       </FormControl>
                     )}
-                  </Grid>
+                  </Grid> */}
                   <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                     {data && (
                       <FormControl fullWidth>
