@@ -30,6 +30,7 @@ import { useThemeContext } from '../../componemts/themeContext';
 import TableSkeleton from '../../componemts/TableSkeleton';
 import { useNavigate } from 'react-router-dom';
 import { Check } from '@mui/icons-material';
+import { LoggedUser, useUser } from '../../auth/userContext';
 
 interface Props {
   budget: Budget;
@@ -61,7 +62,7 @@ const detailsTableHeadings = [
 const BudgetDetails = ({ budget }: Props) => {
   const { mode } = useThemeContext();
   const navigate = useNavigate();
-
+  const { user } = useUser();
 
   const {
     empresa,
@@ -110,8 +111,6 @@ const BudgetDetails = ({ budget }: Props) => {
 
   const validAddresses = addresses?.filter((a: any) => a.vigente === '1');
 
-  console.log(budget);
-
   return (
     <Container>
       <Grid container direction="column" spacing={3}>
@@ -124,19 +123,11 @@ const BudgetDetails = ({ budget }: Props) => {
                   Estado del presupuesto
                 </Typography>
                 <StatusBadge
-                  status={
-                    estado.nombre === 'EN_PROCESO'
-                      ? 'in-progress'
-                      : estado.nombre === 'FINALIZADO'
-                        ? 'finished'
-                        : 'cancelled'
-                  }
+                  status={budget.profesionalValida ? 'finished' : 'in-progress'}
                   title={
-                    estado.nombre === 'EN_PROCESO'
-                      ? 'EN PROCESO'
-                      : estado.nombre === 'FINALIZADO'
-                        ? 'FINALIZADO'
-                        : 'VALIDACION PENDIENTE'
+                    budget.profesionalValida
+                      ? 'VALIDADO'
+                      : 'VALIDACIÓN PENDIENTE'
                   }
                 />
               </Grid>
@@ -150,7 +141,7 @@ const BudgetDetails = ({ budget }: Props) => {
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
                 <Typography sx={{ fontWeight: 'bold' }}>
-                  Fecha de validaciónå
+                  Fecha de validación
                 </Typography>
                 <Typography>
                   {budget.fechaRegistroValida
@@ -190,11 +181,21 @@ const BudgetDetails = ({ budget }: Props) => {
               <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
                 {!budget.profesionalValida && (
                   <Button
-                    onClick={async () =>
-                      await axios.patch(`${generalConfig.baseUrl}/budgets/validatebudget/${budget._id}`,{
-                        profesionalValida:
-                      })
-                    }
+                    onClick={async () => {
+                      if (user) {
+                        const response = await axios.patch(
+                          `${generalConfig.baseUrl}/budgets/validatebudget/${budget._id}`,
+                          {
+                            profesionalValida: (user as LoggedUser)
+                              .profesionalId,
+                          }
+                        );
+
+                        if (response.data.message === 'success') {
+                          navigate('/presupuestos');
+                        }
+                      }
+                    }}
                     color="info"
                     variant="outlined"
                   >
