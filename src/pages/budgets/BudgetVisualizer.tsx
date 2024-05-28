@@ -13,7 +13,7 @@ import React, { useState } from 'react';
 import { useThemeContext } from '../../componemts/themeContext';
 import { Budget } from '../../interfaces/Budget';
 import colors from '../../styles/colors';
-import { Edit, Search } from '@mui/icons-material';
+import { Check, Edit, Search } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
 interface Props {
@@ -46,6 +46,10 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
     {
       id: 4,
       label: 'Tipo presupuesto',
+    },
+    {
+      id: 5,
+      label: 'Estado',
     },
   ];
 
@@ -118,7 +122,7 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
           <Grid container direction="row" justifyContent="space-between">
             {headings.map((h: any) => {
               return (
-                <Grid item key={h.id} xs={3}>
+                <Grid item key={h.id} xs={2}>
                   <Typography sx={{ fontWeight: 'bold' }}>{h.label}</Typography>
                 </Grid>
               );
@@ -141,21 +145,30 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
                   });
                 }}
               >
-                <Grid item xs={3}>
+                <Grid item xs={2}>
                   <Typography>
                     {b.persona.nombre1} {b.persona.apellPat}
                   </Typography>
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={2}>
                   <Typography>{b.persona.rut}</Typography>
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={2}>
                   <Typography>
                     {new Date(b.fechaRegistro).toLocaleDateString()}
                   </Typography>
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={2}>
                   <Typography>{b.presupuestoTipo.nombre}</Typography>
+                </Grid>
+                <Grid item xs={2}>
+                  {b.profesionalValida ? (
+                    <Check color="success" />
+                  ) : (
+                    <Typography style={{ color: colors.ligthModeSoftText }}>
+                      VALIDACIÓN PENDIENTE
+                    </Typography>
+                  )}
                 </Grid>
               </Grid>
             );
