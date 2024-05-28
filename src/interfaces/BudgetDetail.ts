@@ -13,6 +13,7 @@ export interface BudgetDetail {
     // valorUniIva: number;
     valor:number;
     prestacion: ShortModel;
-    cantidad: number
+    cantidad: number,
+    pagado: boolean
 
 }

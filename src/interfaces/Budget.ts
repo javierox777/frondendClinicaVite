@@ -12,6 +12,6 @@ export interface Budget {
     persona: Person;
     presupuestoTipo: ShortModel;
     fechaRegistroValida: string;
-
+    profesionalValida? : Professional
   
 }

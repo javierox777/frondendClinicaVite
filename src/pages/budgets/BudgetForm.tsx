@@ -67,6 +67,7 @@ interface BudgetDetailType {
   valor: number;
   prestacion: string;
   cantidad: number;
+  pagado: boolean;
 }
 
 const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
@@ -94,6 +95,7 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
       // valorUniIva: 0,
       prestacion: '',
       cantidad: 1,
+      pagado: false,
     },
   ]);
 

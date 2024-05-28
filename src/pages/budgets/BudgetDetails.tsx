@@ -29,6 +29,7 @@ import colors from '../../styles/colors';
 import { useThemeContext } from '../../componemts/themeContext';
 import TableSkeleton from '../../componemts/TableSkeleton';
 import { useNavigate } from 'react-router-dom';
+import { Check } from '@mui/icons-material';
 
 interface Props {
   budget: Budget;
@@ -51,10 +52,10 @@ const detailsTableHeadings = [
     id: 4,
     label: 'VALOR',
   },
-  // {
-  //   id: 5,
-  //   label: 'VALOR IVA',
-  // },
+  {
+    id: 5,
+    label: 'PAGADO',
+  },
 ];
 
 const BudgetDetails = ({ budget }: Props) => {
@@ -328,7 +329,17 @@ const BudgetDetails = ({ budget }: Props) => {
                         <TableCell>{d.objeto.nombre}</TableCell>
                         <TableCell>{d.prestacion.nombre}</TableCell>
                         <TableCell>$ {d.valor}</TableCell>
-                        {/* <TableCell>$ {d.valorUniIva}</TableCell> */}
+                        <TableCell>
+                          {d.pagado ? (
+                            <Check color="success" />
+                          ) : (
+                            <Typography
+                              style={{ color: colors.ligthModeSoftText }}
+                            >
+                              PENDIENTE
+                            </Typography>
+                          )}
+                        </TableCell>
                       </TableRow>
                     );
                   })}
@@ -337,6 +348,7 @@ const BudgetDetails = ({ budget }: Props) => {
                   <TableRow>
                     <TableCell>TOTAL A PAGAR</TableCell>
                     <TableCell>
+                      ${' '}
                       {details?.reduce((acc: number, d: BudgetDetail) => {
                         return d.valor + acc;
                       }, 0)}
@@ -344,11 +356,25 @@ const BudgetDetails = ({ budget }: Props) => {
                   </TableRow>
                   <TableRow>
                     <TableCell>PAGADO</TableCell>
-                    <TableCell>1</TableCell>
+                    <TableCell>
+                      ${' '}
+                      {details
+                        .filter((d: any) => d.pagado)
+                        .reduce((acc: number, d: BudgetDetail) => {
+                          return d.valor + acc;
+                        }, 0)}
+                    </TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell>PENDIENTE</TableCell>
-                    <TableCell>1</TableCell>
+                    <TableCell>
+                      ${' '}
+                      {details
+                        .filter((d: any) => !d.pagado)
+                        .reduce((acc: number, d: BudgetDetail) => {
+                          return d.valor + acc;
+                        }, 0)}
+                    </TableCell>
                   </TableRow>
                 </TableFooter>
               </Table>

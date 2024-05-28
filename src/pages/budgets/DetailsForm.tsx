@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Card,
+  Checkbox,
   FormControl,
   Grid,
   IconButton,
@@ -50,6 +51,7 @@ const DetailsForm = ({
         valor: 0,
         prestacion: '',
         cantidad: 1,
+        pagado: false,
       },
     ]);
   };
@@ -131,10 +133,14 @@ const DetailsForm = ({
             }}
           >
             <Grid item xs={3}>
-              <Typography sx={{ fontWeight: 'bold' }}>Descripción</Typography>
+              <Typography sx={{ fontWeight: 'bold', textAlign: 'center' }}>
+                Descripción
+              </Typography>
             </Grid>
             <Grid item xs={3}>
-              <Typography sx={{ fontWeight: 'bold' }}>Prestación</Typography>
+              <Typography sx={{ fontWeight: 'bold', textAlign: 'center' }}>
+                Prestación
+              </Typography>
             </Grid>
             {/* <Grid item xs={2}>
               <Typography sx={{ fontWeight: 'bold' }}>
@@ -142,10 +148,14 @@ const DetailsForm = ({
               </Typography>
             </Grid> */}
             <Grid item xs={3}>
-              <Typography sx={{ fontWeight: 'bold' }}>Valor</Typography>
+              <Typography sx={{ fontWeight: 'bold', textAlign: 'center' }}>
+                Valor
+              </Typography>
             </Grid>
             <Grid item xs={3}>
-              <Typography sx={{ fontWeight: 'bold' }}>Acciones</Typography>
+              <Typography sx={{ fontWeight: 'bold', textAlign: 'center' }}>
+                Pagado
+              </Typography>
             </Grid>
           </Grid>
         </Grid>
@@ -201,7 +211,7 @@ const DetailsForm = ({
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={2} xl={2}>
+                <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
                   {services?.map((s: ServiceInterface) => {
                     if (
                       (typeof b.prestacion !== 'string' &&
@@ -262,6 +272,18 @@ const DetailsForm = ({
                   })}
                 </Grid> */}
                 <Grid item xs={2} display="flex" justifyContent="end">
+                  <Box>
+                    <Checkbox
+                      color="success"
+                      checked={b.pagado}
+                      onClick={() => {
+                        const updatedDetails = [...budgetDetails];
+                        budgetDetails[index].pagado =
+                          !budgetDetails[index].pagado;
+                        setDetails(updatedDetails);
+                      }}
+                    />
+                  </Box>
                   <Box>
                     <IconButton
                       onClick={() => {
