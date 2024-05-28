@@ -62,6 +62,7 @@ const BudgetDetails = ({ budget }: Props) => {
   const { mode } = useThemeContext();
   const navigate = useNavigate();
 
+
   const {
     empresa,
     estado,
@@ -168,7 +169,7 @@ const BudgetDetails = ({ budget }: Props) => {
                 <Typography>{empresa.razonSocial}</Typography>
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
-                <Typography sx={{ fontWeight: 'bold' }}>Emitido</Typography>
+                <Typography sx={{ fontWeight: 'bold' }}>Emitido por</Typography>
                 <Typography>
                   {profesional.nombre1} {profesional.apellPat}
                 </Typography>
@@ -185,6 +186,32 @@ const BudgetDetails = ({ budget }: Props) => {
                 >
                   Editar
                 </Button>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                {!budget.profesionalValida && (
+                  <Button
+                    onClick={async () =>
+                      await axios.patch(`${generalConfig.baseUrl}/budgets/validatebudget/${budget._id}`,{
+                        profesionalValida:
+                      })
+                    }
+                    color="info"
+                    variant="outlined"
+                  >
+                    Validar
+                  </Button>
+                )}
+                {budget.profesionalValida && (
+                  <>
+                    <Typography sx={{ fontWeight: 'bold' }}>
+                      Validado por
+                    </Typography>
+                    <Typography>
+                      {budget.profesionalValida.nombre1}{' '}
+                      {budget.profesionalValida.apellPat}
+                    </Typography>
+                  </>
+                )}
               </Grid>
             </Grid>
           </Card>
