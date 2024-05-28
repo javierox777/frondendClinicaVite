@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   Box,
   CssBaseline,
@@ -53,10 +53,14 @@ import EditProfessionalPage from '../../pages/professionals/EditProfessionalPage
 import BudgetsPage from '../../pages/budgets/BudgetsPage';
 import BudgetDetailsPage from '../../pages/budgets/BudgetDetailsPage';
 import EditBudgetPage from '../../pages/budgets/EditBudgetPage';
+import authStorage from '../../auth/storage';
+import { LoggedUser, UserContext, useUser } from '../../auth/userContext';
 
 const drawerWidth = 240;
 
 const DashboardLayout: React.FC = () => {
+  const { user, setUser } = useUser();
+
   const { toggleColorMode, mode } = useThemeContext();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -73,6 +77,16 @@ const DashboardLayout: React.FC = () => {
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen);
   };
+
+  const restoreUser = async () => {
+    const user = await authStorage.getUser();
+    if (user) setUser(user);
+    return;
+  };
+
+  useEffect(() => {
+    restoreUser();
+  }, []);
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -96,7 +110,7 @@ const DashboardLayout: React.FC = () => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            Dashboard
+            {user && (user as LoggedUser).nombre}
           </Typography>
           <IconButton
             size="large"
