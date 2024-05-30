@@ -55,6 +55,7 @@ import BudgetDetailsPage from '../../pages/budgets/BudgetDetailsPage';
 import EditBudgetPage from '../../pages/budgets/EditBudgetPage';
 import authStorage from '../../auth/storage';
 import { LoggedUser, UserContext, useUser } from '../../auth/userContext';
+import BudgetPDF from '../../pages/budgets/BudgetPDF';
 
 const drawerWidth = 240;
 
@@ -272,6 +273,7 @@ const DashboardLayout: React.FC = () => {
             <Route path="/editarpaciente" element={<EditPatientPage />} />
             <Route path="/profesionales" element={<ProfessionalsPage />} />
             <Route path="/presupuestos" element={<BudgetsPage />} />
+            <Route path="/presupuestopdf" element={<BudgetPDF />} />
             <Route path="/editarpresupuesto" element={<EditBudgetPage />} />
             <Route path="/presupuestodetalle" element={<BudgetDetailsPage />} />
             <Route path="/profesionales" element={<ProfessionalsPage />} />
