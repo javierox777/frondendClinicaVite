@@ -7,6 +7,7 @@ import DashboardLayout from './views/dashboard/dashboardLayout';
 import { CustomThemeProvider } from './componemts/themeContext'; // Ajusta la ruta según tu estructura de carpetas
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { UserProvider } from './auth/userContext';
+import 'rsuite/dist/rsuite.min.css';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Failed to find the root element');

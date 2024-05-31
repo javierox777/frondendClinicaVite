@@ -3,6 +3,7 @@ import { useState } from 'react';
 import PatientForm from './PatientForm';
 import PatientsTable from './PatientsTable';
 import TotalPatients from './TotalPatients';
+import { Badge, Calendar } from 'rsuite';
 
 const PatientsPage = () => {
   const [modalOpen, setModal] = useState(false);

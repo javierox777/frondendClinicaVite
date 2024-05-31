@@ -19,6 +19,7 @@ import {
   AccordionSummary,
   AccordionDetails,
   FormControlLabel,
+  ListItemButton,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
@@ -32,6 +33,7 @@ import { useThemeContext } from '../../componemts/themeContext';
 import { ParticlesContainer } from './ParticlesFire';
 import {
   AssignmentInd,
+  CalendarMonth,
   ContactEmergency,
   RequestQuote,
 } from '@mui/icons-material';
@@ -56,6 +58,7 @@ import EditBudgetPage from '../../pages/budgets/EditBudgetPage';
 import authStorage from '../../auth/storage';
 import { LoggedUser, UserContext, useUser } from '../../auth/userContext';
 import BudgetPDF from '../../pages/budgets/BudgetPDF';
+import AppointmentsPage from '../../pages/appointments/AppointmentsPage';
 
 const drawerWidth = 240;
 
@@ -88,6 +91,24 @@ const DashboardLayout: React.FC = () => {
   useEffect(() => {
     restoreUser();
   }, []);
+
+  const menuItems = [
+    { id: 1, label: 'Inicio', icon: <HomeIcon />, path: '/inicio' },
+    { id: 2, label: 'Pacientes', icon: <AssignmentInd />, path: '/pacientes' },
+    {
+      id: 3,
+      label: 'Profesionales',
+      icon: <ContactEmergency />,
+      path: '/profesionales',
+    },
+    {
+      id: 4,
+      label: 'Presupuestos',
+      icon: <RequestQuote />,
+      path: '/presupuestos',
+    },
+    { id: 5, label: 'Agenda', icon: <CalendarMonth />, path: '/agenda' },
+  ];
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -170,34 +191,16 @@ const DashboardLayout: React.FC = () => {
         <Box sx={{ overflow: 'auto' }}>
           <List>
             {/* Menu items */}
-            {[
-              'Inicio',
-              'Pacientes',
-              'Profesionales',
-              'Ingreso',
-              'Presupuestos',
-            ].map((text, index) => (
-              <ListItem
-                button
-                key={text}
+            {menuItems.map((item, index) => (
+              <ListItemButton
+                key={item.id}
                 component={Link}
-                to={`/${text.toLowerCase()}`}
+                to={item.path}
+                style={{ textDecoration: 'none', color: 'inherit' }}
               >
-                <ListItemIcon>
-                  {index === 0 ? (
-                    <HomeIcon />
-                  ) : index === 1 ? (
-                    <AssignmentInd />
-                  ) : index === 2 ? (
-                    <ContactEmergency />
-                  ) : index === 3 ? (
-                    <PeopleIcon />
-                  ) : (
-                    <RequestQuote />
-                  )}
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItem>
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.label} />
+              </ListItemButton>
             ))}
             {/* Submenu */}
             <Accordion>
@@ -277,6 +280,7 @@ const DashboardLayout: React.FC = () => {
             <Route path="/editarpresupuesto" element={<EditBudgetPage />} />
             <Route path="/presupuestodetalle" element={<BudgetDetailsPage />} />
             <Route path="/profesionales" element={<ProfessionalsPage />} />
+            <Route path="/agenda" element={<AppointmentsPage />} />
             <Route
               path="/editarprofesional"
               element={<EditProfessionalPage />}
