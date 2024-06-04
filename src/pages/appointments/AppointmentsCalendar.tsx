@@ -1,17 +1,24 @@
 import { Card } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import React from 'react';
+import React, { useState } from 'react';
 import { Badge, Calendar, Popover, Whisper } from 'rsuite';
 import esAr from 'rsuite/locales/es_AR';
 import { generalConfig } from '../../config';
 import { Appointment } from '../../interfaces/Appointment';
 import { ServiceHour } from '../../interfaces/ServiceHour';
 import CalendarLoading from './CalendarLoading';
+import { TimeSlot } from '../../interfaces/TimeSlot';
+import DateDetails from './DateDetails';
 
 const AppointmentsCalendar = () => {
+  const [showSlots, setSlots] = useState<TimeSlot[]>([]);
+  const [open, setOpen] = useState(false);
+  const [showDate, setShowDate] = useState<Date>(new Date());
+  const [refetch, setRefetch] = useState(false);
+
   const { data, isLoading } = useQuery({
-    queryKey: ['data'],
+    queryKey: ['data', refetch],
     queryFn: async () => {
       const response = await axios.get(
         `${generalConfig.baseUrl}/service-hours/getschedule`
@@ -39,7 +46,7 @@ const AppointmentsCalendar = () => {
     const serviceHours = data?.serviceHours;
 
     // Crear una lista con los slots y que retorne la cita o si eta disponible en caso de no haber cita q corresponda a cierta hora
-    const timeSlots = serviceHours?.map((hour: ServiceHour) => {
+    const timeSlots: TimeSlot[] = serviceHours?.map((hour: ServiceHour) => {
       const appointment = appointmentsList?.find((a: Appointment) => {
         return (
           a.horaInicio === hour.horaInicio && a.horaTermino === hour.horaTermino
@@ -50,14 +57,14 @@ const AppointmentsCalendar = () => {
       return {
         horaInicio: hour.horaInicio,
         horaTermino: hour.horaTermino,
+        fecha: date,
         content: appointment
           ? {
               type: 'appointment',
               razon: appointment.razon,
-              nombre1: appointment.persona.nombre1,
-              apellPat: appointment.persona.apellPat,
-              rut: appointment.persona.rut,
-              dv: appointment.persona.dv,
+              persona: appointment.persona,
+              estado: appointment.estado,
+              profesional: appointment.profesional,
             }
           : { type: 'available' },
         //en caso de querer obviar algun dia de la semana por ejemplo domingo, hacer aca agregando otro tipo de contenido en caso de cumplir las condiciones
@@ -112,11 +119,17 @@ const AppointmentsCalendar = () => {
       // Mostrar las citas o si esta libre la hora desde hoy hacia adelante
       return (
         <ul className="calendar-todo-list">
-          {displayList?.map((slot: typeof timeSlots, index: number) => {
-            if (slot.content.type === 'appointment') {
+          {displayList?.map((slot: TimeSlot, index: number) => {
+            if (
+              slot.content.type === 'appointment' &&
+              slot.content.estado !== 'CANCELADO'
+            ) {
               return (
                 <li key={index}>
-                  <Badge color="yellow" /> <b>{slot.content.razon}</b>
+                  <Badge color="yellow" />{' '}
+                  <b className="capitalize">
+                    {slot.content.razon?.toLowerCase()}
+                  </b>
                 </li>
               );
             } else {
@@ -136,33 +149,35 @@ const AppointmentsCalendar = () => {
                 trigger="hover"
                 speaker={
                   <Popover>
-                    {hiddenList?.map(
-                      (slot: typeof timeSlots, index: number) => (
-                        <div key={index} className="grid grid-cols-3">
-                          {slot.content.type === 'appointment' ? (
-                            <>
-                              <div>{slot.content.razon}</div>
-                              <div>
-                                {slot.content.nombre1} {slot.content.apellPat}
-                              </div>
-                              <div className="ml-1">
-                                <b>RUT</b> {slot.content.rut} -{' '}
-                                {slot.content.dv}
-                              </div>
-                            </>
-                          ) : (
-                            <div className="col-span-3">
-                              <span className="text-green-500">Disponible</span>{' '}
-                              - {slot.horaInicio} to {slot.horaTermino}
-                            </div>
-                          )}
-                        </div>
-                      )
-                    )}
+                    {hiddenList?.map((slot: TimeSlot, index: number) => (
+                      <div key={index} className="grid grid-cols-3">
+                        {slot.content.type === 'appointment' ? (
+                          <div className="col-span-3">
+                            <span className="font-bold capitalize">
+                              {slot.content.razon?.toLowerCase()}
+                            </span>{' '}
+                            - {slot.horaInicio} - {slot.horaTermino}
+                          </div>
+                        ) : (
+                          <div className="col-span-3">
+                            <span className="text-green-500">Disponible</span> -{' '}
+                            {slot.horaInicio} - {slot.horaTermino}
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </Popover>
                 }
               >
-                <a>Ver más</a>
+                <a
+                  onClick={() => {
+                    setSlots(timeSlots);
+                    setShowDate(date);
+                    setOpen(!open);
+                  }}
+                >
+                  Ver más
+                </a>
               </Whisper>
             </li>
           )}
@@ -171,12 +186,19 @@ const AppointmentsCalendar = () => {
     }
   };
 
-  if (isLoading) return <CalendarLoading />;
-
   return (
-    <Card>
-      <Calendar locale={esAr.Calendar} bordered renderCell={renderCell} />
-    </Card>
+    <>
+      <Card>
+        <Calendar locale={esAr.Calendar} bordered renderCell={renderCell} />
+      </Card>
+      <DateDetails
+        open={open}
+        timeSlots={showSlots}
+        date={showDate}
+        onClose={() => setOpen(false)}
+        refetch={() => setRefetch(!refetch)}
+      />
+    </>
   );
 };
 
