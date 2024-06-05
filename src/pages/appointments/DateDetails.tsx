@@ -1,5 +1,3 @@
-import React, { useState } from 'react';
-import { TimeSlot } from '../../interfaces/TimeSlot';
 import {
   Autocomplete,
   Button,
@@ -16,18 +14,19 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import Draggable from 'react-draggable';
-import { Badge } from 'rsuite';
-import { useThemeContext } from '../../componemts/themeContext';
-import colors from '../../styles/colors';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { generalConfig } from '../../config';
-import { Professional } from '../../interfaces/Professional';
-import { Person } from '../../interfaces/Person';
-import { Form } from 'react-router-dom';
-import Swal from 'sweetalert2';
+import { format } from 'date-fns';
+import React, { useState } from 'react';
+import Draggable from 'react-draggable';
 import toast, { Toaster } from 'react-hot-toast';
+import { Badge } from 'rsuite';
+import { useThemeContext } from '../../componemts/themeContext';
+import { generalConfig } from '../../config';
+import { Person } from '../../interfaces/Person';
+import { Professional } from '../../interfaces/Professional';
+import { TimeSlot } from '../../interfaces/TimeSlot';
+import colors from '../../styles/colors';
 
 interface Props {
   timeSlots: TimeSlot[];
@@ -165,7 +164,7 @@ const SlotDetail = ({
       const data = {
         profesional: professionalId,
         persona: patientId,
-        fecha: slot.fecha.toISOString(),
+        fecha: format(new Date(slot.fecha), 'MM/dd/yyyy'),
         horaInicio: slot.horaInicio,
         horaTermino: slot.horaTermino,
         razon: reason,

@@ -128,8 +128,6 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
       budgetDetails,
     };
 
-    console.log(data);
-
     if (budget) {
       try {
         setSubmitting(true);

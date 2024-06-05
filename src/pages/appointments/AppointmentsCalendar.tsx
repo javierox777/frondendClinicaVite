@@ -1,7 +1,7 @@
-import { Card } from '@mui/material';
+import { Autocomplete, Card, FormControl, TextField } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Badge, Calendar, Popover, Whisper } from 'rsuite';
 import esAr from 'rsuite/locales/es_AR';
 import { generalConfig } from '../../config';
@@ -10,12 +10,22 @@ import { ServiceHour } from '../../interfaces/ServiceHour';
 import CalendarLoading from './CalendarLoading';
 import { TimeSlot } from '../../interfaces/TimeSlot';
 import DateDetails from './DateDetails';
+import colors from '../../styles/colors';
+import { Professional } from '../../interfaces/Professional';
+import { useThemeContext } from '../../componemts/themeContext';
 
 const AppointmentsCalendar = () => {
+  const { mode } = useThemeContext();
+
   const [showSlots, setSlots] = useState<TimeSlot[]>([]);
   const [open, setOpen] = useState(false);
   const [showDate, setShowDate] = useState<Date>(new Date());
   const [refetch, setRefetch] = useState(false);
+  const [filteredAppointments, setFilteredAppointments] = useState<
+    Appointment[]
+  >([]);
+
+  const [professionalId, setProfessionalId] = useState('');
 
   const { data, isLoading } = useQuery({
     queryKey: ['data', refetch],
@@ -28,17 +38,40 @@ const AppointmentsCalendar = () => {
     },
   });
 
+  const { data: professionals } = useQuery({
+    queryKey: ['professionals'],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${generalConfig.baseUrl}/professionals`
+      );
+
+      return response.data.body;
+    },
+  });
+
+  useEffect(() => {
+    if (data && professionals) {
+      const filteredAppointments = data.appointments.filter(
+        (a: Appointment) => {
+          return a.profesional._id === professionalId;
+        }
+      );
+      setFilteredAppointments(filteredAppointments);
+      setRefetch(!refetch);
+    }
+  }, [professionalId]);
+
   const renderCell = (date: Date) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Normalizar la fecha de hoy a media noche
 
     // obtener las citas para las fechas correspondientes
-    const appointmentsList = data?.appointments.filter((a: Appointment) => {
+    const appointmentsList = filteredAppointments.filter((a: Appointment) => {
       const appointmentDate = new Date(a.fecha);
       return (
-        date.getFullYear() === appointmentDate.getFullYear() &&
-        date.getMonth() === appointmentDate.getMonth() &&
-        date.getDate() === appointmentDate.getDate()
+        date.getFullYear() === new Date(appointmentDate).getFullYear() &&
+        date.getMonth() === new Date(appointmentDate).getMonth() &&
+        date.getDate() === new Date(appointmentDate).getDate()
       );
     });
 
@@ -81,11 +114,13 @@ const AppointmentsCalendar = () => {
         <ul className="calendar-todo-list">
           {appointmentsList
             ?.slice(0, 2)
-            .map((item: Appointment, index: number) => (
-              <li key={index}>
-                <Badge color="blue" /> <b>{item.razon}</b>
-              </li>
-            ))}
+            .map((item: Appointment, index: number) => {
+              return (
+                <li key={index}>
+                  <Badge color="blue" /> <b>{item.razon}</b>
+                </li>
+              );
+            })}
           {appointmentsList?.length > 2 && (
             <li>
               <Whisper
@@ -189,6 +224,48 @@ const AppointmentsCalendar = () => {
   return (
     <>
       <Card>
+        {professionals && (
+          <FormControl fullWidth>
+            <Autocomplete
+              disablePortal
+              //   defaultValue={budget?.profesional}
+              options={professionals}
+              renderInput={(params) => (
+                <TextField {...params} label="Dentista" />
+              )}
+              renderOption={(props, professional: Professional) => (
+                <li {...props}>
+                  <div className="flex justify-between w-full">
+                    <span>
+                      {professional.nombre1} {professional.apellPat}
+                    </span>
+                    <span
+                      style={{
+                        color:
+                          mode === 'light'
+                            ? colors.ligthModeSoftText
+                            : colors.darkModeSoftText,
+                      }}
+                    >
+                      {professional.rut}-{professional.dv}
+                    </span>
+                  </div>
+                </li>
+              )}
+              getOptionLabel={(professional: Professional) => {
+                // Value selected with enter, right from the input
+                if (typeof professional === 'string') {
+                  return professional;
+                }
+                // Regular professional
+                return `${professional.nombre1} ${professional.apellPat} ${professional.rut}-${professional.dv}`;
+              }}
+              onChange={(event, professional: Professional | null) => {
+                if (professional) setProfessionalId(professional._id);
+              }}
+            />
+          </FormControl>
+        )}
         <Calendar locale={esAr.Calendar} bordered renderCell={renderCell} />
       </Card>
       <DateDetails
