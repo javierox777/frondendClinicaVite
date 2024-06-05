@@ -318,7 +318,7 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
                             }
                             value={statusId}
                           >
-                            {data.statuses.map((s: ShortModel) => {
+                            {data?.statuses.map((s: ShortModel) => {
                               return (
                                 <MenuItem key={s._id} value={s._id}>
                                   {s.nombre}

@@ -27,8 +27,8 @@ const AppointmentsCalendar = () => {
 
   const [professionalId, setProfessionalId] = useState('');
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['data', refetch],
+  const { data: scheduleData, isLoading } = useQuery({
+    queryKey: ['scheduleData', refetch],
     queryFn: async () => {
       const response = await axios.get(
         `${generalConfig.baseUrl}/service-hours/getschedule`
@@ -50,15 +50,16 @@ const AppointmentsCalendar = () => {
   });
 
   useEffect(() => {
-    if (data && professionals) {
-      const filteredAppointments = data.appointments.filter(
+    if (scheduleData && professionals) {
+      const filteredAppointments = scheduleData?.appointments.filter(
         (a: Appointment) => {
           return a.profesional._id === professionalId;
         }
       );
-      setFilteredAppointments(filteredAppointments);
+      console.log(filteredAppointments);
+      // setFilteredAppointments(filteredAppointments);
     }
-  }, [professionalId, data]);
+  }, [scheduleData, professionalId]);
 
   const renderCell = (date: Date) => {
     const today = new Date();
@@ -75,7 +76,7 @@ const AppointmentsCalendar = () => {
     });
 
     // llamar el horario de atencion
-    const serviceHours = data?.serviceHours;
+    const serviceHours = scheduleData?.serviceHours;
 
     // Crear una lista con los slots y que retorne la cita o si eta disponible en caso de no haber cita q corresponda a cierta hora
     const timeSlots: TimeSlot[] = serviceHours?.map((hour: ServiceHour) => {
