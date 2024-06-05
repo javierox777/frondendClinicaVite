@@ -56,8 +56,8 @@ const AppointmentsCalendar = () => {
           return a.profesional._id === professionalId;
         }
       );
-      console.log(filteredAppointments);
-      // setFilteredAppointments(filteredAppointments);
+
+      setFilteredAppointments(filteredAppointments);
     }
   }, [scheduleData, professionalId]);
 
