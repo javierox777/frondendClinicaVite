@@ -9,8 +9,11 @@ import {
   Divider,
   FormControl,
   Grid,
+  InputLabel,
+  MenuItem,
   Paper,
   PaperProps,
+  Select,
   TextField,
   Typography,
 } from '@mui/material';
@@ -34,6 +37,7 @@ interface Props {
   date: Date;
   onClose: CallableFunction;
   refetch?: CallableFunction;
+  professionalId: string;
 }
 
 const weekDays: Record<number, string> = {
@@ -72,7 +76,14 @@ function PaperComponent(props: PaperProps) {
   );
 }
 
-const DateDetails = ({ timeSlots, open, date, onClose, refetch }: Props) => {
+const DateDetails = ({
+  timeSlots,
+  open,
+  date,
+  onClose,
+  refetch,
+  professionalId,
+}: Props) => {
   const weekDay = date.getDay();
   const month = date.getMonth();
 
@@ -114,6 +125,7 @@ const DateDetails = ({ timeSlots, open, date, onClose, refetch }: Props) => {
                 professionals={formData.professionals}
                 patients={formData.persons}
                 refetch={refetch}
+                professional={professionalId}
               />
             );
           })}
@@ -139,14 +151,15 @@ const SlotDetail = ({
   professionals,
   patients,
   refetch,
+  professional,
 }: {
   slot: TimeSlot;
   professionals: Professional[];
   patients: Person[];
   refetch?: CallableFunction;
+  professional: string;
 }) => {
   const [reservationOpen, setReservationOpen] = useState(false);
-  const [professionalId, setProfessionalId] = useState('');
   const [patientId, setPatientId] = useState('');
   const [reason, setReason] = useState('');
 
@@ -162,7 +175,7 @@ const SlotDetail = ({
     try {
       setSubmitting(true);
       const data = {
-        profesional: professionalId,
+        profesional: professional,
         persona: patientId,
         fecha: format(new Date(slot.fecha), 'MM/dd/yyyy'),
         horaInicio: slot.horaInicio,
@@ -176,7 +189,7 @@ const SlotDetail = ({
       );
 
       if (response.data.message === 'success') {
-        setProfessionalId('');
+        // setProfessionalId('');
         setPatientId('');
         setReason('');
         setSubmitting(false);
@@ -184,6 +197,7 @@ const SlotDetail = ({
         if (refetch) {
           refetch();
         }
+        setReservationOpen(false);
       }
     } catch (error) {
       toast.error('No se pudo reservar la hora deseada, inténtelo nuevamente.');
@@ -399,50 +413,25 @@ const SlotDetail = ({
                     )}
                   </Grid>
                   <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-                    {professionals && (
+                    {professional && (
                       <FormControl fullWidth>
-                        <Autocomplete
-                          disablePortal
-                          //   defaultValue={budget?.profesional}
-                          options={professionals}
-                          renderInput={(params) => (
-                            <TextField {...params} label="Dentista" />
-                          )}
-                          renderOption={(props, professional: Professional) => (
-                            <li {...props}>
-                              <div className="flex justify-between w-full">
-                                <span>
-                                  {professional.nombre1} {professional.apellPat}
-                                </span>
-                                <span
-                                  style={{
-                                    color:
-                                      mode === 'light'
-                                        ? colors.ligthModeSoftText
-                                        : colors.darkModeSoftText,
-                                  }}
-                                >
-                                  {professional.rut}-{professional.dv}
-                                </span>
-                              </div>
-                            </li>
-                          )}
-                          getOptionLabel={(professional: Professional) => {
-                            // Value selected with enter, right from the input
-                            if (typeof professional === 'string') {
-                              return professional;
-                            }
-                            // Regular professional
-                            return `${professional.nombre1} ${professional.apellPat} ${professional.rut}-${professional.dv}`;
-                          }}
-                          onChange={(
-                            event,
-                            professional: Professional | null
-                          ) => {
-                            if (professional)
-                              setProfessionalId(professional._id);
-                          }}
-                        />
+                        <InputLabel id="professional-select">
+                          Atiende
+                        </InputLabel>
+                        <Select
+                          labelId="professional-select"
+                          defaultValue={professional}
+                          disabled
+                          label="Atiende"
+                        >
+                          {professionals.map((p: Professional) => {
+                            return (
+                              <MenuItem key={p._id} value={p._id}>
+                                {p.nombre1} {p.apellPat}
+                              </MenuItem>
+                            );
+                          })}
+                        </Select>
                       </FormControl>
                     )}
                   </Grid>

@@ -1,4 +1,4 @@
-import { Autocomplete, Card, FormControl, TextField } from '@mui/material';
+import { Autocomplete, Box, Card, FormControl, TextField } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
@@ -57,9 +57,8 @@ const AppointmentsCalendar = () => {
         }
       );
       setFilteredAppointments(filteredAppointments);
-      setRefetch(!refetch);
     }
-  }, [professionalId]);
+  }, [professionalId, data]);
 
   const renderCell = (date: Date) => {
     const today = new Date();
@@ -223,57 +222,63 @@ const AppointmentsCalendar = () => {
 
   return (
     <>
+      {professionals && (
+        <FormControl fullWidth>
+          <Autocomplete
+            disablePortal
+            //   defaultValue={budget?.profesional}
+            options={professionals}
+            renderInput={(params) => <TextField {...params} label="Dentista" />}
+            renderOption={(props, professional: Professional) => (
+              <li {...props}>
+                <div className="flex justify-between w-full">
+                  <span>
+                    {professional.nombre1} {professional.apellPat}
+                  </span>
+                  <span
+                    style={{
+                      color:
+                        mode === 'light'
+                          ? colors.ligthModeSoftText
+                          : colors.darkModeSoftText,
+                    }}
+                  >
+                    {professional.rut}-{professional.dv}
+                  </span>
+                </div>
+              </li>
+            )}
+            getOptionLabel={(professional: Professional) => {
+              // Value selected with enter, right from the input
+              if (typeof professional === 'string') {
+                return professional;
+              }
+              // Regular professional
+              return `${professional.nombre1} ${professional.apellPat} ${professional.rut}-${professional.dv}`;
+            }}
+            onChange={(event, professional: Professional | null) => {
+              if (professional) setProfessionalId(professional._id);
+            }}
+          />
+        </FormControl>
+      )}
       <Card>
-        {professionals && (
-          <FormControl fullWidth>
-            <Autocomplete
-              disablePortal
-              //   defaultValue={budget?.profesional}
-              options={professionals}
-              renderInput={(params) => (
-                <TextField {...params} label="Dentista" />
-              )}
-              renderOption={(props, professional: Professional) => (
-                <li {...props}>
-                  <div className="flex justify-between w-full">
-                    <span>
-                      {professional.nombre1} {professional.apellPat}
-                    </span>
-                    <span
-                      style={{
-                        color:
-                          mode === 'light'
-                            ? colors.ligthModeSoftText
-                            : colors.darkModeSoftText,
-                      }}
-                    >
-                      {professional.rut}-{professional.dv}
-                    </span>
-                  </div>
-                </li>
-              )}
-              getOptionLabel={(professional: Professional) => {
-                // Value selected with enter, right from the input
-                if (typeof professional === 'string') {
-                  return professional;
-                }
-                // Regular professional
-                return `${professional.nombre1} ${professional.apellPat} ${professional.rut}-${professional.dv}`;
-              }}
-              onChange={(event, professional: Professional | null) => {
-                if (professional) setProfessionalId(professional._id);
-              }}
-            />
-          </FormControl>
-        )}
-        <Calendar locale={esAr.Calendar} bordered renderCell={renderCell} />
+        <Calendar
+          locale={esAr.Calendar}
+          bordered
+          renderCell={professionalId ? renderCell : undefined}
+        />
       </Card>
       <DateDetails
+        professionalId={professionalId}
         open={open}
         timeSlots={showSlots}
         date={showDate}
         onClose={() => setOpen(false)}
-        refetch={() => setRefetch(!refetch)}
+        refetch={() => {
+          setRefetch(!refetch);
+          setOpen(false);
+        }}
       />
     </>
   );
