@@ -281,7 +281,7 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
                             }
                             value={budgetTypeId}
                           >
-                            {data.budgetTypes.map((t: ShortModel) => {
+                            {data?.budgetTypes.map((t: ShortModel) => {
                               return (
                                 <MenuItem key={t._id} value={t._id}>
                                   {t.nombre}
