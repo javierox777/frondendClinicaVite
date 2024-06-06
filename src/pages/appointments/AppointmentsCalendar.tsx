@@ -1,4 +1,11 @@
-import { Autocomplete, Box, Card, FormControl, TextField } from '@mui/material';
+import {
+  Autocomplete,
+  Box,
+  Card,
+  FormControl,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
@@ -291,6 +298,18 @@ const AppointmentsCalendar = () => {
     <>
       {professionals && (
         <FormControl fullWidth>
+          <Typography
+            style={{
+              fontStyle: 'italic',
+              color:
+                mode === 'light'
+                  ? colors.ligthModeSoftText
+                  : colors.darkModeSoftText,
+              marginBottom: 20,
+            }}
+          >
+            Selecciona dentista para ver su agenda.
+          </Typography>
           <Autocomplete
             disablePortal
             //   defaultValue={budget?.profesional}
