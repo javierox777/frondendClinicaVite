@@ -228,6 +228,47 @@ const AppointmentsCalendar = () => {
           )}
         </ul>
       );
+    } else if (!timeSlots.length) {
+      return (
+        <ul className="calendar-todo-list">
+          {appointmentsList
+            ?.slice(0, 2)
+            .map((item: Appointment, index: number) => {
+              return (
+                <li key={index}>
+                  <Badge color="yellow" /> <b>{item.razon}</b>
+                </li>
+              );
+            })}
+          {appointmentsList?.length > 2 && (
+            <li>
+              <Whisper
+                placement="top"
+                trigger="hover"
+                speaker={
+                  <Popover>
+                    {appointmentsList
+                      .slice(2)
+                      .map((item: Appointment, index: number) => (
+                        <div key={item._id} className="grid grid-cols-3">
+                          <div>{item.razon}</div>
+                          <div>
+                            {item.persona.nombre1} {item.persona.apellPat}
+                          </div>
+                          <div className="ml-1">
+                            <b>RUT</b> {item.persona.rut} - {item.persona.dv}
+                          </div>
+                        </div>
+                      ))}
+                  </Popover>
+                }
+              >
+                <a>Ver más</a>
+              </Whisper>
+            </li>
+          )}
+        </ul>
+      );
     } else {
       // Mostrar las citas o si esta libre la hora desde hoy hacia adelante
       return (
