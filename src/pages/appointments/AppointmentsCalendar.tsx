@@ -22,6 +22,7 @@ import { Professional } from '../../interfaces/Professional';
 import { useThemeContext } from '../../componemts/themeContext';
 import { getScrollingParent } from 'rsuite/esm/List/helper/utils';
 import toast from 'react-hot-toast';
+import { ProfessionalSchedule } from '../../interfaces/ProfessionalSchedule';
 
 const AppointmentsCalendar = () => {
   const { mode } = useThemeContext();
@@ -33,6 +34,8 @@ const AppointmentsCalendar = () => {
   const [filteredAppointments, setFilteredAppointments] = useState<
     Appointment[]
   >([]);
+
+  const [schedule, setSchedule] = useState<ProfessionalSchedule>();
 
   const [professionalId, setProfessionalId] = useState('');
 
@@ -82,8 +85,15 @@ const AppointmentsCalendar = () => {
       );
 
       setFilteredAppointments(filteredAppointments);
+      // setSchedule(professionalSchedule[0]);
     }
   }, [scheduleData, professionalId]);
+
+  useEffect(() => {
+    if (professionalSchedule) {
+      setSchedule(professionalSchedule[0]);
+    }
+  }, [professionalSchedule]);
 
   const renderCell = (date: Date) => {
     const today = new Date();
@@ -137,17 +147,14 @@ const AppointmentsCalendar = () => {
       return serviceHours;
     }
 
-    const schedule = professionalSchedule ? professionalSchedule[0] : [];
-
     // llamar el horario de atencion
-    const serviceHours =
-      schedule.length !== 0
-        ? calculateServiceHours(
-            schedule.horaInicio,
-            schedule.intervalo,
-            schedule.cupos
-          )
-        : [];
+    const serviceHours = schedule
+      ? calculateServiceHours(
+          schedule.horaInicio,
+          schedule.intervalo,
+          schedule.cupos
+        )
+      : [];
 
     // Crear una lista con los slots y que retorne la cita o si eta disponible en caso de no haber cita q corresponda a cierta hora
     const timeSlots: any[] = serviceHours?.map((hour) => {
@@ -178,7 +185,6 @@ const AppointmentsCalendar = () => {
     // Separar la lista que se muestra y la que va en el tooltip
     const displayList = timeSlots?.slice(0, 2);
     const hiddenList = timeSlots?.slice(2);
-    console.log(schedule);
 
     // Mostrar el historial de citas, pero que no retorne si esq hay horas disponibles ya que son dias anteriores a hoy
     if (date < today) {
@@ -239,7 +245,9 @@ const AppointmentsCalendar = () => {
                   </b>
                 </li>
               );
-            } else if (schedule.diasHabilitados.includes(slot.fecha.getDay())) {
+            } else if (
+              schedule?.diasHabilitados.includes(slot.fecha.getDay())
+            ) {
               return (
                 <li key={index}>
                   <Badge color="green" />{' '}
@@ -283,7 +291,7 @@ const AppointmentsCalendar = () => {
                     setOpen(!open);
                   }}
                 >
-                  {schedule.diasHabilitados.includes(date.getDay()) &&
+                  {schedule?.diasHabilitados.includes(date.getDay()) &&
                     'Ver más'}
                 </a>
               </Whisper>
