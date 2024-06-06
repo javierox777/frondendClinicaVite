@@ -13,6 +13,8 @@ import DateDetails from './DateDetails';
 import colors from '../../styles/colors';
 import { Professional } from '../../interfaces/Professional';
 import { useThemeContext } from '../../componemts/themeContext';
+import { getScrollingParent } from 'rsuite/esm/List/helper/utils';
+import toast from 'react-hot-toast';
 
 const AppointmentsCalendar = () => {
   const { mode } = useThemeContext();
@@ -49,6 +51,21 @@ const AppointmentsCalendar = () => {
     },
   });
 
+  const { data: professionalSchedule } = useQuery({
+    queryKey: ['professionalSchedule', professionalId],
+    queryFn: async () => {
+      try {
+        const response = await axios.get(
+          `${generalConfig.baseUrl}/profesional-agenda/getprofessionalschedule/${professionalId}`
+        );
+
+        return response.data.body;
+      } catch (error) {
+        return [];
+      }
+    },
+  });
+
   useEffect(() => {
     if (scheduleData && professionals) {
       const filteredAppointments = scheduleData?.appointments.filter(
@@ -75,11 +92,58 @@ const AppointmentsCalendar = () => {
       );
     });
 
+    function calculateServiceHours(
+      startTime: string,
+      intervalMinutes: number,
+      serviceCount: number
+    ) {
+      // Parse the start time into hours and minutes
+      const [startHour, startMinute] = startTime.split(':').map(Number);
+
+      // Create a Date object with the start time
+      let startDate = new Date();
+      startDate.setHours(startHour, startMinute, 0, 0);
+
+      // Array to hold the service hours
+      const serviceHours = [];
+
+      // Loop to calculate each service time slot
+      for (let i = 0; i < serviceCount; i++) {
+        // Calculate the end time for the current service
+        let endDate = new Date(startDate);
+        endDate.setMinutes(endDate.getMinutes() + intervalMinutes);
+
+        // Format the start and end times as "HH:MM"
+        const formattedStartTime = `${startDate.getHours().toString().padStart(2, '0')}:${startDate.getMinutes().toString().padStart(2, '0')}`;
+        const formattedEndTime = `${endDate.getHours().toString().padStart(2, '0')}:${endDate.getMinutes().toString().padStart(2, '0')}`;
+
+        // Add the time slot to the array
+        serviceHours.push({
+          horaInicio: `${formattedStartTime}`,
+          horaTermino: `${formattedEndTime}`,
+        });
+
+        // Update the start time for the next service
+        startDate = endDate;
+      }
+
+      return serviceHours;
+    }
+
+    const schedule = professionalSchedule ? professionalSchedule[0] : [];
+
     // llamar el horario de atencion
-    const serviceHours = scheduleData?.serviceHours;
+    const serviceHours =
+      schedule.length !== 0
+        ? calculateServiceHours(
+            schedule.horaInicio,
+            schedule.intervalo,
+            schedule.cupos
+          )
+        : [];
 
     // Crear una lista con los slots y que retorne la cita o si eta disponible en caso de no haber cita q corresponda a cierta hora
-    const timeSlots: TimeSlot[] = serviceHours?.map((hour: ServiceHour) => {
+    const timeSlots: any[] = serviceHours?.map((hour) => {
       const appointment = appointmentsList?.find((a: Appointment) => {
         return (
           a.horaInicio === hour.horaInicio && a.horaTermino === hour.horaTermino
@@ -107,6 +171,7 @@ const AppointmentsCalendar = () => {
     // Separar la lista que se muestra y la que va en el tooltip
     const displayList = timeSlots?.slice(0, 2);
     const hiddenList = timeSlots?.slice(2);
+    console.log(schedule);
 
     // Mostrar el historial de citas, pero que no retorne si esq hay horas disponibles ya que son dias anteriores a hoy
     if (date < today) {
@@ -167,7 +232,7 @@ const AppointmentsCalendar = () => {
                   </b>
                 </li>
               );
-            } else {
+            } else if (schedule.diasHabilitados.includes(slot.fecha.getDay())) {
               return (
                 <li key={index}>
                   <Badge color="green" />{' '}
@@ -211,7 +276,8 @@ const AppointmentsCalendar = () => {
                     setOpen(!open);
                   }}
                 >
-                  Ver más
+                  {schedule.diasHabilitados.includes(date.getDay()) &&
+                    'Ver más'}
                 </a>
               </Whisper>
             </li>
