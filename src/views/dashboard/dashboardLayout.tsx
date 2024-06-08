@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   CssBaseline,
@@ -30,11 +30,7 @@ import { Routes, Route, Link } from 'react-router-dom';
 import Inicio from '../../pages/home';
 import { useThemeContext } from '../../componemts/themeContext';
 import { ParticlesContainer } from './ParticlesFire';
-import {
-  AssignmentInd,
-  ContactEmergency,
-  RequestQuote,
-} from '@mui/icons-material';
+import { AssignmentInd, ContactEmergency } from '@mui/icons-material';
 import PatientsPage from '../../pages/patients/PatientsPage';
 import InstitutionForm from '../../pages/institucion/InstitutionForm';
 import PatientDetailsPage from '../../pages/patients/PatientDetailsPage';
@@ -50,18 +46,11 @@ import Solicitario from '../../pages/solicitarioTipo/SolicitarioTipo';
 import TipoDireccion from '../../pages/tipoDireccion/TipoDireccion';
 import ProfessionalsPage from '../../pages/professionals/ProfessionalsPage';
 import EditProfessionalPage from '../../pages/professionals/EditProfessionalPage';
-import BudgetsPage from '../../pages/budgets/BudgetsPage';
-import BudgetDetailsPage from '../../pages/budgets/BudgetDetailsPage';
-import EditBudgetPage from '../../pages/budgets/EditBudgetPage';
-import authStorage from '../../auth/storage';
-import { LoggedUser, UserContext, useUser } from '../../auth/userContext';
-import BudgetPDF from '../../pages/budgets/BudgetPDF';
+import RecetaForm from '../../pages/receta/RecetaTable';
 
 const drawerWidth = 240;
 
 const DashboardLayout: React.FC = () => {
-  const { user, setUser } = useUser();
-
   const { toggleColorMode, mode } = useThemeContext();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -78,16 +67,6 @@ const DashboardLayout: React.FC = () => {
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen);
   };
-
-  const restoreUser = async () => {
-    const user = await authStorage.getUser();
-    if (user) setUser(user);
-    return;
-  };
-
-  useEffect(() => {
-    restoreUser();
-  }, []);
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -111,7 +90,7 @@ const DashboardLayout: React.FC = () => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            {user && (user as LoggedUser).nombre}
+            Dashboard
           </Typography>
           <IconButton
             size="large"
@@ -170,35 +149,29 @@ const DashboardLayout: React.FC = () => {
         <Box sx={{ overflow: 'auto' }}>
           <List>
             {/* Menu items */}
-            {[
-              'Inicio',
-              'Pacientes',
-              'Profesionales',
-              'Ingreso',
-              'Presupuestos',
-            ].map((text, index) => (
-              <ListItem
-                button
-                key={text}
-                component={Link}
-                to={`/${text.toLowerCase()}`}
-              >
-                <ListItemIcon>
-                  {index === 0 ? (
-                    <HomeIcon />
-                  ) : index === 1 ? (
-                    <AssignmentInd />
-                  ) : index === 2 ? (
-                    <ContactEmergency />
-                  ) : index === 3 ? (
-                    <PeopleIcon />
-                  ) : (
-                    <RequestQuote />
-                  )}
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItem>
-            ))}
+            {['Inicio', 'Pacientes', 'Profesionales', 'Receta', 'Ingreso'].map(
+              (text, index) => (
+                <ListItem
+                  button
+                  key={text}
+                  component={Link}
+                  to={`/${text.toLowerCase()}`}
+                >
+                  <ListItemIcon>
+                    {index === 0 ? (
+                      <HomeIcon />
+                    ) : index === 1 ? (
+                      <AssignmentInd />
+                    ) : index === 2 ? (
+                      <ContactEmergency />
+                    ) : (
+                      <PeopleIcon />
+                    )}
+                  </ListItemIcon>
+                  <ListItemText primary={text} />
+                </ListItem>
+              )
+            )}
             {/* Submenu */}
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -245,44 +218,37 @@ const DashboardLayout: React.FC = () => {
           p: 3,
         }}
       >
-        <Box
-          component="main"
-          sx={{
-            flexGrow: 1,
-            bgcolor: 'background.default',
-            p: 3,
-            transition: 'margin-left 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
-            marginLeft: drawerOpen ? '240px' : '0px', // Ajusta el margen izquierdo según si el Drawer está abierto o cerrado
-          }}
-        >
-          <Toolbar />
-          <Routes>
-            <Route path="/inicio" element={<Inicio />} />
-            <Route path="/pacientes" element={<PatientsPage />} />
-            <Route path="/ingreso" element={<InstitutionForm />} />
-            <Route path="/sexo" element={<Sexo />} />
-            <Route path="/atencion" element={<AtencionTipo />} />
-            <Route path="/ciudad" element={<Ciudad />} />
-            <Route path="/contacto" element={<Contacto />} />
-            <Route path="/estado" element={<Estado />} />
-            <Route path="/mensaje" element={<Mensaje />} />
-            <Route path="/presupuesto" element={<PresupuestoTipo />} />
-            <Route path="/solicitario" element={<Solicitario />} />
-            <Route path="/direccion" element={<TipoDireccion />} />
-            <Route path="/detallespaciente" element={<PatientDetailsPage />} />
-            <Route path="/editarpaciente" element={<EditPatientPage />} />
-            <Route path="/profesionales" element={<ProfessionalsPage />} />
-            <Route path="/presupuestos" element={<BudgetsPage />} />
-            <Route path="/presupuestopdf" element={<BudgetPDF />} />
-            <Route path="/editarpresupuesto" element={<EditBudgetPage />} />
-            <Route path="/presupuestodetalle" element={<BudgetDetailsPage />} />
-            <Route path="/profesionales" element={<ProfessionalsPage />} />
-            <Route
-              path="/editarprofesional"
-              element={<EditProfessionalPage />}
-            />
-          </Routes>
-        </Box>
+       <Box
+  component="main"
+  sx={{
+    flexGrow: 1,
+    bgcolor: 'background.default',
+    p: 3,
+    transition: 'margin-left 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
+    marginLeft: drawerOpen ? '240px' : '0px', // Ajusta el margen izquierdo según si el Drawer está abierto o cerrado
+  }}
+>
+  <Toolbar />
+  <Routes>
+    <Route path="/inicio" element={<Inicio />} />
+    <Route path="/pacientes" element={<PatientsPage />} />
+    <Route path="/receta" element={<RecetaForm />} />
+    <Route path="/ingreso" element={<InstitutionForm />} />
+    <Route path="/sexo" element={<Sexo />} />
+    <Route path="/atencion" element={<AtencionTipo />} />
+    <Route path="/ciudad" element={<Ciudad />} />
+    <Route path="/contacto" element={<Contacto />} />
+    <Route path="/estado" element={<Estado />} />
+    <Route path="/mensaje" element={<Mensaje />} />
+    <Route path="/presupuesto" element={<PresupuestoTipo />} />
+    <Route path="/solicitario" element={<Solicitario />} />
+    <Route path="/direccion" element={<TipoDireccion />} />
+    <Route path="/detallespaciente" element={<PatientDetailsPage />} />
+    <Route path="/editarpaciente" element={<EditPatientPage />} />
+    <Route path="/profesionales" element={<ProfessionalsPage />} />
+    <Route path="/editarprofesional" element={<EditProfessionalPage />} />
+  </Routes>
+</Box>
       </Box>
     </Box>
   );
