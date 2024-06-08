@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Box, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
+import {
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Box, Dialog, DialogTitle, DialogContent, DialogActions, IconButton
+} from '@mui/material';
 import RecetaForm from './RecetaForm';
 import EditRecetaForm from './EditRecetaForm';
 import RecetaTemplate from './RecetaPdf'; // Asegúrate de importar el componente correcto
@@ -10,7 +12,7 @@ import axios from 'axios';
 import jsPDF from 'jspdf';
 import Algo from './RecetaSprint'
 import html2canvas from 'html2canvas';
-import './styles.css'
+import './styles.css';
 
 // Define the type for the table data
 interface TableData {
@@ -62,6 +64,7 @@ const Receta: React.FC = () => {
   const [pdfOpen, setPdfOpen] = useState(false);
   const [selectedReceta, setSelectedReceta] = useState<TableData | null>(null);
   const [formData, setFormData] = useState<TableData[]>([]);
+  const [selectedRow, setSelectedRow] = useState<string | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -141,17 +144,18 @@ const Receta: React.FC = () => {
     }
   };
 
+  const handleRowClick = (id: string) => {
+    setSelectedRow(id === selectedRow ? null : id);
+  };
+
   return (
     <div>
       <Box display="flex" justifyContent="flex-end" mb={2}>
         <Button variant="contained" color="primary" onClick={handleClickOpen}>
           Crear Receta
         </Button>
-
       </Box>
-     
-     
-      
+
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -167,7 +171,11 @@ const Receta: React.FC = () => {
           </TableHead>
           <TableBody>
             {formData.map((row, index) => (
-              <TableRow key={index}>
+              <TableRow
+                key={index}
+                className={`table-row ${selectedRow === row._id ? 'table-row-selected' : ''}`}
+                onClick={() => handleRowClick(row._id)}
+              >
                 <TableCell>{row.estado_id ? 'Activo' : 'Inactivo'}</TableCell>
                 <TableCell>{`${row.profesional_id.nombre1} ${row.profesional_id.nombre2} ${row.profesional_id.apellPat} ${row.profesional_id.apellMat}`}</TableCell>
                 <TableCell>{row.empresa_id.razonSocial}</TableCell>
@@ -231,7 +239,6 @@ const Receta: React.FC = () => {
       </Dialog>
     <Algo />
     </div>
-    
   );
 };
 

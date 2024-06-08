@@ -134,7 +134,7 @@ const RecetaForm: React.FC<RecetaFormProps> = ({ onSuccess }) => {
     e.preventDefault();
     console.log(formData);
     try {
-      await axios.post('http://localhost:4000/api/receipt/', formData);
+      await axios.post('http://localhost:3000/api/receipt/', formData);
       onSuccess(); // Llamar la función onSuccess después de un envío exitoso
     } catch (error) {
       console.error('Error al enviar la data:', error);
@@ -142,19 +142,19 @@ const RecetaForm: React.FC<RecetaFormProps> = ({ onSuccess }) => {
   };
 
   const getProfesionals = async () => {
-    const data = await axios.get('http://localhost:4000/api/professionals');
+    const data = await axios.get('http://localhost:3000/api/professionals');
     setProfesionals(data.data.body);
     console.log("aca professionals", profesionals);
   };
 
   const getCompanies = async () => {
-    const data = await axios.get('http://localhost:4000/api/companies');
+    const data = await axios.get('http://localhost:3000/api/companies');
     setCompanies(data.data.body);
     console.log("aca companies", companies);
   };
 
   const getPersons = async () => {
-    const data = await axios.get('http://localhost:4000/api/persons');
+    const data = await axios.get('http://localhost:3000/api/persons');
     setPersons(data.data.body);
     console.log("aca persons", persons);
   };
