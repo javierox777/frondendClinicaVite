@@ -10,7 +10,7 @@ const Inicio: React.FC = () => {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Typography variant="h4" gutterBottom>
-        Bienvenido al Dashboard {(user as LoggedUser).nombre}
+        Bienvenido al Dashboard {(user as LoggedUser)?.nombre}
       </Typography>
     </Box>
   );

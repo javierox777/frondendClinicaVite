@@ -56,7 +56,7 @@ interface IPersona {
   receta: string;
 }
 
-const MyTable: React.FC = () => {
+const Receta: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [pdfOpen, setPdfOpen] = useState(false);
@@ -235,4 +235,4 @@ const MyTable: React.FC = () => {
   );
 };
 
-export default MyTable;
+export default Receta;

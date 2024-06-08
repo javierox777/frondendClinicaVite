@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   CssBaseline,
@@ -19,6 +19,7 @@ import {
   AccordionSummary,
   AccordionDetails,
   FormControlLabel,
+  ListItemButton,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
@@ -30,7 +31,13 @@ import { Routes, Route, Link } from 'react-router-dom';
 import Inicio from '../../pages/home';
 import { useThemeContext } from '../../componemts/themeContext';
 import { ParticlesContainer } from './ParticlesFire';
-import { AssignmentInd, ContactEmergency } from '@mui/icons-material';
+import {
+  AssignmentInd,
+  CalendarMonth,
+  ContactEmergency,
+  Receipt,
+  RequestQuote,
+} from '@mui/icons-material';
 import PatientsPage from '../../pages/patients/PatientsPage';
 import InstitutionForm from '../../pages/institucion/InstitutionForm';
 import PatientDetailsPage from '../../pages/patients/PatientDetailsPage';
@@ -46,7 +53,16 @@ import Solicitario from '../../pages/solicitarioTipo/SolicitarioTipo';
 import TipoDireccion from '../../pages/tipoDireccion/TipoDireccion';
 import ProfessionalsPage from '../../pages/professionals/ProfessionalsPage';
 import EditProfessionalPage from '../../pages/professionals/EditProfessionalPage';
-import RecetaForm from '../../pages/receta/RecetaTable';
+import BudgetsPage from '../../pages/budgets/BudgetsPage';
+import BudgetDetailsPage from '../../pages/budgets/BudgetDetailsPage';
+import EditBudgetPage from '../../pages/budgets/EditBudgetPage';
+import authStorage from '../../auth/storage';
+import { LoggedUser, UserContext, useUser } from '../../auth/userContext';
+import Receta from '../../pages/receta/RecetaTable'
+import BudgetPDF from '../../pages/budgets/BudgetPDF';
+import AppointmentsPage from '../../pages/appointments/AppointmentsPage';
+import AppointmentsCalendar from '../../pages/appointments/AppointmentsCalendar';
+
 
 const drawerWidth = 240;
 
@@ -55,6 +71,7 @@ const DashboardLayout: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const open = Boolean(anchorEl);
+  const { user, setUser } = useUser();
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -67,6 +84,41 @@ const DashboardLayout: React.FC = () => {
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen);
   };
+
+  const restoreUser = async () => {
+    const user = await authStorage.getUser();
+    if (user) setUser(user);
+    return;
+  };
+
+  useEffect(() => {
+    restoreUser();
+  }, []);
+
+  const menuItems = [
+    { id: 1, label: 'Inicio', icon: <HomeIcon />, path: '/inicio' },
+    { id: 2, label: 'Pacientes', icon: <AssignmentInd />, path: '/pacientes' },
+    {
+      id: 3,
+      label: 'Profesionales',
+      icon: <ContactEmergency />,
+      path: '/profesionales',
+    },
+    {
+      id: 4,
+      label: 'Presupuestos',
+      icon: <RequestQuote />,
+      path: '/presupuestos',
+    },
+    
+    { id: 5, label: 'Agenda', icon: <CalendarMonth />, path: '/agenda' },
+    {
+      id: 6,
+      label: 'Receta',
+      icon: <RequestQuote />,
+      path: '/receta',
+    },
+  ];
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -149,29 +201,17 @@ const DashboardLayout: React.FC = () => {
         <Box sx={{ overflow: 'auto' }}>
           <List>
             {/* Menu items */}
-            {['Inicio', 'Pacientes', 'Profesionales', 'Receta', 'Ingreso'].map(
-              (text, index) => (
-                <ListItem
-                  button
-                  key={text}
-                  component={Link}
-                  to={`/${text.toLowerCase()}`}
-                >
-                  <ListItemIcon>
-                    {index === 0 ? (
-                      <HomeIcon />
-                    ) : index === 1 ? (
-                      <AssignmentInd />
-                    ) : index === 2 ? (
-                      <ContactEmergency />
-                    ) : (
-                      <PeopleIcon />
-                    )}
-                  </ListItemIcon>
-                  <ListItemText primary={text} />
-                </ListItem>
-              )
-            )}
+            {menuItems.map((item, index) => (
+              <ListItemButton
+                key={item.id}
+                component={Link}
+                to={item.path}
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.label} />
+              </ListItemButton>
+            ))}
             {/* Submenu */}
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -218,37 +258,47 @@ const DashboardLayout: React.FC = () => {
           p: 3,
         }}
       >
-       <Box
-  component="main"
-  sx={{
-    flexGrow: 1,
-    bgcolor: 'background.default',
-    p: 3,
-    transition: 'margin-left 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
-    marginLeft: drawerOpen ? '240px' : '0px', // Ajusta el margen izquierdo según si el Drawer está abierto o cerrado
-  }}
->
-  <Toolbar />
-  <Routes>
-    <Route path="/inicio" element={<Inicio />} />
-    <Route path="/pacientes" element={<PatientsPage />} />
-    <Route path="/receta" element={<RecetaForm />} />
-    <Route path="/ingreso" element={<InstitutionForm />} />
-    <Route path="/sexo" element={<Sexo />} />
-    <Route path="/atencion" element={<AtencionTipo />} />
-    <Route path="/ciudad" element={<Ciudad />} />
-    <Route path="/contacto" element={<Contacto />} />
-    <Route path="/estado" element={<Estado />} />
-    <Route path="/mensaje" element={<Mensaje />} />
-    <Route path="/presupuesto" element={<PresupuestoTipo />} />
-    <Route path="/solicitario" element={<Solicitario />} />
-    <Route path="/direccion" element={<TipoDireccion />} />
-    <Route path="/detallespaciente" element={<PatientDetailsPage />} />
-    <Route path="/editarpaciente" element={<EditPatientPage />} />
-    <Route path="/profesionales" element={<ProfessionalsPage />} />
-    <Route path="/editarprofesional" element={<EditProfessionalPage />} />
-  </Routes>
-</Box>
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            bgcolor: 'background.default',
+            p: 3,
+            transition: 'margin-left 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
+            marginLeft: drawerOpen ? '240px' : '0px', // Ajusta el margen izquierdo según si el Drawer está abierto o cerrado
+          }}
+        >
+          <Toolbar />
+          <Routes>
+            <Route path="/inicio" element={<Inicio />} />
+            <Route path="/pacientes" element={<PatientsPage />} />
+            <Route path="/ingreso" element={<InstitutionForm />} />
+            <Route path="/sexo" element={<Sexo />} />
+            <Route path="/atencion" element={<AtencionTipo />} />
+            <Route path="/ciudad" element={<Ciudad />} />
+            <Route path="/contacto" element={<Contacto />} />
+            <Route path="/estado" element={<Estado />} />
+            <Route path="/mensaje" element={<Mensaje />} />
+            <Route path="/presupuesto" element={<PresupuestoTipo />} />
+            <Route path="/solicitario" element={<Solicitario />} />
+            <Route path="/direccion" element={<TipoDireccion />} />
+            <Route path="/detallespaciente" element={<PatientDetailsPage />} />
+            <Route path="/editarpaciente" element={<EditPatientPage />} />
+            <Route path="/receta" element={<Receta />} />
+            <Route path="/profesionales" element={<ProfessionalsPage />} />
+            <Route path="/presupuestos" element={<BudgetsPage />} />
+            <Route path="/presupuestopdf" element={<BudgetPDF />} />
+            <Route path="/editarpresupuesto" element={<EditBudgetPage />} />
+            <Route path="/presupuestodetalle" element={<BudgetDetailsPage />} />
+            <Route path="/profesionales" element={<ProfessionalsPage />} />
+            <Route path="/agenda" element={<AppointmentsPage />} />
+            <Route path="/calendario" element={<AppointmentsCalendar />} />
+            <Route
+              path="/editarprofesional"
+              element={<EditProfessionalPage />}
+            />
+          </Routes>
+        </Box>
       </Box>
     </Box>
   );

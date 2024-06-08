@@ -8,5 +8,5 @@ export interface Professional {
  celular: string;
  nombre1: string;
  nombre2: string;
- email: string;   
+ email: string;
 }
