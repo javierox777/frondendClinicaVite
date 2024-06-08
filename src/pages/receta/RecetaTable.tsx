@@ -237,7 +237,7 @@ const Receta: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    <Algo />
+    {/* <Algo /> */}
     </div>
   );
 };
