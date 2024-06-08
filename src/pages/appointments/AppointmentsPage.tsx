@@ -1,14 +1,17 @@
 import React from 'react';
 import AppointmentsCalendar from './AppointmentsCalendar';
-import { Grid } from '@mui/material';
+import { Container, Grid } from '@mui/material';
+import TodaysSchedule from './TodaysSchedule';
 
 const AppointmentsPage = () => {
   return (
-    <Grid container spacing={3}>
-      <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-        <AppointmentsCalendar />
+    <Container>
+      <Grid container spacing={3}>
+        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          <AppointmentsCalendar />
+        </Grid>
       </Grid>
-    </Grid>
+    </Container>
   );
 };
 

@@ -59,6 +59,7 @@ import authStorage from '../../auth/storage';
 import { LoggedUser, UserContext, useUser } from '../../auth/userContext';
 import BudgetPDF from '../../pages/budgets/BudgetPDF';
 import AppointmentsPage from '../../pages/appointments/AppointmentsPage';
+import AppointmentsCalendar from '../../pages/appointments/AppointmentsCalendar';
 
 const drawerWidth = 240;
 
@@ -281,6 +282,7 @@ const DashboardLayout: React.FC = () => {
             <Route path="/presupuestodetalle" element={<BudgetDetailsPage />} />
             <Route path="/profesionales" element={<ProfessionalsPage />} />
             <Route path="/agenda" element={<AppointmentsPage />} />
+            <Route path="/calendario" element={<AppointmentsCalendar />} />
             <Route
               path="/editarprofesional"
               element={<EditProfessionalPage />}

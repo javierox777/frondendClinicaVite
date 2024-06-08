@@ -1,6 +1,5 @@
 import {
   Autocomplete,
-  Box,
   Card,
   FormControl,
   TextField,
@@ -8,21 +7,17 @@ import {
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Badge, Calendar, Popover, Whisper } from 'rsuite';
 import esAr from 'rsuite/locales/es_AR';
+import { useThemeContext } from '../../componemts/themeContext';
 import { generalConfig } from '../../config';
 import { Appointment } from '../../interfaces/Appointment';
-import { ServiceHour } from '../../interfaces/ServiceHour';
-import CalendarLoading from './CalendarLoading';
-import { TimeSlot } from '../../interfaces/TimeSlot';
-import DateDetails from './DateDetails';
-import colors from '../../styles/colors';
 import { Professional } from '../../interfaces/Professional';
-import { useThemeContext } from '../../componemts/themeContext';
-import { getScrollingParent } from 'rsuite/esm/List/helper/utils';
-import toast from 'react-hot-toast';
 import { ProfessionalSchedule } from '../../interfaces/ProfessionalSchedule';
+import { TimeSlot } from '../../interfaces/TimeSlot';
+import colors from '../../styles/colors';
+import DateDetails from './DateDetails';
 
 const AppointmentsCalendar = () => {
   const { mode } = useThemeContext();
@@ -393,6 +388,9 @@ const AppointmentsCalendar = () => {
             }}
             onChange={(event, professional: Professional | null) => {
               if (professional) setProfessionalId(professional._id);
+            }}
+            style={{
+              marginBottom: 20,
             }}
           />
         </FormControl>
