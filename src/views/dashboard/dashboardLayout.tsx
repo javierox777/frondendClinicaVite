@@ -27,7 +27,7 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import PeopleIcon from '@mui/icons-material/People';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // Icono de expansión
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import Inicio from '../../pages/home';
 import { useThemeContext } from '../../componemts/themeContext';
 import { ParticlesContainer } from './ParticlesFire';
@@ -58,11 +58,10 @@ import BudgetDetailsPage from '../../pages/budgets/BudgetDetailsPage';
 import EditBudgetPage from '../../pages/budgets/EditBudgetPage';
 import authStorage from '../../auth/storage';
 import { LoggedUser, UserContext, useUser } from '../../auth/userContext';
-import Receta from '../../pages/receta/RecetaTable'
+import Receta from '../../pages/receta/RecetaTable';
 import BudgetPDF from '../../pages/budgets/BudgetPDF';
 import AppointmentsPage from '../../pages/appointments/AppointmentsPage';
 import AppointmentsCalendar from '../../pages/appointments/AppointmentsCalendar';
-
 
 const drawerWidth = 240;
 
@@ -72,6 +71,7 @@ const DashboardLayout: React.FC = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const open = Boolean(anchorEl);
   const { user, setUser } = useUser();
+  const location = useLocation();
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -110,14 +110,8 @@ const DashboardLayout: React.FC = () => {
       icon: <RequestQuote />,
       path: '/presupuestos',
     },
-    
     { id: 5, label: 'Agenda', icon: <CalendarMonth />, path: '/agenda' },
-    {
-      id: 6,
-      label: 'Receta',
-      icon: <RequestQuote />,
-      path: '/receta',
-    },
+    { id: 6, label: 'Receta', icon: <RequestQuote />, path: '/receta' },
   ];
 
   return (
@@ -193,7 +187,7 @@ const DashboardLayout: React.FC = () => {
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
-            background: 'transparent 20%', // Establecer el fondo del Drawer como transparente
+            background: 'rgba(0, 0, 0, 0.2)', // Establecer el fondo del Drawer como transparente
           },
         }}
       >
@@ -201,26 +195,34 @@ const DashboardLayout: React.FC = () => {
         <Box sx={{ overflow: 'auto' }}>
           <List>
             {/* Menu items */}
-            {menuItems.map((item, index) => (
+            {menuItems.map((item) => (
               <ListItemButton
                 key={item.id}
                 component={Link}
                 to={item.path}
-                style={{ textDecoration: 'none', color: 'inherit' }}
+                style={{
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  background: location.pathname === item.path ? 'rgba(255, 255, 255, 0.2)' : 'transparent', // Resaltar la pestaña seleccionada
+                }}
               >
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.label} />
+                <ListItemIcon
+                  sx={{ color: location.pathname === item.path ? 'primary.main' : 'inherit' }} // Cambiar el color del icono si está seleccionado
+                >
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText primary={item.label} sx={{ color: 'white' }} />
               </ListItemButton>
             ))}
             {/* Submenu */}
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <ListItemIcon>
+            <Accordion sx={{ background: 'transparent', color: 'white' }}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}>
+                <ListItemIcon sx={{ color: 'white' }}>
                   <SettingsIcon />
                 </ListItemIcon>
-                <ListItemText primary="Configuraciones" />
+                <ListItemText primary="Configuraciones" sx={{ color: 'white' }} />
               </AccordionSummary>
-              <AccordionDetails>
+              <AccordionDetails sx={{ background: 'rgba(0, 0, 0, 0.2)' }}>
                 <List>
                   {[
                     'Sexo',
@@ -232,13 +234,16 @@ const DashboardLayout: React.FC = () => {
                     'Presupuesto',
                     'Solicitario',
                     'Direccion',
-                  ].map((text, index) => (
+                  ].map((text) => (
                     <ListItem
                       button
                       key={text}
                       component={Link}
                       to={`/${text.toLowerCase()}`}
-                      sx={{ pl: 4 }}
+                      sx={{ pl: 4, color: 'white' }}
+                      style={{
+                        background: location.pathname === `/${text.toLowerCase()}` ? 'rgba(255, 255, 255, 0.2)' : 'transparent', // Resaltar la pestaña seleccionada
+                      }}
                     >
                       <ListItemText primary={text} />
                     </ListItem>
@@ -293,10 +298,7 @@ const DashboardLayout: React.FC = () => {
             <Route path="/profesionales" element={<ProfessionalsPage />} />
             <Route path="/agenda" element={<AppointmentsPage />} />
             <Route path="/calendario" element={<AppointmentsCalendar />} />
-            <Route
-              path="/editarprofesional"
-              element={<EditProfessionalPage />}
-            />
+            <Route path="/editarprofesional" element={<EditProfessionalPage />} />
           </Routes>
         </Box>
       </Box>
