@@ -30,7 +30,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // Icono de expansi
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import Inicio from '../../pages/home';
 import { useThemeContext } from '../../componemts/themeContext';
-import { ParticlesContainer } from './ParticlesFire';
+import {ParticlesContainer} from './ParticlesFire'; // Asegúrate de importar correctamente
 import {
   AssignmentInd,
   CalendarMonth,
@@ -69,6 +69,7 @@ const DashboardLayout: React.FC = () => {
   const { toggleColorMode, mode } = useThemeContext();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [particlesEnabled, setParticlesEnabled] = useState(true); // Estado para controlar las partículas
   const open = Boolean(anchorEl);
   const { user, setUser } = useUser();
   const location = useLocation();
@@ -116,7 +117,7 @@ const DashboardLayout: React.FC = () => {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <ParticlesContainer />
+      {particlesEnabled && <ParticlesContainer />} {/* Renderiza las partículas solo si están habilitadas */}
       <CssBaseline />
       <AppBar
         position="fixed"
@@ -168,6 +169,13 @@ const DashboardLayout: React.FC = () => {
               <FormControlLabel
                 control={<Switch onChange={toggleColorMode} />}
                 label={`Modo ${mode === 'light' ? 'oscuro' : 'claro'}`}
+                labelPlacement="start"
+              />
+            </MenuItem>
+            <MenuItem>
+              <FormControlLabel
+                control={<Switch checked={particlesEnabled} onChange={() => setParticlesEnabled(!particlesEnabled)} />}
+                label="Partículas"
                 labelPlacement="start"
               />
             </MenuItem>
