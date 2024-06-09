@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Box, Dialog, DialogTitle, DialogContent, DialogActions, IconButton
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Box, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, TextField
 } from '@mui/material';
+import { useSpring, animated } from '@react-spring/web';
 import RecetaForm from './RecetaForm';
 import EditRecetaForm from './EditRecetaForm';
 import RecetaTemplate from './RecetaPdf'; // Asegúrate de importar el componente correcto
@@ -10,9 +11,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import axios from 'axios';
 import jsPDF from 'jspdf';
-import Algo from './RecetaSprint'
+import Algo from './RecetaSprint';
 import html2canvas from 'html2canvas';
 import './styles.css';
+import { Margin } from '@mui/icons-material';
 
 // Define the type for the table data
 interface TableData {
@@ -58,13 +60,19 @@ interface IPersona {
   receta: string;
 }
 
+const AnimatedDialog = animated(Dialog);
+const AnimatedDialogContent = animated(DialogContent);
+const AnimatedDialogTitle = animated(DialogTitle);
+
 const Receta: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [pdfOpen, setPdfOpen] = useState(false);
+  const [rowOpen, setRowOpen] = useState(false);
   const [selectedReceta, setSelectedReceta] = useState<TableData | null>(null);
   const [formData, setFormData] = useState<TableData[]>([]);
-  const [selectedRow, setSelectedRow] = useState<string | null>(null);
+  const [selectedRow, setSelectedRow] = useState<TableData | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -79,7 +87,58 @@ const Receta: React.FC = () => {
     }
   };
 
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const filteredData = formData.filter((row) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      row.profesional_id.nombre1.toLowerCase().includes(query) ||
+      row.profesional_id.nombre2.toLowerCase().includes(query) ||
+      row.profesional_id.apellPat.toLowerCase().includes(query) ||
+      row.profesional_id.apellMat.toLowerCase().includes(query) ||
+      row.persona_id.rut.toLowerCase().includes(query) ||
+      row.empresa_id.razonSocial.toLowerCase().includes(query) ||
+      new Date(row.fechaRegistro).toLocaleDateString().includes(query)
+    );
+  });
+
+  const [createAnimation, createAnimationApi] = useSpring(() => ({
+    from: { opacity: 0, transform: 'scale(0.5) translateY(-100%)' },
+    to: { opacity: 1, transform: 'scale(1) translateY(0)' },
+    config: { tension: 280, friction: 60 },
+  }));
+
+  const [editAnimation, editAnimationApi] = useSpring(() => ({
+    from: { opacity: 0, transform: 'scale(0.5) translateY(-100%)' },
+    to: { opacity: 1, transform: 'scale(1) translateY(0)' },
+    config: { tension: 280, friction: 60 },
+  }));
+
+  const [pdfAnimation, pdfAnimationApi] = useSpring(() => ({
+    from: { opacity: 0, transform: 'scale(0.5) translateY(-100%)' },
+    to: { opacity: 1, transform: 'scale(1) translateY(0)' },
+    config: { tension: 280, friction: 60 },
+  }));
+
+  const [rowAnimation, rowAnimationApi] = useSpring(() => ({
+    from: { opacity: 0, transform: 'scale(0.5) translateY(-100%)' },
+    to: { opacity: 1, transform: 'scale(1) translateY(0)' },
+    config: { tension: 280, friction: 60 },
+  }));
+
+  const textAnimationProps = useSpring({
+    from: { transform: 'scale(1)', opacity: 1 },
+    to: { transform: (rowOpen || editOpen || pdfOpen || open) ? 'scale(1.1)' : 'scale(1)', opacity: (rowOpen || editOpen || pdfOpen || open) ? 1 : 0 },
+    config: { tension: 300, friction: 25 },
+  });
+
   const handleClickOpen = () => {
+    createAnimationApi.start({
+      from: { opacity: 0, transform: 'scale(0.5) translateY(-100%)' },
+      to: { opacity: 1, transform: 'scale(1) translateY(0)' },
+    });
     setOpen(true);
   };
 
@@ -88,6 +147,10 @@ const Receta: React.FC = () => {
   };
 
   const handleEditClickOpen = (receta: TableData) => {
+    editAnimationApi.start({
+      from: { opacity: 0, transform: 'scale(0.5) translateY(-100%)' },
+      to: { opacity: 1, transform: 'scale(1) translateY(0)' },
+    });
     setSelectedReceta(receta);
     setEditOpen(true);
   };
@@ -98,6 +161,10 @@ const Receta: React.FC = () => {
   };
 
   const handlePdfClickOpen = (receta: TableData) => {
+    pdfAnimationApi.start({
+      from: { opacity: 0, transform: 'scale(0.5) translateY(-100%)' },
+      to: { opacity: 1, transform: 'scale(1) translateY(0)' },
+    });
     setSelectedReceta(receta);
     setPdfOpen(true);
   };
@@ -107,11 +174,26 @@ const Receta: React.FC = () => {
     setSelectedReceta(null);
   };
 
+  const handleRowClickOpen = (row: TableData) => {
+    rowAnimationApi.start({
+      from: { opacity: 0, transform: 'scale(0.5) translateY(-100%)' },
+      to: { opacity: 1, transform: 'scale(1) translateY(0)' },
+    });
+    setSelectedRow(row);
+    setRowOpen(true);
+  };
+
+  const handleRowClose = () => {
+    setRowOpen(false);
+    setSelectedRow(null);
+  };
+
   const handleSuccess = () => {
     fetchData();
     handleClose();
     handleEditClose();
     handlePdfClose();
+    handleRowClose();
   };
 
   const handleDelete = () => {
@@ -144,13 +226,15 @@ const Receta: React.FC = () => {
     }
   };
 
-  const handleRowClick = (id: string) => {
-    setSelectedRow(id === selectedRow ? null : id);
-  };
-
   return (
     <div>
-      <Box display="flex" justifyContent="flex-end" mb={2}>
+      <Box display="flex" justifyContent="space-between" mb={2}>
+        <TextField
+          label="Buscar"
+          variant="outlined"
+          value={searchQuery}
+          onChange={handleSearch}
+        />
         <Button variant="contained" color="primary" onClick={handleClickOpen}>
           Crear Receta
         </Button>
@@ -160,6 +244,7 @@ const Receta: React.FC = () => {
         <Table>
           <TableHead>
             <TableRow>
+              <TableCell>N°</TableCell>
               <TableCell>Estado</TableCell>
               <TableCell>Profesional</TableCell>
               <TableCell>Empresa</TableCell>
@@ -170,12 +255,13 @@ const Receta: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {formData.map((row, index) => (
+            {filteredData.map((row, index) => (
               <TableRow
                 key={index}
-                className={`table-row ${selectedRow === row._id ? 'table-row-selected' : ''}`}
-                onClick={() => handleRowClick(row._id)}
+                className={`table-row ${selectedRow && selectedRow._id === row._id ? 'table-row-selected' : ''}`}
+                onClick={() => handleRowClickOpen(row)}
               >
+                <TableCell>{index + 1}</TableCell> {/* Índice de la fila */}
                 <TableCell>{row.estado_id ? 'Activo' : 'Inactivo'}</TableCell>
                 <TableCell>{`${row.profesional_id.nombre1} ${row.profesional_id.nombre2} ${row.profesional_id.apellPat} ${row.profesional_id.apellMat}`}</TableCell>
                 <TableCell>{row.empresa_id.razonSocial}</TableCell>
@@ -183,13 +269,13 @@ const Receta: React.FC = () => {
                 <TableCell>{row.persona_id.rut}</TableCell>
                 <TableCell>{row.recetaDetalle.join(', ')}</TableCell>
                 <TableCell>
-                  <IconButton color="primary" onClick={() => handlePdfClickOpen(row)}>
+                  <IconButton color="primary" onClick={(e) => { e.stopPropagation(); handlePdfClickOpen(row); }}>
                     <PictureAsPdfIcon />
                   </IconButton>
-                  <IconButton color="primary" onClick={() => handleEditClickOpen(row)}>
+                  <IconButton color="primary" onClick={(e) => { e.stopPropagation(); handleEditClickOpen(row); }}>
                     <EditIcon />
                   </IconButton>
-                  <IconButton color="secondary" onClick={() => handleDelete()}>
+                  <IconButton color="secondary" onClick={(e) => { e.stopPropagation(); handleDelete(); }}>
                     <DeleteIcon />
                   </IconButton>
                 </TableCell>
@@ -199,36 +285,36 @@ const Receta: React.FC = () => {
         </Table>
       </TableContainer>
 
-      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle>Crear Receta</DialogTitle>
-        <DialogContent>
+      <AnimatedDialog open={open} onClose={handleClose} maxWidth="sm" fullWidth style={createAnimation}>
+        <AnimatedDialogTitle className="modal-title" style={textAnimationProps}>Crear Receta</AnimatedDialogTitle>
+        <AnimatedDialogContent className="modal-content" style={createAnimation}>
           <RecetaForm onSuccess={handleSuccess} />
-        </DialogContent>
-        <DialogActions>
+        </AnimatedDialogContent>
+        <DialogActions className="modal-actions">
           <Button onClick={handleClose} color="primary">
             Cancelar
           </Button>
         </DialogActions>
-      </Dialog>
+      </AnimatedDialog>
 
-      <Dialog open={editOpen} onClose={handleEditClose} maxWidth="sm" fullWidth>
-        <DialogTitle>Editar Receta</DialogTitle>
-        <DialogContent>
+      <AnimatedDialog open={editOpen} onClose={handleEditClose} maxWidth="sm" fullWidth style={editAnimation}>
+        <AnimatedDialogTitle className="modal-title" style={textAnimationProps}>Editar Receta</AnimatedDialogTitle>
+        <AnimatedDialogContent className="modal-content" style={editAnimation}>
           {selectedReceta && <EditRecetaForm receta={transformReceta(selectedReceta)} onSuccess={handleSuccess} />}
-        </DialogContent>
-        <DialogActions>
+        </AnimatedDialogContent>
+        <DialogActions className="modal-actions">
           <Button onClick={handleEditClose} color="primary">
             Cancelar
           </Button>
         </DialogActions>
-      </Dialog>
+      </AnimatedDialog>
 
-      <Dialog open={pdfOpen} onClose={handlePdfClose} maxWidth="md" fullWidth>
-        <DialogTitle>Vista previa de la Receta</DialogTitle>
-        <DialogContent>
+      <AnimatedDialog open={pdfOpen} onClose={handlePdfClose} maxWidth="md" fullWidth style={pdfAnimation}>
+        <AnimatedDialogTitle className="modal-title" style={textAnimationProps}>Vista previa de la Receta</AnimatedDialogTitle>
+        <AnimatedDialogContent className="modal-content" style={pdfAnimation}>
           {selectedReceta && <div id="pdf-content"><RecetaTemplate receta={selectedReceta} /></div>}
-        </DialogContent>
-        <DialogActions>
+        </AnimatedDialogContent>
+        <DialogActions className="modal-actions">
           <Button onClick={exportPDF} color="primary">
             Descargar Receta
           </Button>
@@ -236,8 +322,31 @@ const Receta: React.FC = () => {
             Cancelar
           </Button>
         </DialogActions>
-      </Dialog>
-    {/* <Algo /> */}
+      </AnimatedDialog>
+
+      <AnimatedDialog open={rowOpen} onClose={handleRowClose} maxWidth="md" fullWidth style={rowAnimation}>
+        <AnimatedDialogTitle className="modal-title" ml="10mm" style={textAnimationProps}>Detalles de la Receta</AnimatedDialogTitle>
+        <AnimatedDialogContent className="modal-content" style={rowAnimation}>
+          {selectedRow && (
+            <div>
+              <p><strong>Estado:</strong> {selectedRow.estado_id ? 'Activo' : 'Inactivo'}</p>
+              <p><strong>Profesional:</strong> {`${selectedRow.profesional_id.nombre1} ${selectedRow.profesional_id.nombre2} ${selectedRow.profesional_id.apellPat} ${selectedRow.profesional_id.apellMat}`}</p>
+              <p><strong>Empresa:</strong> {selectedRow.empresa_id.razonSocial}</p>
+              <p><strong>Fecha Registro:</strong> {new Date(selectedRow.fechaRegistro).toLocaleDateString()}</p>
+              <p><strong>Persona:</strong> {selectedRow.persona_id.rut}</p>
+              <p><strong>Receta Detalle:</strong> {selectedRow.recetaDetalle.join(', ')}</p>
+              {/* Puedes agregar más campos según sea necesario */}
+            </div>
+          )}
+        </AnimatedDialogContent>
+        <DialogActions className="modal-actions">
+          <Button onClick={handleRowClose} color="primary">
+            Cerrar
+          </Button>
+        </DialogActions>
+      </AnimatedDialog>
+
+      
     </div>
   );
 };
