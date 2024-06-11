@@ -104,120 +104,39 @@ const AppointmentsCalendar = () => {
       );
     });
 
-    // function calculateServiceHours(
-    //   startTime: string,
-    //   intervalMinutes: number,
-    //   serviceCount: number
-    // ) {
-    //   // Parse the start time into hours and minutes
-    //   const [startHour, startMinute] = startTime.split(':').map(Number);
+    function calculateServiceHours(schedule: ProfessionalSchedule[]) {
+      let serviceHours: any[] = [];
 
-    //   // Create a Date object with the start time
-    //   let startDate = new Date();
-    //   startDate.setHours(startHour, startMinute, 0, 0);
+      schedule.forEach((s: ProfessionalSchedule) => {
+        const [startHour, startMinute] = s.horaInicio.split(':').map(Number);
 
-    //   // Array to hold the service hours
-    //   const serviceHours = [];
+        let startDate = new Date();
+        startDate.setHours(startHour, startMinute, 0, 0);
 
-    //   // Loop to calculate each service time slot
-    //   for (let i = 0; i < serviceCount; i++) {
-    //     // Calculate the end time for the current service
-    //     let endDate = new Date(startDate);
-    //     endDate.setMinutes(endDate.getMinutes() + intervalMinutes);
+        for (let i = 0; i < s.cupos; i++) {
+          let endDate = new Date(startDate);
+          endDate.setMinutes(endDate.getMinutes() + s.intervalo);
 
-    //     // Format the start and end times as "HH:MM"
-    //     const formattedStartTime = `${startDate.getHours().toString().padStart(2, '0')}:${startDate.getMinutes().toString().padStart(2, '0')}`;
-    //     const formattedEndTime = `${endDate.getHours().toString().padStart(2, '0')}:${endDate.getMinutes().toString().padStart(2, '0')}`;
+          const formattedStartTime = `${startDate.getHours().toString().padStart(2, '0')}:${startDate.getMinutes().toString().padStart(2, '0')}`;
+          const formattedEndTime = `${endDate.getHours().toString().padStart(2, '0')}:${endDate.getMinutes().toString().padStart(2, '0')}`;
 
-    //     // Add the time slot to the array
-    //     serviceHours.push({
-    //       horaInicio: `${formattedStartTime}`,
-    //       horaTermino: `${formattedEndTime}`,
-    //     });
+          serviceHours.push({
+            horaInicio: `${formattedStartTime}`,
+            horaTermino: `${formattedEndTime}`,
+            agenda: s._id,
+          });
 
-    //     // Update the start time for the next service
-    //     startDate = endDate;
-    //   }
+          startDate = endDate;
+        }
+      });
 
-    //   return serviceHours;
-    // }
+      return serviceHours;
+    }
 
     // // llamar el horario de atencion
-    // const serviceHours = schedule
-    //   ? calculateServiceHours(
-    //       schedule.horaInicio,
-    //       schedule.intervalo,
-    //       schedule.cupos
-    //     )
-    //   : [];
-
-    const serviceHours = [
-      {
-        horaInicio: '08:00',
-        horaTermino: '08:30',
-        agenda: '666668084aad08fbfccc32f0',
-      },
-      {
-        horaInicio: '09:00',
-        horaTermino: '09:30',
-        agenda: '666668084aad08fbfccc32f0',
-      },
-      {
-        horaInicio: '10:00',
-        horaTermino: '10:30',
-        agenda: '666668084aad08fbfccc32f0',
-      },
-      {
-        horaInicio: '11:00',
-        horaTermino: '11:30',
-        agenda: '666668084aad08fbfccc32f0',
-      },
-      {
-        horaInicio: '12:00',
-        horaTermino: '12:30',
-        agenda: '666668084aad08fbfccc32f0',
-      },
-      {
-        horaInicio: '13:00',
-        horaTermino: '13:30',
-        agenda: '666668084aad08fbfccc32f0',
-      },
-      {
-        horaInicio: '15:00',
-        horaTermino: '15:30',
-        agenda: '6666687a4aad08fbfccc3302',
-      },
-      {
-        horaInicio: '16:00',
-        horaTermino: '16:30',
-        agenda: '6666687a4aad08fbfccc3302',
-      },
-      {
-        horaInicio: '17:00',
-        horaTermino: '17:30',
-        agenda: '6666687a4aad08fbfccc3302',
-      },
-      {
-        horaInicio: '18:00',
-        horaTermino: '18:30',
-        agenda: '6666687a4aad08fbfccc3302',
-      },
-      {
-        horaInicio: '20:00',
-        horaTermino: '20:30',
-        agenda: '6667af684aad08fbfccc3b64',
-      },
-      {
-        horaInicio: '21:00',
-        horaTermino: '21:30',
-        agenda: '6667af684aad08fbfccc3b64',
-      },
-      {
-        horaInicio: '22:00',
-        horaTermino: '22:30',
-        agenda: '6667af684aad08fbfccc3b64',
-      },
-    ];
+    const serviceHours = professionalSchedule
+      ? calculateServiceHours(professionalSchedule)
+      : [];
 
     // Crear una lista con los slots y que retorne la cita o si eta disponible en caso de no haber cita q corresponda a cierta hora
     const timeSlots: any[] = serviceHours?.map((hour) => {
