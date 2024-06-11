@@ -12,4 +12,6 @@ export interface TimeSlot {
                 profesional:Professional,
                 estado:string        
         }
+        mostrarHora:boolean;
+        cuadroHabilitado:boolean;
 }
