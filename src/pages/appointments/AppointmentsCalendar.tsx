@@ -18,6 +18,7 @@ import { ProfessionalSchedule } from '../../interfaces/ProfessionalSchedule';
 import { TimeSlot } from '../../interfaces/TimeSlot';
 import colors from '../../styles/colors';
 import DateDetails from './DateDetails';
+import { format } from 'date-fns';
 
 const AppointmentsCalendar = () => {
   const { mode } = useThemeContext();
@@ -141,6 +142,13 @@ const AppointmentsCalendar = () => {
         return s._id === hour.agenda;
       });
 
+      const isDayOff =
+        professionalSchedule && agenda.length
+          ? agenda[0].diasLibres.includes(format(date, 'MM/dd/yyy'))
+          : false;
+
+      console.log(isDayOff);
+
       const show =
         professionalSchedule && agenda.length
           ? date >= new Date(agenda[0].fechaInicio) &&
@@ -167,7 +175,9 @@ const AppointmentsCalendar = () => {
               estado: appointment.estado,
               profesional: appointment.profesional,
             }
-          : { type: 'available' },
+          : isDayOff
+            ? { type: 'day off' }
+            : { type: 'available' },
         //en caso de querer obviar algun dia de la semana por ejemplo domingo, hacer aca agregando otro tipo de contenido en caso de cumplir las condiciones
       };
     });
@@ -282,6 +292,13 @@ const AppointmentsCalendar = () => {
                   <b className="capitalize">
                     {slot.content.razon?.toLowerCase()}
                   </b>
+                </li>
+              );
+            } else if (slot.content.type === 'day off') {
+              return (
+                <li key={index}>
+                  <Badge color="green" />
+                  <span className="text-red-500 ml-1">LIBRE</span>
                 </li>
               );
             } else if (

@@ -30,11 +30,12 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // Icono de expansi
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import Inicio from '../../pages/home';
 import { useThemeContext } from '../../componemts/themeContext';
-import {ParticlesContainer} from './ParticlesFire'; // Asegúrate de importar correctamente
+import { ParticlesContainer } from './ParticlesFire'; // Asegúrate de importar correctamente
 import {
   AssignmentInd,
   CalendarMonth,
   ContactEmergency,
+  EditCalendar,
   Receipt,
   RequestQuote,
 } from '@mui/icons-material';
@@ -62,6 +63,7 @@ import Receta from '../../pages/receta/RecetaTable';
 import BudgetPDF from '../../pages/budgets/BudgetPDF';
 import AppointmentsPage from '../../pages/appointments/AppointmentsPage';
 import AppointmentsCalendar from '../../pages/appointments/AppointmentsCalendar';
+import SchedulingPage from '../../pages/scheduling/SchedulingPage';
 
 const drawerWidth = 240;
 
@@ -112,12 +114,19 @@ const DashboardLayout: React.FC = () => {
       path: '/presupuestos',
     },
     { id: 5, label: 'Agenda', icon: <CalendarMonth />, path: '/agenda' },
+    {
+      id: 7,
+      label: 'Programación',
+      icon: <EditCalendar />,
+      path: '/programacion',
+    },
     { id: 6, label: 'Receta', icon: <RequestQuote />, path: '/receta' },
   ];
 
   return (
     <Box sx={{ display: 'flex' }}>
-      {particlesEnabled && <ParticlesContainer />} {/* Renderiza las partículas solo si están habilitadas */}
+      {particlesEnabled && <ParticlesContainer />}{' '}
+      {/* Renderiza las partículas solo si están habilitadas */}
       <CssBaseline />
       <AppBar
         position="fixed"
@@ -174,7 +183,12 @@ const DashboardLayout: React.FC = () => {
             </MenuItem>
             <MenuItem>
               <FormControlLabel
-                control={<Switch checked={particlesEnabled} onChange={() => setParticlesEnabled(!particlesEnabled)} />}
+                control={
+                  <Switch
+                    checked={particlesEnabled}
+                    onChange={() => setParticlesEnabled(!particlesEnabled)}
+                  />
+                }
                 label="Partículas"
                 labelPlacement="start"
               />
@@ -211,11 +225,19 @@ const DashboardLayout: React.FC = () => {
                 style={{
                   textDecoration: 'none',
                   color: 'inherit',
-                  background: location.pathname === item.path ? 'rgba(255, 255, 255, 0.2)' : 'transparent', // Resaltar la pestaña seleccionada
+                  background:
+                    location.pathname === item.path
+                      ? 'rgba(255, 255, 255, 0.2)'
+                      : 'transparent', // Resaltar la pestaña seleccionada
                 }}
               >
                 <ListItemIcon
-                  sx={{ color: location.pathname === item.path ? 'primary.main' : 'inherit' }} // Cambiar el color del icono si está seleccionado
+                  sx={{
+                    color:
+                      location.pathname === item.path
+                        ? 'primary.main'
+                        : 'inherit',
+                  }} // Cambiar el color del icono si está seleccionado
                 >
                   {item.icon}
                 </ListItemIcon>
@@ -224,11 +246,16 @@ const DashboardLayout: React.FC = () => {
             ))}
             {/* Submenu */}
             <Accordion sx={{ background: 'transparent', color: 'white' }}>
-              <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
+              >
                 <ListItemIcon sx={{ color: 'white' }}>
                   <SettingsIcon />
                 </ListItemIcon>
-                <ListItemText primary="Configuraciones" sx={{ color: 'white' }} />
+                <ListItemText
+                  primary="Configuraciones"
+                  sx={{ color: 'white' }}
+                />
               </AccordionSummary>
               <AccordionDetails sx={{ background: 'rgba(0, 0, 0, 0.2)' }}>
                 <List>
@@ -250,7 +277,10 @@ const DashboardLayout: React.FC = () => {
                       to={`/${text.toLowerCase()}`}
                       sx={{ pl: 4, color: 'white' }}
                       style={{
-                        background: location.pathname === `/${text.toLowerCase()}` ? 'rgba(255, 255, 255, 0.2)' : 'transparent', // Resaltar la pestaña seleccionada
+                        background:
+                          location.pathname === `/${text.toLowerCase()}`
+                            ? 'rgba(255, 255, 255, 0.2)'
+                            : 'transparent', // Resaltar la pestaña seleccionada
                       }}
                     >
                       <ListItemText primary={text} />
@@ -306,7 +336,11 @@ const DashboardLayout: React.FC = () => {
             <Route path="/profesionales" element={<ProfessionalsPage />} />
             <Route path="/agenda" element={<AppointmentsPage />} />
             <Route path="/calendario" element={<AppointmentsCalendar />} />
-            <Route path="/editarprofesional" element={<EditProfessionalPage />} />
+            <Route path="/programacion" element={<SchedulingPage />} />
+            <Route
+              path="/editarprofesional"
+              element={<EditProfessionalPage />}
+            />
           </Routes>
         </Box>
       </Box>
