@@ -37,7 +37,11 @@ import {
   ContactEmergency,
   Receipt,
   RequestQuote,
+  
 } from '@mui/icons-material';
+
+import DescriptionIcon from '@mui/icons-material/Description';
+
 import PatientsPage from '../../pages/patients/PatientsPage';
 import InstitutionForm from '../../pages/institucion/InstitutionForm';
 import PatientDetailsPage from '../../pages/patients/PatientDetailsPage';
@@ -62,6 +66,7 @@ import Receta from '../../pages/receta/RecetaTable';
 import BudgetPDF from '../../pages/budgets/BudgetPDF';
 import AppointmentsPage from '../../pages/appointments/AppointmentsPage';
 import AppointmentsCalendar from '../../pages/appointments/AppointmentsCalendar';
+import ConsentForm from '../../pages/consent/ConsentPage';
 
 const drawerWidth = 240;
 
@@ -113,6 +118,7 @@ const DashboardLayout: React.FC = () => {
     },
     { id: 5, label: 'Agenda', icon: <CalendarMonth />, path: '/agenda' },
     { id: 6, label: 'Receta', icon: <RequestQuote />, path: '/receta' },
+    { id: 7, label: 'Consentimiento', icon: <DescriptionIcon />, path: '/consentimiento' },
   ];
 
   return (
@@ -307,6 +313,7 @@ const DashboardLayout: React.FC = () => {
             <Route path="/agenda" element={<AppointmentsPage />} />
             <Route path="/calendario" element={<AppointmentsCalendar />} />
             <Route path="/editarprofesional" element={<EditProfessionalPage />} />
+            <Route path="/consentimiento" element={<ConsentForm />} />
           </Routes>
         </Box>
       </Box>
