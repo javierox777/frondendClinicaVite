@@ -30,8 +30,6 @@ const AppointmentsCalendar = () => {
     Appointment[]
   >([]);
 
-  const [schedule, setSchedule] = useState<ProfessionalSchedule>();
-
   const [professionalId, setProfessionalId] = useState('');
 
   const { data: scheduleData, isLoading } = useQuery({
@@ -80,15 +78,8 @@ const AppointmentsCalendar = () => {
       );
 
       setFilteredAppointments(filteredAppointments);
-      // setSchedule(professionalSchedule[0]);
     }
   }, [scheduleData, professionalId]);
-
-  useEffect(() => {
-    if (professionalSchedule) {
-      setSchedule(professionalSchedule[0]);
-    }
-  }, [professionalSchedule]);
 
   const renderCell = (date: Date) => {
     const today = new Date();
