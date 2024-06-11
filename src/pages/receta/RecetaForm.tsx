@@ -1,5 +1,5 @@
 import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
-import { TextField, Button, Container, Paper, Box, MenuItem, Select, InputLabel, FormControl, FormControlLabel, Switch, SelectChangeEvent, Grid } from '@mui/material';
+import { TextField, Button, Container, Paper, Box, MenuItem, Select, InputLabel, FormControl, FormControlLabel, Switch, SelectChangeEvent, Grid, Snackbar, Alert } from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -86,6 +86,11 @@ const RecetaForm: React.FC<RecetaFormProps> = ({ onSuccess }) => {
     recetaDetalle: [''],
   });
 
+  const [errors, setErrors] = useState<{ [key: string]: boolean }>({});
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertSeverity, setAlertSeverity] = useState<'success' | 'error'>('success');
+
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -133,33 +138,57 @@ const RecetaForm: React.FC<RecetaFormProps> = ({ onSuccess }) => {
     }));
   };
 
+  const validateForm = () => {
+    let newErrors: { [key: string]: boolean } = {};
+    Object.keys(formData).forEach((key) => {
+      if (formData[key as keyof FormData] === '' || formData[key as keyof FormData] === null) {
+        newErrors[key] = true;
+      }
+    });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    console.log(formData);
-    try {
-      await axios.post('http://localhost:3000/api/receipt/', formData);
-      onSuccess(); // Llamar la función onSuccess después de un envío exitoso
-    } catch (error) {
-      console.error('Error al enviar la data:', error);
+    if (validateForm()) {
+      try {
+        await axios.post('http://localhost:3000/api/receipt/', formData);
+        setAlertMessage('Se creó nueva receta');
+        setAlertSeverity('success');
+        setAlertOpen(true);
+        onSuccess();
+      } catch (error) {
+        setAlertMessage('Error al enviar la data');
+        setAlertSeverity('error');
+        setAlertOpen(true);
+      }
+    } else {
+      let missingFields = 'Por favor complete los siguientes campos: ';
+      Object.keys(errors).forEach((key) => {
+        if (errors[key]) {
+          missingFields += `${key}, `;
+        }
+      });
+      setAlertMessage(missingFields.slice(0, -2));
+      setAlertSeverity('error');
+      setAlertOpen(true);
     }
   };
 
   const getProfesionals = async () => {
     const data = await axios.get('http://localhost:3000/api/professionals');
     setProfesionals(data.data.body);
-    console.log("aca professionals", profesionals);
   };
 
   const getCompanies = async () => {
     const data = await axios.get('http://localhost:3000/api/companies');
     setCompanies(data.data.body);
-    console.log("aca companies", companies);
   };
 
   const getPersons = async () => {
     const data = await axios.get('http://localhost:3000/api/persons');
     setPersons(data.data.body);
-    console.log("aca persons", persons);
   };
 
   const handlePersonaChange = (e: SelectChangeEvent<string>) => {
@@ -170,7 +199,7 @@ const RecetaForm: React.FC<RecetaFormProps> = ({ onSuccess }) => {
       setFormData((prevData) => ({
         ...prevData,
         persona_id: selected._id,
-        direccion: selected.direccion, // Establecer la dirección aquí
+        direccion: selected.direccion,
       }));
     }
   };
@@ -180,6 +209,10 @@ const RecetaForm: React.FC<RecetaFormProps> = ({ onSuccess }) => {
     getCompanies();
     getPersons();
   }, []);
+
+  const handleCloseAlert = () => {
+    setAlertOpen(false);
+  };
 
   return (
     <Container maxWidth="sm">
@@ -200,16 +233,18 @@ const RecetaForm: React.FC<RecetaFormProps> = ({ onSuccess }) => {
               }
               label="Estado ID"
             />
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
+             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 label="Fecha de Registro"
+                
                 value={formData.fechaRegistro ? dayjs(formData.fechaRegistro) : null}
                 onChange={handleDateChange}
+                
               />
             </LocalizationProvider>
           </Box>
           <Box mb={1}>
-            <FormControl fullWidth variant="outlined">
+            <FormControl fullWidth variant="outlined" error={errors.persona_id}>
               <InputLabel id="persona-label">Persona</InputLabel>
               <Select
                 labelId="persona-label"
@@ -224,6 +259,7 @@ const RecetaForm: React.FC<RecetaFormProps> = ({ onSuccess }) => {
                   </MenuItem>
                 ))}
               </Select>
+              {errors.persona_id && <p style={{ color: 'red' }}>Campo requerido</p>}
             </FormControl>
           </Box>
           {selectedPersona && (
@@ -288,13 +324,15 @@ const RecetaForm: React.FC<RecetaFormProps> = ({ onSuccess }) => {
                     onChange={handleChange}
                     variant="outlined"
                     margin="normal"
+                    error={errors.direccion}
+                    helperText={errors.direccion ? 'Campo requerido' : ''}
                   />
                 </Grid>
               </Grid>
             </Box>
           )}
           <Box mb={2}>
-            <FormControl fullWidth variant="outlined">
+            <FormControl fullWidth variant="outlined" error={errors.profesional_id}>
               <InputLabel id="profesional-label">Profesional</InputLabel>
               <Select
                 labelId="profesional-label"
@@ -309,10 +347,11 @@ const RecetaForm: React.FC<RecetaFormProps> = ({ onSuccess }) => {
                   </MenuItem>
                 ))}
               </Select>
+              {errors.profesional_id && <p style={{ color: 'red' }}>Campo requerido</p>}
             </FormControl>
           </Box>
           <Box mb={2}>
-            <FormControl fullWidth variant="outlined">
+            <FormControl fullWidth variant="outlined" error={errors.empresa_id}>
               <InputLabel id="empresa">Empresa</InputLabel>
               <Select
                 labelId="empresa"
@@ -327,6 +366,7 @@ const RecetaForm: React.FC<RecetaFormProps> = ({ onSuccess }) => {
                   </MenuItem>
                 ))}
               </Select>
+              {errors.empresa_id && <p style={{ color: 'red' }}>Campo requerido</p>}
             </FormControl>
           </Box>
           <Box mb={2}>
@@ -338,6 +378,8 @@ const RecetaForm: React.FC<RecetaFormProps> = ({ onSuccess }) => {
                   value={detalle}
                   onChange={(e) => handleRecetaDetalleChange(index, e.target.value)}
                   variant="outlined"
+                  error={errors[`recetaDetalle-${index}`]}
+                  helperText={errors[`recetaDetalle-${index}`] ? 'Campo requerido' : ''}
                 />
               </Box>
             ))}
@@ -349,6 +391,11 @@ const RecetaForm: React.FC<RecetaFormProps> = ({ onSuccess }) => {
             Enviar
           </Button>
         </form>
+        <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleCloseAlert}>
+          <Alert onClose={handleCloseAlert} severity={alertSeverity} sx={{ width: '100%' }}>
+            {alertMessage}
+          </Alert>
+        </Snackbar>
       </Paper>
     </Container>
   );
