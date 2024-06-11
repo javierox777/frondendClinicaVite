@@ -5,18 +5,16 @@ import {
 import { useSpring, animated } from '@react-spring/web';
 import RecetaForm from './RecetaForm';
 import EditRecetaForm from './EditRecetaForm';
-import RecetaTemplate from './RecetaPdf'; // Asegúrate de importar el componente correcto
+import RecetaTemplate from './RecetaPdf';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import axios from 'axios';
 import jsPDF from 'jspdf';
-import Algo from './RecetaSprint';
 import html2canvas from 'html2canvas';
 import './styles.css';
 import { Margin } from '@mui/icons-material';
 
-// Define the type for the table data
 interface TableData {
   _id: string;
   estado_id: boolean;
@@ -32,6 +30,7 @@ interface TableData {
     razonSocial: string;
   };
   fechaRegistro: string;
+  direccion: string;
   persona_id: IPersona;
   recetaDetalle: string[];
 }
@@ -100,6 +99,7 @@ const Receta: React.FC = () => {
       row.profesional_id.apellMat.toLowerCase().includes(query) ||
       row.persona_id.rut.toLowerCase().includes(query) ||
       row.empresa_id.razonSocial.toLowerCase().includes(query) ||
+      row.direccion.toLowerCase().includes(query) || // Filtra por dirección
       new Date(row.fechaRegistro).toLocaleDateString().includes(query)
     );
   });
@@ -196,8 +196,13 @@ const Receta: React.FC = () => {
     handleRowClose();
   };
 
-  const handleDelete = () => {
-    // Aquí puedes manejar la lógica de eliminación si es necesario
+  const handleDelete = async (id: string) => {
+    try {
+      await axios.delete(`http://localhost:3000/api/receipt/${id}`);
+      fetchData(); // Refresca los datos después de eliminar la receta
+    } catch (error) {
+      console.error("Error deleting data:", error);
+    }
   };
 
   const transformReceta = (receta: TableData) => {
@@ -207,6 +212,7 @@ const Receta: React.FC = () => {
       profesional_id: receta.profesional_id._id,
       empresa_id: receta.empresa_id._id,
       fechaRegistro: new Date(receta.fechaRegistro),
+      direccion: receta.direccion, // Asegúrate de incluir la dirección aquí
       persona_id: receta.persona_id._id,
       recetaDetalle: receta.recetaDetalle,
     };
@@ -250,6 +256,7 @@ const Receta: React.FC = () => {
               <TableCell>Empresa</TableCell>
               <TableCell>Fecha Registro</TableCell>
               <TableCell>Persona</TableCell>
+              <TableCell>Dirección</TableCell> {/* Nuevo campo */}
               <TableCell>Receta Detalle</TableCell>
               <TableCell>Acciones</TableCell>
             </TableRow>
@@ -261,12 +268,13 @@ const Receta: React.FC = () => {
                 className={`table-row ${selectedRow && selectedRow._id === row._id ? 'table-row-selected' : ''}`}
                 onClick={() => handleRowClickOpen(row)}
               >
-                <TableCell>{index + 1}</TableCell> {/* Índice de la fila */}
+                <TableCell>{index + 1}</TableCell>
                 <TableCell>{row.estado_id ? 'Activo' : 'Inactivo'}</TableCell>
                 <TableCell>{`${row.profesional_id.nombre1} ${row.profesional_id.nombre2} ${row.profesional_id.apellPat} ${row.profesional_id.apellMat}`}</TableCell>
                 <TableCell>{row.empresa_id.razonSocial}</TableCell>
                 <TableCell>{new Date(row.fechaRegistro).toLocaleDateString()}</TableCell>
                 <TableCell>{row.persona_id.rut}</TableCell>
+                <TableCell>{row.direccion}</TableCell> {/* Nuevo campo */}
                 <TableCell>{row.recetaDetalle.join(', ')}</TableCell>
                 <TableCell>
                   <IconButton color="primary" onClick={(e) => { e.stopPropagation(); handlePdfClickOpen(row); }}>
@@ -275,7 +283,7 @@ const Receta: React.FC = () => {
                   <IconButton color="primary" onClick={(e) => { e.stopPropagation(); handleEditClickOpen(row); }}>
                     <EditIcon />
                   </IconButton>
-                  <IconButton color="secondary" onClick={(e) => { e.stopPropagation(); handleDelete(); }}>
+                  <IconButton color="secondary" onClick={(e) => { e.stopPropagation(); handleDelete(row._id); }}>
                     <DeleteIcon />
                   </IconButton>
                 </TableCell>
@@ -310,7 +318,9 @@ const Receta: React.FC = () => {
       </AnimatedDialog>
 
       <AnimatedDialog open={pdfOpen} onClose={handlePdfClose} maxWidth="md" fullWidth style={pdfAnimation}>
-        <AnimatedDialogTitle className="modal-title" style={textAnimationProps}>Vista previa de la Receta</AnimatedDialogTitle>
+        <AnimatedDialogTitle className="modal-title" style={{ ...textAnimationProps, textAlign: 'left', paddingLeft: '50px' }}>
+          Vista previa de la Receta
+        </AnimatedDialogTitle>
         <AnimatedDialogContent className="modal-content" style={pdfAnimation}>
           {selectedReceta && <div id="pdf-content"><RecetaTemplate receta={selectedReceta} /></div>}
         </AnimatedDialogContent>
@@ -334,8 +344,8 @@ const Receta: React.FC = () => {
               <p><strong>Empresa:</strong> {selectedRow.empresa_id.razonSocial}</p>
               <p><strong>Fecha Registro:</strong> {new Date(selectedRow.fechaRegistro).toLocaleDateString()}</p>
               <p><strong>Persona:</strong> {selectedRow.persona_id.rut}</p>
+              <p><strong>Dirección:</strong> {selectedRow.direccion}</p> {/* Nuevo campo */}
               <p><strong>Receta Detalle:</strong> {selectedRow.recetaDetalle.join(', ')}</p>
-              {/* Puedes agregar más campos según sea necesario */}
             </div>
           )}
         </AnimatedDialogContent>
@@ -345,8 +355,6 @@ const Receta: React.FC = () => {
           </Button>
         </DialogActions>
       </AnimatedDialog>
-
-      
     </div>
   );
 };

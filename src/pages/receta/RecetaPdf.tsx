@@ -1,6 +1,5 @@
 import React from 'react';
-import logo from './receta.jpeg'; // Asegúrate de que la ruta sea correcta y que el archivo exista en esta ubicación
-
+import logo from './receta.jpeg'; 
 interface IPersona {
   _id: string;
   apellMat: string;
@@ -40,6 +39,7 @@ interface TableData {
     razonSocial: string;
   };
   fechaRegistro: string;
+  direccion: string;
   persona_id: IPersona;
   recetaDetalle: string[];
 }
@@ -70,19 +70,16 @@ const RecetaTemplate: React.FC<RecetaTemplateProps> = ({ receta }) => (
         </div>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
           <span>Dirección:</span>
-          <span style={{ flexGrow: 1, borderBottom: '1px solid blue', marginLeft: '10px' }}>{receta.persona_id.direccion}</span>
+          <span style={{ flexGrow: 1, borderBottom: '1px solid blue', marginLeft: '10px' }}>{receta.direccion}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
           <span>Edad:</span>
           <span style={{ flexGrow: 1, borderBottom: '1px solid blue', marginLeft: '10px' }}>{new Date().getFullYear() - new Date(receta.persona_id.fechaNac).getFullYear()}</span>
-      
-       
           <span>C. Identidad:</span>
           <span style={{ flexGrow: 1, borderBottom: '1px solid blue', marginLeft: '10px' }}>{receta.persona_id.rut}</span>
         </div>
         <div><br /></div>
         <p style={{ marginLeft: "2mm" }}>Rp.<br /> {receta.recetaDetalle.join(', ')}</p>
-        <div></div>
         <div><br /></div>
         <br />
         <br />
@@ -95,8 +92,17 @@ const RecetaTemplate: React.FC<RecetaTemplateProps> = ({ receta }) => (
         <br />
         <br />
         <br />
-        <p style={{ textAlign: 'right', marginTop: '20px', color: 'blue', fontWeight: 'bold' }}>Firma Profesional: ____________________</p>
-        <div><br /></div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
+          <div style={{ textAlign: 'left' }}>
+            <p style={{ borderBottom: '1px solid blue', width: '200px', margin: '0 auto' }}>{receta.profesional_id.nombre1} {receta.profesional_id.nombre2} {receta.profesional_id.apellPat} {receta.profesional_id.apellMat}</p>
+            <p style={{ width: '200px', margin: '0 auto' }}>Profesional</p>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <br/>
+            <br/>
+            <p style={{ borderTop: '1px solid blue', width: '200px', margin: '0 auto' }}>Firma Profesional</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>

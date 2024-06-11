@@ -13,6 +13,7 @@ interface FormData {
   empresa_id: string;
   fechaRegistro: Date | null;
   persona_id: string;
+  direccion: string; // Añadir dirección aquí
   recetaDetalle: string[];
 }
 
@@ -63,6 +64,7 @@ interface IPersona {
   rut: string;
   sexo: string;
   vigente: string;
+  direccion: string; // Añadir dirección aquí
 }
 
 interface EditRecetaFormProps {
@@ -162,6 +164,7 @@ const EditRecetaForm: React.FC<EditRecetaFormProps> = ({ receta, onSuccess }) =>
       setFormData((prevData) => ({
         ...prevData,
         persona_id: selected._id,
+        direccion: selected.direccion, // Actualiza la dirección cuando cambia la persona
       }));
     }
   };
@@ -274,6 +277,17 @@ const EditRecetaForm: React.FC<EditRecetaFormProps> = ({ receta, onSuccess }) =>
                     value={selectedPersona.apellMat}
                     variant="outlined"
                     disabled
+                    margin="normal"
+                  />
+                </Grid>
+                <Grid item xs={6} sm={4}>
+                  <TextField
+                    fullWidth
+                    label="Dirección"
+                    value={selectedPersona.direccion}
+                    variant="outlined"
+                    name="direccion"
+                    onChange={handleChange}
                     margin="normal"
                   />
                 </Grid>

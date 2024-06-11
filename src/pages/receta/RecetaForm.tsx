@@ -11,6 +11,7 @@ interface FormData {
   profesional_id: string;
   empresa_id: string;
   fechaRegistro: Date | null;
+  direccion: string;
   persona_id: string;
   recetaDetalle: string[];
 }
@@ -62,6 +63,7 @@ interface IPersona {
   rut: string;
   sexo: string;
   vigente: string;
+  direccion: string;
 }
 
 interface RecetaFormProps {
@@ -78,6 +80,7 @@ const RecetaForm: React.FC<RecetaFormProps> = ({ onSuccess }) => {
     estado_id: true,
     profesional_id: '',
     empresa_id: '',
+    direccion: '',
     fechaRegistro: null,
     persona_id: '',
     recetaDetalle: [''],
@@ -99,7 +102,7 @@ const RecetaForm: React.FC<RecetaFormProps> = ({ onSuccess }) => {
     }));
   };
 
-  const handleSelectChange = (e: SelectChangeEvent<string>) => { // Usa SelectChangeEvent en lugar de ChangeEvent
+  const handleSelectChange = (e: SelectChangeEvent<string>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -159,17 +162,18 @@ const RecetaForm: React.FC<RecetaFormProps> = ({ onSuccess }) => {
     console.log("aca persons", persons);
   };
 
- const handlePersonaChange = (e: SelectChangeEvent<string>) => {
-  const personaId = e.target.value;
-  const selected = persons.find(persona => persona._id === personaId);
-  if (selected) {
-    setSelectedPersona(selected);
-    setFormData((prevData) => ({
-      ...prevData,
-      persona_id: selected._id,
-    }));
-  }
-};
+  const handlePersonaChange = (e: SelectChangeEvent<string>) => {
+    const personaId = e.target.value;
+    const selected = persons.find(persona => persona._id === personaId);
+    if (selected) {
+      setSelectedPersona(selected);
+      setFormData((prevData) => ({
+        ...prevData,
+        persona_id: selected._id,
+        direccion: selected.direccion, // Establecer la dirección aquí
+      }));
+    }
+  };
 
   useEffect(() => {
     getProfesionals();
@@ -181,11 +185,10 @@ const RecetaForm: React.FC<RecetaFormProps> = ({ onSuccess }) => {
     <Container maxWidth="sm">
       <Paper elevation={0} sx={{ p: 3, bgcolor: 'rgba(255, 255, 255, 0.8)' }}>
         <form onSubmit={handleSubmit}>
-        <Button style={{ marginBottom: '10px' }} variant="contained" color="primary" type="submit">
+          <Button style={{ marginBottom: '10px' }} variant="contained" color="primary" type="submit">
             Ficha Clinica
           </Button>
           <Box mb={2} mt={4} display="flex" justifyContent="space-between" alignItems="center">
-         
             <FormControlLabel
               control={
                 <Switch
@@ -224,66 +227,71 @@ const RecetaForm: React.FC<RecetaFormProps> = ({ onSuccess }) => {
             </FormControl>
           </Box>
           {selectedPersona && (
-          <Box mb={1}>
-          <Grid container spacing={2}>
-            {/* Primer campo */}
-            <Grid item xs={6} sm={4}> 
-              <TextField
-                fullWidth
-                label="RUT"
-                value={selectedPersona.rut}
-                variant="outlined"
-                disabled
-                margin="normal"
-              />
-            </Grid>
-            {/* Segundo campo */}
-            <Grid item xs={6} sm={4}> 
-              <TextField
-                fullWidth
-                label="Nombre 1"
-                value={selectedPersona.nombre1}
-                variant="outlined"
-                disabled
-                margin="normal"
-              />
-            </Grid>
-            {/* Tercer campo */}
-            <Grid item xs={6} sm={4}> 
-              <TextField
-                fullWidth
-                label="Nombre 2"
-                value={selectedPersona.nombre2}
-                variant="outlined"
-                disabled
-                margin="normal"
-              />
-            </Grid>
-            {/* Cuarto campo */}
-            <Grid item xs={6} sm={4}> 
-              <TextField
-                fullWidth
-                label="Apellido Paterno"
-                value={selectedPersona.apellPat}
-                variant="outlined"
-                disabled
-                margin="normal"
-              />
-            </Grid>
-            {/* Quinto campo */}
-            <Grid item xs={6} sm={4}> 
-              <TextField
-                fullWidth
-                label="Apellido Materno"
-                value={selectedPersona.apellMat}
-                variant="outlined"
-                disabled
-                margin="normal"
-              />
-            </Grid>
-          </Grid>
-        </Box>
-        
+            <Box mb={1}>
+              <Grid container spacing={2}>
+                <Grid item xs={6} sm={4}>
+                  <TextField
+                    fullWidth
+                    label="RUT"
+                    value={selectedPersona.rut}
+                    variant="outlined"
+                    disabled
+                    margin="normal"
+                  />
+                </Grid>
+                <Grid item xs={6} sm={4}>
+                  <TextField
+                    fullWidth
+                    label="Nombre 1"
+                    value={selectedPersona.nombre1}
+                    variant="outlined"
+                    disabled
+                    margin="normal"
+                  />
+                </Grid>
+                <Grid item xs={6} sm={4}>
+                  <TextField
+                    fullWidth
+                    label="Nombre 2"
+                    value={selectedPersona.nombre2}
+                    variant="outlined"
+                    disabled
+                    margin="normal"
+                  />
+                </Grid>
+                <Grid item xs={6} sm={4}>
+                  <TextField
+                    fullWidth
+                    label="Apellido Paterno"
+                    value={selectedPersona.apellPat}
+                    variant="outlined"
+                    disabled
+                    margin="normal"
+                  />
+                </Grid>
+                <Grid item xs={6} sm={4}>
+                  <TextField
+                    fullWidth
+                    label="Apellido Materno"
+                    value={selectedPersona.apellMat}
+                    variant="outlined"
+                    disabled
+                    margin="normal"
+                  />
+                </Grid>
+                <Grid item xs={6} sm={4}>
+                  <TextField
+                    fullWidth
+                    label="Dirección"
+                    name="direccion"
+                    value={formData.direccion}
+                    onChange={handleChange}
+                    variant="outlined"
+                    margin="normal"
+                  />
+                </Grid>
+              </Grid>
+            </Box>
           )}
           <Box mb={2}>
             <FormControl fullWidth variant="outlined">
@@ -321,7 +329,6 @@ const RecetaForm: React.FC<RecetaFormProps> = ({ onSuccess }) => {
               </Select>
             </FormControl>
           </Box>
-         
           <Box mb={2}>
             <label>Receta Detalle:</label>
             {formData.recetaDetalle.map((detalle, index) => (

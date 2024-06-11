@@ -67,11 +67,7 @@ import Receta from '../../pages/receta/RecetaTable';
 import BudgetPDF from '../../pages/budgets/BudgetPDF';
 import AppointmentsPage from '../../pages/appointments/AppointmentsPage';
 import AppointmentsCalendar from '../../pages/appointments/AppointmentsCalendar';
-<<<<<<< HEAD
-import ConsentForm from '../../pages/consent/ConsentPage';
-=======
 import SchedulingPage from '../../pages/scheduling/SchedulingPage';
->>>>>>> 79d24dbcdf4b3d55ea0912b715624b545fe74ffa
 
 const drawerWidth = 240;
 
@@ -345,16 +341,11 @@ const DashboardLayout: React.FC = () => {
             <Route path="/profesionales" element={<ProfessionalsPage />} />
             <Route path="/agenda" element={<AppointmentsPage />} />
             <Route path="/calendario" element={<AppointmentsCalendar />} />
-<<<<<<< HEAD
-            <Route path="/editarprofesional" element={<EditProfessionalPage />} />
-            <Route path="/consentimiento" element={<ConsentForm />} />
-=======
-            <Route path="/programacion" element={<SchedulingPage />} />
+          
             <Route
               path="/editarprofesional"
               element={<EditProfessionalPage />}
             />
->>>>>>> 79d24dbcdf4b3d55ea0912b715624b545fe74ffa
           </Routes>
         </Box>
       </Box>
