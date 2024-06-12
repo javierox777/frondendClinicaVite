@@ -291,16 +291,18 @@ const Receta: React.FC = () => {
                 <TableCell>{row.direccion}</TableCell> {/* Nuevo campo */}
                 <TableCell>{row.recetaDetalle.join(', ')}</TableCell>
                 <TableCell>
-                  <IconButton color="primary" onClick={(e) => { e.stopPropagation(); handlePdfClickOpen(row); }}>
-                    <PictureAsPdfIcon />
-                  </IconButton>
-                  <IconButton color="primary" onClick={(e) => { e.stopPropagation(); handleEditClickOpen(row); }}>
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton color="secondary" onClick={(e) => { e.stopPropagation(); handleDelete(row._id); }}>
-                    <DeleteIcon />
-                  </IconButton>
-                  <Switch
+                  <Box display="flex" flexDirection="row">
+                    <IconButton color="primary" onClick={(e) => { e.stopPropagation(); handlePdfClickOpen(row); }}>
+                      <PictureAsPdfIcon />
+                    </IconButton>
+                    <IconButton color="primary" onClick={(e) => { e.stopPropagation(); handleEditClickOpen(row); }}>
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton color="secondary" onClick={(e) => { e.stopPropagation(); handleDelete(row._id); }}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                  {/* <Switch
                     checked={row.estado_id}
                     onChange={(e) => {
                       e.stopPropagation();
@@ -308,7 +310,7 @@ const Receta: React.FC = () => {
                     }}
                     color="primary"
                     inputProps={{ 'aria-label': 'controlled' }}
-                  />
+                  /> */}
                 </TableCell>
               </TableRow>
             ))}
