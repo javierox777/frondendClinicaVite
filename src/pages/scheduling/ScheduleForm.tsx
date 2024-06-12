@@ -1,3 +1,4 @@
+import { Close } from '@mui/icons-material';
 import {
   Autocomplete,
   Box,
@@ -15,17 +16,14 @@ import {
   Typography,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
-import React, { useState } from 'react';
-import { generalConfig } from '../../config';
 import axios from 'axios';
+import { format } from 'date-fns';
+import React, { useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
+import { useThemeContext } from '../../componemts/themeContext';
+import { generalConfig } from '../../config';
 import { Professional } from '../../interfaces/Professional';
 import colors from '../../styles/colors';
-import { useThemeContext } from '../../componemts/themeContext';
-import { Form } from 'react-router-dom';
-import { format } from 'date-fns';
-import toast, { Toaster } from 'react-hot-toast';
-import { Close } from '@mui/icons-material';
-import { display } from 'html2canvas/dist/types/css/property-descriptors/display';
 
 const ScheduleForm = () => {
   const { mode } = useThemeContext();
@@ -232,8 +230,8 @@ const ScheduleForm = () => {
                   >
                     <MenuItem value="01">01</MenuItem>
                     <MenuItem value="02">02</MenuItem>
-                    <MenuItem value="03"> 03</MenuItem>
-                    <MenuItem value="04"> 04</MenuItem>
+                    <MenuItem value="03">03</MenuItem>
+                    <MenuItem value="04">04</MenuItem>
                     <MenuItem value="05">05</MenuItem>
                     <MenuItem value="06">06</MenuItem>
                     <MenuItem value="07">07</MenuItem>
