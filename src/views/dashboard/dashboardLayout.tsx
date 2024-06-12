@@ -38,7 +38,6 @@ import {
   EditCalendar,
   Receipt,
   RequestQuote,
-  
 } from '@mui/icons-material';
 
 import DescriptionIcon from '@mui/icons-material/Description';
@@ -125,7 +124,12 @@ const DashboardLayout: React.FC = () => {
       path: '/programacion',
     },
     { id: 6, label: 'Receta', icon: <RequestQuote />, path: '/receta' },
-    { id: 7, label: 'Consentimiento', icon: <DescriptionIcon />, path: '/consentimiento' },
+    {
+      id: 7,
+      label: 'Consentimiento',
+      icon: <DescriptionIcon />,
+      path: '/consentimiento',
+    },
   ];
 
   return (
@@ -341,7 +345,7 @@ const DashboardLayout: React.FC = () => {
             <Route path="/profesionales" element={<ProfessionalsPage />} />
             <Route path="/agenda" element={<AppointmentsPage />} />
             <Route path="/calendario" element={<AppointmentsCalendar />} />
-          
+            <Route path="/programacion" element={<SchedulingPage />} />
             <Route
               path="/editarprofesional"
               element={<EditProfessionalPage />}
