@@ -13,7 +13,6 @@ import axios from 'axios';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import './styles.css';
-import { Margin } from '@mui/icons-material';
 
 interface TableData {
   _id: string;
@@ -255,7 +254,8 @@ const Receta: React.FC = () => {
               <TableCell>Profesional</TableCell>
               <TableCell>Empresa</TableCell>
               <TableCell>Fecha Registro</TableCell>
-              <TableCell>Persona</TableCell>
+              <TableCell>Rut</TableCell>
+              <TableCell>Nombre</TableCell>
               <TableCell>Dirección</TableCell> {/* Nuevo campo */}
               <TableCell>Receta Detalle</TableCell>
               <TableCell>Acciones</TableCell>
@@ -274,6 +274,7 @@ const Receta: React.FC = () => {
                 <TableCell>{row.empresa_id.razonSocial}</TableCell>
                 <TableCell>{new Date(row.fechaRegistro).toLocaleDateString()}</TableCell>
                 <TableCell>{row.persona_id.rut}</TableCell>
+                <TableCell>{`${row.persona_id.nombre1} ${row.persona_id.nombre2} ${row.persona_id.apellPat} ${row.persona_id.apellMat}`}</TableCell>
                 <TableCell>{row.direccion}</TableCell> {/* Nuevo campo */}
                 <TableCell>{row.recetaDetalle.join(', ')}</TableCell>
                 <TableCell>
@@ -343,7 +344,8 @@ const Receta: React.FC = () => {
               <p><strong>Profesional:</strong> {`${selectedRow.profesional_id.nombre1} ${selectedRow.profesional_id.nombre2} ${selectedRow.profesional_id.apellPat} ${selectedRow.profesional_id.apellMat}`}</p>
               <p><strong>Empresa:</strong> {selectedRow.empresa_id.razonSocial}</p>
               <p><strong>Fecha Registro:</strong> {new Date(selectedRow.fechaRegistro).toLocaleDateString()}</p>
-              <p><strong>Persona:</strong> {selectedRow.persona_id.rut}</p>
+              <p><strong>Rut:</strong> {selectedRow.persona_id.rut}</p>
+              <p><strong>Nombre:</strong> {`${selectedRow.persona_id.nombre1} ${selectedRow.persona_id.nombre2} ${selectedRow.persona_id.apellPat} ${selectedRow.persona_id.apellMat}`}</p>
               <p><strong>Dirección:</strong> {selectedRow.direccion}</p> {/* Nuevo campo */}
               <p><strong>Receta Detalle:</strong> {selectedRow.recetaDetalle.join(', ')}</p>
             </div>
