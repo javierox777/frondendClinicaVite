@@ -86,6 +86,14 @@ const AppointmentsCalendar = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Normalizar la fecha de hoy a media noche
 
+    const dayOff = professionalSchedule.some((s: ProfessionalSchedule) => {
+      return s.diasLibres.some((d) => {
+        return d === format(date, 'MM/dd/yyyy');
+      });
+    });
+
+    console.log(dayOff);
+
     // obtener las citas para las fechas correspondientes
     const appointmentsList = filteredAppointments.filter((a: Appointment) => {
       const appointmentDate = new Date(a.fecha);
@@ -146,8 +154,6 @@ const AppointmentsCalendar = () => {
         professionalSchedule && agenda.length
           ? agenda[0].diasLibres.includes(format(date, 'MM/dd/yyy'))
           : false;
-
-      console.log(isDayOff);
 
       const show =
         professionalSchedule && agenda.length
@@ -347,15 +353,17 @@ const AppointmentsCalendar = () => {
                   </Popover>
                 }
               >
-                <a
-                  onClick={() => {
-                    setSlots(slotsToShow);
-                    setShowDate(date);
-                    setOpen(!open);
-                  }}
-                >
-                  Ver más
-                </a>
+                {
+                  <a
+                    onClick={() => {
+                      setSlots(slotsToShow);
+                      setShowDate(date);
+                      setOpen(!open);
+                    }}
+                  >
+                    {!dayOff && 'Ver más'}
+                  </a>
+                }
               </Whisper>
             </li>
           )}
