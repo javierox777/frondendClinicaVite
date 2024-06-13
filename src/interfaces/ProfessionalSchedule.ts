@@ -10,4 +10,5 @@ export interface ProfessionalSchedule {
     fechaInicio:string;
     fechaTermino:string
     diasLibres:string[]
+    vigente:string;
 }

@@ -125,7 +125,7 @@ const DashboardLayout: React.FC = () => {
     },
     { id: 6, label: 'Receta', icon: <RequestQuote />, path: '/receta' },
     {
-      id: 7,
+      id: 8,
       label: 'Consentimiento',
       icon: <DescriptionIcon />,
       path: '/consentimiento',

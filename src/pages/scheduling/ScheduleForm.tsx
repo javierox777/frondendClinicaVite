@@ -16,6 +16,7 @@ import {
   Paper,
   Select,
   Slide,
+  Switch,
   TextField,
   Toolbar,
   Typography,
@@ -36,6 +37,7 @@ interface Props {
   open: boolean;
   onClose: CallableFunction;
   schedule?: ProfessionalSchedule;
+  refetch?: CallableFunction;
 }
 
 const Transition = React.forwardRef(function Transition(
@@ -57,7 +59,7 @@ const weekDaysOptions = [
   { label: 'Sábado', value: 6 },
 ];
 
-const ScheduleForm = ({ onClose, open, schedule }: Props) => {
+const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
   const { mode } = useThemeContext();
 
   const [professionalId, setProfessionalId] = useState<string>('');
@@ -70,6 +72,7 @@ const ScheduleForm = ({ onClose, open, schedule }: Props) => {
   const [dayOffToAdd, setDayOffToAdd] = useState<string>('');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
+  const [valid, setValid] = useState<string>('');
 
   const [isSubmitting, setSubmitting] = useState<boolean>(false);
 
@@ -125,6 +128,9 @@ const ScheduleForm = ({ onClose, open, schedule }: Props) => {
           setStartDate('');
           setEndDate('');
           setSubmitting(false);
+          if (refetch) {
+            refetch();
+          }
         }
       } else {
         const response = await axios.patch(
@@ -135,6 +141,9 @@ const ScheduleForm = ({ onClose, open, schedule }: Props) => {
         if (response.data.message === 'success') {
           toast.success('Agenda actualizada');
           setSubmitting(false);
+          if (refetch) {
+            refetch();
+          }
         }
       }
     } catch (error) {
@@ -157,6 +166,7 @@ const ScheduleForm = ({ onClose, open, schedule }: Props) => {
       setDaysOff(schedule.diasLibres);
       setStartDate(format(new Date(schedule.fechaInicio), 'yyyy-MM-dd'));
       setEndDate(format(new Date(schedule.fechaTermino), 'yyyy-MM-dd'));
+      setValid(schedule.vigente);
     }
   }, [schedule]);
 
@@ -183,6 +193,25 @@ const ScheduleForm = ({ onClose, open, schedule }: Props) => {
               <Grid item xs={12}>
                 <Typography>Rellena los datos para generar agenda</Typography>
               </Grid>
+              <Grid item xs={12}>
+                <Divider />
+              </Grid>
+              {schedule && (
+                <Grid item>
+                  <Typography>Vigente</Typography>
+                  <Switch
+                    checked={valid === '1'}
+                    onChange={() => {
+                      if (valid === '1') {
+                        setValid('2');
+                      } else if (valid === '2') {
+                        setValid('1');
+                      }
+                    }}
+                  />
+                </Grid>
+              )}
+
               <Grid item xs={12}>
                 <FormControl fullWidth>
                   <Autocomplete

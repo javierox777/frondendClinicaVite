@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { generalConfig } from '../../config';
 import {
   Autocomplete,
@@ -44,13 +44,14 @@ const ScheduleTable = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [formOpen, setFormOpen] = useState<boolean>(false);
+  const [refetch, setRefetch] = useState<boolean>(false);
 
   const [scheduleToEdit, setEditSchedule] = useState<
     ProfessionalSchedule | undefined
   >();
 
   const { data: professionals } = useQuery({
-    queryKey: ['professionals'],
+    queryKey: ['professionals', refetch],
     queryFn: async () => {
       const response = await axios.get(
         `${generalConfig.baseUrl}/professionals`
@@ -60,9 +61,11 @@ const ScheduleTable = () => {
     },
   });
 
-  const handleSearch = async (e: React.FormEvent) => {
+  const handleSearch = async (e?: React.FormEvent) => {
     setSearching(true);
-    e.preventDefault();
+    if (e) {
+      e.preventDefault();
+    }
     if (!professionalId) {
       return toast.error('Selecciona profesional para ver su agenda');
     }
@@ -99,49 +102,51 @@ const ScheduleTable = () => {
       <form onSubmit={handleSearch}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <FormControl fullWidth>
-              <Autocomplete
-                disablePortal
-                //   defaultValue={budget?.profesional}
-                options={professionals}
-                renderInput={(params) => (
-                  <TextField {...params} label="Dentista" />
-                )}
-                renderOption={(props, professional: Professional) => (
-                  <li {...props}>
-                    <div className="flex justify-between w-full">
-                      <span>
-                        {professional.nombre1} {professional.apellPat}
-                      </span>
-                      <span
-                        style={{
-                          color:
-                            mode === 'light'
-                              ? colors.ligthModeSoftText
-                              : colors.darkModeSoftText,
-                        }}
-                      >
-                        {professional.rut}-{professional.dv}
-                      </span>
-                    </div>
-                  </li>
-                )}
-                getOptionLabel={(professional: Professional) => {
-                  // Value selected with enter, right from the input
-                  if (typeof professional === 'string') {
-                    return professional;
-                  }
-                  // Regular professional
-                  return `${professional.nombre1} ${professional.apellPat} ${professional.rut}-${professional.dv}`;
-                }}
-                onChange={(event, professional: Professional | null) => {
-                  if (professional) setProfessionalId(professional._id);
-                }}
-                style={{
-                  marginBottom: 20,
-                }}
-              />
-            </FormControl>
+            {professionals && (
+              <FormControl fullWidth>
+                <Autocomplete
+                  disablePortal
+                  defaultValue={scheduleToEdit?.profesional as Professional}
+                  options={professionals}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Dentista" />
+                  )}
+                  renderOption={(props, professional: Professional) => (
+                    <li {...props}>
+                      <div className="flex justify-between w-full">
+                        <span>
+                          {professional.nombre1} {professional.apellPat}
+                        </span>
+                        <span
+                          style={{
+                            color:
+                              mode === 'light'
+                                ? colors.ligthModeSoftText
+                                : colors.darkModeSoftText,
+                          }}
+                        >
+                          {professional.rut}-{professional.dv}
+                        </span>
+                      </div>
+                    </li>
+                  )}
+                  getOptionLabel={(professional: Professional) => {
+                    // Value selected with enter, right from the input
+                    if (typeof professional === 'string') {
+                      return professional;
+                    }
+                    // Regular professional
+                    return `${professional.nombre1} ${professional.apellPat} ${professional.rut}-${professional.dv}`;
+                  }}
+                  onChange={(event, professional: Professional | null) => {
+                    if (professional) setProfessionalId(professional._id);
+                  }}
+                  style={{
+                    marginBottom: 20,
+                  }}
+                />
+              </FormControl>
+            )}
             <FormControl>
               <Button variant="contained" type="submit">
                 Buscar Agenda
@@ -230,6 +235,10 @@ const ScheduleTable = () => {
         open={formOpen}
         onClose={() => setFormOpen(false)}
         schedule={scheduleToEdit && scheduleToEdit}
+        refetch={() => {
+          setRefetch(!refetch);
+          handleSearch();
+        }}
       />
     </>
   );
