@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Box, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, TextField
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Box, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, TextField, Switch
 } from '@mui/material';
 import { useSpring, animated } from '@react-spring/web';
 import RecetaForm from './RecetaForm';
@@ -13,7 +13,6 @@ import axios from 'axios';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import './styles.css';
-import { Margin } from '@mui/icons-material';
 
 interface TableData {
   _id: string;
@@ -205,6 +204,19 @@ const Receta: React.FC = () => {
     }
   };
 
+  const handleEstadoChange = async (id: string, estado: boolean) => {
+    try {
+      await axios.put(`http://localhost:3000/api/receipt/${id}`, { estado_id: estado });
+      setFormData((prevData) => 
+        prevData.map((item) => 
+          item._id === id ? { ...item, estado_id: estado } : item
+        )
+      ); // Actualiza el estado localmente
+    } catch (error) {
+      console.error("Error updating estado:", error);
+    }
+  };
+
   const transformReceta = (receta: TableData) => {
     return {
       _id: receta._id,
@@ -251,11 +263,12 @@ const Receta: React.FC = () => {
           <TableHead>
             <TableRow>
               <TableCell>N°</TableCell>
+              <TableCell>Rut</TableCell>
+              <TableCell>Nombre</TableCell>
               <TableCell>Estado</TableCell>
               <TableCell>Profesional</TableCell>
               <TableCell>Empresa</TableCell>
               <TableCell>Fecha Registro</TableCell>
-              <TableCell>Persona</TableCell>
               <TableCell>Dirección</TableCell> {/* Nuevo campo */}
               <TableCell>Receta Detalle</TableCell>
               <TableCell>Acciones</TableCell>
@@ -265,27 +278,39 @@ const Receta: React.FC = () => {
             {filteredData.map((row, index) => (
               <TableRow
                 key={index}
-                className={`table-row ${selectedRow && selectedRow._id === row._id ? 'table-row-selected' : ''}`}
+                className={`table-row ${selectedRow && selectedRow._id === row._id ? 'table-row-selected' : ''} ${!row.estado_id ? 'inactive-row' : ''}`}
                 onClick={() => handleRowClickOpen(row)}
               >
                 <TableCell>{index + 1}</TableCell>
+                <TableCell>{row.persona_id.rut}</TableCell>
+                <TableCell>{`${row.persona_id.nombre1} ${row.persona_id.nombre2} ${row.persona_id.apellPat} ${row.persona_id.apellMat}`}</TableCell>
                 <TableCell>{row.estado_id ? 'Activo' : 'Inactivo'}</TableCell>
                 <TableCell>{`${row.profesional_id.nombre1} ${row.profesional_id.nombre2} ${row.profesional_id.apellPat} ${row.profesional_id.apellMat}`}</TableCell>
                 <TableCell>{row.empresa_id.razonSocial}</TableCell>
                 <TableCell>{new Date(row.fechaRegistro).toLocaleDateString()}</TableCell>
-                <TableCell>{row.persona_id.rut}</TableCell>
                 <TableCell>{row.direccion}</TableCell> {/* Nuevo campo */}
                 <TableCell>{row.recetaDetalle.join(', ')}</TableCell>
                 <TableCell>
-                  <IconButton color="primary" onClick={(e) => { e.stopPropagation(); handlePdfClickOpen(row); }}>
-                    <PictureAsPdfIcon />
-                  </IconButton>
-                  <IconButton color="primary" onClick={(e) => { e.stopPropagation(); handleEditClickOpen(row); }}>
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton color="secondary" onClick={(e) => { e.stopPropagation(); handleDelete(row._id); }}>
-                    <DeleteIcon />
-                  </IconButton>
+                  <Box display="flex" flexDirection="row">
+                    <IconButton color="primary" onClick={(e) => { e.stopPropagation(); handlePdfClickOpen(row); }}>
+                      <PictureAsPdfIcon />
+                    </IconButton>
+                    <IconButton color="primary" onClick={(e) => { e.stopPropagation(); handleEditClickOpen(row); }}>
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton color="secondary" onClick={(e) => { e.stopPropagation(); handleDelete(row._id); }}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                  {/* <Switch
+                    checked={row.estado_id}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      handleEstadoChange(row._id, e.target.checked);
+                    }}
+                    color="primary"
+                    inputProps={{ 'aria-label': 'controlled' }}
+                  /> */}
                 </TableCell>
               </TableRow>
             ))}
@@ -343,7 +368,8 @@ const Receta: React.FC = () => {
               <p><strong>Profesional:</strong> {`${selectedRow.profesional_id.nombre1} ${selectedRow.profesional_id.nombre2} ${selectedRow.profesional_id.apellPat} ${selectedRow.profesional_id.apellMat}`}</p>
               <p><strong>Empresa:</strong> {selectedRow.empresa_id.razonSocial}</p>
               <p><strong>Fecha Registro:</strong> {new Date(selectedRow.fechaRegistro).toLocaleDateString()}</p>
-              <p><strong>Persona:</strong> {selectedRow.persona_id.rut}</p>
+              <p><strong>Rut:</strong> {selectedRow.persona_id.rut}</p>
+              <p><strong>Nombre:</strong> {`${selectedRow.persona_id.nombre1} ${selectedRow.persona_id.nombre2} ${selectedRow.persona_id.apellPat} ${selectedRow.persona_id.apellMat}`}</p>
               <p><strong>Dirección:</strong> {selectedRow.direccion}</p> {/* Nuevo campo */}
               <p><strong>Receta Detalle:</strong> {selectedRow.recetaDetalle.join(', ')}</p>
             </div>

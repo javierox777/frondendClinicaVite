@@ -96,4 +96,7 @@ body {
 .table-row-selected {
   background-color: #d0d0d0; /* Cambia esto al color que desees */
 }
+.inactive-row {
+  background-color: rgba(255, 0, 0, 0.2); /* Rojo transparente */
+}
 
