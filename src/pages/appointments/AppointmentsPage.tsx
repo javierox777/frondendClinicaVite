@@ -8,7 +8,7 @@ const AppointmentsPage = () => {
     <Container>
       <Grid container spacing={3}>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-          <AppointmentsCalendar />
+          <TodaysSchedule />
         </Grid>
       </Grid>
     </Container>
