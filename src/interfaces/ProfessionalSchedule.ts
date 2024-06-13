@@ -9,4 +9,5 @@ export interface ProfessionalSchedule {
     horaInicio:string;
     fechaInicio:string;
     fechaTermino:string
+    diasLibres:string[]
 }
