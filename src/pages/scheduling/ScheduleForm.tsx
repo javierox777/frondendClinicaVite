@@ -135,7 +135,17 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
       } else {
         const response = await axios.patch(
           `${generalConfig.baseUrl}/profesional-agenda/${schedule._id}`,
-          data
+          {
+            diasHabilitados: weekDays,
+            cupos: quota,
+            intervalo: interval,
+            profesional: professionalId,
+            horaInicio: `${startHour}:${startMinutes}`,
+            fechaInicio: format(new Date(startDate), 'MM/dd/yyyy'),
+            fechaTermino: format(new Date(endDate), 'MM/dd/yyyy'),
+            diasLibres: daysOff,
+            vigente: valid,
+          }
         );
 
         if (response.data.message === 'success') {
