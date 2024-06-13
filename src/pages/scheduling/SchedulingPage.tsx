@@ -9,7 +9,7 @@ const SchedulingPage = () => {
   const [showCalendar, setCalendar] = useState<boolean>(false);
   return (
     <Container>
-      <Grid container>
+      <Grid container spacing={2}>
         <Grid item xs={12}>
           <ScheduleTable />
         </Grid>
