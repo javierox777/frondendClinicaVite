@@ -175,6 +175,7 @@ const AppointmentsCalendar = () => {
         cuadroHabilitado: showDaySchedule,
         content: appointment
           ? {
+              id: appointment._id,
               type: 'appointment',
               razon: appointment.razon,
               persona: appointment.persona,

@@ -6,6 +6,7 @@ export interface TimeSlot {
         horaTermino: string;
         fecha:Date;
         content: {
+                id:string,
                 type: string,
                 razon?: string,
                 persona:Person,

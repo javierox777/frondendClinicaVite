@@ -30,6 +30,7 @@ import { Person } from '../../interfaces/Person';
 import { Professional } from '../../interfaces/Professional';
 import { TimeSlot } from '../../interfaces/TimeSlot';
 import colors from '../../styles/colors';
+import { Toys } from '@mui/icons-material';
 
 interface Props {
   timeSlots: TimeSlot[];
@@ -159,9 +160,10 @@ const SlotDetail = ({
   refetch?: CallableFunction;
   professional: string;
 }) => {
-  const [reservationOpen, setReservationOpen] = useState(false);
-  const [patientId, setPatientId] = useState('');
-  const [reason, setReason] = useState('');
+  const [reservationOpen, setReservationOpen] = useState<boolean>(false);
+  const [patientId, setPatientId] = useState<string>('');
+  const [reason, setReason] = useState<string>('');
+  const [cancelOpen, setCancel] = useState<boolean>(false);
 
   const [submitting, setSubmitting] = useState(false);
 
@@ -209,106 +211,153 @@ const SlotDetail = ({
     slot.content.estado !== 'CANCELADO'
   ) {
     return (
-      <Grid container direction="column" spacing={1}>
-        <Grid item>
-          <Grid container spacing={1} alignItems="center">
-            <Grid item>
-              <Badge color="yellow" />
-            </Grid>
-            <Grid item>
-              <Typography>
-                {slot.horaInicio} - {slot.horaTermino}
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Typography style={{ textTransform: 'capitalize' }}>
-                {slot.content.razon?.toLowerCase()}
-              </Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid item>
-          <Grid container spacing={1}>
-            <Grid item>
-              <Typography
-                style={{
-                  fontWeight: 'bold',
-                  color:
-                    mode === 'light'
-                      ? colors.ligthModeSoftText
-                      : colors.darkModeSoftText,
-                }}
+      <Grid container spacing={2} direction="column">
+        <Grid item justifyContent="center" alignItems="center" display="flex">
+          <Grid container justifyContent="space-between" alignItems="center">
+            <Grid item xs={12} sm={12} md={12} lg={9} xl={6}>
+              <Grid
+                container
+                spacing={1}
+                justifyContent="center"
+                direction="column"
               >
-                Paciente
-              </Typography>
+                <Grid item>
+                  <Typography
+                    style={{
+                      textTransform: 'capitalize',
+                      fontWeight: 'bold',
+                      color:
+                        mode === 'light'
+                          ? colors.lightModeTableText
+                          : colors.darkModeSoftText,
+                    }}
+                  >
+                    {slot.content.razon?.toLocaleLowerCase()}
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Typography
+                    style={{
+                      textTransform: 'capitalize',
+                      fontWeight: 'bold',
+                      color:
+                        mode === 'light'
+                          ? colors.lightModeTableText
+                          : colors.darkModeSoftText,
+                    }}
+                  >
+                    Paciente
+                  </Typography>
+                  <Typography
+                    style={{
+                      textTransform: 'capitalize',
+                      color:
+                        mode === 'light'
+                          ? colors.ligthModeSoftText
+                          : colors.darkModeSoftText,
+                    }}
+                  >
+                    {slot.content.persona.nombre1}{' '}
+                    {slot.content.persona.nombre2}{' '}
+                    {slot.content.persona.apellPat}{' '}
+                    {slot.content.persona.apellMat}
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Typography
+                    style={{
+                      textTransform: 'capitalize',
+                      fontWeight: 'bold',
+                      color:
+                        mode === 'light'
+                          ? colors.lightModeTableText
+                          : colors.darkModeSoftText,
+                    }}
+                  >
+                    Atiende
+                  </Typography>
+                  <Typography
+                    style={{
+                      textTransform: 'capitalize',
+                      color:
+                        mode === 'light'
+                          ? colors.ligthModeSoftText
+                          : colors.darkModeSoftText,
+                    }}
+                  >
+                    {slot.content.profesional.nombre1}{' '}
+                    {slot.content.profesional.nombre2}{' '}
+                    {slot.content.profesional.apellPat}{' '}
+                    {slot.content.profesional.apellMat}
+                  </Typography>
+                </Grid>
+              </Grid>
             </Grid>
-            <Grid item>
-              <Typography
-                style={{
-                  textTransform: 'capitalize',
-                  color:
-                    mode === 'light'
-                      ? colors.ligthModeSoftText
-                      : colors.darkModeSoftText,
-                }}
+            <Grid item xs={12} sm={12} md={12} lg={9} xl={3}>
+              <Button
+                variant="outlined"
+                onClick={() => setCancel(true)}
+                fullWidth
+                color="warning"
               >
-                {slot.content.persona.nombre1.toLowerCase()}{' '}
-                {slot.content.persona.apellPat.toLowerCase()}
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Typography
-                style={{
-                  color:
-                    mode === 'light'
-                      ? colors.ligthModeSoftText
-                      : colors.darkModeSoftText,
+                Liberar hora
+              </Button>
+              <Dialog
+                open={cancelOpen}
+                onClose={() => setCancel(false)}
+                PaperComponent={PaperComponent}
+                PaperProps={{
+                  component: 'form',
+                  onSubmit: async (e: React.FormEvent) => {
+                    e.preventDefault();
+                    const response = await axios.patch(
+                      `${generalConfig.baseUrl}/appointments/${slot.content.id}`,
+                      { estado: 'CANCELADO' }
+                    );
+                    if (response.data.message === 'success') {
+                      toast.success('Se ha liberado la hora.');
+                      setCancel(false);
+                    }
+                    if (refetch) {
+                      refetch();
+                    }
+                  },
                 }}
+                aria-labelledby="draggable-dialog-title"
               >
-                {slot.content.persona.rut}-{slot.content.persona.dv}
-              </Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid item>
-          <Grid container spacing={1}>
-            <Grid item>
-              <Typography
-                style={{
-                  fontWeight: 'bold',
-                  color:
-                    mode === 'light'
-                      ? colors.ligthModeSoftText
-                      : colors.darkModeSoftText,
-                }}
-              >
-                Atiende
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Typography
-                style={{
-                  color:
-                    mode === 'light'
-                      ? colors.ligthModeSoftText
-                      : colors.darkModeSoftText,
-                }}
-              >
-                {slot.content.profesional.nombre1}{' '}
-                {slot.content.profesional.apellPat}
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Typography
-                style={{
-                  color:
-                    mode === 'light'
-                      ? colors.ligthModeSoftText
-                      : colors.darkModeSoftText,
-                }}
-              >
-                {slot.content.persona.rut}-{slot.content.persona.dv}
-              </Typography>
+                <DialogTitle
+                  style={{ cursor: 'move' }}
+                  id="draggable-dialog-title"
+                >
+                  Liberar hora {slot.horaInicio} - {slot.horaTermino} del{' '}
+                  {weekDays[weekDay]} {slot.fecha.getDate()} {months[month]}{' '}
+                  {slot.fecha.getFullYear()}
+                </DialogTitle>
+                <DialogContent>
+                  <Typography>
+                    ¿Está seguro que quiere liberar esta hora?
+                  </Typography>
+                </DialogContent>
+                <DialogActions>
+                  <Button
+                    variant="contained"
+                    color="inherit"
+                    onClick={() => setCancel(false)}
+                    disabled={submitting}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="submit"
+                    color="warning"
+                    variant="contained"
+                    disabled={submitting}
+                  >
+                    {!submitting && 'Liberar Hora'}
+                    {submitting && 'liberando hora'}
+                  </Button>
+                </DialogActions>
+              </Dialog>
             </Grid>
           </Grid>
         </Grid>
@@ -339,7 +388,11 @@ const SlotDetail = ({
             </Grid>
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={9} xl={3}>
-            <Button variant="outlined" onClick={() => setReservationOpen(true)}>
+            <Button
+              fullWidth
+              variant="outlined"
+              onClick={() => setReservationOpen(true)}
+            >
               Reservar hora
             </Button>
             <Dialog
