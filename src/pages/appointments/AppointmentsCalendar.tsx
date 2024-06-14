@@ -86,7 +86,7 @@ const AppointmentsCalendar = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Normalizar la fecha de hoy a media noche
 
-    const dayOff = professionalSchedule.some((s: ProfessionalSchedule) => {
+    const dayOff = professionalSchedule?.some((s: ProfessionalSchedule) => {
       return s.diasLibres.some((d) => {
         return d === format(date, 'MM/dd/yyyy');
       });
