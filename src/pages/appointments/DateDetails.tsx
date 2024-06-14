@@ -310,9 +310,8 @@ const SlotDetail = ({
                   component: 'form',
                   onSubmit: async (e: React.FormEvent) => {
                     e.preventDefault();
-                    const response = await axios.patch(
-                      `${generalConfig.baseUrl}/appointments/${slot.content.id}`,
-                      { estado: 'CANCELADO' }
+                    const response = await axios.delete(
+                      `${generalConfig.baseUrl}/appointments/${slot.content.id}`
                     );
                     if (response.data.message === 'success') {
                       toast.success('Se ha liberado la hora.');
