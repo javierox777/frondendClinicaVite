@@ -67,6 +67,7 @@ import BudgetPDF from '../../pages/budgets/BudgetPDF';
 import AppointmentsPage from '../../pages/appointments/AppointmentsPage';
 import AppointmentsCalendar from '../../pages/appointments/AppointmentsCalendar';
 import SchedulingPage from '../../pages/scheduling/SchedulingPage';
+import NewSchedulePage from '../../pages/scheduling/NewSchedulePage';
 
 const drawerWidth = 240;
 

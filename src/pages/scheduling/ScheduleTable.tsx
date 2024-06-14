@@ -6,6 +6,7 @@ import {
   Autocomplete,
   Box,
   Button,
+  ButtonGroup,
   FormControl,
   Grid,
   IconButton,
@@ -100,7 +101,7 @@ const ScheduleTable = () => {
   return (
     <>
       <form onSubmit={handleSearch}>
-        <Grid container spacing={3}>
+        <Grid container spacing={2}>
           <Grid item xs={12}>
             {professionals && (
               <FormControl fullWidth>
@@ -147,15 +148,22 @@ const ScheduleTable = () => {
                 />
               </FormControl>
             )}
-            <FormControl>
-              <Button variant="contained" type="submit">
-                Buscar Agenda
+          </Grid>
+          <Grid item>
+            <ButtonGroup>
+              <FormControl>
+                <Button variant="contained" type="submit">
+                  Buscar Agenda
+                </Button>
+              </FormControl>
+              <Button variant="contained" onClick={() => setFormOpen(true)}>
+                Crear Agenda
               </Button>
-            </FormControl>
+            </ButtonGroup>
           </Grid>
 
           <Grid item xs={12}>
-            {isSearching && <LinearProgress />}
+            {isSearching && professionalId && <LinearProgress />}
             {scheduletoShow && (
               <>
                 <TableContainer component={Paper}>
