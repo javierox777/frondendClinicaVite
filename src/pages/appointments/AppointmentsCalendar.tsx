@@ -1,6 +1,7 @@
 import {
   Autocomplete,
   Card,
+  CircularProgress,
   FormControl,
   TextField,
   Typography,
@@ -33,7 +34,7 @@ const AppointmentsCalendar = () => {
 
   const [professionalId, setProfessionalId] = useState('');
 
-  const { data: scheduleData, isLoading } = useQuery({
+  const { data: scheduleData, isFetching } = useQuery({
     queryKey: ['scheduleData', refetch],
     queryFn: async () => {
       const response = await axios.get(
@@ -83,6 +84,10 @@ const AppointmentsCalendar = () => {
   }, [scheduleData, professionalId]);
 
   const renderCell = (date: Date) => {
+    if (isFetching) {
+      return <CircularProgress />;
+    }
+
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Normalizar la fecha de hoy a media noche
 
@@ -91,8 +96,6 @@ const AppointmentsCalendar = () => {
         return d === format(date, 'MM/dd/yyyy');
       });
     });
-
-    console.log(dayOff);
 
     // obtener las citas para las fechas correspondientes
     const appointmentsList = filteredAppointments.filter((a: Appointment) => {
