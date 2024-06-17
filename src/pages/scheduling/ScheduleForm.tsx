@@ -525,7 +525,7 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
                       >
                         {!isSubmitting && !schedule && 'Registrar Agenda'}
                         {isSubmitting && !schedule && 'Registrando Agenda'}
-                        {schedule && 'Actualizar Agenda'}
+                        {schedule && !isSubmitting && 'Actualizar Agenda'}
                         {schedule && isSubmitting && 'Actualizando Agenda'}
                       </Button>
                     </FormControl>

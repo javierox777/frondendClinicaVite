@@ -60,11 +60,15 @@ const AppointmentsCalendar = () => {
     queryKey: ['professionalSchedule', professionalId],
     queryFn: async () => {
       try {
-        const response = await axios.get(
-          `${generalConfig.baseUrl}/profesional-agenda/getprofessionalschedule/${professionalId}`
-        );
+        if (professionalId) {
+          const response = await axios.get(
+            `${generalConfig.baseUrl}/profesional-agenda/getprofessionalschedule/${professionalId}`
+          );
 
-        return response.data.body;
+          return response.data.body;
+        } else {
+          return [];
+        }
       } catch (error) {
         return [];
       }
