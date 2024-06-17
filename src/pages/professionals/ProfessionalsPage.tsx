@@ -12,7 +12,7 @@ const ProfessionalsPage = () => {
       <Grid container>
         <Grid item xs={12}>
           <Button
-            variant="outlined"
+            variant="contained"
             onClick={() => {
               setModal(true);
             }}

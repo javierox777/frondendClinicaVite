@@ -14,7 +14,7 @@ const PatientsPage = () => {
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Button
-            variant="outlined"
+            variant="contained"
             onClick={() => {
               setModal(true);
             }}

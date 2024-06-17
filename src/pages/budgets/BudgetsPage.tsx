@@ -26,7 +26,7 @@ const BudgetsPage = () => {
       <Container>
         <Grid container spacing={2}>
           <Grid item>
-            <Button variant="outlined" onClick={() => setOpen(true)}>
+            <Button variant="contained" onClick={() => setOpen(true)}>
               <Add />
               Generar presupuesto
             </Button>
