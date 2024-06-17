@@ -12,29 +12,26 @@ const SchedulingPage = () => {
   // const navigation = useNavigate();
   return (
     <>
-      <Container>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <ScheduleTable />
-          </Grid>
-          <Grid item>
-            <Button
-              onClick={() => setCalendar(!showCalendar)}
-              variant="contained"
-              color="secondary"
-            >
-              <CalendarMonth />
-              {showCalendar ? 'Cerrar Calendario' : 'Abrir Calendario'}
-            </Button>
-          </Grid>
-          {showCalendar && (
-            <Grid item>
-              <AppointmentsCalendar />
-            </Grid>
-          )}
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <ScheduleTable />
         </Grid>
-      </Container>
-      {/* <ScheduleForm open={openForm} onClose={() => setNewForm(false)} /> */}
+        <Grid item>
+          <Button
+            onClick={() => setCalendar(!showCalendar)}
+            variant="contained"
+            color="secondary"
+          >
+            <CalendarMonth />
+            {showCalendar ? 'Cerrar Calendario' : 'Abrir Calendario'}
+          </Button>
+        </Grid>
+        {showCalendar && (
+          <Grid item>
+            <AppointmentsCalendar />
+          </Grid>
+        )}
+      </Grid>
     </>
   );
 };

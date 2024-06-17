@@ -1,6 +1,7 @@
-import { Search } from '@mui/icons-material';
+import { Edit, Search } from '@mui/icons-material';
 import {
   Button,
+  IconButton,
   InputAdornment,
   Paper,
   Switch,
@@ -167,17 +168,16 @@ const PatientsTable = ({ refetch }: Props) => {
                     <TableCell>{p.rut}</TableCell>
                     <TableCell>{p.institucion.nombre}</TableCell>
                     <TableCell>
-                      <Button
+                      <IconButton
                         color="success"
-                        variant="outlined"
                         onClick={() =>
                           navigation('/editarpaciente', {
                             state: { patient: p },
                           })
                         }
                       >
-                        Editar
-                      </Button>
+                        <Edit />
+                      </IconButton>
                     </TableCell>
                     <TableCell>
                       <Switch
