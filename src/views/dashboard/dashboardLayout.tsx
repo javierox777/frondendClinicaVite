@@ -67,6 +67,7 @@ import BudgetPDF from '../../pages/budgets/BudgetPDF';
 import AppointmentsPage from '../../pages/appointments/AppointmentsPage';
 import AppointmentsCalendar from '../../pages/appointments/AppointmentsCalendar';
 import SchedulingPage from '../../pages/scheduling/SchedulingPage';
+import AppointmentDetail from '../../pages/appointments/AppointmentDetail';
 
 const drawerWidth = 240;
 
@@ -346,6 +347,7 @@ const DashboardLayout: React.FC = () => {
             <Route path="/agenda" element={<AppointmentsPage />} />
             <Route path="/calendario" element={<AppointmentsCalendar />} />
             <Route path="/programacion" element={<SchedulingPage />} />
+            <Route path="/citadetalle" element={<AppointmentDetail />} />
             <Route
               path="/editarprofesional"
               element={<EditProfessionalPage />}

@@ -1,10 +1,12 @@
 import {
   Card,
   Container,
+  Divider,
   Grid,
   IconButton,
   InputAdornment,
   LinearProgress,
+  Paper,
   TablePagination,
   TextField,
   Typography,
@@ -93,7 +95,7 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
   }
 
   return (
-    <Card elevation={3} sx={{ padding: 0 }}>
+    <>
       <TextField
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
@@ -107,7 +109,7 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
           ),
         }}
       />
-      <Grid container>
+      <Grid container component={Paper}>
         <Grid
           item
           xs={12}
@@ -137,8 +139,8 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
                 container
                 key={b._id}
                 justifyContent="space-between"
-                sx={{ padding: 3 }}
-                className="hover:scale-[1.01] transition-all duration-500 cursor-pointer"
+                sx={{ padding: 2, minHeight: '5rem' }}
+                className={`hover:scale-[1.01] transition-all duration-300 cursor-pointer ${mode === 'light' ? 'hover:bg-slate-100' : 'hover:bg-slate-900'}`}
                 onClick={() => {
                   navigation('/presupuestodetalle', {
                     state: { budget: b },
@@ -146,8 +148,16 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
                 }}
               >
                 <Grid item xs={2}>
-                  <Typography>
-                    {b.persona.nombre1} {b.persona.apellPat}
+                  <Typography
+                    style={{
+                      fontWeight: 'bold',
+                      color:
+                        mode === 'light' ? colors.lightModeTableText : 'white',
+                      textTransform: 'capitalize',
+                    }}
+                  >
+                    {b.persona.nombre1.toLowerCase()}{' '}
+                    {b.persona.apellPat.toLowerCase()}
                   </Typography>
                 </Grid>
                 <Grid item xs={2}>
@@ -170,6 +180,9 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
                     </Typography>
                   )}
                 </Grid>
+                <Grid item xs={12}>
+                  <Divider />
+                </Grid>
               </Grid>
             );
           })}
@@ -182,7 +195,7 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Grid>
-    </Card>
+    </>
   );
 };
 

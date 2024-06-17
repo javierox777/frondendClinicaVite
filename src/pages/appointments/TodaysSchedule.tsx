@@ -116,9 +116,19 @@ const TodaysSchedule = () => {
                     .map((a: Appointment) => {
                       return (
                         <TableRow key={a._id}>
-                          <TableCell>
-                            {a.persona.nombre1} {a.persona.apellPat}{' '}
-                            {a.persona.apellMat}
+                          <TableCell
+                            style={{
+                              fontWeight: 'bold',
+                              color:
+                                mode === 'light'
+                                  ? colors.lightModeTableText
+                                  : 'white',
+                              textTransform: 'capitalize',
+                            }}
+                          >
+                            {a.persona.nombre1.toLowerCase()}{' '}
+                            {a.persona.apellPat.toLowerCase()}{' '}
+                            {a.persona.apellMat.toLowerCase()}
                           </TableCell>
                           <TableCell>
                             {a.persona.rut}-{a.persona.dv}

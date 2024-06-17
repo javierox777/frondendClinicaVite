@@ -23,22 +23,24 @@ const BudgetsPage = () => {
 
   return (
     <>
-      <Grid container spacing={2}>
-        <Grid item>
-          <Button variant="outlined" onClick={() => setOpen(true)}>
-            <Add />
-            Generar presupuesto
-          </Button>
+      <Container>
+        <Grid container spacing={2}>
+          <Grid item>
+            <Button variant="outlined" onClick={() => setOpen(true)}>
+              <Add />
+              Generar presupuesto
+            </Button>
+          </Grid>
+          <Grid item xs={12}>
+            <BudgetVisualizer budgets={budgets} isLoading={isLoading} />
+          </Grid>
         </Grid>
-        <Grid item xs={12}>
-          <BudgetVisualizer budgets={budgets} isLoading={isLoading} />
-        </Grid>
-      </Grid>
-      <BudgetForm
-        open={formOpen}
-        onClose={() => setOpen(false)}
-        afterSubmit={() => setSubmitted(!formSubmitted)}
-      />
+        <BudgetForm
+          open={formOpen}
+          onClose={() => setOpen(false)}
+          afterSubmit={() => setSubmitted(!formSubmitted)}
+        />
+      </Container>
     </>
   );
 };

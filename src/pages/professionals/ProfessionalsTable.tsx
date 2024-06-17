@@ -1,6 +1,7 @@
 import {
   Button,
   InputAdornment,
+  Paper,
   Table,
   TableBody,
   TableCell,
@@ -111,7 +112,7 @@ const ProfessionalsTable = ({ refetch }: Props) => {
           ),
         }}
       />
-      <TableContainer>
+      <TableContainer component={Paper}>
         <Table>
           <TableHead
             style={{
