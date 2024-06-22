@@ -27,15 +27,9 @@ interface IProfesional {
   nombre1: string;
   nombre2: string;
   rut: string;
-  solicitario: string;
-  atencion: string;
-  consentimiento: string;
-  fichaClinica: string;
-  presupuesto: string;
-  receta: string;
 }
 
-interface IEmpresa extends Document {
+interface IEmpresa {
   _id: string;
   vigencia: string;
   dv: string;
@@ -44,10 +38,15 @@ interface IEmpresa extends Document {
   rol: string;
   email: string;
   giro: string;
-  Solicitario: string;
-  consentimiento: string;
-  presupuesto: string;
-  receta: string;
+}
+
+interface ILibretaDireccion {
+  _id: string;
+  nombre: string;
+  tipoDireccion: string;
+  ciudad: string;
+  persona: string;
+  vigente: string;
 }
 
 interface IPersona {
@@ -63,7 +62,7 @@ interface IPersona {
   rut: string;
   sexo: string;
   vigente: string;
-  direccion: string;
+  libretadireccions: ILibretaDireccion[];
 }
 
 interface RecetaFormProps {
@@ -196,10 +195,11 @@ const RecetaForm: React.FC<RecetaFormProps> = ({ onSuccess }) => {
     const selected = persons.find(persona => persona._id === personaId);
     if (selected) {
       setSelectedPersona(selected);
+      const direccion = selected.libretadireccions.length > 0 ? selected.libretadireccions[0].nombre : '';
       setFormData((prevData) => ({
         ...prevData,
         persona_id: selected._id,
-        direccion: selected.direccion,
+        direccion: direccion,
       }));
     }
   };
@@ -323,6 +323,7 @@ const RecetaForm: React.FC<RecetaFormProps> = ({ onSuccess }) => {
                     value={formData.direccion}
                     onChange={handleChange}
                     variant="outlined"
+                    disabled
                     margin="normal"
                     error={errors.direccion}
                     helperText={errors.direccion ? 'Campo requerido' : ''}
