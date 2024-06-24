@@ -84,10 +84,6 @@ const PatientsTable = ({ refetch }: Props) => {
       id: 4,
       label: 'Acciones',
     },
-    {
-      id: 5,
-      label: 'Vigente',
-    },
   ];
 
   const filteredPatients = patients?.filter((p: Person) => {
@@ -108,7 +104,7 @@ const PatientsTable = ({ refetch }: Props) => {
       <TextField
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
-        style={{ marginBlock: '16px', width: '30%' }}
+        style={{ marginBlock: '16px' }}
         placeholder="Buscar..."
         InputProps={{
           startAdornment: (
@@ -178,21 +174,6 @@ const PatientsTable = ({ refetch }: Props) => {
                       >
                         <Edit />
                       </IconButton>
-                    </TableCell>
-                    <TableCell>
-                      <Switch
-                        color="success"
-                        checked={p.vigente === '1'}
-                        onChange={async () => {
-                          await axios.patch(
-                            `${generalConfig.baseUrl}/persons/${p.id}`,
-                            {
-                              vigente: p.vigente === '1' ? '2' : '1',
-                            }
-                          );
-                          setValidUpdated(!validUpdated);
-                        }}
-                      />
                     </TableCell>
                   </TableRow>
                 );

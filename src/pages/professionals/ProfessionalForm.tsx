@@ -161,17 +161,17 @@ const ProfessionalForm = ({
         TransitionComponent={Transition}
         fullScreen
       >
-        <form onSubmit={handleSubmit}>
-          <Toolbar
-            component={Paper}
-            elevation={3}
-            style={{ backgroundColor: 'teal' }}
-          >
-            <IconButton onClick={() => onClose()}>
-              <Close />
-            </IconButton>
-          </Toolbar>
-          <Container>
+        <Toolbar
+          component={Paper}
+          elevation={3}
+          style={{ backgroundColor: 'teal' }}
+        >
+          <IconButton onClick={() => onClose()}>
+            <Close />
+          </IconButton>
+        </Toolbar>
+        <Container>
+          <form onSubmit={handleSubmit}>
             <Grid item xs={12}>
               <Typography className="p-3">DATOS PERSONALES</Typography>
               <Typography
@@ -182,7 +182,7 @@ const ProfessionalForm = ({
               </Typography>
             </Grid>
             <Grid container spacing={5}>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <FormControl fullWidth>
                   <TextField
                     label="Nombre"
@@ -193,7 +193,7 @@ const ProfessionalForm = ({
                   />
                 </FormControl>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <FormControl fullWidth>
                   <TextField
                     label="Segundo nombre"
@@ -204,7 +204,7 @@ const ProfessionalForm = ({
                   />
                 </FormControl>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <FormControl fullWidth>
                   <TextField
                     label="Apellido paterno"
@@ -215,7 +215,7 @@ const ProfessionalForm = ({
                   />
                 </FormControl>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <FormControl fullWidth>
                   <TextField
                     label="Apellido materno"
@@ -226,7 +226,7 @@ const ProfessionalForm = ({
                   />
                 </FormControl>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <Grid container direction="row" alignItems="center">
                   <FormControl style={{ width: '60%' }}>
                     <TextField
@@ -248,7 +248,7 @@ const ProfessionalForm = ({
                   </FormControl>
                 </Grid>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <FormControl fullWidth>
                   <TextField
                     label="Dirección"
@@ -259,7 +259,7 @@ const ProfessionalForm = ({
                   />
                 </FormControl>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <FormControl fullWidth>
                   <TextField
                     label="Email"
@@ -270,7 +270,7 @@ const ProfessionalForm = ({
                   />
                 </FormControl>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <FormControl fullWidth>
                   <TextField
                     label="Celular"
@@ -293,7 +293,7 @@ const ProfessionalForm = ({
                       profesional.
                     </Typography>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                     <FormControl fullWidth>
                       <TextField
                         label="Nombre de usuario"
@@ -304,7 +304,7 @@ const ProfessionalForm = ({
                       />
                     </FormControl>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                     <FormControl fullWidth>
                       <TextField
                         label="Contraseña"
@@ -350,8 +350,8 @@ const ProfessionalForm = ({
                 </FormControl>
               </Grid>
             </Grid>
-          </Container>
-        </form>
+          </form>
+        </Container>
       </Dialog>
       <Toaster />
     </>

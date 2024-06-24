@@ -46,10 +46,12 @@ const ProfessionalsTable = ({ refetch }: Props) => {
     {
       id: 3,
       label: 'Email',
+      hide: true,
     },
     {
       id: 4,
       label: 'Celular',
+      hide: true,
     },
     {
       id: 5,

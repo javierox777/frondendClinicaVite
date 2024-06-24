@@ -325,7 +325,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
           </Container>
           <Container className="p-5">
             <Grid container spacing={5}>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <FormControl fullWidth>
                   <TextField
                     label="Nombre"
@@ -336,7 +336,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                   />
                 </FormControl>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <FormControl fullWidth>
                   <TextField
                     label="Segundo nombre"
@@ -347,7 +347,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                   />
                 </FormControl>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <FormControl fullWidth>
                   <TextField
                     label="Apellido paterno"
@@ -358,7 +358,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                   />
                 </FormControl>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <FormControl fullWidth>
                   <TextField
                     label="Apellido Materno"
@@ -369,7 +369,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                   />
                 </FormControl>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <Grid container direction="row" alignItems="center">
                   <FormControl style={{ width: '60%' }}>
                     <TextField
@@ -391,7 +391,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                   </FormControl>
                 </Grid>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <FormControl fullWidth>
                   <TextField
                     label="Fecha de nacimiento"
@@ -404,7 +404,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                   />
                 </FormControl>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <Box sx={{ marginBottom: 2 }}>
                   <Subform
                     title="Agregar nacionalidad"
@@ -436,7 +436,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <Box sx={{ marginBottom: 2 }}>
                   <Subform
                     title="Agregar sexo"
@@ -466,7 +466,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <FormControl fullWidth>
                   <InputLabel id="prevision-select-label">Previsión</InputLabel>
                   <Select
@@ -488,7 +488,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <FormControl fullWidth>
                   <InputLabel id="institution-select-label">
                     Institución
@@ -558,7 +558,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                             onClick={() => {
                               const updatedContacts = contacts.filter(
                                 (contact) => {
-                                  return c.id !== contact._id;
+                                  return c._id !== contact._id;
                                 }
                               );
                               setContacts(updatedContacts);

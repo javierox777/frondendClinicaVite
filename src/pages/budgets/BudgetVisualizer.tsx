@@ -48,10 +48,12 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
     {
       id: 4,
       label: 'Tipo presupuesto',
+      hide: true,
     },
     {
       id: 5,
       label: 'Estado',
+      hide: true,
     },
   ];
 
@@ -96,20 +98,23 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
 
   return (
     <>
-      <TextField
-        value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
-        style={{ marginBlock: '16px', width: '30%' }}
-        placeholder="Buscar..."
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <Search />
-            </InputAdornment>
-          ),
-        }}
-      />
-      <Grid container component={Paper}>
+      <Grid container>
+        <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+          <TextField
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            style={{ marginBlock: '16px' }}
+            placeholder="Buscar..."
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search />
+                </InputAdornment>
+              ),
+            }}
+            fullWidth
+          />
+        </Grid>
         <Grid
           item
           xs={12}
@@ -124,7 +129,18 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
           <Grid container direction="row" justifyContent="space-between">
             {headings.map((h: any) => {
               return (
-                <Grid item key={h.id} xs={2}>
+                <Grid
+                  item
+                  key={h.id}
+                  xs={2}
+                  display={{
+                    xs: h.hide ? 'none' : 'flex',
+                    sm: h.hide ? 'none' : 'flex',
+                    md: h.hide ? 'none' : 'flex',
+                    lg: 'flex',
+                    xl: 'flex',
+                  }}
+                >
                   <Typography sx={{ fontWeight: 'bold' }}>{h.label}</Typography>
                 </Grid>
               );
@@ -168,10 +184,30 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
                     {new Date(b.fechaRegistro).toLocaleDateString()}
                   </Typography>
                 </Grid>
-                <Grid item xs={2}>
+                <Grid
+                  item
+                  xs={2}
+                  display={{
+                    xs: 'none',
+                    sm: 'none',
+                    md: 'none',
+                    lg: 'flex',
+                    xl: 'flex',
+                  }}
+                >
                   <Typography>{b.presupuestoTipo.nombre}</Typography>
                 </Grid>
-                <Grid item xs={2}>
+                <Grid
+                  item
+                  xs={2}
+                  display={{
+                    xs: 'none',
+                    sm: 'none',
+                    md: 'none',
+                    lg: 'flex',
+                    xl: 'flex',
+                  }}
+                >
                   {b.profesionalValida ? (
                     <Check color="success" />
                   ) : (
