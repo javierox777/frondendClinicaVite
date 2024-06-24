@@ -62,12 +62,6 @@ const Transition = React.forwardRef(function Transition(
 const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
   const { mode } = useThemeContext();
 
-  // estados para enviar a la api
-  // ***********
-  // ***********
-  // ***********
-  // ***********
-
   const [firstName, setFirstName] = useState('');
   const [secondName, setSecondName] = useState('');
   const [firstSurname, setFirstSurname] = useState('');
@@ -82,7 +76,6 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
   const [isSubmitting, setSubmitting] = useState(false);
 
   const [correspondingInstitutions, setCorrespondingInst] = useState([]);
-  //estado que avisa si se ha agregado algun dato ya sea nacionalidad o sexo
   const [subFormSubmitted, setSubFormSubmitted] = useState(true);
 
   const [contacts, setContacts] = useState([
@@ -104,17 +97,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
       vigente: '1',
     },
   ]);
-  // ***********
-  // ***********
-  // ***********
-  // ***********
-  // estados para enviar a la api
 
-  //funciones que manejan los cambios de los inputs dinamicos de direcciones y contactos
-  // ***********
-  // ***********
-  // ***********
-  // ***********
   const handleAddContact = () => {
     setContacts([
       ...contacts,
@@ -122,7 +105,6 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
         _id: (Math.random() * 1000).toString(),
         descripcion: '',
         contacto: '',
-        // fechaReg: Date.now(),
         persona: '',
         vigente: '1',
       },
@@ -162,11 +144,6 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
     updatedContacts[rowIndex][field] = (e.target as HTMLInputElement).value;
     setContacts(updatedContacts);
   };
-  // ***********
-  // ***********
-  // ***********
-  // ***********
-  //funciones que manejan los cambios de los inputs dinamicos de direcciones y contactos
 
   const { data: formData } = useQuery({
     queryKey: ['formData', subFormSubmitted],
@@ -179,11 +156,6 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
     },
   });
 
-  //funcion que se ejecuta al hacer submit al formulario
-  // ***********
-  // ***********
-  // ***********
-  // ***********
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newPerson = {
@@ -231,20 +203,6 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
     }
   };
 
-  // ***********
-  // ***********
-  // ***********
-  // ***********
-  //funcion que se ejecuta al hacer submit al formulario
-
-  //efecto del componente en caso de que se este entrando al componente para editar algun usuario ya existente
-  // ***********
-  // ***********
-  // ***********
-  // ***********
-
-  //funciones que trate la libreta de contacto y de direccion del paciente a editar
-
   const getPatientAddresses = async (patientId: string) => {
     const response = await axios.get(`${generalConfig.baseUrl}/address-book`);
 
@@ -264,10 +222,6 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
 
     setContacts([...contacts]);
   };
-
-  //funciones que trate la libreta de contacto y de direccion del paciente a editar
-
-  // console.log('contactos', contacts);
 
   useEffect(() => {
     if (patient) {
@@ -293,12 +247,6 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
     });
     setCorrespondingInst(institutions);
   }, [selectedPrevision]);
-
-  // ***********
-  // ***********
-  // ***********
-  // ***********
-  //efecto del componente en caso de que se este entrando al componente para editar algun usuario ya existente
 
   return (
     <>
@@ -760,9 +708,6 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                               value={a.ciudad?._id}
                               required
                             >
-                              {/* {selectedPrevision === '' && (
-                              <MenuItem>Seleccione Tipo de contacto</MenuItem>
-                            )} */}
                               {formData?.cities.map((c: ShortModel) => {
                                 return (
                                   <MenuItem key={c._id} value={c._id}>
