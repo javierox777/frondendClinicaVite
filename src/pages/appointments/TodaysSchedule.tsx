@@ -115,7 +115,10 @@ const TodaysSchedule = () => {
                     )
                     .map((a: Appointment) => {
                       return (
-                        <TableRow key={a._id}>
+                        <TableRow
+                          key={a._id}
+                          className="hover:bg-slate-500 transition-all cursor-pointer "
+                        >
                           <TableCell
                             style={{
                               fontWeight: 'bold',

@@ -33,6 +33,8 @@ import { useThemeContext } from '../../componemts/themeContext';
 import { ParticlesContainer } from './ParticlesFire'; // Asegúrate de importar correctamente
 import {
   AssignmentInd,
+  AssignmentLate,
+  AssignmentReturn,
   CalendarMonth,
   ContactEmergency,
   EditCalendar,
@@ -68,6 +70,7 @@ import AppointmentsPage from '../../pages/appointments/AppointmentsPage';
 import AppointmentsCalendar from '../../pages/appointments/AppointmentsCalendar';
 import SchedulingPage from '../../pages/scheduling/SchedulingPage';
 import AppointmentDetail from '../../pages/appointments/AppointmentDetail';
+import AttentionPage from '../../pages/attention/AttentionPage';
 
 const drawerWidth = 240;
 
@@ -130,6 +133,12 @@ const DashboardLayout: React.FC = () => {
       label: 'Consentimiento',
       icon: <DescriptionIcon />,
       path: '/consentimiento',
+    },
+    {
+      id: 9,
+      label: 'Atención',
+      icon: <AssignmentLate />,
+      path: '/atencionhoy',
     },
   ];
 
@@ -348,6 +357,7 @@ const DashboardLayout: React.FC = () => {
             <Route path="/calendario" element={<AppointmentsCalendar />} />
             <Route path="/programacion" element={<SchedulingPage />} />
             <Route path="/citadetalle" element={<AppointmentDetail />} />
+            <Route path="/atencionhoy" element={<AttentionPage />} />
             <Route
               path="/editarprofesional"
               element={<EditProfessionalPage />}
