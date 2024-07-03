@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Appointment } from '../../interfaces/Appointment';
 import {
@@ -36,6 +36,12 @@ const CurrentPatient = () => {
       toast.success('Cita no pudo ser completada.');
     }
   };
+
+  useEffect(() => {
+    if (appointment.estado === 'COMPLETADO') {
+      setCompleted(true);
+    }
+  }, []);
 
   return (
     <>
