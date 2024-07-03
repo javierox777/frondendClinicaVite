@@ -20,6 +20,7 @@ import { Appointment } from '../../interfaces/Appointment';
 import StatusBadge from '../../componemts/StatusBadge';
 import { useThemeContext } from '../../componemts/themeContext';
 import colors from '../../styles/colors';
+import { useNavigate } from 'react-router-dom';
 
 const tableHeadings = [
   { id: 1, label: 'Paciente' },
@@ -33,6 +34,8 @@ const TodaysSchedule = () => {
   const { mode } = useThemeContext();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const navigation = useNavigate();
 
   const { data: appointments, isLoading } = useQuery({
     queryKey: ['appointments'],
@@ -117,7 +120,12 @@ const TodaysSchedule = () => {
                       return (
                         <TableRow
                           key={a._id}
-                          className="hover:bg-slate-500 transition-all cursor-pointer "
+                          className="hover:bg-slate-400 transition-all cursor-pointer "
+                          onClick={() =>
+                            navigation('/atencionpaciente', {
+                              state: { appointment: a },
+                            })
+                          }
                         >
                           <TableCell
                             style={{

@@ -71,6 +71,7 @@ import AppointmentsCalendar from '../../pages/appointments/AppointmentsCalendar'
 import SchedulingPage from '../../pages/scheduling/SchedulingPage';
 import AppointmentDetail from '../../pages/appointments/AppointmentDetail';
 import AttentionPage from '../../pages/attention/AttentionPage';
+import CurrentPatient from '../../pages/attention/CurrentPatient';
 
 const drawerWidth = 240;
 
@@ -358,6 +359,7 @@ const DashboardLayout: React.FC = () => {
             <Route path="/programacion" element={<SchedulingPage />} />
             <Route path="/citadetalle" element={<AppointmentDetail />} />
             <Route path="/atencionhoy" element={<AttentionPage />} />
+            <Route path="/atencionpaciente" element={<CurrentPatient />} />
             <Route
               path="/editarprofesional"
               element={<EditProfessionalPage />}
