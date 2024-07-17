@@ -5,8 +5,10 @@ import {
   Button,
   ButtonGroup,
   Container,
+  Dialog,
   Divider,
   Grid,
+  Modal,
   Typography,
 } from '@mui/material';
 import RecetaForm from '../receta/RecetaForm';
@@ -14,9 +16,11 @@ import axios from 'axios';
 import { generalConfig } from '../../config';
 import toast, { Toaster } from 'react-hot-toast';
 import StatusBadge from '../../componemts/StatusBadge';
+import RecetaDetailsPage from '../receta/RecetaDetailsPage';
 
 const CurrentPatient = () => {
   const [completed, setCompleted] = useState(false);
+  const [recepitOpen, setReceipt] = useState(false);
 
   const appointment: Appointment = useLocation().state.appointment;
 
@@ -49,8 +53,10 @@ const CurrentPatient = () => {
         <Grid container direction="column" spacing={2}>
           <Grid item xs={12}>
             <ButtonGroup>
-              <Button variant="contained">CREAR RECETA</Button>
               <Button variant="contained">FICHA CLÍNICA</Button>
+              <Button variant="contained" onClick={() => setReceipt(true)}>
+                CREAR RECETA
+              </Button>
               <Button
                 variant="contained"
                 color="secondary"
@@ -166,6 +172,9 @@ const CurrentPatient = () => {
         </Grid>
       </Container>
       <Toaster />
+      <Modal open={recepitOpen} onClose={() => setReceipt(false)}>
+        <RecetaForm onSuccess={() => console.log('hola')} />
+      </Modal>
     </>
   );
 };
