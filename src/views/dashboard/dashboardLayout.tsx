@@ -72,6 +72,7 @@ import SchedulingPage from '../../pages/scheduling/SchedulingPage';
 import AppointmentDetail from '../../pages/appointments/AppointmentDetail';
 import AttentionPage from '../../pages/attention/AttentionPage';
 import CurrentPatient from '../../pages/attention/CurrentPatient';
+import ClinicalRecordPage from '../../pages/clinicalrecord/ClinicalRecordPage';
 
 const drawerWidth = 240;
 
@@ -129,6 +130,12 @@ const DashboardLayout: React.FC = () => {
       path: '/programacion',
     },
     { id: 6, label: 'Receta', icon: <RequestQuote />, path: '/receta' },
+    {
+      id: 6,
+      label: 'Ficha Clínica',
+      icon: <RequestQuote />,
+      path: '/fichaclinica',
+    },
     {
       id: 8,
       label: 'Consentimiento',
@@ -359,6 +366,7 @@ const DashboardLayout: React.FC = () => {
             <Route path="/programacion" element={<SchedulingPage />} />
             <Route path="/citadetalle" element={<AppointmentDetail />} />
             <Route path="/atencionhoy" element={<AttentionPage />} />
+            <Route path="/fichaclinica" element={<ClinicalRecordPage />} />
             <Route path="/atencionpaciente" element={<CurrentPatient />} />
             <Route
               path="/editarprofesional"
