@@ -29,6 +29,7 @@ import { generalConfig } from '../../config';
 import { Person } from '../../interfaces/Person';
 import { Appointment } from '../../interfaces/Appointment';
 import ProgressLine from 'rsuite/esm/Progress/ProgressLine';
+import OdontogramTab from './OdontogramTab';
 
 const tableHeadings = [
   { id: 1, label: 'Fecha' },
@@ -50,11 +51,21 @@ const PatientRecord = () => {
 
   const patient: Person = useLocation().state.patient;
 
-  const { data: appointments, isFetching } = useQuery({
+  const { data: appointments, isFetching: appointmentsFetching } = useQuery({
     queryKey: ['appointments'],
     queryFn: async () => {
       const data = await axios.get(
         `${generalConfig.baseUrl}/appointments/patientappointments/${patient._id}`
+      );
+      return data.data.body;
+    },
+  });
+
+  const { data: odontograms, isFetching: odontogramsFetching } = useQuery({
+    queryKey: ['odontograms'],
+    queryFn: async () => {
+      const data = await axios.get(
+        `${generalConfig.baseUrl}/odontogramas/getpatientodontograms/${patient._id}`
       );
       return data.data.body;
     },
@@ -77,6 +88,7 @@ const PatientRecord = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
   return (
     <Grid container spacing={4}>
       {/* INFORMACION DE PACIENTE  */}
@@ -122,12 +134,12 @@ const PatientRecord = () => {
           </Tabs>
         </Box>
         <CustomTabPanel value={value} index={0}>
-          {isFetching && (
+          {appointmentsFetching && (
             <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
               <LinearProgress />
             </Grid>
           )}
-          {appointments && !isFetching && (
+          {appointments && !appointmentsFetching && (
             <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
               <TableContainer component={Paper}>
                 <Table>
@@ -185,7 +197,7 @@ const PatientRecord = () => {
           )}
         </CustomTabPanel>
         <CustomTabPanel value={value} index={1}>
-          <Odontogram />
+          <OdontogramTab odontograms={odontograms} />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={2}>
           Item Three
