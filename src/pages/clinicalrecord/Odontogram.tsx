@@ -23,7 +23,7 @@ import { Diente } from '../../interfaces/Diente';
 import { OdontogramInterface } from '../../interfaces/Odontogram';
 
 import { Close, Save } from '@mui/icons-material';
-import { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import diente11 from '../../assets/dientes/diente11.png';
 import diente12 from '../../assets/dientes/diente12.png';
 import diente13 from '../../assets/dientes/diente13.png';
@@ -60,6 +60,13 @@ import { useThemeContext } from '../../componemts/themeContext';
 import colors from '../../styles/colors';
 import ToothDetails from './ToothDetails';
 import { Professional } from '../../interfaces/Professional';
+import axios from 'axios';
+import { generalConfig } from '../../config';
+import { Loader } from 'rsuite';
+import { Person } from '../../interfaces/Person';
+import { useUser } from '../../auth/userContext';
+import { User } from '../../interfaces/User';
+import { format } from 'date-fns';
 
 type DienteKeys =
   `diente${11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48}`;
@@ -116,13 +123,17 @@ const tableHeadings = [
 
 interface Props {
   odontogram: OdontogramInterface | undefined;
+  afterSubmit?: CallableFunction;
 }
 
-const Odontogram = ({ odontogram }: Props) => {
+const Odontogram = ({ odontogram, afterSubmit }: Props) => {
   const { mode } = useThemeContext();
+  const { user } = useUser();
   const [open, setOpen] = useState(false);
   const [selectedTooth, setTooth] = useState<Diente>();
   const [alertOpen, setAlertOpen] = useState(false);
+
+  const [isSubmitting, setSubmitting] = useState(false);
 
   const [newOdontogram, setNewOdontogram] = useState<OdontogramInterface>({
     persona: '',
@@ -169,7 +180,32 @@ const Odontogram = ({ odontogram }: Props) => {
     setNewOdontogram((prevState) => ({
       ...prevState,
       dientes: [...teeth],
+      persona: (odontogram.persona as Person)._id,
+      profesionalModifica: (user as User).profesionalId,
+      fecha: format(new Date(), 'yyyy-MM-dd'),
     }));
+  };
+
+  const handleCreateNewVersion = async () => {
+    try {
+      setSubmitting(true);
+      const response = await axios.post(
+        `${generalConfig.baseUrl}/odontogramas`,
+        newOdontogram
+      );
+
+      if (response.data.message === 'success') {
+        toast.success('Se ha creado una nueva versión del odontograma.');
+        if (afterSubmit) afterSubmit();
+        setAlertOpen(false);
+        setSubmitting(false);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error('No se pudo crear una nueva versión, inténtelo nuevamente.');
+      setAlertOpen(false);
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -180,8 +216,12 @@ const Odontogram = ({ odontogram }: Props) => {
             fullWidth
             variant="contained"
             onClick={() => setAlertOpen(true)}
+            disabled={isSubmitting}
           >
-            <Save /> Guardar Registro
+            {isSubmitting && <Loader />}
+            {!isSubmitting && <Save />}{' '}
+            {isSubmitting && 'Creando nueva versión'}
+            {!isSubmitting && 'Guardar Registro'}
           </Button>
           <Dialog
             open={alertOpen}
@@ -208,11 +248,13 @@ const Odontogram = ({ odontogram }: Props) => {
                 Cancelar
               </Button>
               <Button
-                onClick={() => console.log('algo')}
+                onClick={handleCreateNewVersion}
                 autoFocus
                 variant="contained"
+                disabled={isSubmitting}
               >
-                Guardar registro
+                {isSubmitting && 'Creando nueva versión'}
+                {!isSubmitting && 'Guardar Registro'}
               </Button>
             </DialogActions>
           </Dialog>

@@ -10,6 +10,7 @@ import {
   DialogTitle,
   FormControl,
   Grid,
+  LinearProgress,
   MenuItem,
   Select,
   TextField,
@@ -23,9 +24,10 @@ import { Toaster } from 'react-hot-toast';
 
 interface Props {
   odontograms: OdontogramInterface[];
+  afterSubmit?: CallableFunction;
 }
 
-const OdontogramTab = ({ odontograms }: Props) => {
+const OdontogramTab = ({ odontograms, afterSubmit }: Props) => {
   const { mode } = useThemeContext();
 
   const [selectedOdontogram, setOdontogram] = useState<OdontogramInterface>();
@@ -34,47 +36,53 @@ const OdontogramTab = ({ odontograms }: Props) => {
     <>
       <Grid container spacing={3}>
         <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
-          <FormControl fullWidth>
-            <Autocomplete
-              disablePortal
-              // defaultValue={budget?.profesional}
-              options={odontograms}
-              renderInput={(params) => (
-                <TextField {...params} label="Selecciona Odontograma" />
-              )}
-              renderOption={(props, o: OdontogramInterface) => (
-                <li {...props}>
-                  <div className="flex justify-between w-full">
-                    <span>Vers. {o.fecha}</span>
-                    <span
-                      style={{
-                        color:
-                          mode === 'light'
-                            ? colors.ligthModeSoftText
-                            : colors.darkModeSoftText,
-                      }}
-                    >
-                      Odontograma
-                    </span>
-                  </div>
-                </li>
-              )}
-              getOptionLabel={(o: OdontogramInterface) => {
-                // Value selected with enter, right from the input
-                if (typeof o === 'string') {
-                  return o;
-                }
-                // Regular professional
-                return `Fecha seleccionada: ${o.fecha}`;
-              }}
-              onChange={(event, o: OdontogramInterface | null) => {
-                if (o) setOdontogram(o);
-              }}
-            />
-          </FormControl>
+          {!odontograms && <LinearProgress />}
+          {odontograms && (
+            <FormControl fullWidth>
+              <Autocomplete
+                disablePortal
+                // defaultValue={budget?.profesional}
+                options={odontograms}
+                renderInput={(params) => (
+                  <TextField {...params} label="Selecciona Odontograma" />
+                )}
+                renderOption={(props, o: OdontogramInterface) => (
+                  <li {...props}>
+                    <div className="flex justify-between w-full">
+                      <span>Vers. {o.fecha}</span>
+                      <span
+                        style={{
+                          color:
+                            mode === 'light'
+                              ? colors.ligthModeSoftText
+                              : colors.darkModeSoftText,
+                        }}
+                      >
+                        Odontograma
+                      </span>
+                    </div>
+                  </li>
+                )}
+                getOptionLabel={(o: OdontogramInterface) => {
+                  // Value selected with enter, right from the input
+                  if (typeof o === 'string') {
+                    return o;
+                  }
+                  // Regular professional
+                  return `Fecha seleccionada: ${o.fecha}`;
+                }}
+                onChange={(event, o: OdontogramInterface | null) => {
+                  if (o) setOdontogram(o);
+                }}
+              />
+            </FormControl>
+          )}
         </Grid>
         <Grid item xs={12}>
-          <Odontogram odontogram={selectedOdontogram} />
+          <Odontogram
+            odontogram={selectedOdontogram}
+            afterSubmit={afterSubmit}
+          />
         </Grid>
       </Grid>
       <Toaster />

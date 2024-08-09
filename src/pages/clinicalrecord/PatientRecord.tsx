@@ -49,6 +49,8 @@ const PatientRecord = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [value, setValue] = React.useState(0);
 
+  const [dataUpdated, setUpdated] = useState(false);
+
   const patient: Person = useLocation().state.patient;
 
   const { data: appointments, isFetching: appointmentsFetching } = useQuery({
@@ -62,7 +64,7 @@ const PatientRecord = () => {
   });
 
   const { data: odontograms, isFetching: odontogramsFetching } = useQuery({
-    queryKey: ['odontograms'],
+    queryKey: ['odontograms', dataUpdated],
     queryFn: async () => {
       const data = await axios.get(
         `${generalConfig.baseUrl}/odontogramas/getpatientodontograms/${patient._id}`
@@ -204,7 +206,10 @@ const PatientRecord = () => {
           )}
         </CustomTabPanel>
         <CustomTabPanel value={value} index={1}>
-          <OdontogramTab odontograms={odontograms} />
+          <OdontogramTab
+            odontograms={odontograms}
+            afterSubmit={() => setUpdated(!dataUpdated)}
+          />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={2}>
           Item Three

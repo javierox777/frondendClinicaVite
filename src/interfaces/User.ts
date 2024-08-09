@@ -3,5 +3,5 @@ export interface User {
     vigencia: string;
     fechaRegistro: Date;
     login: string;
-
+    profesionalId:string
 }

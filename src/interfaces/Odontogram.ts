@@ -4,9 +4,9 @@ import { Professional } from "./Professional";
 
 export interface OdontogramInterface {
     _id?: string;
-    persona: string | Person
+    persona: Person | string
     version: number
     fecha: string;
-    profesionalModifica:  string | Professional
+    profesionalModifica: Professional | string
     dientes: Diente[]
 }
