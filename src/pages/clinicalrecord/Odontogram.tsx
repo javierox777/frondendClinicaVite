@@ -47,6 +47,7 @@ import diente46 from '../../assets/dientes/diente46.png';
 import diente47 from '../../assets/dientes/diente47.png';
 import diente48 from '../../assets/dientes/diente48.png';
 import ToothDetails from './ToothDetails';
+import { Close } from '@mui/icons-material';
 
 type DienteKeys =
   `diente${11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48}`;
@@ -114,12 +115,17 @@ const Odontogram = ({ odontogram }: Props) => {
                     </Grid>
                     <Grid
                       item
-                      className="hover:scale-[1.05] cursor-pointer transition-all"
+                      className="hover:scale-[1.05] cursor-pointer transition-all relative"
                       onClick={() => {
                         setTooth(d);
                         setOpen(true);
                       }}
                     >
+                      {!d.activo && (
+                        <div className="absolute">
+                          <Close color="error" />
+                        </div>
+                      )}
                       <img
                         src={dientesImages[dienteKey]}
                         height={200}
@@ -141,12 +147,17 @@ const Odontogram = ({ odontogram }: Props) => {
                   <Grid container justifyContent={'center'}>
                     <Grid
                       item
-                      className="hover:scale-[1.05] cursor-pointer transition-all"
+                      className="hover:scale-[1.05] cursor-pointer transition-all relative"
                       onClick={() => {
                         setTooth(d);
                         setOpen(true);
                       }}
                     >
+                      {!d.activo && (
+                        <div className="absolute">
+                          <Close color="error" />
+                        </div>
+                      )}
                       <img
                         src={dientesImages[dienteKey]}
                         height={200}
