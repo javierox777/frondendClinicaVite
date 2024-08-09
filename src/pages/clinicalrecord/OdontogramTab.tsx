@@ -45,7 +45,7 @@ const OdontogramTab = ({ odontograms }: Props) => {
               renderOption={(props, o: OdontogramInterface) => (
                 <li {...props}>
                   <div className="flex justify-between w-full">
-                    <span>Ver {o.fecha}</span>
+                    <span>Vers. {o.fecha}</span>
                     <span
                       style={{
                         color:

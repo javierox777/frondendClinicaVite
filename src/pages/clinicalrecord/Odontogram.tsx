@@ -59,6 +59,7 @@ import diente48 from '../../assets/dientes/diente48.png';
 import { useThemeContext } from '../../componemts/themeContext';
 import colors from '../../styles/colors';
 import ToothDetails from './ToothDetails';
+import { Professional } from '../../interfaces/Professional';
 
 type DienteKeys =
   `diente${11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48}`;
@@ -174,7 +175,7 @@ const Odontogram = ({ odontogram }: Props) => {
   return (
     <>
       <Grid container spacing={5}>
-        <Grid item>
+        <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
           <Button
             fullWidth
             variant="contained"
@@ -216,6 +217,27 @@ const Odontogram = ({ odontogram }: Props) => {
             </DialogActions>
           </Dialog>
         </Grid>
+        {/* INFORMACION DEL ODONTOGRAMA */}
+        <Grid item xs={12}>
+          <Grid container spacing={5}>
+            <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+              <Typography sx={{ fontWeight: 'bold' }}>
+                Fecha de registro (Versión)
+              </Typography>
+              <Typography>{odontogram.fecha}</Typography>
+            </Grid>
+            <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+              <Typography sx={{ fontWeight: 'bold' }}>Atención</Typography>
+              <Typography>
+                {(odontogram.profesionalModifica as Professional).nombre1}{' '}
+                {(odontogram.profesionalModifica as Professional).nombre2}{' '}
+                {(odontogram.profesionalModifica as Professional).apellPat}{' '}
+                {(odontogram.profesionalModifica as Professional).apellMat}{' '}
+              </Typography>
+            </Grid>
+          </Grid>
+        </Grid>
+        {/* INFORMACION DEL ODONTOGRAMA */}
         <Grid item xs={12}>
           <Divider />
         </Grid>
@@ -300,7 +322,7 @@ const Odontogram = ({ odontogram }: Props) => {
           </Grid>
           <Grid item xs={12}>
             <Grid container>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <TableContainer component={Paper} elevation={3}>
                   <Table>
                     <TableHead
