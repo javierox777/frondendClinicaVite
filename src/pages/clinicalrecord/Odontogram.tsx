@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Divider,
   Grid,
   Paper,
   Table,
@@ -15,13 +16,14 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  TextField,
   Typography,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { OdontogramInterface } from '../../interfaces/Odontogram';
 import { Diente } from '../../interfaces/Diente';
+import { OdontogramInterface } from '../../interfaces/Odontogram';
 
+import { Close, Save } from '@mui/icons-material';
+import { Toaster } from 'react-hot-toast';
 import diente11 from '../../assets/dientes/diente11.png';
 import diente12 from '../../assets/dientes/diente12.png';
 import diente13 from '../../assets/dientes/diente13.png';
@@ -46,19 +48,17 @@ import diente35 from '../../assets/dientes/diente35.png';
 import diente36 from '../../assets/dientes/diente36.png';
 import diente37 from '../../assets/dientes/diente37.png';
 import diente38 from '../../assets/dientes/diente38.png';
-import diente42 from '../../assets/dientes/diente42.png';
 import diente41 from '../../assets/dientes/diente41.png';
+import diente42 from '../../assets/dientes/diente42.png';
 import diente43 from '../../assets/dientes/diente43.png';
 import diente44 from '../../assets/dientes/diente44.png';
 import diente45 from '../../assets/dientes/diente45.png';
 import diente46 from '../../assets/dientes/diente46.png';
 import diente47 from '../../assets/dientes/diente47.png';
 import diente48 from '../../assets/dientes/diente48.png';
-import ToothDetails from './ToothDetails';
-import { Close } from '@mui/icons-material';
-import colors from '../../styles/colors';
 import { useThemeContext } from '../../componemts/themeContext';
-import { Toaster } from 'react-hot-toast';
+import colors from '../../styles/colors';
+import ToothDetails from './ToothDetails';
 
 type DienteKeys =
   `diente${11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48}`;
@@ -121,6 +121,7 @@ const Odontogram = ({ odontogram }: Props) => {
   const { mode } = useThemeContext();
   const [open, setOpen] = useState(false);
   const [selectedTooth, setTooth] = useState<Diente>();
+  const [alertOpen, setAlertOpen] = useState(false);
 
   const [newOdontogram, setNewOdontogram] = useState<OdontogramInterface>({
     persona: '',
@@ -172,6 +173,53 @@ const Odontogram = ({ odontogram }: Props) => {
 
   return (
     <>
+      <Grid container spacing={5}>
+        <Grid item>
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={() => setAlertOpen(true)}
+          >
+            <Save /> Guardar Registro
+          </Button>
+          <Dialog
+            open={alertOpen}
+            onClose={() => setAlertOpen(false)}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">
+              {'¿Guardar registro de odontograma?'}
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                Al aceptar, se creará una nueva versión del odontograma en la
+                base de datos, ¿Está seguro(a) que esta es la versión que quiere
+                guardar?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                variant="contained"
+                color="inherit"
+                onClick={() => setAlertOpen(false)}
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={() => console.log('algo')}
+                autoFocus
+                variant="contained"
+              >
+                Guardar registro
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </Grid>
+        <Grid item xs={12}>
+          <Divider />
+        </Grid>
+      </Grid>
       <Container>
         <Grid container spacing={6}>
           <Grid item>
