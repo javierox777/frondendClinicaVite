@@ -79,9 +79,7 @@ const OdontogramTab = ({ odontograms }: Props) => {
         </Grid>
       )}
       <Grid item xs={12}>
-        <Card elevation={3}>
-          <Odontogram odontogram={selectedOdontogram} />
-        </Card>
+        <Odontogram odontogram={selectedOdontogram} />
       </Grid>
     </Grid>
   );

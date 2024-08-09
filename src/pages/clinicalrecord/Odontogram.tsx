@@ -7,6 +7,14 @@ import {
   DialogContentText,
   DialogTitle,
   Grid,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
   TextField,
   Typography,
 } from '@mui/material';
@@ -48,6 +56,8 @@ import diente47 from '../../assets/dientes/diente47.png';
 import diente48 from '../../assets/dientes/diente48.png';
 import ToothDetails from './ToothDetails';
 import { Close } from '@mui/icons-material';
+import colors from '../../styles/colors';
+import { useThemeContext } from '../../componemts/themeContext';
 
 type DienteKeys =
   `diente${11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48}`;
@@ -87,92 +97,204 @@ const dientesImages: Record<DienteKeys, string> = {
   diente48: diente48,
 };
 
+const tableHeadings = [
+  {
+    id: 1,
+    label: 'Pieza',
+  },
+  {
+    id: 2,
+    label: 'Estado',
+  },
+  {
+    id: 3,
+    label: 'Diagnóstico',
+  },
+];
+
 interface Props {
   odontogram: OdontogramInterface | undefined;
 }
 
 const Odontogram = ({ odontogram }: Props) => {
+  const { mode } = useThemeContext();
   const [open, setOpen] = useState(false);
   const [selectedTooth, setTooth] = useState<Diente>();
 
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(8);
+
   if (!odontogram) return null;
+
+  const handleChangePage = (
+    event: React.MouseEvent<HTMLButtonElement> | null,
+    newPage: number
+  ) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   return (
     <>
       <Container>
-        <Grid container spacing={1}>
-          {odontogram.dientes
-            .filter((d) => parseInt(d.pieza) < 31)
-            .map((d: Diente) => {
-              const dienteKey = `diente${d.pieza}` as DienteKeys;
-              return (
-                <Grid item xs key={d.pieza}>
-                  <Grid container justifyContent={'center'}>
-                    <Grid item>
-                      <Typography style={{ textAlign: 'center' }}>
-                        {d.pieza}
-                      </Typography>
+        <Grid container spacing={6}>
+          <Grid item>
+            <Grid container spacing={1}>
+              {odontogram.dientes
+                .filter((d) => parseInt(d.pieza) < 31)
+                .map((d: Diente) => {
+                  const dienteKey = `diente${d.pieza}` as DienteKeys;
+                  return (
+                    <Grid item xs key={d.pieza}>
+                      <Grid container justifyContent={'center'}>
+                        <Grid item>
+                          <Typography style={{ textAlign: 'center' }}>
+                            {d.pieza}
+                          </Typography>
+                        </Grid>
+                        <Grid
+                          item
+                          className="hover:scale-[1.05] cursor-pointer transition-all relative"
+                          onClick={() => {
+                            setTooth(d);
+                            setOpen(true);
+                          }}
+                        >
+                          {!d.activo && (
+                            <div className="absolute">
+                              <Close color="error" />
+                            </div>
+                          )}
+                          <img
+                            src={dientesImages[dienteKey]}
+                            height={200}
+                            width={50}
+                          />
+                        </Grid>
+                      </Grid>
                     </Grid>
-                    <Grid
-                      item
-                      className="hover:scale-[1.05] cursor-pointer transition-all relative"
-                      onClick={() => {
-                        setTooth(d);
-                        setOpen(true);
+                  );
+                })}
+            </Grid>
+            <Grid container spacing={1} alignItems={'baseline'}>
+              {odontogram.dientes
+                .filter((d) => parseInt(d.pieza) >= 31)
+                .map((d: Diente) => {
+                  const dienteKey = `diente${d.pieza}` as DienteKeys;
+                  return (
+                    <Grid item xs key={d.pieza}>
+                      <Grid container justifyContent={'center'}>
+                        <Grid
+                          item
+                          className="hover:scale-[1.05] cursor-pointer transition-all relative"
+                          onClick={() => {
+                            setTooth(d);
+                            setOpen(true);
+                          }}
+                        >
+                          {!d.activo && (
+                            <div className="absolute">
+                              <Close color="error" />
+                            </div>
+                          )}
+                          <img
+                            src={dientesImages[dienteKey]}
+                            height={200}
+                            width={50}
+                          />
+                        </Grid>
+                        <Grid item>
+                          <Typography style={{ textAlign: 'center' }}>
+                            {d.pieza}
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                  );
+                })}
+            </Grid>
+          </Grid>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={12}>
+                <TableContainer component={Paper} elevation={3}>
+                  <Table>
+                    <TableHead
+                      style={{
+                        backgroundColor:
+                          mode === 'light'
+                            ? colors.lightModeTableHead
+                            : colors.darkModeTableHead,
                       }}
                     >
-                      {!d.activo && (
-                        <div className="absolute">
-                          <Close color="error" />
-                        </div>
-                      )}
-                      <img
-                        src={dientesImages[dienteKey]}
-                        height={200}
-                        width={50}
-                      />
-                    </Grid>
-                  </Grid>
-                </Grid>
-              );
-            })}
-        </Grid>
-        <Grid container spacing={1} alignItems={'baseline'}>
-          {odontogram.dientes
-            .filter((d) => parseInt(d.pieza) >= 31)
-            .map((d: Diente) => {
-              const dienteKey = `diente${d.pieza}` as DienteKeys;
-              return (
-                <Grid item xs key={d.pieza}>
-                  <Grid container justifyContent={'center'}>
-                    <Grid
-                      item
-                      className="hover:scale-[1.05] cursor-pointer transition-all relative"
-                      onClick={() => {
-                        setTooth(d);
-                        setOpen(true);
-                      }}
-                    >
-                      {!d.activo && (
-                        <div className="absolute">
-                          <Close color="error" />
-                        </div>
-                      )}
-                      <img
-                        src={dientesImages[dienteKey]}
-                        height={200}
-                        width={50}
-                      />
-                    </Grid>
-                    <Grid item>
-                      <Typography style={{ textAlign: 'center' }}>
-                        {d.pieza}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              );
-            })}
+                      {tableHeadings.map((h) => {
+                        return (
+                          <TableCell
+                            style={{
+                              fontWeight: 'bold',
+                              color:
+                                mode === 'light'
+                                  ? colors.lightModeTableText
+                                  : 'white',
+                            }}
+                            key={h.id}
+                          >
+                            {h.label}
+                          </TableCell>
+                        );
+                      })}
+                    </TableHead>
+                    <TableBody>
+                      {odontogram.dientes
+                        ?.slice(
+                          page * rowsPerPage,
+                          page * rowsPerPage + rowsPerPage
+                        )
+                        .map((d: Diente) => {
+                          return (
+                            <TableRow key={d._id}>
+                              <TableCell
+                                className="cursor-pointer"
+                                style={{
+                                  fontWeight: 'bold',
+                                  color:
+                                    mode === 'light'
+                                      ? colors.lightModeTableText
+                                      : 'white',
+                                }}
+                                onClick={() => {
+                                  setTooth(d);
+                                  setOpen(true);
+                                }}
+                              >
+                                {d.pieza}
+                              </TableCell>
+                              <TableCell>{d.estado}</TableCell>
+                              <TableCell>{d.diagnostico}</TableCell>
+                            </TableRow>
+                          );
+                        })}
+                    </TableBody>
+                  </Table>
+                  <TablePagination
+                    page={page}
+                    onPageChange={handleChangePage}
+                    count={odontogram.dientes?.length}
+                    component="div"
+                    rowsPerPage={rowsPerPage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    rowsPerPageOptions={[8, 16, 32]}
+                  />
+                </TableContainer>
+              </Grid>
+            </Grid>
+          </Grid>
         </Grid>
       </Container>
       <ToothDetails
