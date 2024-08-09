@@ -9,6 +9,9 @@ import {
   Grid,
   Typography,
   Divider,
+  Switch,
+  FormControl,
+  FormControlLabel,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { Diente } from '../../interfaces/Diente';
@@ -159,9 +162,11 @@ const ToothDetails = ({ open, setOpen, tooth }: Props) => {
         },
       }}
     >
-      <DialogTitle>Pieza {tooth?.pieza}</DialogTitle>
+      <DialogTitle>
+        Pieza {tooth?.pieza} {!tooth?.activo && '(Diente ausente)'}
+      </DialogTitle>
       <DialogContent>
-        <Grid container spacing={2}>
+        <Grid container spacing={2} alignItems="center">
           <Grid item xs={12}>
             <Tooth
               setPartParent={(part: string) => {
@@ -172,32 +177,59 @@ const ToothDetails = ({ open, setOpen, tooth }: Props) => {
               }}
             />
           </Grid>
+          <Grid item>
+            <Typography style={{ fontWeight: 'lighter' }}>
+              Habilitar/Deshabilitar pieza
+            </Typography>
+          </Grid>
+          <Grid item>
+            <FormControlLabel
+              label={editTooth?.activo ? 'Diente habilitado' : 'Diente ausente'}
+              control={
+                <Switch
+                  checked={editTooth?.activo}
+                  onChange={() => {
+                    const value = editTooth.activo ? false : true;
+
+                    setToothProp('activo', value);
+                  }}
+                />
+              }
+            />
+          </Grid>
           <Grid item xs={12}>
             <Typography style={{ fontWeight: 'bold' }}>
               Información general del diente
             </Typography>
           </Grid>
           <Grid item>
-            <TextField
-              value={editTooth.detalle}
-              label="Nota"
-              InputLabelProps={{ shrink: true }}
-            />
+            <FormControl>
+              <TextField
+                value={editTooth.detalle}
+                label="Nota"
+                InputLabelProps={{ shrink: true }}
+              />
+            </FormControl>
           </Grid>
           <Grid item>
-            <TextField
-              value={editTooth?.diagnostico}
-              label="Diagnostico"
-              InputLabelProps={{ shrink: true }}
-            />
+            <FormControl>
+              <TextField
+                value={editTooth?.diagnostico}
+                label="Diagnostico"
+                InputLabelProps={{ shrink: true }}
+              />
+            </FormControl>
           </Grid>
           <Grid item>
-            <TextField
-              value={editTooth?.estado}
-              label="Estado"
-              InputLabelProps={{ shrink: true }}
-            />
+            <FormControl>
+              <TextField
+                value={editTooth?.estado}
+                label="Estado"
+                InputLabelProps={{ shrink: true }}
+              />
+            </FormControl>
           </Grid>
+
           <Grid item xs={12}>
             <Divider />
           </Grid>
