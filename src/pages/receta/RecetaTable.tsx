@@ -1,6 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Box, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, TextField, Switch
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  Box,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+  TextField,
+  Switch,
 } from '@mui/material';
 import { useSpring, animated } from '@react-spring/web';
 import RecetaForm from './RecetaForm';
@@ -78,10 +93,10 @@ const Receta: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/api/receipt");
+      const response = await axios.get('http://localhost:3000/api/receipt');
       setFormData(response.data.body);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error('Error fetching data:', error);
     }
   };
 
@@ -129,7 +144,11 @@ const Receta: React.FC = () => {
 
   const textAnimationProps = useSpring({
     from: { transform: 'scale(1)', opacity: 1 },
-    to: { transform: (rowOpen || editOpen || pdfOpen || open) ? 'scale(1.1)' : 'scale(1)', opacity: (rowOpen || editOpen || pdfOpen || open) ? 1 : 0 },
+    to: {
+      transform:
+        rowOpen || editOpen || pdfOpen || open ? 'scale(1.1)' : 'scale(1)',
+      opacity: rowOpen || editOpen || pdfOpen || open ? 1 : 0,
+    },
     config: { tension: 300, friction: 25 },
   });
 
@@ -200,20 +219,22 @@ const Receta: React.FC = () => {
       await axios.delete(`http://localhost:3000/api/receipt/${id}`);
       fetchData(); // Refresca los datos después de eliminar la receta
     } catch (error) {
-      console.error("Error deleting data:", error);
+      console.error('Error deleting data:', error);
     }
   };
 
   const handleEstadoChange = async (id: string, estado: boolean) => {
     try {
-      await axios.put(`http://localhost:3000/api/receipt/${id}`, { estado_id: estado });
-      setFormData((prevData) => 
-        prevData.map((item) => 
+      await axios.put(`http://localhost:3000/api/receipt/${id}`, {
+        estado_id: estado,
+      });
+      setFormData((prevData) =>
+        prevData.map((item) =>
           item._id === id ? { ...item, estado_id: estado } : item
         )
       ); // Actualiza el estado localmente
     } catch (error) {
-      console.error("Error updating estado:", error);
+      console.error('Error updating estado:', error);
     }
   };
 
@@ -240,7 +261,7 @@ const Receta: React.FC = () => {
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save("receta.pdf");
+      pdf.save('receta.pdf');
     }
   };
 
@@ -287,18 +308,38 @@ const Receta: React.FC = () => {
                 <TableCell>{row.estado_id ? 'Activo' : 'Inactivo'}</TableCell>
                 <TableCell>{`${row.profesional_id.nombre1} ${row.profesional_id.nombre2} ${row.profesional_id.apellPat} ${row.profesional_id.apellMat}`}</TableCell>
                 <TableCell>{row.empresa_id.razonSocial}</TableCell>
-                <TableCell>{new Date(row.fechaRegistro).toLocaleDateString()}</TableCell>
+                <TableCell>
+                  {new Date(row.fechaRegistro).toLocaleDateString()}
+                </TableCell>
                 <TableCell>{row.direccion}</TableCell> {/* Nuevo campo */}
                 <TableCell>{row.recetaDetalle.join(', ')}</TableCell>
                 <TableCell>
                   <Box display="flex" flexDirection="row">
-                    <IconButton color="primary" onClick={(e) => { e.stopPropagation(); handlePdfClickOpen(row); }}>
+                    <IconButton
+                      color="primary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePdfClickOpen(row);
+                      }}
+                    >
                       <PictureAsPdfIcon />
                     </IconButton>
-                    <IconButton color="primary" onClick={(e) => { e.stopPropagation(); handleEditClickOpen(row); }}>
+                    <IconButton
+                      color="primary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditClickOpen(row);
+                      }}
+                    >
                       <EditIcon />
                     </IconButton>
-                    <IconButton color="secondary" onClick={(e) => { e.stopPropagation(); handleDelete(row._id); }}>
+                    <IconButton
+                      color="secondary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(row._id);
+                      }}
+                    >
                       <DeleteIcon />
                     </IconButton>
                   </Box>
@@ -318,9 +359,20 @@ const Receta: React.FC = () => {
         </Table>
       </TableContainer>
 
-      <AnimatedDialog open={open} onClose={handleClose} maxWidth="sm" fullWidth style={createAnimation}>
-        <AnimatedDialogTitle className="modal-title" style={textAnimationProps}>Crear Receta</AnimatedDialogTitle>
-        <AnimatedDialogContent className="modal-content" style={createAnimation}>
+      <AnimatedDialog
+        open={open}
+        onClose={handleClose}
+        maxWidth="sm"
+        fullWidth
+        style={createAnimation}
+      >
+        <AnimatedDialogTitle className="modal-title" style={textAnimationProps}>
+          Crear Receta
+        </AnimatedDialogTitle>
+        <AnimatedDialogContent
+          className="modal-content"
+          style={createAnimation}
+        >
           <RecetaForm onSuccess={handleSuccess} />
         </AnimatedDialogContent>
         <DialogActions className="modal-actions">
@@ -330,10 +382,23 @@ const Receta: React.FC = () => {
         </DialogActions>
       </AnimatedDialog>
 
-      <AnimatedDialog open={editOpen} onClose={handleEditClose} maxWidth="sm" fullWidth style={editAnimation}>
-        <AnimatedDialogTitle className="modal-title" style={textAnimationProps}>Editar Receta</AnimatedDialogTitle>
+      <AnimatedDialog
+        open={editOpen}
+        onClose={handleEditClose}
+        maxWidth="sm"
+        fullWidth
+        style={editAnimation}
+      >
+        <AnimatedDialogTitle className="modal-title" style={textAnimationProps}>
+          Editar Receta
+        </AnimatedDialogTitle>
         <AnimatedDialogContent className="modal-content" style={editAnimation}>
-          {selectedReceta && <EditRecetaForm receta={transformReceta(selectedReceta)} onSuccess={handleSuccess} />}
+          {selectedReceta && (
+            <EditRecetaForm
+              receta={transformReceta(selectedReceta)}
+              onSuccess={handleSuccess}
+            />
+          )}
         </AnimatedDialogContent>
         <DialogActions className="modal-actions">
           <Button onClick={handleEditClose} color="primary">
@@ -342,12 +407,29 @@ const Receta: React.FC = () => {
         </DialogActions>
       </AnimatedDialog>
 
-      <AnimatedDialog open={pdfOpen} onClose={handlePdfClose} maxWidth="md" fullWidth style={pdfAnimation}>
-        <AnimatedDialogTitle className="modal-title" style={{ ...textAnimationProps, textAlign: 'left', paddingLeft: '50px' }}>
+      <AnimatedDialog
+        open={pdfOpen}
+        onClose={handlePdfClose}
+        maxWidth="md"
+        fullWidth
+        style={pdfAnimation}
+      >
+        <AnimatedDialogTitle
+          className="modal-title"
+          style={{
+            ...textAnimationProps,
+            textAlign: 'left',
+            paddingLeft: '50px',
+          }}
+        >
           Vista previa de la Receta
         </AnimatedDialogTitle>
         <AnimatedDialogContent className="modal-content" style={pdfAnimation}>
-          {selectedReceta && <div id="pdf-content"><RecetaTemplate receta={selectedReceta} /></div>}
+          {selectedReceta && (
+            <div id="pdf-content">
+              <RecetaTemplate receta={selectedReceta} />
+            </div>
+          )}
         </AnimatedDialogContent>
         <DialogActions className="modal-actions">
           <Button onClick={exportPDF} color="primary">
@@ -359,19 +441,53 @@ const Receta: React.FC = () => {
         </DialogActions>
       </AnimatedDialog>
 
-      <AnimatedDialog open={rowOpen} onClose={handleRowClose} maxWidth="md" fullWidth style={rowAnimation}>
-        <AnimatedDialogTitle className="modal-title" ml="10mm" style={textAnimationProps}>Detalles de la Receta</AnimatedDialogTitle>
+      <AnimatedDialog
+        open={rowOpen}
+        onClose={handleRowClose}
+        maxWidth="md"
+        fullWidth
+        style={rowAnimation}
+      >
+        <AnimatedDialogTitle
+          className="modal-title"
+          ml="10mm"
+          style={textAnimationProps}
+        >
+          Detalles de la Receta
+        </AnimatedDialogTitle>
         <AnimatedDialogContent className="modal-content" style={rowAnimation}>
           {selectedRow && (
             <div>
-              <p><strong>Estado:</strong> {selectedRow.estado_id ? 'Activo' : 'Inactivo'}</p>
-              <p><strong>Profesional:</strong> {`${selectedRow.profesional_id.nombre1} ${selectedRow.profesional_id.nombre2} ${selectedRow.profesional_id.apellPat} ${selectedRow.profesional_id.apellMat}`}</p>
-              <p><strong>Empresa:</strong> {selectedRow.empresa_id.razonSocial}</p>
-              <p><strong>Fecha Registro:</strong> {new Date(selectedRow.fechaRegistro).toLocaleDateString()}</p>
-              <p><strong>Rut:</strong> {selectedRow.persona_id.rut}</p>
-              <p><strong>Nombre:</strong> {`${selectedRow.persona_id.nombre1} ${selectedRow.persona_id.nombre2} ${selectedRow.persona_id.apellPat} ${selectedRow.persona_id.apellMat}`}</p>
-              <p><strong>Dirección:</strong> {selectedRow.direccion}</p> {/* Nuevo campo */}
-              <p><strong>Receta Detalle:</strong> {selectedRow.recetaDetalle.join(', ')}</p>
+              <p>
+                <strong>Estado:</strong>{' '}
+                {selectedRow.estado_id ? 'Activo' : 'Inactivo'}
+              </p>
+              <p>
+                <strong>Profesional:</strong>{' '}
+                {`${selectedRow.profesional_id.nombre1} ${selectedRow.profesional_id.nombre2} ${selectedRow.profesional_id.apellPat} ${selectedRow.profesional_id.apellMat}`}
+              </p>
+              <p>
+                <strong>Empresa:</strong> {selectedRow.empresa_id.razonSocial}
+              </p>
+              <p>
+                <strong>Fecha Registro:</strong>{' '}
+                {new Date(selectedRow.fechaRegistro).toLocaleDateString()}
+              </p>
+              <p>
+                <strong>Rut:</strong> {selectedRow.persona_id.rut}
+              </p>
+              <p>
+                <strong>Nombre:</strong>{' '}
+                {`${selectedRow.persona_id.nombre1} ${selectedRow.persona_id.nombre2} ${selectedRow.persona_id.apellPat} ${selectedRow.persona_id.apellMat}`}
+              </p>
+              <p>
+                <strong>Dirección:</strong> {selectedRow.direccion}
+              </p>{' '}
+              {/* Nuevo campo */}
+              <p>
+                <strong>Receta Detalle:</strong>{' '}
+                {selectedRow.recetaDetalle.join(', ')}
+              </p>
             </div>
           )}
         </AnimatedDialogContent>

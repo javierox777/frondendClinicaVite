@@ -3,7 +3,7 @@ import { Person } from "./Person";
 import { Professional } from "./Professional";
 
 export interface OdontogramInterface {
-    _id: string;
+    _id?: string;
     persona: string | Person
     version: number
     fecha: string;

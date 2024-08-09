@@ -17,6 +17,7 @@ import React, { useEffect, useState } from 'react';
 import { Diente } from '../../interfaces/Diente';
 import Tooth from '../../componemts/Tooth';
 import { ToothPart } from '../../interfaces/ToothPart';
+import toast from 'react-hot-toast';
 
 type TeethPartKeys =
   | 'bucal'
@@ -30,6 +31,7 @@ interface Props {
   open: boolean;
   setOpen: CallableFunction;
   tooth: Diente | undefined;
+  onSave: CallableFunction;
 }
 
 type PartName =
@@ -48,7 +50,7 @@ type PartProperties = {
   estado?: string;
 };
 
-const ToothDetails = ({ open, setOpen, tooth }: Props) => {
+const ToothDetails = ({ open, setOpen, tooth, onSave }: Props) => {
   const [selectedPart, setPart] = useState('');
 
   const [toothPart, setToothPart] = useState<ToothPart>();
@@ -158,7 +160,9 @@ const ToothDetails = ({ open, setOpen, tooth }: Props) => {
         component: 'form',
         onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
           event.preventDefault();
-          console.log(editTooth);
+          onSave(editTooth, tooth?._id);
+          toast.success('Cambios guardados');
+          setOpen(false);
         },
       }}
     >
@@ -208,6 +212,9 @@ const ToothDetails = ({ open, setOpen, tooth }: Props) => {
                 value={editTooth.detalle}
                 label="Nota"
                 InputLabelProps={{ shrink: true }}
+                onChange={(e) => {
+                  setToothProp('detalle', e.target.value);
+                }}
               />
             </FormControl>
           </Grid>
@@ -217,6 +224,9 @@ const ToothDetails = ({ open, setOpen, tooth }: Props) => {
                 value={editTooth?.diagnostico}
                 label="Diagnostico"
                 InputLabelProps={{ shrink: true }}
+                onChange={(e) => {
+                  setToothProp('diagnostico', e.target.value);
+                }}
               />
             </FormControl>
           </Grid>
@@ -226,6 +236,9 @@ const ToothDetails = ({ open, setOpen, tooth }: Props) => {
                 value={editTooth?.estado}
                 label="Estado"
                 InputLabelProps={{ shrink: true }}
+                onChange={(e) => {
+                  setToothProp('estado', e.target.value);
+                }}
               />
             </FormControl>
           </Grid>

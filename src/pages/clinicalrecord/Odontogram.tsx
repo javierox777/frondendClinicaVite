@@ -18,7 +18,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { OdontogramInterface } from '../../interfaces/Odontogram';
 import { Diente } from '../../interfaces/Diente';
 
@@ -58,6 +58,7 @@ import ToothDetails from './ToothDetails';
 import { Close } from '@mui/icons-material';
 import colors from '../../styles/colors';
 import { useThemeContext } from '../../componemts/themeContext';
+import { Toaster } from 'react-hot-toast';
 
 type DienteKeys =
   `diente${11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48}`;
@@ -121,8 +122,22 @@ const Odontogram = ({ odontogram }: Props) => {
   const [open, setOpen] = useState(false);
   const [selectedTooth, setTooth] = useState<Diente>();
 
+  const [newOdontogram, setNewOdontogram] = useState<OdontogramInterface>({
+    persona: '',
+    fecha: '',
+    dientes: [],
+    version: 0,
+    profesionalModifica: '',
+  });
+
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(8);
+
+  useEffect(() => {
+    if (odontogram) {
+      setNewOdontogram(odontogram);
+    }
+  }, [odontogram]);
 
   if (!odontogram) return null;
 
@@ -140,18 +155,33 @@ const Odontogram = ({ odontogram }: Props) => {
     setPage(0);
   };
 
+  const handleToothChange = (tooth: Diente, id: string) => {
+    const teeth = [...newOdontogram.dientes];
+
+    const indexOfOldTooth = newOdontogram?.dientes.findIndex(
+      (d: Diente) => d._id === id
+    );
+
+    teeth[indexOfOldTooth] = tooth;
+
+    setNewOdontogram((prevState) => ({
+      ...prevState,
+      dientes: [...teeth],
+    }));
+  };
+
   return (
     <>
       <Container>
         <Grid container spacing={6}>
           <Grid item>
             <Grid container spacing={1}>
-              {odontogram.dientes
+              {newOdontogram.dientes
                 .filter((d) => parseInt(d.pieza) < 31)
                 .map((d: Diente) => {
                   const dienteKey = `diente${d.pieza}` as DienteKeys;
                   return (
-                    <Grid item xs key={d.pieza}>
+                    <Grid item xs key={d._id}>
                       <Grid container justifyContent={'center'}>
                         <Grid item>
                           <Typography style={{ textAlign: 'center' }}>
@@ -183,12 +213,12 @@ const Odontogram = ({ odontogram }: Props) => {
                 })}
             </Grid>
             <Grid container spacing={1} alignItems={'baseline'}>
-              {odontogram.dientes
+              {newOdontogram.dientes
                 .filter((d) => parseInt(d.pieza) >= 31)
                 .map((d: Diente) => {
                   const dienteKey = `diente${d.pieza}` as DienteKeys;
                   return (
-                    <Grid item xs key={d.pieza}>
+                    <Grid item xs key={d._id}>
                       <Grid container justifyContent={'center'}>
                         <Grid
                           item
@@ -251,7 +281,7 @@ const Odontogram = ({ odontogram }: Props) => {
                       })}
                     </TableHead>
                     <TableBody>
-                      {odontogram.dientes
+                      {newOdontogram.dientes
                         ?.slice(
                           page * rowsPerPage,
                           page * rowsPerPage + rowsPerPage
@@ -275,8 +305,28 @@ const Odontogram = ({ odontogram }: Props) => {
                               >
                                 {d.pieza}
                               </TableCell>
-                              <TableCell>{d.estado}</TableCell>
-                              <TableCell>{d.diagnostico}</TableCell>
+                              <TableCell
+                                style={{
+                                  color:
+                                    mode === 'light'
+                                      ? colors.lightModeTableText
+                                      : 'white',
+                                }}
+                              >
+                                {d.activo && d.estado}{' '}
+                                {!d.activo && 'Diente ausente'}
+                              </TableCell>
+                              <TableCell
+                                style={{
+                                  color:
+                                    mode === 'light'
+                                      ? colors.lightModeTableText
+                                      : 'white',
+                                }}
+                              >
+                                {d.activo && d.diagnostico}{' '}
+                                {!d.activo && 'Diente ausente'}
+                              </TableCell>
                             </TableRow>
                           );
                         })}
@@ -301,7 +351,9 @@ const Odontogram = ({ odontogram }: Props) => {
         open={open}
         setOpen={() => setOpen(false)}
         tooth={selectedTooth}
+        onSave={handleToothChange}
       />
+      <Toaster />
     </>
   );
 };
