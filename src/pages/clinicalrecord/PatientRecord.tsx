@@ -143,7 +143,14 @@ const PatientRecord = () => {
             <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
               <TableContainer component={Paper}>
                 <Table>
-                  <TableHead>
+                  <TableHead
+                    style={{
+                      backgroundColor:
+                        mode === 'light'
+                          ? colors.lightModeTableHead
+                          : colors.darkModeTableHead,
+                    }}
+                  >
                     <TableRow>
                       {tableHeadings.map((h) => {
                         return (
@@ -184,15 +191,15 @@ const PatientRecord = () => {
                       })}
                   </TableBody>
                 </Table>
+                <TablePagination
+                  page={page}
+                  onPageChange={handleChangePage}
+                  count={appointments?.length}
+                  component="div"
+                  rowsPerPage={rowsPerPage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                />
               </TableContainer>
-              <TablePagination
-                page={page}
-                onPageChange={handleChangePage}
-                count={appointments?.length}
-                component="div"
-                rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-              />
             </Grid>
           )}
         </CustomTabPanel>

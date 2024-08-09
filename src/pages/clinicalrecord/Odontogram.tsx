@@ -222,7 +222,7 @@ const Odontogram = ({ odontogram }: Props) => {
           </Grid>
           <Grid item xs={12}>
             <Grid container>
-              <Grid item xs={12}>
+              <Grid item xs={6}>
                 <TableContainer component={Paper} elevation={3}>
                   <Table>
                     <TableHead
