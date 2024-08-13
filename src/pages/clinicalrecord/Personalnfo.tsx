@@ -118,9 +118,10 @@ const Personalnfo = ({ patient }: Props) => {
                 <Divider />
                 <Typography
                   style={{
-                    fontWeight: 'bold',
+                    fontWeight: 'lighter',
                     color:
                       mode === 'light' ? colors.lightModeTableText : 'white',
+                    textTransform: 'capitalize',
                   }}
                 >
                   {' '}
@@ -155,13 +156,14 @@ const Personalnfo = ({ patient }: Props) => {
                 <Divider />
                 <Typography
                   style={{
-                    fontWeight: 'bold',
+                    fontWeight: 'lighter',
                     color:
                       mode === 'light' ? colors.lightModeTableText : 'white',
+                    textTransform: 'capitalize',
                   }}
                 >
                   {' '}
-                  {a.tipoDireccion.nombre}
+                  {a.tipoDireccion.nombre.toLowerCase()}
                 </Typography>
                 <Typography>{a.nombre}</Typography>
                 <Divider />

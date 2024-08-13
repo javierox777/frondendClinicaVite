@@ -22,9 +22,6 @@ const PatientsPage = () => {
             Registrar nuevo paciente
           </Button>
         </Grid>
-        <Grid item>
-          <TotalPatients />
-        </Grid>
         <Grid item xs={12}>
           <PatientsTable refetch={formSubmitted} />
         </Grid>
