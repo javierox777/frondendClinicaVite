@@ -1,5 +1,6 @@
 import {
   Button,
+  IconButton,
   InputAdornment,
   Paper,
   Table,
@@ -19,7 +20,7 @@ import axios from 'axios';
 import { generalConfig } from '../../config';
 import TableSkeleton from '../../componemts/TableSkeleton';
 import { Professional } from '../../interfaces/Professional';
-import { Search } from '@mui/icons-material';
+import { Edit, Search } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
 interface Props {
@@ -162,17 +163,16 @@ const ProfessionalsTable = ({ refetch }: Props) => {
                     <TableCell>{p.email}</TableCell>
                     <TableCell>{p.celular}</TableCell>
                     <TableCell>
-                      <Button
+                      <IconButton
                         color="success"
-                        variant="outlined"
                         onClick={() =>
                           navigation('/editarprofesional', {
                             state: { professional: p },
                           })
                         }
                       >
-                        Editar
-                      </Button>
+                        <Edit />
+                      </IconButton>
                     </TableCell>
                   </TableRow>
                 );

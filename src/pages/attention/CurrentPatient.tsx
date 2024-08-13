@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Appointment } from '../../interfaces/Appointment';
 import {
   Button,
   ButtonGroup,
   Container,
   Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Divider,
   Grid,
   Modal,
@@ -17,10 +21,14 @@ import { generalConfig } from '../../config';
 import toast, { Toaster } from 'react-hot-toast';
 import StatusBadge from '../../componemts/StatusBadge';
 import RecetaDetailsPage from '../receta/RecetaDetailsPage';
+import PatientRecord from '../clinicalrecord/PatientRecord';
 
 const CurrentPatient = () => {
   const [completed, setCompleted] = useState(false);
   const [recepitOpen, setReceipt] = useState(false);
+  const [alertOpen, setAlert] = useState(false);
+  const [isSubmitting, setSubmitting] = useState(false);
+  const navigation = useNavigate();
 
   const appointment: Appointment = useLocation().state.appointment;
 
@@ -52,15 +60,25 @@ const CurrentPatient = () => {
       <Container>
         <Grid container direction="column" spacing={2}>
           <Grid item xs={12}>
-            <ButtonGroup>
-              <Button variant="contained">FICHA CLÍNICA</Button>
+            <ButtonGroup fullWidth>
+              <Button
+                variant="contained"
+                onClick={() =>
+                  navigation('/fichaclinica', {
+                    state: { patient: appointment.persona },
+                  })
+                }
+              >
+                FICHA CLÍNICA
+              </Button>
               <Button variant="contained" onClick={() => setReceipt(true)}>
                 CREAR RECETA
               </Button>
               <Button
                 variant="contained"
                 color="secondary"
-                onClick={handleComplete}
+                onClick={() => setAlert(true)}
+                disabled={appointment.estado === 'COMPLETADO'}
               >
                 FINALIZAR CITA
               </Button>
@@ -122,10 +140,6 @@ const CurrentPatient = () => {
                   {appointment.persona.institucion.prevision.nombre}
                 </Typography>
               </Grid>
-              <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-                <Typography style={{ fontWeight: 'bold' }}>Sexo</Typography>
-                <Typography>{appointment.persona.sexo.nombre}</Typography>
-              </Grid>
             </Grid>
           </Grid>
           {/* DATOS DEL PACIENTE */}
@@ -175,6 +189,37 @@ const CurrentPatient = () => {
       <Modal open={recepitOpen} onClose={() => setReceipt(false)}>
         <RecetaForm onSuccess={() => console.log('hola')} />
       </Modal>
+      <Dialog
+        open={alertOpen}
+        onClose={() => setAlert(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{'¿Finalizar cita?'}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            La cita se registrará como finalizada, ¿Desea continuar?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            color="inherit"
+            onClick={() => setAlert(false)}
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleComplete}
+            autoFocus
+            variant="contained"
+            disabled={isSubmitting}
+          >
+            {isSubmitting && 'Finalizando cita'}
+            {!isSubmitting && 'Finalizar Cita'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

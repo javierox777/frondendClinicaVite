@@ -1,4 +1,5 @@
 import {
+  Box,
   Card,
   Container,
   Divider,
@@ -7,7 +8,13 @@ import {
   InputAdornment,
   LinearProgress,
   Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
   TablePagination,
+  TableRow,
   TextField,
   Typography,
 } from '@mui/material';
@@ -15,7 +22,15 @@ import React, { useState } from 'react';
 import { useThemeContext } from '../../componemts/themeContext';
 import { Budget } from '../../interfaces/Budget';
 import colors from '../../styles/colors';
-import { Check, Edit, Search } from '@mui/icons-material';
+import {
+  Cancel,
+  Check,
+  CheckCircle,
+  CloseRounded,
+  Edit,
+  Pending,
+  Search,
+} from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
 interface Props {
@@ -47,12 +62,7 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
     },
     {
       id: 4,
-      label: 'Tipo presupuesto',
-      hide: true,
-    },
-    {
-      id: 5,
-      label: 'Estado',
+      label: 'Validado',
       hide: true,
     },
   ];
@@ -98,7 +108,7 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
 
   return (
     <>
-      <Grid container>
+      <Grid container spacing={2}>
         <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
           <TextField
             value={searchText}
@@ -115,121 +125,97 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
             fullWidth
           />
         </Grid>
-        <Grid
-          item
-          xs={12}
-          sx={{
-            backgroundColor:
-              mode === 'light'
-                ? colors.lightModeTableHead
-                : colors.darkModeTableHead,
-            padding: 3,
-          }}
-        >
-          <Grid container direction="row" justifyContent="space-between">
-            {headings.map((h: any) => {
-              return (
-                <Grid
-                  item
-                  key={h.id}
-                  xs={2}
-                  display={{
-                    xs: h.hide ? 'none' : 'flex',
-                    sm: h.hide ? 'none' : 'flex',
-                    md: h.hide ? 'none' : 'flex',
-                    lg: 'flex',
-                    xl: 'flex',
-                  }}
-                >
-                  <Typography sx={{ fontWeight: 'bold' }}>{h.label}</Typography>
-                </Grid>
-              );
-            })}
-          </Grid>
-        </Grid>
-        {filteredBudgets
-          ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-          .map((b: Budget) => {
-            return (
-              <Grid
-                container
-                key={b._id}
-                justifyContent="space-between"
-                sx={{ padding: 2, minHeight: '5rem' }}
-                className={`hover:scale-[1.01] transition-all duration-300 cursor-pointer ${mode === 'light' ? 'hover:bg-slate-100' : 'hover:bg-slate-900'}`}
-                onClick={() => {
-                  navigation('/presupuestodetalle', {
-                    state: { budget: b },
-                  });
+        <Grid item xs={12}>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead
+                style={{
+                  backgroundColor:
+                    mode === 'light'
+                      ? colors.lightModeTableHead
+                      : colors.darkModeTableHead,
                 }}
               >
-                <Grid item xs={2}>
-                  <Typography
-                    style={{
-                      fontWeight: 'bold',
-                      color:
-                        mode === 'light' ? colors.lightModeTableText : 'white',
-                      textTransform: 'capitalize',
-                    }}
-                  >
-                    {b.persona.nombre1.toLowerCase()}{' '}
-                    {b.persona.apellPat.toLowerCase()}
-                  </Typography>
-                </Grid>
-                <Grid item xs={2}>
-                  <Typography>{b.persona.rut}</Typography>
-                </Grid>
-                <Grid item xs={2}>
-                  <Typography>
-                    {new Date(b.fechaRegistro).toLocaleDateString()}
-                  </Typography>
-                </Grid>
-                <Grid
-                  item
-                  xs={2}
-                  display={{
-                    xs: 'none',
-                    sm: 'none',
-                    md: 'none',
-                    lg: 'flex',
-                    xl: 'flex',
-                  }}
-                >
-                  <Typography>{b.presupuestoTipo.nombre}</Typography>
-                </Grid>
-                <Grid
-                  item
-                  xs={2}
-                  display={{
-                    xs: 'none',
-                    sm: 'none',
-                    md: 'none',
-                    lg: 'flex',
-                    xl: 'flex',
-                  }}
-                >
-                  {b.profesionalValida ? (
-                    <Check color="success" />
-                  ) : (
-                    <Typography style={{ color: colors.ligthModeSoftText }}>
-                      VALIDACIÓN PENDIENTE
-                    </Typography>
-                  )}
-                </Grid>
-                <Grid item xs={12}>
-                  <Divider />
-                </Grid>
-              </Grid>
-            );
-          })}
-        <TablePagination
-          page={page}
-          onPageChange={handleChangePage}
-          count={budgets?.length}
-          component="div"
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+                <TableRow>
+                  {headings.map((h) => {
+                    return (
+                      <TableCell
+                        key={h.id}
+                        style={{
+                          fontWeight: 'bold',
+                          color:
+                            mode === 'light'
+                              ? colors.lightModeTableText
+                              : 'white',
+                        }}
+                      >
+                        {h.label}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredBudgets
+                  ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((b: Budget) => {
+                    return (
+                      <TableRow key={b._id}>
+                        <TableCell
+                          className="cursor-pointer"
+                          style={{
+                            fontWeight: 'bold',
+                            color:
+                              mode === 'light'
+                                ? colors.lightModeTableText
+                                : 'white',
+                          }}
+                          onClick={() => {
+                            navigation('/presupuestodetalle', {
+                              state: { budget: b },
+                            });
+                          }}
+                        >
+                          {b.persona.nombre1} {b.persona.apellPat}
+                        </TableCell>
+                        <TableCell>{b.persona.rut}</TableCell>
+                        <TableCell>
+                          {new Date(b.fechaRegistro).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          {b.profesionalValida ? (
+                            <CheckCircle color="success" />
+                          ) : (
+                            <Pending color="warning" />
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+              </TableBody>
+            </Table>
+            <TablePagination
+              page={page}
+              onPageChange={handleChangePage}
+              count={budgets?.length}
+              component="div"
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </TableContainer>
+        </Grid>
+        <Grid item xs={12}>
+          <Grid container direction={'row'}>
+            <Grid item xs={1}>
+              <CheckCircle color="success" />
+              <Typography>Validado</Typography>
+            </Grid>
+            <Grid item xs={2}>
+              <Pending color="warning" />
+              <Typography>Validación pendiente</Typography>
+            </Grid>
+          </Grid>
+        </Grid>
       </Grid>
     </>
   );

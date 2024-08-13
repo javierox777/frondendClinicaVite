@@ -30,6 +30,8 @@ import { Person } from '../../interfaces/Person';
 import { Appointment } from '../../interfaces/Appointment';
 import ProgressLine from 'rsuite/esm/Progress/ProgressLine';
 import OdontogramTab from './OdontogramTab';
+import { Badge, ContactEmergency } from '@mui/icons-material';
+import Personalnfo from './Personalnfo';
 
 const tableHeadings = [
   { id: 1, label: 'Fecha' },
@@ -91,51 +93,123 @@ const PatientRecord = () => {
     setPage(0);
   };
 
+  function calculateAge(birthDate: Date, age: string, monthsString: string) {
+    const now = new Date();
+    const birth = new Date(birthDate);
+
+    let years = now.getFullYear() - birth.getFullYear();
+    let months = now.getMonth() - birth.getMonth();
+
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+
+    let days = now.getDate() - birth.getDate();
+    if (days < 0) {
+      months--;
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+      const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+      days += prevMonth.getDate();
+    }
+
+    return `${years} ${age}, ${months} ${monthsString}`;
+  }
+
   return (
     <Grid container spacing={4}>
       {/* INFORMACION DE PACIENTE  */}
-      <Grid
-        item
-        xs={12}
-        sm={12}
-        md={12}
-        lg={12}
-        xl={12}
-        style={{
-          backgroundColor:
-            mode === 'light'
-              ? colors.ligthModeSoftText
-              : colors.darkModeTableHead,
-        }}
-      >
-        <Grid container>
+      <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+        <Grid container spacing={1}>
           <Grid item xs={12}>
-            <Typography style={{ fontWeight: 'bold', fontSize: 23 }}>
+            <Typography
+              style={{
+                fontWeight: 'bold',
+                fontSize: 23,
+                color:
+                  mode === 'light'
+                    ? colors.ligthModeSoftText
+                    : colors.darkModeSoftText,
+              }}
+            >
               {patient.nombre1} {patient.nombre2} {patient.apellPat}{' '}
               {patient.apellMat}
             </Typography>
           </Grid>
           <Grid item xs={12}>
-            <Typography>
-              RUT:{patient.rut}-{patient.dv}
+            <Typography
+              style={{
+                fontWeight: 'bold',
+                color:
+                  mode === 'light'
+                    ? colors.ligthModeSoftText
+                    : colors.darkModeSoftText,
+              }}
+            >
+              SIN CONVENIO
+              {/* hacerlo dinamico */}
             </Typography>
+          </Grid>
+          <Grid item>
+            <Box className="flex gap-4">
+              <Box className="flex gap-1 justify-center items-center">
+                <Box>
+                  <ContactEmergency color="disabled" />
+                </Box>
+                <Box>
+                  <Typography
+                    style={{
+                      fontWeight: 'lighter',
+                      color:
+                        mode === 'light'
+                          ? colors.ligthModeSoftText
+                          : colors.darkModeSoftText,
+                    }}
+                  >
+                    Rut {patient.rut}-{patient.dv}{' '}
+                  </Typography>
+                </Box>
+              </Box>
+              <Divider orientation="vertical" flexItem />
+              <Box>
+                <Typography
+                  style={{
+                    fontWeight: 'lighter',
+                    color:
+                      mode === 'light'
+                        ? colors.ligthModeSoftText
+                        : colors.darkModeSoftText,
+                  }}
+                >
+                  Edad{' '}
+                  {calculateAge(new Date(patient.fechaNac), 'años', 'meses')}
+                </Typography>
+              </Box>
+            </Box>
           </Grid>
         </Grid>
       </Grid>
       {/* INFORMACION DE PACIENTE  */}
-      <Box sx={{ width: '100%' }}>
+      <Grid xs={12}>
+        <Divider />
+      </Grid>
+
+      <Grid item xs={12}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs
             value={value}
             onChange={handleChange}
             aria-label="basic tabs example"
           >
-            <Tab label="Historial de citas" {...a11yProps(0)} />
+            <Tab label="Datos Personales" {...a11yProps(0)} />
             <Tab label="Odontograma" {...a11yProps(1)} />
-            <Tab label="Datos Personales" {...a11yProps(2)} />
+            <Tab label="Historial de citas" {...a11yProps(2)} />
           </Tabs>
         </Box>
-        <CustomTabPanel value={value} index={0}>
+        <CustomTabPanel value={value} index={2}>
           {appointmentsFetching && (
             <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
               <LinearProgress />
@@ -211,10 +285,10 @@ const PatientRecord = () => {
             afterSubmit={() => setUpdated(!dataUpdated)}
           />
         </CustomTabPanel>
-        <CustomTabPanel value={value} index={2}>
-          Item Three
+        <CustomTabPanel value={value} index={0}>
+          <Personalnfo patient={patient} />
         </CustomTabPanel>
-      </Box>
+      </Grid>
     </Grid>
   );
 };
