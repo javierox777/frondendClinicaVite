@@ -207,7 +207,7 @@ const PatientRecord = () => {
             <Tab label="Datos Personales" {...a11yProps(0)} />
             <Tab label="Odontograma" {...a11yProps(1)} />
             <Tab label="Historial de citas" {...a11yProps(2)} />
-            <Tab label="Recetas" {...a11yProps(3)} />
+            <Tab label="Medicamentos" {...a11yProps(3)} />
           </Tabs>
         </Box>
         <CustomTabPanel value={value} index={2}>

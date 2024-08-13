@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { Contact } from '../../interfaces/Contact';
 import { Address } from '../../interfaces/Address';
+import { ContactEmergency } from '@mui/icons-material';
 
 interface Props {
   patient: Person;
@@ -106,7 +107,7 @@ const Personalnfo = ({ patient }: Props) => {
         >
           Contacto
         </Typography>
-        <Grid container>
+        <Grid container spacing={1}>
           {!validContacts && (
             <Box sx={{ width: '40%' }}>
               <LinearProgress />
@@ -128,7 +129,6 @@ const Personalnfo = ({ patient }: Props) => {
                   {c.contacto.nombre}
                 </Typography>
                 <Typography>{c.descripcion}</Typography>
-                <Divider />
               </Grid>
             );
           })}
@@ -144,7 +144,7 @@ const Personalnfo = ({ patient }: Props) => {
         >
           Direcciones
         </Typography>
-        <Grid container>
+        <Grid container spacing={1}>
           {!validAddresses && (
             <Box sx={{ width: '40%' }}>
               <LinearProgress />
@@ -166,7 +166,6 @@ const Personalnfo = ({ patient }: Props) => {
                   {a.tipoDireccion.nombre.toLowerCase()}
                 </Typography>
                 <Typography>{a.nombre}</Typography>
-                <Divider />
               </Grid>
             );
           })}
