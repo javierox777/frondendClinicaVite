@@ -1,5 +1,7 @@
 import {
+  Box,
   Button,
+  Collapse,
   Container,
   Dialog,
   DialogActions,
@@ -8,6 +10,7 @@ import {
   DialogTitle,
   Divider,
   Grid,
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -22,7 +25,12 @@ import React, { useEffect, useState } from 'react';
 import { Diente } from '../../interfaces/Diente';
 import { OdontogramInterface } from '../../interfaces/Odontogram';
 
-import { Close, Save } from '@mui/icons-material';
+import {
+  Close,
+  KeyboardArrowDown,
+  KeyboardArrowUp,
+  Save,
+} from '@mui/icons-material';
 import toast, { Toaster } from 'react-hot-toast';
 import diente11 from '../../assets/dientes/diente11.png';
 import diente12 from '../../assets/dientes/diente12.png';
@@ -67,6 +75,9 @@ import { Person } from '../../interfaces/Person';
 import { useUser } from '../../auth/userContext';
 import { User } from '../../interfaces/User';
 import { format } from 'date-fns';
+
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 type DienteKeys =
   `diente${11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48}`;
@@ -364,7 +375,7 @@ const Odontogram = ({ odontogram, afterSubmit }: Props) => {
           </Grid>
           <Grid item xs={12}>
             <Grid container>
-              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                 <TableContainer component={Paper} elevation={3}>
                   <Table>
                     <TableHead
@@ -375,6 +386,7 @@ const Odontogram = ({ odontogram, afterSubmit }: Props) => {
                             : colors.darkModeTableHead,
                       }}
                     >
+                      <TableCell />
                       {tableHeadings.map((h) => {
                         return (
                           <TableCell
@@ -400,46 +412,11 @@ const Odontogram = ({ odontogram, afterSubmit }: Props) => {
                         )
                         .map((d: Diente) => {
                           return (
-                            <TableRow key={d._id}>
-                              <TableCell
-                                className="cursor-pointer"
-                                style={{
-                                  fontWeight: 'bold',
-                                  color:
-                                    mode === 'light'
-                                      ? colors.lightModeTableText
-                                      : 'white',
-                                }}
-                                onClick={() => {
-                                  setTooth(d);
-                                  setOpen(true);
-                                }}
-                              >
-                                {d.pieza}
-                              </TableCell>
-                              <TableCell
-                                style={{
-                                  color:
-                                    mode === 'light'
-                                      ? colors.lightModeTableText
-                                      : 'white',
-                                }}
-                              >
-                                {d.activo && d.estado}{' '}
-                                {!d.activo && 'Diente ausente'}
-                              </TableCell>
-                              <TableCell
-                                style={{
-                                  color:
-                                    mode === 'light'
-                                      ? colors.lightModeTableText
-                                      : 'white',
-                                }}
-                              >
-                                {d.activo && d.diagnostico}{' '}
-                                {!d.activo && 'Diente ausente'}
-                              </TableCell>
-                            </TableRow>
+                            <ToothTableRow
+                              tooth={d}
+                              setTooth={() => setTooth(d)}
+                              setOpen={() => setOpen(true)}
+                            />
                           );
                         })}
                     </TableBody>
@@ -467,6 +444,159 @@ const Odontogram = ({ odontogram, afterSubmit }: Props) => {
       />
       <Toaster />
     </>
+  );
+};
+
+const ToothTableRow = ({
+  tooth,
+  setTooth,
+  setOpen,
+}: {
+  tooth: Diente;
+  setTooth: CallableFunction;
+  setOpen: CallableFunction;
+}) => {
+  const { mode } = useThemeContext();
+  const [rowOpen, setRowOpen] = useState(false);
+
+  return (
+    <React.Fragment>
+      <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+        <TableCell>
+          <IconButton
+            aria-label="expand row"
+            onClick={() => setRowOpen(!rowOpen)}
+          >
+            {rowOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </IconButton>
+        </TableCell>
+        <TableCell
+          className="cursor-pointer"
+          style={{
+            fontWeight: 'bold',
+            color: mode === 'light' ? colors.lightModeTableText : 'white',
+          }}
+          onClick={() => {
+            setTooth();
+            setOpen();
+          }}
+        >
+          {tooth.pieza}
+        </TableCell>
+        <TableCell
+          style={{
+            color: mode === 'light' ? colors.lightModeTableText : 'white',
+          }}
+        >
+          {tooth.activo && tooth.estado} {!tooth.activo && 'Diente ausente'}
+        </TableCell>
+        <TableCell
+          style={{
+            color: mode === 'light' ? colors.lightModeTableText : 'white',
+          }}
+        >
+          {tooth.activo && tooth.diagnostico}{' '}
+          {!tooth.activo && 'Diente ausente'}
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+          <Collapse in={rowOpen} timeout="auto" unmountOnExit>
+            <Box sx={{ margin: 1 }}>
+              <Typography variant="h6" gutterBottom component="div">
+                {tooth.activo && `Pieza ${tooth.pieza}`}
+                {!tooth.activo && 'Diente Ausente'}
+              </Typography>
+              {tooth.activo && (
+                <Table size="small" aria-label="purchases">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell
+                        style={{
+                          fontWeight: 'bold',
+                          color:
+                            mode === 'light'
+                              ? colors.lightModeTableText
+                              : 'white',
+                        }}
+                      >
+                        Cara
+                      </TableCell>
+                      <TableCell
+                        style={{
+                          fontWeight: 'bold',
+                          color:
+                            mode === 'light'
+                              ? colors.lightModeTableText
+                              : 'white',
+                        }}
+                      >
+                        Estado
+                      </TableCell>
+                      <TableCell
+                        align="right"
+                        style={{
+                          fontWeight: 'bold',
+                          color:
+                            mode === 'light'
+                              ? colors.lightModeTableText
+                              : 'white',
+                        }}
+                      >
+                        Diagnóstico
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell>Oclusal</TableCell>
+                      <TableCell>{tooth.oclusal.estado}</TableCell>
+                      <TableCell align="right">{tooth.diagnostico}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Distal</TableCell>
+                      <TableCell>{tooth.distal.estado}</TableCell>
+                      <TableCell align="right">
+                        {tooth.distal.diagnostico}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>bucal</TableCell>
+                      <TableCell>{tooth.bucal.estado}</TableCell>
+                      <TableCell align="right">
+                        {tooth.bucal.diagnostico}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>mesial</TableCell>
+                      <TableCell>{tooth.mesial.estado}</TableCell>
+                      <TableCell align="right">
+                        {' '}
+                        {tooth.mesial.diagnostico}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>lingual/palatino</TableCell>
+                      <TableCell>{tooth.lingualpalatino.estado}</TableCell>
+                      <TableCell align="right">
+                        {tooth.lingualpalatino.diagnostico}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>raíz</TableCell>
+                      <TableCell>{tooth.raiz.estado}</TableCell>
+                      <TableCell align="right">
+                        {tooth.raiz.diagnostico}
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              )}
+            </Box>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </React.Fragment>
   );
 };
 

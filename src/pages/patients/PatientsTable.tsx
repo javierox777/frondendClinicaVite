@@ -104,7 +104,7 @@ const PatientsTable = ({ refetch }: Props) => {
       <TextField
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
-        style={{ marginBlock: '16px' }}
+        style={{ marginBlock: '16px', width: '30%' }}
         placeholder="Buscar..."
         InputProps={{
           startAdornment: (

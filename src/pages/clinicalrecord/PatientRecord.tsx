@@ -32,6 +32,7 @@ import ProgressLine from 'rsuite/esm/Progress/ProgressLine';
 import OdontogramTab from './OdontogramTab';
 import { Badge, ContactEmergency } from '@mui/icons-material';
 import Personalnfo from './Personalnfo';
+import PatientReceipts from './PatientReceipts';
 
 const tableHeadings = [
   { id: 1, label: 'Fecha' },
@@ -120,10 +121,10 @@ const PatientRecord = () => {
   }
 
   return (
-    <Grid container spacing={4}>
+    <Grid container>
       {/* INFORMACION DE PACIENTE  */}
       <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-        <Card sx={{ padding: 3 }} elevation={4}>
+        <Card sx={{ padding: 3 }} elevation={2}>
           <Grid container spacing={1}>
             <Grid item xs={12}>
               <Typography
@@ -206,6 +207,7 @@ const PatientRecord = () => {
             <Tab label="Datos Personales" {...a11yProps(0)} />
             <Tab label="Odontograma" {...a11yProps(1)} />
             <Tab label="Historial de citas" {...a11yProps(2)} />
+            <Tab label="Recetas" {...a11yProps(3)} />
           </Tabs>
         </Box>
         <CustomTabPanel value={value} index={2}>
@@ -286,6 +288,9 @@ const PatientRecord = () => {
         </CustomTabPanel>
         <CustomTabPanel value={value} index={0}>
           <Personalnfo patient={patient} />
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={3}>
+          <PatientReceipts patient={patient} />
         </CustomTabPanel>
       </Grid>
     </Grid>

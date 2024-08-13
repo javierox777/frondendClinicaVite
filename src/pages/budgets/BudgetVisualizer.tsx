@@ -108,12 +108,12 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
 
   return (
     <>
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+      <Grid container>
+        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
           <TextField
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-            style={{ marginBlock: '16px' }}
+            style={{ marginBlock: '16px', width: '30%' }}
             placeholder="Buscar..."
             InputProps={{
               startAdornment: (
