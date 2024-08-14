@@ -63,37 +63,66 @@ const TodaysSchedule = () => {
   };
 
   return (
-    <Card elevation={4} style={{ padding: 10 }}>
-      <Grid container spacing={2}>
+    <Grid container>
+      <Grid item xs={12}>
+        <Typography
+          style={{
+            fontSize: 20,
+          }}
+        >
+          Citaciones del dia de hoy
+        </Typography>
+      </Grid>
+      {isLoading && (
         <Grid item xs={12}>
-          <Typography
-            style={{
-              fontSize: 20,
-            }}
-          >
-            Citaciones del dia de hoy
-          </Typography>
+          <LinearProgress />
         </Grid>
-        {isLoading && (
-          <Grid item xs={12}>
-            <LinearProgress />
-          </Grid>
-        )}
-        {!isLoading && (
-          <Grid item xs={12}>
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead
-                  style={{
-                    backgroundColor:
-                      mode === 'light'
-                        ? colors.lightModeTableHead
-                        : colors.darkModeTableHead,
-                  }}
-                >
-                  <TableRow>
-                    {tableHeadings.map((h) => {
-                      return (
+      )}
+      {!isLoading && (
+        <Grid item xs={12} className="shadow-lg rounded-lg">
+          <TableContainer component={Paper} elevation={0}>
+            <Table>
+              <TableHead
+                style={{
+                  backgroundColor:
+                    mode === 'light'
+                      ? colors.lightModeTableHead
+                      : colors.darkModeTableHead,
+                }}
+              >
+                <TableRow>
+                  {tableHeadings.map((h) => {
+                    return (
+                      <TableCell
+                        style={{
+                          fontWeight: 'bold',
+                          color:
+                            mode === 'light'
+                              ? colors.lightModeTableText
+                              : 'white',
+                        }}
+                        key={h.id}
+                      >
+                        {h.label}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {appointments
+                  ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((a: Appointment) => {
+                    return (
+                      <TableRow
+                        key={a._id}
+                        className="hover:bg-slate-400 transition-all cursor-pointer "
+                        onClick={() =>
+                          navigation('/atencionpaciente', {
+                            state: { appointment: a },
+                          })
+                        }
+                      >
                         <TableCell
                           style={{
                             fontWeight: 'bold',
@@ -101,85 +130,51 @@ const TodaysSchedule = () => {
                               mode === 'light'
                                 ? colors.lightModeTableText
                                 : 'white',
+                            textTransform: 'capitalize',
                           }}
-                          key={h.id}
                         >
-                          {h.label}
+                          {a.persona.nombre1.toLowerCase()}{' '}
+                          {a.persona.apellPat.toLowerCase()}{' '}
+                          {a.persona.apellMat.toLowerCase()}
                         </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {appointments
-                    ?.slice(
-                      page * rowsPerPage,
-                      page * rowsPerPage + rowsPerPage
-                    )
-                    .map((a: Appointment) => {
-                      return (
-                        <TableRow
-                          key={a._id}
-                          className="hover:bg-slate-400 transition-all cursor-pointer "
-                          onClick={() =>
-                            navigation('/atencionpaciente', {
-                              state: { appointment: a },
-                            })
-                          }
-                        >
-                          <TableCell
-                            style={{
-                              fontWeight: 'bold',
-                              color:
-                                mode === 'light'
-                                  ? colors.lightModeTableText
-                                  : 'white',
-                              textTransform: 'capitalize',
-                            }}
-                          >
-                            {a.persona.nombre1.toLowerCase()}{' '}
-                            {a.persona.apellPat.toLowerCase()}{' '}
-                            {a.persona.apellMat.toLowerCase()}
-                          </TableCell>
-                          <TableCell>
-                            {a.persona.rut}-{a.persona.dv}
-                          </TableCell>
-                          <TableCell>
-                            {a.profesional.nombre1} {a.profesional.apellPat}
-                          </TableCell>
-                          <TableCell>
-                            {a.horaInicio} - {a.horaTermino}
-                          </TableCell>
-                          <TableCell>
-                            <StatusBadge
-                              status={
-                                a.estado === 'COMPLETADO'
-                                  ? 'finished'
-                                  : a.estado === 'AGENDADO'
-                                    ? 'in-progress'
-                                    : 'in-progress'
-                              }
-                              title={a.estado}
-                            />
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <TablePagination
-              page={page}
-              onPageChange={handleChangePage}
-              count={appointments?.length}
-              component="div"
-              rowsPerPage={rowsPerPage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          </Grid>
-        )}
-      </Grid>
-    </Card>
+                        <TableCell>
+                          {a.persona.rut}-{a.persona.dv}
+                        </TableCell>
+                        <TableCell>
+                          {a.profesional.nombre1} {a.profesional.apellPat}
+                        </TableCell>
+                        <TableCell>
+                          {a.horaInicio} - {a.horaTermino}
+                        </TableCell>
+                        <TableCell>
+                          <StatusBadge
+                            status={
+                              a.estado === 'COMPLETADO'
+                                ? 'finished'
+                                : a.estado === 'AGENDADO'
+                                  ? 'in-progress'
+                                  : 'in-progress'
+                            }
+                            title={a.estado}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            page={page}
+            onPageChange={handleChangePage}
+            count={appointments?.length}
+            component="div"
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Grid>
+      )}
+    </Grid>
   );
 };
 

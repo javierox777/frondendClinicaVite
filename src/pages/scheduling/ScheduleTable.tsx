@@ -149,7 +149,7 @@ const ScheduleTable = () => {
               </FormControl>
             )}
           </Grid>
-          <Grid item>
+          <Grid item xs={12}>
             <ButtonGroup>
               <FormControl>
                 <Button variant="contained" type="submit">
@@ -165,8 +165,8 @@ const ScheduleTable = () => {
           <Grid item xs={12}>
             {isSearching && professionalId && <LinearProgress />}
             {scheduletoShow && (
-              <>
-                <TableContainer component={Paper}>
+              <Box className="shadow-lg rounded-lg">
+                <TableContainer component={Paper} elevation={0}>
                   <Table>
                     <TableHead
                       style={{
@@ -233,7 +233,7 @@ const ScheduleTable = () => {
                   rowsPerPage={rowsPerPage}
                   onRowsPerPageChange={handleChangeRowsPerPage}
                 />
-              </>
+              </Box>
             )}
           </Grid>
         </Grid>

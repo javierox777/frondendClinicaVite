@@ -1,5 +1,6 @@
 import { Edit, Search } from '@mui/icons-material';
 import {
+  Box,
   Button,
   IconButton,
   InputAdornment,
@@ -114,42 +115,20 @@ const PatientsTable = ({ refetch }: Props) => {
           ),
         }}
       />
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead
-            style={{
-              backgroundColor:
-                mode === 'light'
-                  ? colors.lightModeTableHead
-                  : colors.darkModeTableHead,
-            }}
-          >
-            <TableRow>
-              {tableHeadings.map((h) => {
-                return (
-                  <TableCell
-                    style={{
-                      fontWeight: 'bold',
-                      color:
-                        mode === 'light' ? colors.lightModeTableText : 'white',
-                    }}
-                    key={h.id}
-                  >
-                    {h.label}
-                  </TableCell>
-                );
-              })}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredPatients
-              ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((p: Person, index: number) => {
-                return (
-                  <TableRow
-                    key={p._id}
-                    // className={`${index % 2 === 0 && mode === 'light' ? 'bg-slate-100' : 'white'}`}
-                  >
+      <Box className="shadow-lg rounded-lg">
+        <TableContainer component={Paper} elevation={0}>
+          <Table>
+            <TableHead
+              style={{
+                backgroundColor:
+                  mode === 'light'
+                    ? colors.lightModeTableHead
+                    : colors.darkModeTableHead,
+              }}
+            >
+              <TableRow>
+                {tableHeadings.map((h) => {
+                  return (
                     <TableCell
                       style={{
                         fontWeight: 'bold',
@@ -158,37 +137,63 @@ const PatientsTable = ({ refetch }: Props) => {
                             ? colors.lightModeTableText
                             : 'white',
                       }}
+                      key={h.id}
                     >
-                      {p.nombre1} {p.apellPat}
+                      {h.label}
                     </TableCell>
-                    <TableCell>{p.rut}</TableCell>
-                    <TableCell>{p.institucion.nombre}</TableCell>
-                    <TableCell>
-                      <IconButton
-                        color="success"
-                        onClick={() =>
-                          navigation('/editarpaciente', {
-                            state: { patient: p },
-                          })
-                        }
+                  );
+                })}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredPatients
+                ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((p: Person, index: number) => {
+                  return (
+                    <TableRow
+                      key={p._id}
+                      // className={`${index % 2 === 0 && mode === 'light' ? 'bg-slate-100' : 'white'}`}
+                    >
+                      <TableCell
+                        style={{
+                          fontWeight: 'bold',
+                          color:
+                            mode === 'light'
+                              ? colors.lightModeTableText
+                              : 'white',
+                        }}
                       >
-                        <Edit />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <TablePagination
-        page={page}
-        onPageChange={handleChangePage}
-        count={patients?.length}
-        component="div"
-        rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
+                        {p.nombre1} {p.apellPat}
+                      </TableCell>
+                      <TableCell>{p.rut}</TableCell>
+                      <TableCell>{p.institucion.nombre}</TableCell>
+                      <TableCell>
+                        <IconButton
+                          color="success"
+                          onClick={() =>
+                            navigation('/editarpaciente', {
+                              state: { patient: p },
+                            })
+                          }
+                        >
+                          <Edit />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <TablePagination
+          page={page}
+          onPageChange={handleChangePage}
+          count={patients?.length}
+          component="div"
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </Box>
     </>
   );
 };

@@ -123,59 +123,51 @@ const PatientRecord = () => {
   return (
     <Grid container>
       {/* INFORMACION DE PACIENTE  */}
-      <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-        <Card sx={{ padding: 3 }} elevation={2}>
-          <Grid container spacing={1}>
-            <Grid item xs={12}>
-              <Typography
-                style={{
-                  fontWeight: 'bold',
-                  fontSize: 23,
-                  color:
-                    mode === 'light'
-                      ? colors.ligthModeSoftText
-                      : colors.darkModeSoftText,
-                }}
-              >
-                {patient.nombre1} {patient.nombre2} {patient.apellPat}{' '}
-                {patient.apellMat}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography
-                style={{
-                  fontWeight: 'bold',
-                  color:
-                    mode === 'light'
-                      ? colors.ligthModeSoftText
-                      : colors.darkModeSoftText,
-                }}
-              >
-                SIN CONVENIO
-                {/* hacerlo dinamico */}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Box className="flex gap-4">
-                <Box className="flex gap-1 justify-center items-center">
-                  <Box>
-                    <ContactEmergency color="disabled" />
-                  </Box>
-                  <Box>
-                    <Typography
-                      style={{
-                        fontWeight: 'lighter',
-                        color:
-                          mode === 'light'
-                            ? colors.ligthModeSoftText
-                            : colors.darkModeSoftText,
-                      }}
-                    >
-                      Rut {patient.rut}-{patient.dv}{' '}
-                    </Typography>
-                  </Box>
+      <Grid
+        item
+        xs={12}
+        sm={12}
+        md={12}
+        lg={12}
+        xl={12}
+        className="shadow-lg rounded-lg p-5"
+      >
+        <Grid container spacing={1}>
+          <Grid item xs={12}>
+            <Typography
+              style={{
+                fontWeight: 'bold',
+                fontSize: 23,
+                color:
+                  mode === 'light'
+                    ? colors.ligthModeSoftText
+                    : colors.darkModeSoftText,
+              }}
+            >
+              {patient.nombre1} {patient.nombre2} {patient.apellPat}{' '}
+              {patient.apellMat}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography
+              style={{
+                fontWeight: 'bold',
+                color:
+                  mode === 'light'
+                    ? colors.ligthModeSoftText
+                    : colors.darkModeSoftText,
+              }}
+            >
+              SIN CONVENIO
+              {/* hacerlo dinamico */}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Box className="flex gap-4">
+              <Box className="flex gap-1 justify-center items-center">
+                <Box>
+                  <ContactEmergency color="disabled" />
                 </Box>
-                <Divider orientation="vertical" flexItem />
                 <Box>
                   <Typography
                     style={{
@@ -186,14 +178,28 @@ const PatientRecord = () => {
                           : colors.darkModeSoftText,
                     }}
                   >
-                    Edad{' '}
-                    {calculateAge(new Date(patient.fechaNac), 'años', 'meses')}
+                    Rut {patient.rut}-{patient.dv}{' '}
                   </Typography>
                 </Box>
               </Box>
-            </Grid>
+              <Divider orientation="vertical" flexItem />
+              <Box>
+                <Typography
+                  style={{
+                    fontWeight: 'lighter',
+                    color:
+                      mode === 'light'
+                        ? colors.ligthModeSoftText
+                        : colors.darkModeSoftText,
+                  }}
+                >
+                  Edad{' '}
+                  {calculateAge(new Date(patient.fechaNac), 'años', 'meses')}
+                </Typography>
+              </Box>
+            </Box>
           </Grid>
-        </Card>
+        </Grid>
       </Grid>
       {/* INFORMACION DE PACIENTE  */}
 
@@ -217,8 +223,16 @@ const PatientRecord = () => {
             </Grid>
           )}
           {appointments && !appointmentsFetching && (
-            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-              <TableContainer component={Paper}>
+            <Grid
+              item
+              xs={12}
+              sm={12}
+              md={12}
+              lg={12}
+              xl={12}
+              className="shadow-lg"
+            >
+              <TableContainer component={Paper} elevation={0}>
                 <Table>
                   <TableHead
                     style={{

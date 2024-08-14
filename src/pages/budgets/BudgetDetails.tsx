@@ -116,241 +116,228 @@ const BudgetDetails = ({ budget }: Props) => {
   return (
     <div id="pdf">
       <Container>
-        <Grid container direction="column" spacing={3}>
+        <Grid container direction="column" spacing={4}>
           {/* Datos del presupuesto */}
-          <Grid item>
-            <Card elevation={3} sx={{ padding: 2 }}>
-              <Grid container spacing={3}>
-                <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
-                  <Typography sx={{ fontWeight: 'bold' }}>
-                    Estado del presupuesto
-                  </Typography>
-                  <StatusBadge
-                    status={
-                      budget.profesionalValida ? 'finished' : 'in-progress'
-                    }
-                    title={
-                      budget.profesionalValida
-                        ? 'VALIDADO'
-                        : 'VALIDACIÓN PENDIENTE'
-                    }
-                  />
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
-                  <Typography sx={{ fontWeight: 'bold' }}>
-                    Fecha de registro
-                  </Typography>
-                  <Typography>
-                    {new Date(fechaRegistro).toLocaleDateString()}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
-                  <Typography sx={{ fontWeight: 'bold' }}>
-                    Fecha de validación
-                  </Typography>
-                  <Typography>
-                    {budget.fechaRegistroValida
-                      ? new Date(fechaRegistroValida).toLocaleDateString()
-                      : 'Validación pendiente'}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
-                  <Typography sx={{ fontWeight: 'bold' }}>
-                    Tipo de presupuesto
-                  </Typography>
-                  <Typography>{presupuestoTipo.nombre}</Typography>
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
-                  <Typography sx={{ fontWeight: 'bold' }}>Clínica</Typography>
-                  <Typography>{empresa.razonSocial}</Typography>
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
-                  <Typography sx={{ fontWeight: 'bold' }}>
-                    Emitido por
-                  </Typography>
-                  <Typography>
-                    {profesional.nombre1} {profesional.apellPat}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
-                  {!budget.profesionalValida && (
-                    <Button
-                      onClick={async () => {
-                        if (user) {
-                          const response = await axios.patch(
-                            `${generalConfig.baseUrl}/budgets/validatebudget/${budget._id}`,
-                            {
-                              profesionalValida: (user as LoggedUser)
-                                .profesionalId,
-                            }
-                          );
-
-                          if (response.data.message === 'success') {
-                            navigate('/presupuestos');
+          <Grid item className="shadow-lg rounded-lg p-5">
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                <Typography sx={{ fontWeight: 'bold' }}>
+                  Estado del presupuesto
+                </Typography>
+                <StatusBadge
+                  status={budget.profesionalValida ? 'finished' : 'in-progress'}
+                  title={
+                    budget.profesionalValida
+                      ? 'VALIDADO'
+                      : 'VALIDACIÓN PENDIENTE'
+                  }
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                <Typography sx={{ fontWeight: 'bold' }}>
+                  Fecha de registro
+                </Typography>
+                <Typography>
+                  {new Date(fechaRegistro).toLocaleDateString()}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                <Typography sx={{ fontWeight: 'bold' }}>
+                  Fecha de validación
+                </Typography>
+                <Typography>
+                  {budget.fechaRegistroValida
+                    ? new Date(fechaRegistroValida).toLocaleDateString()
+                    : 'Validación pendiente'}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                <Typography sx={{ fontWeight: 'bold' }}>
+                  Tipo de presupuesto
+                </Typography>
+                <Typography>{presupuestoTipo.nombre}</Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                <Typography sx={{ fontWeight: 'bold' }}>Clínica</Typography>
+                <Typography>{empresa.razonSocial}</Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                <Typography sx={{ fontWeight: 'bold' }}>Emitido por</Typography>
+                <Typography>
+                  {profesional.nombre1} {profesional.apellPat}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                {!budget.profesionalValida && (
+                  <Button
+                    onClick={async () => {
+                      if (user) {
+                        const response = await axios.patch(
+                          `${generalConfig.baseUrl}/budgets/validatebudget/${budget._id}`,
+                          {
+                            profesionalValida: (user as LoggedUser)
+                              .profesionalId,
                           }
+                        );
+
+                        if (response.data.message === 'success') {
+                          navigate('/presupuestos');
                         }
-                      }}
-                      color="info"
-                      variant="outlined"
-                    >
-                      Validar
-                    </Button>
-                  )}
-                  {budget.profesionalValida && (
-                    <>
-                      <Typography sx={{ fontWeight: 'bold' }}>
-                        Validado por
-                      </Typography>
-                      <Typography>
-                        {budget.profesionalValida.nombre1}{' '}
-                        {budget.profesionalValida.apellPat}
-                      </Typography>
-                    </>
-                  )}
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
-                  <Button
-                    onClick={() =>
-                      navigate('/editarpresupuesto', {
-                        state: { budget: budget },
-                      })
-                    }
-                    color="success"
-                    variant="outlined"
-                    style={{ marginRight: 5 }}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    onClick={() =>
-                      navigate('/presupuestopdf', {
-                        state: {
-                          budget: budget,
-                          contacts: contacts,
-                          addresses: addresses,
-                          details: details,
-                        },
-                      })
-                    }
+                      }
+                    }}
                     color="info"
                     variant="outlined"
                   >
-                    Ver PDF
+                    Validar
                   </Button>
-                </Grid>
+                )}
+                {budget.profesionalValida && (
+                  <>
+                    <Typography sx={{ fontWeight: 'bold' }}>
+                      Validado por
+                    </Typography>
+                    <Typography>
+                      {budget.profesionalValida.nombre1}{' '}
+                      {budget.profesionalValida.apellPat}
+                    </Typography>
+                  </>
+                )}
               </Grid>
-            </Card>
+              <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                <Button
+                  onClick={() =>
+                    navigate('/editarpresupuesto', {
+                      state: { budget: budget },
+                    })
+                  }
+                  color="success"
+                  variant="outlined"
+                  style={{ marginRight: 5 }}
+                >
+                  Editar
+                </Button>
+                <Button
+                  onClick={() =>
+                    navigate('/presupuestopdf', {
+                      state: {
+                        budget: budget,
+                        contacts: contacts,
+                        addresses: addresses,
+                        details: details,
+                      },
+                    })
+                  }
+                  color="info"
+                  variant="outlined"
+                >
+                  Ver PDF
+                </Button>
+              </Grid>
+            </Grid>
           </Grid>
           {/* Datos del presupuesto */}
 
           {/* Datos del paciente */}
-          <Grid item>
-            <Card sx={{ padding: 2 }} elevation={3}>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <Typography sx={{ fontWeight: 'lighter', fontSize: 22 }}>
-                    Datos de paciente
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-                  <Typography sx={{ fontWeight: 'bold' }}>Nombre</Typography>
-                  <Typography>
-                    {persona.nombre1} {persona.nombre2} {persona.apellPat}{' '}
-                    {persona.apellMat}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-                  <Typography sx={{ fontWeight: 'bold' }}>RUT</Typography>
-                  <Typography>
-                    {persona.rut} - {persona.dv}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-                  <Typography sx={{ fontWeight: 'bold' }}>
-                    Fecha de nacimiento
-                  </Typography>
-                  <Typography>
-                    {new Date(persona.fechaNac).toLocaleDateString()}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-                  <Typography sx={{ fontWeight: 'bold' }}>Previsión</Typography>
-                  <Typography>
-                    {persona.institucion.prevision.nombre}{' '}
-                    {persona.institucion.nombre}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                  <Typography sx={{ fontWeight: 'bold' }}>Contacto</Typography>
-                  <Grid container>
-                    {!validContacts && (
-                      <Box sx={{ width: '40%' }}>
-                        <LinearProgress />
-                      </Box>
-                    )}
-                    {validContacts?.map((c: Contact) => {
-                      return (
-                        <Grid
-                          item
-                          key={c._id}
-                          xs={12}
-                          sm={12}
-                          md={12}
-                          lg={6}
-                          xl={6}
-                        >
-                          <Divider />
-                          <Typography sx={{ fontWeight: 'bold' }}>
-                            {' '}
-                            {c.contacto.nombre}
-                          </Typography>
-                          <Typography>{c.descripcion}</Typography>
-                          <Divider />
-                        </Grid>
-                      );
-                    })}
-                    <Grid item xs={12}></Grid>
-                  </Grid>
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                  <Typography sx={{ fontWeight: 'bold' }}>
-                    Direcciones
-                  </Typography>
-                  <Grid container>
-                    {!validAddresses && (
-                      <Box sx={{ width: '40%' }}>
-                        <LinearProgress />
-                      </Box>
-                    )}
-                    {validAddresses?.map((a: Address) => {
-                      return (
-                        <Grid
-                          item
-                          key={a._id}
-                          xs={12}
-                          sm={12}
-                          md={12}
-                          lg={6}
-                          xl={6}
-                        >
-                          <Divider />
-                          <Typography sx={{ fontWeight: 'bold' }}>
-                            {' '}
-                            {a.tipoDireccion.nombre}
-                          </Typography>
-                          <Typography>{a.nombre}</Typography>
-                          <Divider />
-                        </Grid>
-                      );
-                    })}
-                    <Grid item xs={12}></Grid>
-                  </Grid>
-                </Grid>
-                <Grid item xs={12}>
-                  <Divider />
+          <Grid item className="shadow-lg rounded-lg p-5">
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <Typography sx={{ fontWeight: 'lighter', fontSize: 22 }}>
+                  Datos de paciente
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                <Typography sx={{ fontWeight: 'bold' }}>Nombre</Typography>
+                <Typography>
+                  {persona.nombre1} {persona.nombre2} {persona.apellPat}{' '}
+                  {persona.apellMat}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                <Typography sx={{ fontWeight: 'bold' }}>RUT</Typography>
+                <Typography>
+                  {persona.rut} - {persona.dv}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                <Typography sx={{ fontWeight: 'bold' }}>
+                  Fecha de nacimiento
+                </Typography>
+                <Typography>
+                  {new Date(persona.fechaNac).toLocaleDateString()}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                <Typography sx={{ fontWeight: 'bold' }}>Previsión</Typography>
+                <Typography>
+                  {persona.institucion.prevision.nombre}{' '}
+                  {persona.institucion.nombre}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <Typography sx={{ fontWeight: 'bold' }}>Contacto</Typography>
+                <Grid container>
+                  {!validContacts && (
+                    <Box sx={{ width: '40%' }}>
+                      <LinearProgress />
+                    </Box>
+                  )}
+                  {validContacts?.map((c: Contact) => {
+                    return (
+                      <Grid
+                        item
+                        key={c._id}
+                        xs={12}
+                        sm={12}
+                        md={12}
+                        lg={6}
+                        xl={6}
+                      >
+                        <Divider />
+                        <Typography sx={{ fontWeight: 'bold' }}>
+                          {' '}
+                          {c.contacto.nombre}
+                        </Typography>
+                        <Typography>{c.descripcion}</Typography>
+                        <Divider />
+                      </Grid>
+                    );
+                  })}
+                  <Grid item xs={12}></Grid>
                 </Grid>
               </Grid>
-            </Card>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <Typography sx={{ fontWeight: 'bold' }}>Direcciones</Typography>
+                <Grid container>
+                  {!validAddresses && (
+                    <Box sx={{ width: '40%' }}>
+                      <LinearProgress />
+                    </Box>
+                  )}
+                  {validAddresses?.map((a: Address) => {
+                    return (
+                      <Grid
+                        item
+                        key={a._id}
+                        xs={12}
+                        sm={12}
+                        md={12}
+                        lg={6}
+                        xl={6}
+                      >
+                        <Divider />
+                        <Typography sx={{ fontWeight: 'bold' }}>
+                          {' '}
+                          {a.tipoDireccion.nombre}
+                        </Typography>
+                        <Typography>{a.nombre}</Typography>
+                        <Divider />
+                      </Grid>
+                    );
+                  })}
+                  <Grid item xs={12}></Grid>
+                </Grid>
+              </Grid>
+            </Grid>
           </Grid>
           {/* Datos del paciente */}
 

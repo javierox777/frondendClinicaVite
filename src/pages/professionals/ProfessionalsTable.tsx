@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   IconButton,
   InputAdornment,
@@ -115,39 +116,20 @@ const ProfessionalsTable = ({ refetch }: Props) => {
           ),
         }}
       />
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead
-            style={{
-              backgroundColor:
-                mode === 'light'
-                  ? colors.lightModeTableHead
-                  : colors.darkModeTableHead,
-            }}
-          >
-            <TableRow>
-              {tableHeadings.map((h) => {
-                return (
-                  <TableCell
-                    style={{
-                      fontWeight: 'bold',
-                      color:
-                        mode === 'light' ? colors.lightModeTableText : 'white',
-                    }}
-                    key={h.id}
-                  >
-                    {h.label}
-                  </TableCell>
-                );
-              })}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredPatients
-              ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((p: Professional) => {
-                return (
-                  <TableRow key={p._id}>
+      <Box className="shadow-lg rounded-lg">
+        <TableContainer component={Paper} elevation={0}>
+          <Table>
+            <TableHead
+              style={{
+                backgroundColor:
+                  mode === 'light'
+                    ? colors.lightModeTableHead
+                    : colors.darkModeTableHead,
+              }}
+            >
+              <TableRow>
+                {tableHeadings.map((h) => {
+                  return (
                     <TableCell
                       style={{
                         fontWeight: 'bold',
@@ -156,38 +138,61 @@ const ProfessionalsTable = ({ refetch }: Props) => {
                             ? colors.lightModeTableText
                             : 'white',
                       }}
+                      key={h.id}
                     >
-                      {p.nombre1} {p.apellPat}
+                      {h.label}
                     </TableCell>
-                    <TableCell>{p.rut}</TableCell>
-                    <TableCell>{p.email}</TableCell>
-                    <TableCell>{p.celular}</TableCell>
-                    <TableCell>
-                      <IconButton
-                        color="success"
-                        onClick={() =>
-                          navigation('/editarprofesional', {
-                            state: { professional: p },
-                          })
-                        }
+                  );
+                })}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredPatients
+                ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((p: Professional) => {
+                  return (
+                    <TableRow key={p._id}>
+                      <TableCell
+                        style={{
+                          fontWeight: 'bold',
+                          color:
+                            mode === 'light'
+                              ? colors.lightModeTableText
+                              : 'white',
+                        }}
                       >
-                        <Edit />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <TablePagination
-        page={page}
-        onPageChange={handleChangePage}
-        count={professionals?.length}
-        component="div"
-        rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
+                        {p.nombre1} {p.apellPat}
+                      </TableCell>
+                      <TableCell>{p.rut}</TableCell>
+                      <TableCell>{p.email}</TableCell>
+                      <TableCell>{p.celular}</TableCell>
+                      <TableCell>
+                        <IconButton
+                          color="success"
+                          onClick={() =>
+                            navigation('/editarprofesional', {
+                              state: { professional: p },
+                            })
+                          }
+                        >
+                          <Edit />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <TablePagination
+          page={page}
+          onPageChange={handleChangePage}
+          count={professionals?.length}
+          component="div"
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </Box>
     </>
   );
 };

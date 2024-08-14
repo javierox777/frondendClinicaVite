@@ -126,7 +126,19 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
           />
         </Grid>
         <Grid item xs={12}>
-          <TableContainer component={Paper}>
+          <Grid container direction={'row'}>
+            <Grid item xs={6} sm={6} md={6} lg={2} xl={2}>
+              <CheckCircle color="success" />
+              <Typography>Validado</Typography>
+            </Grid>
+            <Grid item xs={6} sm={6} md={6} lg={2} xl={2}>
+              <Pending color="warning" />
+              <Typography>Validación pendiente</Typography>
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid item xs={12} className="shadow-lg rounded-lg">
+          <TableContainer component={Paper} elevation={0}>
             <Table>
               <TableHead
                 style={{
@@ -203,18 +215,6 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
               onRowsPerPageChange={handleChangeRowsPerPage}
             />
           </TableContainer>
-        </Grid>
-        <Grid item xs={12}>
-          <Grid container direction={'row'}>
-            <Grid item xs={1}>
-              <CheckCircle color="success" />
-              <Typography>Validado</Typography>
-            </Grid>
-            <Grid item xs={2}>
-              <Pending color="warning" />
-              <Typography>Validación pendiente</Typography>
-            </Grid>
-          </Grid>
         </Grid>
       </Grid>
     </>

@@ -437,13 +437,13 @@ const AppointmentsCalendar = () => {
           />
         </FormControl>
       )}
-      <Card>
-        <Calendar
-          locale={esAr.Calendar}
-          bordered
-          renderCell={professionalId ? renderCell : undefined}
-        />
-      </Card>
+
+      <Calendar
+        locale={esAr.Calendar}
+        bordered
+        renderCell={professionalId ? renderCell : undefined}
+      />
+
       <DateDetails
         professionalId={professionalId}
         open={open}
