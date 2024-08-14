@@ -375,8 +375,16 @@ const Odontogram = ({ odontogram, afterSubmit }: Props) => {
           </Grid>
           <Grid item xs={12}>
             <Grid container>
-              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                <TableContainer component={Paper} elevation={3}>
+              <Grid
+                item
+                xs={12}
+                sm={12}
+                md={12}
+                lg={12}
+                xl={12}
+                className="rounded-lg shadow-lg"
+              >
+                <TableContainer component={Paper} elevation={0}>
                   <Table>
                     <TableHead
                       style={{

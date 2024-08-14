@@ -43,6 +43,7 @@ export interface Profesional {
   
   export interface Receipt {
     _id: string;
+    direccion:string;
     estado_id: boolean;
     profesional_id: Profesional;
     empresa_id: Empresa;
