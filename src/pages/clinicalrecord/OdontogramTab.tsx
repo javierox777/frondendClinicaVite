@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  AppBar,
   Autocomplete,
   Button,
   Card,
@@ -10,10 +11,14 @@ import {
   DialogTitle,
   FormControl,
   Grid,
+  IconButton,
   LinearProgress,
   MenuItem,
+  Modal,
   Select,
+  Slide,
   TextField,
+  Toolbar,
 } from '@mui/material';
 import colors from '../../styles/colors';
 import { useThemeContext } from '../../componemts/themeContext';
@@ -21,21 +26,51 @@ import Odontogram from './Odontogram';
 import { OdontogramInterface } from '../../interfaces/Odontogram';
 import { Diente } from '../../interfaces/Diente';
 import { Toaster } from 'react-hot-toast';
+import OdontogramForm from './OdontogramForm';
+import { TransitionProps } from '@mui/material/transitions';
+import { Close } from '@mui/icons-material';
+import { Person } from '../../interfaces/Person';
+import { useUser } from '../../auth/userContext';
+import { User } from '../../interfaces/User';
 
 interface Props {
   odontograms: OdontogramInterface[];
   afterSubmit?: CallableFunction;
+  persona: Person;
 }
 
-const OdontogramTab = ({ odontograms, afterSubmit }: Props) => {
+const Transition = React.forwardRef(function Transition(
+  props: TransitionProps & {
+    children: React.ReactElement;
+  },
+  ref: React.Ref<unknown>
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
+const OdontogramTab = ({ odontograms, afterSubmit, persona }: Props) => {
+  const { user } = useUser();
+
   const { mode } = useThemeContext();
+  const [openForm, setOpenForm] = useState(false);
 
   const [selectedOdontogram, setOdontogram] = useState<OdontogramInterface>();
 
   return (
     <>
-      <Grid container spacing={3}>
-        <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+      <Grid container gap={5}>
+        <Grid item xs={12}>
+          {odontograms.length === 0 && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => setOpenForm(true)}
+            >
+              Registrar odontograma
+            </Button>
+          )}
+        </Grid>
+        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
           {!odontograms && <LinearProgress />}
           {odontograms && (
             <FormControl fullWidth>
@@ -86,6 +121,26 @@ const OdontogramTab = ({ odontograms, afterSubmit }: Props) => {
         </Grid>
       </Grid>
       <Toaster />
+      <Dialog
+        fullScreen
+        open={openForm}
+        onClose={() => setOpenForm(false)}
+        TransitionComponent={Transition}
+      >
+        <AppBar sx={{ position: 'relative' }}>
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={() => setOpenForm(false)}
+              aria-label="close"
+            >
+              <Close />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+        <OdontogramForm persona={persona} profesionalId={(user as User)._id} />
+      </Dialog>
     </>
   );
 };

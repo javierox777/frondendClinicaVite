@@ -209,6 +209,7 @@ const PatientRecord = () => {
             value={value}
             onChange={handleChange}
             aria-label="basic tabs example"
+            variant="fullWidth"
           >
             <Tab label="Datos Personales" {...a11yProps(0)} />
             <Tab label="Odontograma" {...a11yProps(1)} />
@@ -298,6 +299,7 @@ const PatientRecord = () => {
           <OdontogramTab
             odontograms={odontograms}
             afterSubmit={() => setUpdated(!dataUpdated)}
+            persona={patient}
           />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={0}>

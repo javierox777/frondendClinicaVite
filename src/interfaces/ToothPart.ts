@@ -1,5 +1,7 @@
 export interface ToothPart {
     detalle:string;
     diagnostico:string;
-    estado:string
+    estado:string,
+    caries:boolean,
+    restauracion:boolean
 }

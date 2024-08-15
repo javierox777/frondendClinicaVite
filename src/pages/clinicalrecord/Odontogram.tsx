@@ -12,6 +12,7 @@ import {
   Grid,
   IconButton,
   Paper,
+  Tab,
   Table,
   TableBody,
   TableCell,
@@ -19,6 +20,7 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  Tabs,
   Typography,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
@@ -137,6 +139,12 @@ interface Props {
   afterSubmit?: CallableFunction;
 }
 
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
 const Odontogram = ({ odontogram, afterSubmit }: Props) => {
   const { mode } = useThemeContext();
   const { user } = useUser();
@@ -145,12 +153,12 @@ const Odontogram = ({ odontogram, afterSubmit }: Props) => {
   const [alertOpen, setAlertOpen] = useState(false);
 
   const [isSubmitting, setSubmitting] = useState(false);
+  const [value, setValue] = React.useState(0);
 
   const [newOdontogram, setNewOdontogram] = useState<OdontogramInterface>({
     persona: '',
     fecha: '',
     dientes: [],
-    version: 0,
     profesionalModifica: '',
   });
 
@@ -170,6 +178,10 @@ const Odontogram = ({ odontogram, afterSubmit }: Props) => {
     newPage: number
   ) => {
     setPage(newPage);
+  };
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
   };
 
   const handleChangeRowsPerPage = (
@@ -222,71 +234,95 @@ const Odontogram = ({ odontogram, afterSubmit }: Props) => {
   return (
     <>
       <Grid container spacing={5}>
-        <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
-          <Button
-            fullWidth
-            variant="contained"
-            onClick={() => setAlertOpen(true)}
-            disabled={isSubmitting}
-          >
-            {isSubmitting && <Loader />}
-            {!isSubmitting && <Save />}{' '}
-            {isSubmitting && 'Creando nueva versión'}
-            {!isSubmitting && 'Guardar Registro'}
-          </Button>
-          <Dialog
-            open={alertOpen}
-            onClose={() => setAlertOpen(false)}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-          >
-            <DialogTitle id="alert-dialog-title">
-              {'¿Guardar registro de odontograma?'}
-            </DialogTitle>
-            <DialogContent>
-              <DialogContentText id="alert-dialog-description">
-                Al aceptar, se creará una nueva versión del odontograma en la
-                base de datos, ¿Está seguro(a) que esta es la versión que quiere
-                guardar?
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button
-                variant="contained"
-                color="inherit"
-                onClick={() => setAlertOpen(false)}
-              >
-                Cancelar
-              </Button>
-              <Button
-                onClick={handleCreateNewVersion}
-                autoFocus
-                variant="contained"
-                disabled={isSubmitting}
-              >
-                {isSubmitting && 'Creando nueva versión'}
-                {!isSubmitting && 'Guardar Registro'}
-              </Button>
-            </DialogActions>
-          </Dialog>
-        </Grid>
         {/* INFORMACION DEL ODONTOGRAMA */}
         <Grid item xs={12}>
-          <Grid container spacing={5}>
-            <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-              <Typography sx={{ fontWeight: 'bold' }}>
+          <Grid container justifyContent={'center'} alignItems={'center'}>
+            <Grid item xs={12} sm={12} md={12} lg={4} xl={4}>
+              <Typography
+                style={{
+                  fontWeight: 'bold',
+                  color: mode === 'light' ? colors.lightModeTableText : 'white',
+                }}
+              >
                 Fecha de registro (Versión)
               </Typography>
-              <Typography>{odontogram.fecha}</Typography>
+              <Typography
+                style={{
+                  fontWeight: 'bold',
+                  color: mode === 'light' ? colors.lightModeTableText : 'white',
+                }}
+              >
+                {odontogram.fecha}
+              </Typography>
             </Grid>
-            <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-              <Typography sx={{ fontWeight: 'bold' }}>Atención</Typography>
-              <Typography>
+            <Grid item xs={12} sm={12} md={12} lg={4} xl={4}>
+              <Typography
+                style={{
+                  fontWeight: 'bold',
+                  color: mode === 'light' ? colors.lightModeTableText : 'white',
+                }}
+              >
+                Atención
+              </Typography>
+              <Typography
+                style={{
+                  color: mode === 'light' ? colors.lightModeTableText : 'white',
+                }}
+              >
                 {(odontogram.profesionalModifica as Professional).nombre1}{' '}
                 {(odontogram.profesionalModifica as Professional).nombre2}{' '}
                 {(odontogram.profesionalModifica as Professional).apellPat}{' '}
                 {(odontogram.profesionalModifica as Professional).apellMat}{' '}
               </Typography>
+            </Grid>
+            <Grid item xs={12} sm={12} md={12} lg={3} xl={2}>
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={() => setAlertOpen(true)}
+                disabled={isSubmitting}
+                color="success"
+              >
+                {isSubmitting && <Loader />}
+                {!isSubmitting && <Save />}{' '}
+                {isSubmitting && 'Creando nueva versión'}
+                {!isSubmitting && 'Guardar Registro'}
+              </Button>
+              <Dialog
+                open={alertOpen}
+                onClose={() => setAlertOpen(false)}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+              >
+                <DialogTitle id="alert-dialog-title">
+                  {'¿Guardar registro de odontograma?'}
+                </DialogTitle>
+                <DialogContent>
+                  <DialogContentText id="alert-dialog-description">
+                    Al aceptar, se creará una nueva versión del odontograma en
+                    la base de datos, ¿Está seguro(a) que esta es la versión que
+                    quiere guardar?
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button
+                    variant="contained"
+                    color="inherit"
+                    onClick={() => setAlertOpen(false)}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={handleCreateNewVersion}
+                    autoFocus
+                    variant="contained"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting && 'Creando nueva versión'}
+                    {!isSubmitting && 'Guardar Registro'}
+                  </Button>
+                </DialogActions>
+              </Dialog>
             </Grid>
           </Grid>
         </Grid>
@@ -295,95 +331,109 @@ const Odontogram = ({ odontogram, afterSubmit }: Props) => {
           <Divider />
         </Grid>
       </Grid>
-      <Container>
-        <Grid container spacing={6}>
-          <Grid item>
-            <Grid container spacing={1}>
-              {newOdontogram.dientes
-                .filter((d) => parseInt(d.pieza) < 31)
-                .map((d: Diente) => {
-                  const dienteKey = `diente${d.pieza}` as DienteKeys;
-                  return (
-                    <Grid item xs key={d._id}>
-                      <Grid container justifyContent={'center'}>
-                        <Grid item>
-                          <Typography style={{ textAlign: 'center' }}>
-                            {d.pieza}
-                          </Typography>
-                        </Grid>
-                        <Grid
-                          item
-                          className="hover:scale-[1.05] cursor-pointer transition-all relative"
-                          onClick={() => {
-                            setTooth(d);
-                            setOpen(true);
-                          }}
-                        >
-                          {!d.activo && (
-                            <div className="absolute">
-                              <Close color="error" />
-                            </div>
-                          )}
-                          <img
-                            src={dientesImages[dienteKey]}
-                            height={200}
-                            width={50}
-                          />
-                        </Grid>
+
+      <Grid container spacing={6}>
+        <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+          <Grid container spacing={1}>
+            {newOdontogram.dientes
+              .filter((d) => parseInt(d.pieza!) < 31)
+              .map((d: Diente) => {
+                const dienteKey = `diente${d.pieza}` as DienteKeys;
+                return (
+                  <Grid item xs key={d._id}>
+                    <Grid container justifyContent={'center'}>
+                      <Grid item>
+                        <Typography style={{ textAlign: 'center' }}>
+                          {d.pieza}
+                        </Typography>
+                      </Grid>
+                      <Grid
+                        item
+                        className="hover:scale-[1.05] cursor-pointer transition-all relative"
+                        onClick={() => {
+                          setTooth(d);
+                          setOpen(true);
+                        }}
+                      >
+                        {!d.activo && (
+                          <div className="absolute">
+                            <Close color="error" />
+                          </div>
+                        )}
+                        <img
+                          src={dientesImages[dienteKey]}
+                          height={200}
+                          width={50}
+                        />
                       </Grid>
                     </Grid>
-                  );
-                })}
-            </Grid>
-            <Grid container spacing={1} alignItems={'baseline'}>
-              {newOdontogram.dientes
-                .filter((d) => parseInt(d.pieza) >= 31)
-                .map((d: Diente) => {
-                  const dienteKey = `diente${d.pieza}` as DienteKeys;
-                  return (
-                    <Grid item xs key={d._id}>
-                      <Grid container justifyContent={'center'}>
-                        <Grid
-                          item
-                          className="hover:scale-[1.05] cursor-pointer transition-all relative"
-                          onClick={() => {
-                            setTooth(d);
-                            setOpen(true);
-                          }}
-                        >
-                          {!d.activo && (
-                            <div className="absolute">
-                              <Close color="error" />
-                            </div>
-                          )}
-                          <img
-                            src={dientesImages[dienteKey]}
-                            height={200}
-                            width={50}
-                          />
-                        </Grid>
-                        <Grid item>
-                          <Typography style={{ textAlign: 'center' }}>
-                            {d.pieza}
-                          </Typography>
-                        </Grid>
-                      </Grid>
-                    </Grid>
-                  );
-                })}
-            </Grid>
+                  </Grid>
+                );
+              })}
           </Grid>
-          <Grid item xs={12}>
-            <Grid container>
-              <Grid
-                item
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-                xl={12}
-                className="rounded-lg shadow-lg"
-              >
+          <Grid container spacing={1} alignItems={'baseline'}>
+            {newOdontogram.dientes
+              .filter((d) => parseInt(d.pieza!) >= 31)
+              .map((d: Diente) => {
+                const dienteKey = `diente${d.pieza}` as DienteKeys;
+                return (
+                  <Grid item xs key={d._id}>
+                    <Grid container justifyContent={'center'}>
+                      <Grid
+                        item
+                        className="hover:scale-[1.05] cursor-pointer transition-all relative"
+                        onClick={() => {
+                          setTooth(d);
+                          setOpen(true);
+                        }}
+                      >
+                        {!d.activo && (
+                          <div className="absolute">
+                            <Close color="error" />
+                          </div>
+                        )}
+                        <img
+                          src={dientesImages[dienteKey]}
+                          height={200}
+                          width={50}
+                        />
+                      </Grid>
+                      <Grid item>
+                        <Typography style={{ textAlign: 'center' }}>
+                          {d.pieza}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                );
+              })}
+          </Grid>
+        </Grid>
+        <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+          <Grid container>
+            <Grid
+              item
+              xs={12}
+              sm={12}
+              md={12}
+              lg={12}
+              xl={12}
+              className="rounded-lg shadow-lg"
+            >
+              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <Tabs
+                  value={value}
+                  onChange={handleChange}
+                  aria-label="basic tabs example"
+                  variant="fullWidth"
+                >
+                  <Tab label="Tratamientos" {...a11yProps(0)} />
+                  <Tab label="Resumen" {...a11yProps(1)} />
+                  <Tab label="Historial de citas" {...a11yProps(2)} />
+                  <Tab label="Medicamentos" {...a11yProps(3)} />
+                </Tabs>
+              </Box>
+              <CustomTabPanel value={value} index={1}>
                 <TableContainer component={Paper} elevation={0}>
                   <Table>
                     <TableHead
@@ -439,11 +489,12 @@ const Odontogram = ({ odontogram, afterSubmit }: Props) => {
                     rowsPerPageOptions={[8, 16, 32]}
                   />
                 </TableContainer>
-              </Grid>
+              </CustomTabPanel>
             </Grid>
           </Grid>
         </Grid>
-      </Container>
+      </Grid>
+
       <ToothDetails
         open={open}
         setOpen={() => setOpen(false)}
@@ -511,10 +562,26 @@ const ToothTableRow = ({
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={rowOpen} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
-              <Typography variant="h6" gutterBottom component="div">
-                {tooth.activo && `Pieza ${tooth.pieza}`}
-                {!tooth.activo && 'Diente Ausente'}
-              </Typography>
+              {tooth.activo && (
+                <Typography variant="h6" gutterBottom component="div">
+                  {`Pieza ${tooth.pieza}`}
+                </Typography>
+              )}
+              {!tooth.activo && (
+                <Typography
+                  style={{
+                    color:
+                      mode === 'light' ? colors.lightModeTableText : 'white',
+                    fontWeight: 'lighter',
+                    textAlign: 'center',
+                  }}
+                  variant="h6"
+                  gutterBottom
+                  component="div"
+                >
+                  Diente Ausente
+                </Typography>
+              )}
               {tooth.activo && (
                 <Table size="small" aria-label="purchases">
                   <TableHead>
@@ -607,5 +674,27 @@ const ToothTableRow = ({
     </React.Fragment>
   );
 };
+
+function a11yProps(index: number) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+function CustomTabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+    </div>
+  );
+}
 
 export default Odontogram;

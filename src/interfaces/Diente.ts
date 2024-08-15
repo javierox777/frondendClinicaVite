@@ -2,7 +2,7 @@ import { ToothPart } from "./ToothPart";
 
 export interface Diente {
     _id?:string;
-    pieza: string;
+    pieza?: string;
     detalle: string;
     diagnostico: string;
     estado: string;

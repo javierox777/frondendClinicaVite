@@ -206,20 +206,21 @@ const ToothDetails = ({ open, setOpen, tooth, onSave }: Props) => {
               Información general del diente
             </Typography>
           </Grid>
-          <Grid item>
-            <FormControl>
+          <Grid item xs={12}>
+            <FormControl fullWidth>
               <TextField
                 value={editTooth.detalle}
-                label="Nota"
+                label="Observación"
                 InputLabelProps={{ shrink: true }}
                 onChange={(e) => {
                   setToothProp('detalle', e.target.value);
                 }}
+                multiline
               />
             </FormControl>
           </Grid>
-          <Grid item>
-            <FormControl>
+          <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+            <FormControl fullWidth>
               <TextField
                 value={editTooth?.diagnostico}
                 label="Diagnostico"
@@ -230,8 +231,8 @@ const ToothDetails = ({ open, setOpen, tooth, onSave }: Props) => {
               />
             </FormControl>
           </Grid>
-          <Grid item>
-            <FormControl>
+          <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+            <FormControl fullWidth>
               <TextField
                 value={editTooth?.estado}
                 label="Estado"
@@ -255,47 +256,56 @@ const ToothDetails = ({ open, setOpen, tooth, onSave }: Props) => {
           </Grid>
           {selectedPart && (
             <>
-              <Grid item>
-                <TextField
-                  value={editTooth[selectedPart as TeethPartKeys].detalle}
-                  label="Nota"
-                  InputLabelProps={{ shrink: true }}
-                  onChange={(e) => {
-                    setPartProp(
-                      selectedPart as TeethPartKeys,
-                      'detalle',
-                      e.target.value
-                    );
-                  }}
-                />
+              <Grid item xs={12}>
+                <FormControl fullWidth>
+                  <TextField
+                    value={editTooth[selectedPart as TeethPartKeys].detalle}
+                    label="Observación"
+                    InputLabelProps={{ shrink: true }}
+                    onChange={(e) => {
+                      setPartProp(
+                        selectedPart as TeethPartKeys,
+                        'detalle',
+                        e.target.value
+                      );
+                    }}
+                    multiline
+                  />
+                </FormControl>
               </Grid>
-              <Grid item>
-                <TextField
-                  value={editTooth[selectedPart as TeethPartKeys]?.diagnostico}
-                  label="Diagnostico"
-                  InputLabelProps={{ shrink: true }}
-                  onChange={(e) => {
-                    setPartProp(
-                      selectedPart as TeethPartKeys,
-                      'diagnostico',
-                      e.target.value
-                    );
-                  }}
-                />
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                <FormControl fullWidth>
+                  <TextField
+                    value={
+                      editTooth[selectedPart as TeethPartKeys]?.diagnostico
+                    }
+                    label="Diagnostico"
+                    InputLabelProps={{ shrink: true }}
+                    onChange={(e) => {
+                      setPartProp(
+                        selectedPart as TeethPartKeys,
+                        'diagnostico',
+                        e.target.value
+                      );
+                    }}
+                  />
+                </FormControl>
               </Grid>
-              <Grid item>
-                <TextField
-                  value={editTooth[selectedPart as TeethPartKeys]?.estado}
-                  label="Estado"
-                  InputLabelProps={{ shrink: true }}
-                  onChange={(e) => {
-                    setPartProp(
-                      selectedPart as TeethPartKeys,
-                      'estado',
-                      e.target.value
-                    );
-                  }}
-                />
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                <FormControl fullWidth>
+                  <TextField
+                    value={editTooth[selectedPart as TeethPartKeys]?.estado}
+                    label="Estado"
+                    InputLabelProps={{ shrink: true }}
+                    onChange={(e) => {
+                      setPartProp(
+                        selectedPart as TeethPartKeys,
+                        'estado',
+                        e.target.value
+                      );
+                    }}
+                  />
+                </FormControl>
               </Grid>
             </>
           )}
