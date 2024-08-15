@@ -19,6 +19,7 @@ import {
   Slide,
   TextField,
   Toolbar,
+  Typography,
 } from '@mui/material';
 import colors from '../../styles/colors';
 import { useThemeContext } from '../../componemts/themeContext';
@@ -35,7 +36,7 @@ import { User } from '../../interfaces/User';
 
 interface Props {
   odontograms: OdontogramInterface[];
-  afterSubmit?: CallableFunction;
+  afterSubmit: CallableFunction;
   persona: Person;
 }
 
@@ -59,12 +60,18 @@ const OdontogramTab = ({ odontograms, afterSubmit, persona }: Props) => {
   return (
     <>
       <Grid container gap={5}>
+        <Grid item>
+          <Typography>
+            No se ha registrado odontograma para este paciente.
+          </Typography>
+        </Grid>
         <Grid item xs={12}>
-          {odontograms.length === 0 && (
+          {odontograms && odontograms.length === 0 && (
             <Button
               variant="contained"
               color="primary"
               onClick={() => setOpenForm(true)}
+              fullWidth
             >
               Registrar odontograma
             </Button>
@@ -72,7 +79,7 @@ const OdontogramTab = ({ odontograms, afterSubmit, persona }: Props) => {
         </Grid>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
           {!odontograms && <LinearProgress />}
-          {odontograms && (
+          {odontograms && !(odontograms.length === 0) && (
             <FormControl fullWidth>
               <Autocomplete
                 disablePortal
@@ -139,7 +146,11 @@ const OdontogramTab = ({ odontograms, afterSubmit, persona }: Props) => {
             </IconButton>
           </Toolbar>
         </AppBar>
-        <OdontogramForm persona={persona} profesionalId={(user as User)._id} />
+        <OdontogramForm
+          persona={persona}
+          profesionalId={(user as User).profesionalId}
+          afterSubmit={() => afterSubmit()}
+        />
       </Dialog>
     </>
   );
