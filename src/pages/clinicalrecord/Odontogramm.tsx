@@ -295,6 +295,58 @@ const Odontogramm = ({ odontogram }: Props) => {
   return (
     <>
       <Grid container>
+        <Grid item xs={12} style={{ paddingBottom: 20 }}>
+          <Grid container>
+            <Grid item xs={12} sm={12} md={12} lg={5} xl={5}>
+              <Box>
+                <Typography
+                  style={{
+                    fontWeight: 'bold',
+                    color:
+                      mode === 'light' ? colors.lightModeTableText : 'white',
+                    textAlign: 'center',
+                  }}
+                >
+                  Fecha de registro
+                </Typography>
+                <Typography
+                  style={{
+                    color:
+                      mode === 'light' ? colors.lightModeTableText : 'white',
+                    textAlign: 'center',
+                  }}
+                >
+                  {odontogram?.fecha}
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm={12} md={12} lg={5} xl={5}>
+              <Box>
+                <Typography
+                  style={{
+                    fontWeight: 'bold',
+                    color:
+                      mode === 'light' ? colors.lightModeTableText : 'white',
+                    textAlign: 'center',
+                  }}
+                >
+                  Última modificación
+                </Typography>
+                <Typography
+                  style={{
+                    color:
+                      mode === 'light' ? colors.lightModeTableText : 'white',
+                    textAlign: 'center',
+                  }}
+                >
+                  {(odontogram?.profesionalModifica as Professional).nombre1}{' '}
+                  {(odontogram?.profesionalModifica as Professional).apellPat}
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
+        </Grid>
+
         <Grid item xs={12} style={{ marginBottom: 15 }}>
           <MuiButton
             variant="contained"
@@ -314,7 +366,7 @@ const Odontogramm = ({ odontogram }: Props) => {
           lg={3}
           xl={3}
           style={{ height: 'calc(500px + 0.75rem)' }}
-          className="border-2 border-b-0 overflow-y-auto no-scrollbar"
+          className="border-2 border-b-0 rounded-tl-md overflow-y-auto no-scrollbar"
         >
           <Box>
             <Box
@@ -370,7 +422,7 @@ const Odontogramm = ({ odontogram }: Props) => {
           md={12}
           lg={9}
           xl={9}
-          className="border-2 border-b-0 pt-3"
+          className="border-2 border-b-0 pt-3 rounded-tr-md"
         >
           {odontogramLoading && (
             <Grid
