@@ -16,6 +16,7 @@ import axios from 'axios';
 import { Contact } from '../../interfaces/Contact';
 import { Address } from '../../interfaces/Address';
 import { ContactEmergency } from '@mui/icons-material';
+import Toooth from '../../componemts/Toooth';
 
 interface Props {
   patient: Person;
@@ -57,8 +58,8 @@ const Personalnfo = ({ patient }: Props) => {
         xs={12}
         sm={12}
         md={12}
-        lg={12}
-        xl={12}
+        lg={6}
+        xl={6}
         className="shadow-lg p-7"
       >
         <Grid container spacing={2}>

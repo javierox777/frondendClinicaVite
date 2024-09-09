@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   AppBar,
   Autocomplete,
@@ -23,16 +23,15 @@ import {
 } from '@mui/material';
 import colors from '../../styles/colors';
 import { useThemeContext } from '../../componemts/themeContext';
-import Odontogram from './Odontogram';
 import { OdontogramInterface } from '../../interfaces/Odontogram';
 import { Diente } from '../../interfaces/Diente';
 import { Toaster } from 'react-hot-toast';
-import OdontogramForm from './OdontogramForm';
 import { TransitionProps } from '@mui/material/transitions';
 import { Close } from '@mui/icons-material';
 import { Person } from '../../interfaces/Person';
 import { useUser } from '../../auth/userContext';
 import { User } from '../../interfaces/User';
+import Odontogramm from './Odontogramm';
 
 interface Props {
   odontograms: OdontogramInterface[];
@@ -57,14 +56,20 @@ const OdontogramTab = ({ odontograms, afterSubmit, persona }: Props) => {
 
   const [selectedOdontogram, setOdontogram] = useState<OdontogramInterface>();
 
-  return (
-    <>
+  useEffect(() => {
+    if (odontograms) setOdontogram(odontograms[0]);
+  }, []);
+
+  if (odontograms && odontograms.length === 0)
+    return (
       <Grid container gap={5}>
-        <Grid item>
-          <Typography>
-            No se ha registrado odontograma para este paciente.
-          </Typography>
-        </Grid>
+        {odontograms && odontograms.length === 0 && (
+          <Grid item>
+            <Typography>
+              No se ha registrado odontograma para este paciente.
+            </Typography>
+          </Grid>
+        )}
         <Grid item xs={12}>
           {odontograms && odontograms.length === 0 && (
             <Button
@@ -77,56 +82,12 @@ const OdontogramTab = ({ odontograms, afterSubmit, persona }: Props) => {
             </Button>
           )}
         </Grid>
-        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-          {!odontograms && <LinearProgress />}
-          {odontograms && !(odontograms.length === 0) && (
-            <FormControl fullWidth>
-              <Autocomplete
-                disablePortal
-                // defaultValue={budget?.profesional}
-                options={odontograms}
-                renderInput={(params) => (
-                  <TextField {...params} label="Selecciona Odontograma" />
-                )}
-                renderOption={(props, o: OdontogramInterface) => (
-                  <li {...props}>
-                    <div className="flex justify-between w-full">
-                      <span>Vers. {o.fecha}</span>
-                      <span
-                        style={{
-                          color:
-                            mode === 'light'
-                              ? colors.ligthModeSoftText
-                              : colors.darkModeSoftText,
-                        }}
-                      >
-                        Odontograma
-                      </span>
-                    </div>
-                  </li>
-                )}
-                getOptionLabel={(o: OdontogramInterface) => {
-                  // Value selected with enter, right from the input
-                  if (typeof o === 'string') {
-                    return o;
-                  }
-                  // Regular professional
-                  return `Fecha seleccionada: ${o.fecha}`;
-                }}
-                onChange={(event, o: OdontogramInterface | null) => {
-                  if (o) setOdontogram(o);
-                }}
-              />
-            </FormControl>
-          )}
-        </Grid>
-        <Grid item xs={12}>
-          <Odontogram
-            odontogram={selectedOdontogram}
-            afterSubmit={afterSubmit}
-          />
-        </Grid>
       </Grid>
+    );
+
+  return (
+    <>
+      <Odontogramm odontogram={selectedOdontogram} />
       <Toaster />
       <Dialog
         fullScreen
@@ -146,11 +107,11 @@ const OdontogramTab = ({ odontograms, afterSubmit, persona }: Props) => {
             </IconButton>
           </Toolbar>
         </AppBar>
-        <OdontogramForm
+        {/* <OdontogramForm
           persona={persona}
           profesionalId={(user as User).profesionalId}
           afterSubmit={() => afterSubmit()}
-        />
+        /> */}
       </Dialog>
     </>
   );

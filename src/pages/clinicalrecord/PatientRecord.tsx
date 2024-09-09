@@ -33,6 +33,7 @@ import OdontogramTab from './OdontogramTab';
 import { Badge, ContactEmergency } from '@mui/icons-material';
 import Personalnfo from './Personalnfo';
 import PatientReceipts from './PatientReceipts';
+import { update } from '@react-spring/web';
 
 const tableHeadings = [
   { id: 1, label: 'Fecha' },
@@ -200,23 +201,25 @@ const PatientRecord = () => {
             </Box>
           </Grid>
         </Grid>
+        <Grid item>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs
+              value={value}
+              onChange={handleChange}
+              aria-label="basic tabs example"
+              variant="fullWidth"
+            >
+              <Tab label="Datos Personales" {...a11yProps(0)} />
+              <Tab label="Odontograma" {...a11yProps(1)} />
+              <Tab label="Historial de citas" {...a11yProps(2)} />
+              <Tab label="Medicamentos" {...a11yProps(3)} />
+            </Tabs>
+          </Box>
+        </Grid>
       </Grid>
       {/* INFORMACION DE PACIENTE  */}
 
       <Grid item xs={12}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            aria-label="basic tabs example"
-            variant="fullWidth"
-          >
-            <Tab label="Datos Personales" {...a11yProps(0)} />
-            <Tab label="Odontograma" {...a11yProps(1)} />
-            <Tab label="Historial de citas" {...a11yProps(2)} />
-            <Tab label="Medicamentos" {...a11yProps(3)} />
-          </Tabs>
-        </Box>
         <CustomTabPanel value={value} index={2}>
           {appointmentsFetching && (
             <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>

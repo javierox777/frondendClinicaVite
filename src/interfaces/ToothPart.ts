@@ -3,5 +3,6 @@ export interface ToothPart {
     diagnostico:string;
     estado:string,
     caries:boolean,
-    restauracion:boolean
+    restauracion:boolean,
+    color:string
 }

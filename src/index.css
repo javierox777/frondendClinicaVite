@@ -70,3 +70,32 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera by default */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge, and Firefox by default */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  /* Make the scrollbar visible on hover */
+  .no-scrollbar:hover::-webkit-scrollbar {
+    display: block;
+    width: 8px; /* Adjust width as needed */
+  }
+
+  /* For Firefox and other browsers */
+  .no-scrollbar:hover {
+    scrollbar-width: thin;
+    scrollbar-color: auto; /* Add color if needed */
+  }
+
+  .calculate-height {
+    height: calc(100vh - 3rem);
+  }
+}
