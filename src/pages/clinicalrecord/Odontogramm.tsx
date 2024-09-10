@@ -339,8 +339,11 @@ const Odontogramm = ({ odontogram }: Props) => {
                     textAlign: 'center',
                   }}
                 >
-                  {(odontogram?.profesionalModifica as Professional).nombre1}{' '}
-                  {(odontogram?.profesionalModifica as Professional).apellPat}
+                  {odontogram &&
+                    (odontogram.profesionalModifica as Professional)
+                      .nombre1}{' '}
+                  {odontogram &&
+                    (odontogram.profesionalModifica as Professional).apellPat}
                 </Typography>
               </Box>
             </Grid>
@@ -628,7 +631,28 @@ const Odontogramm = ({ odontogram }: Props) => {
             </Grid>
           )}
         </Grid>
-        <Grid item xs={12} className="border-t-2">
+        <Grid
+          item
+          xs={12}
+          style={{
+            backgroundColor:
+              mode === 'light'
+                ? colors.lightModeTableHead
+                : colors.darkModeTableHead,
+            marginBlock: 15,
+          }}
+        >
+          <Typography
+            style={{
+              fontWeight: 'bold',
+              color: mode === 'light' ? colors.lightModeTableText : 'white',
+              textAlign: 'center',
+            }}
+          >
+            Registro Clínico De Dientes.
+          </Typography>
+        </Grid>
+        <Grid item xs={12} sm={12} md={12} lg={6} xl={6} className="border-t-2">
           <TableContainer>
             <Table>
               <TableHead
@@ -667,7 +691,15 @@ const Odontogramm = ({ odontogram }: Props) => {
                   >
                     Fecha
                   </TableCell>
-                  <TableCell>Atención</TableCell>
+                  <TableCell
+                    style={{
+                      fontWeight: 'bold',
+                      color:
+                        mode === 'light' ? colors.lightModeTableText : 'white',
+                    }}
+                  >
+                    Atención
+                  </TableCell>
                   <TableCell
                     style={{
                       fontWeight: 'bold',

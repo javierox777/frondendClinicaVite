@@ -37,7 +37,7 @@ const Tooth = ({ tooth, onUpdate, treatment }: Props) => {
   return (
     <div className="flex-col">
       <div className="flex justify-center items-center min-w-full gap-3">
-        <div className="grid grid-cols-3 grid-rows-3 border-black w-10 h-10 cursor-pointer ">
+        <div className="grid grid-cols-3 grid-rows-3 border-black w-14 h-14 cursor-pointer ">
           <div
             style={{
               borderColor:
