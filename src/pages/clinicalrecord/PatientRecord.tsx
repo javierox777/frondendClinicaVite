@@ -21,7 +21,6 @@ import React, { useState } from 'react';
 import { useThemeContext } from '../../componemts/themeContext';
 import colors from '../../styles/colors';
 import Tooth from '../../componemts/Tooth';
-import Odontogram from './Odontogram';
 import { useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';

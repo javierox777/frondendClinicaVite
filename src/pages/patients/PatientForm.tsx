@@ -3,16 +3,19 @@ import {
   AddCircleOutline,
   CheckCircle,
   Close,
+  Delete,
   PlusOne,
 } from '@mui/icons-material';
 import {
   Box,
   Button,
   Card,
+  Checkbox,
   Container,
   Dialog,
   Fab,
   FormControl,
+  FormControlLabel,
   Grid,
   IconButton,
   InputLabel,
@@ -22,6 +25,8 @@ import {
   SelectChangeEvent,
   Slide,
   Switch,
+  Tab,
+  Tabs,
   TextField,
   Toolbar,
   Typography,
@@ -59,8 +64,17 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
+const badHabits = [
+  { descripcion: 'Succión digital', id: 1 },
+  { descripcion: 'Respirador bucal', id: 2 },
+  { descripcion: 'Onicofagia', id: 3 },
+  { descripcion: 'Succión chupete-mamadera', id: 4 },
+  { descripcion: 'Deflución atípico', id: 5 },
+];
+
 const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
   const { mode } = useThemeContext();
+  const [value, setValue] = useState(0);
 
   const [firstName, setFirstName] = useState('');
   const [secondName, setSecondName] = useState('');
@@ -77,6 +91,88 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
 
   const [correspondingInstitutions, setCorrespondingInst] = useState([]);
   const [subFormSubmitted, setSubFormSubmitted] = useState(true);
+
+  const [morbid, setMorbid] = useState([
+    {
+      _id: (Math.random() * 1000).toString(),
+      descripcion: '',
+    },
+  ]);
+  const [familiar, setFamiliar] = useState([
+    {
+      _id: (Math.random() * 1000).toString(),
+      descripcion: '',
+    },
+  ]);
+  const [habits, setHabits] = useState([
+    {
+      descripcion: '',
+    },
+  ]);
+  const [allergies, setAllergies] = useState([
+    {
+      _id: (Math.random() * 1000).toString(),
+      descripcion: '',
+    },
+  ]);
+
+  const handleAddAntecedent = (
+    type: 'morbid' | 'familiar' | 'allergy' | 'habits'
+  ) => {
+    switch (type) {
+      case 'morbid':
+        setMorbid([
+          ...morbid,
+          {
+            _id: (Math.random() * 1000).toString(),
+            descripcion: '',
+          },
+        ]);
+        break;
+      case 'familiar':
+        setFamiliar([
+          ...familiar,
+          {
+            _id: (Math.random() * 1000).toString(),
+            descripcion: '',
+          },
+        ]);
+        break;
+      case 'allergy':
+        setAllergies([
+          ...allergies,
+          {
+            _id: (Math.random() * 1000).toString(),
+            descripcion: '',
+          },
+        ]);
+        break;
+    }
+  };
+
+  const handleChangeAntecedents = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    type: 'morbid' | 'familiar' | 'allergy',
+    index: number
+  ) => {
+    switch (type) {
+      case 'morbid':
+        const updatedMorbid = [...morbid];
+        updatedMorbid[index].descripcion = e.target.value;
+        setMorbid(updatedMorbid);
+        break;
+      case 'familiar':
+        const updatedFamiliar = [...familiar];
+        updatedFamiliar[index].descripcion = e.target.value;
+        setFamiliar(updatedFamiliar);
+        break;
+      case 'allergy':
+        const updatedAllergies = [...allergies];
+        updatedAllergies[index].descripcion = e.target.value;
+        setAllergies(updatedAllergies);
+        break;
+    }
+  };
 
   const [contacts, setContacts] = useState([
     {
@@ -247,6 +343,10 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
     });
     setCorrespondingInst(institutions);
   }, [selectedPrevision]);
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
 
   return (
     <>
@@ -462,6 +562,193 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                     })}
                   </Select>
                 </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  style={{ marginBottom: 10 }}
+                >
+                  <Typography style={{ fontWeight: 'bold' }}>
+                    Antecedentes
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    backgroundColor:
+                      mode === 'light'
+                        ? colors.lightModeTableHead
+                        : colors.darkModeTableHead,
+                  }}
+                >
+                  <Tabs
+                    value={value}
+                    onChange={handleChange}
+                    aria-label="basic tabs example"
+                    variant="fullWidth"
+                  >
+                    <Tab label="Mórbidos" {...a11yProps(0)} />
+                    <Tab label="Familiares" {...a11yProps(1)} />
+                    <Tab label="Malos hábitos" {...a11yProps(2)} />
+                    <Tab label="Alergias" {...a11yProps(3)} />
+                  </Tabs>
+                </Box>
+                <CustomTabPanel value={value} index={0}>
+                  <Box display="flex-column" gap={1}>
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <Typography style={{ fontWeight: 'bold' }}>
+                        Agregar antecedente
+                      </Typography>
+                      <IconButton onClick={() => handleAddAntecedent('morbid')}>
+                        <AddCircleOutline />
+                      </IconButton>
+                    </Box>
+                    {morbid.map((m: any, index: number) => {
+                      return (
+                        <Box
+                          key={m._id}
+                          className="flex items-center"
+                          style={{ marginBottom: 5 }}
+                        >
+                          <TextField
+                            label="Antecedente mórbido"
+                            fullWidth
+                            onChange={(e) =>
+                              handleChangeAntecedents(e, 'morbid', index)
+                            }
+                            value={m.descripcion}
+                          />
+                          <IconButton>
+                            <Delete
+                              onClick={() => {
+                                const updatedData = morbid.filter(
+                                  (md) => md._id !== m._id
+                                );
+                                setMorbid(updatedData);
+                              }}
+                            />
+                          </IconButton>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                </CustomTabPanel>
+                <CustomTabPanel value={value} index={1}>
+                  <Box display="flex-column" gap={1}>
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <Typography style={{ fontWeight: 'bold' }}>
+                        Agregar antecedente
+                      </Typography>
+                      <IconButton
+                        onClick={() => handleAddAntecedent('familiar')}
+                      >
+                        <AddCircleOutline />
+                      </IconButton>
+                    </Box>
+                    {familiar.map((m: any, index: number) => {
+                      return (
+                        <Box
+                          key={m._id}
+                          className="flex items-center"
+                          style={{ marginBottom: 5 }}
+                        >
+                          <TextField
+                            label="Antecedente familiar"
+                            fullWidth
+                            onChange={(e) =>
+                              handleChangeAntecedents(e, 'familiar', index)
+                            }
+                            value={m.descripcion}
+                          />
+                          <IconButton>
+                            <Delete
+                              onClick={() => {
+                                const updatedData = familiar.filter(
+                                  (md) => md._id !== m._id
+                                );
+                                setFamiliar(updatedData);
+                              }}
+                            />
+                          </IconButton>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                </CustomTabPanel>
+                <CustomTabPanel value={value} index={3}>
+                  <Box display="flex-column" gap={1}>
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <Typography style={{ fontWeight: 'bold' }}>
+                        Agregar antecedente
+                      </Typography>
+                      <IconButton
+                        onClick={() => handleAddAntecedent('allergy')}
+                      >
+                        <AddCircleOutline />
+                      </IconButton>
+                    </Box>
+                    {allergies.map((m: any, index: number) => {
+                      return (
+                        <Box
+                          key={m._id}
+                          className="flex items-center"
+                          style={{ marginBottom: 5 }}
+                        >
+                          <TextField
+                            label="Alérgia"
+                            fullWidth
+                            onChange={(e) =>
+                              handleChangeAntecedents(e, 'allergy', index)
+                            }
+                            value={m.descripcion}
+                          />
+                          <IconButton>
+                            <Delete
+                              onClick={() => {
+                                const updatedData = allergies.filter(
+                                  (md) => md._id !== m._id
+                                );
+                                setAllergies(updatedData);
+                              }}
+                            />
+                          </IconButton>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                </CustomTabPanel>
+                <CustomTabPanel value={value} index={2}>
+                  <Box display="flex-column" gap={1}>
+                    <Box className="">
+                      {badHabits.map((bh: any) => {
+                        return (
+                          <FormControl fullWidth key={bh.id}>
+                            <FormControlLabel
+                              label={bh.descripcion}
+                              control={
+                                <Checkbox
+                                  checked={habits.some(
+                                    (h) => h.descripcion === bh.descripcion
+                                  )}
+                                  onChange={(e, checked) => {
+                                    if (checked) {
+                                      setHabits([...habits, bh]);
+                                    } else {
+                                      const updatedHabits = habits.filter(
+                                        (h) => h.descripcion !== bh.descripcion
+                                      );
+                                      setHabits(updatedHabits);
+                                    }
+                                  }}
+                                />
+                              }
+                            />
+                          </FormControl>
+                        );
+                      })}
+                    </Box>
+                  </Box>
+                </CustomTabPanel>
               </Grid>
               <Grid item xs={12}>
                 <Box
@@ -757,5 +1044,33 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
     </>
   );
 };
+
+function a11yProps(index: number) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+function CustomTabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+    </div>
+  );
+}
 
 export default PatientForm;
