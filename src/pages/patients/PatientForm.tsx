@@ -115,9 +115,15 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
       descripcion: '',
     },
   ]);
+  const [general, setGeneral] = useState([
+    {
+      _id: (Math.random() * 1000).toString(),
+      descripcion: '',
+    },
+  ]);
 
   const handleAddAntecedent = (
-    type: 'morbid' | 'familiar' | 'allergy' | 'habits'
+    type: 'morbid' | 'familiar' | 'allergy' | 'general'
   ) => {
     switch (type) {
       case 'morbid':
@@ -147,12 +153,21 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
           },
         ]);
         break;
+      case 'general':
+        setGeneral([
+          ...general,
+          {
+            _id: (Math.random() * 1000).toString(),
+            descripcion: '',
+          },
+        ]);
+        break;
     }
   };
 
   const handleChangeAntecedents = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    type: 'morbid' | 'familiar' | 'allergy',
+    type: 'morbid' | 'familiar' | 'allergy' | 'general',
     index: number
   ) => {
     switch (type) {
@@ -170,6 +185,11 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
         const updatedAllergies = [...allergies];
         updatedAllergies[index].descripcion = e.target.value;
         setAllergies(updatedAllergies);
+        break;
+      case 'general':
+        const updatedGeneral = [...general];
+        updatedGeneral[index].descripcion = e.target.value;
+        setGeneral(updatedGeneral);
         break;
     }
   };
@@ -267,6 +287,12 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
       sexo: gender,
       contactos: contacts,
       direcciones: addresses,
+      antecedentes: {
+        morbidos: morbid,
+        familiares: familiar,
+        habitos: habits,
+        alergias: allergies,
+      },
     };
 
     try {
@@ -591,6 +617,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                     <Tab label="Familiares" {...a11yProps(1)} />
                     <Tab label="Malos hábitos" {...a11yProps(2)} />
                     <Tab label="Alergias" {...a11yProps(3)} />
+                    <Tab label="Generales" {...a11yProps(4)} />
                   </Tabs>
                 </Box>
                 <CustomTabPanel value={value} index={0}>
@@ -617,6 +644,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                               handleChangeAntecedents(e, 'morbid', index)
                             }
                             value={m.descripcion}
+                            required
                           />
                           <IconButton>
                             <Delete
@@ -659,6 +687,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                               handleChangeAntecedents(e, 'familiar', index)
                             }
                             value={m.descripcion}
+                            required
                           />
                           <IconButton>
                             <Delete
@@ -679,7 +708,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                   <Box display="flex-column" gap={1}>
                     <Box display="flex" alignItems="center" gap={1}>
                       <Typography style={{ fontWeight: 'bold' }}>
-                        Agregar antecedente
+                        Agregar alérgia
                       </Typography>
                       <IconButton
                         onClick={() => handleAddAntecedent('allergy')}
@@ -701,6 +730,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                               handleChangeAntecedents(e, 'allergy', index)
                             }
                             value={m.descripcion}
+                            required
                           />
                           <IconButton>
                             <Delete
@@ -709,6 +739,49 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                                   (md) => md._id !== m._id
                                 );
                                 setAllergies(updatedData);
+                              }}
+                            />
+                          </IconButton>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                </CustomTabPanel>
+                <CustomTabPanel value={value} index={4}>
+                  <Box display="flex-column" gap={1}>
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <Typography style={{ fontWeight: 'bold' }}>
+                        Agregar antecedente
+                      </Typography>
+                      <IconButton
+                        onClick={() => handleAddAntecedent('allergy')}
+                      >
+                        <AddCircleOutline />
+                      </IconButton>
+                    </Box>
+                    {general.map((m: any, index: number) => {
+                      return (
+                        <Box
+                          key={m._id}
+                          className="flex items-center"
+                          style={{ marginBottom: 5 }}
+                        >
+                          <TextField
+                            label="Antecedente general"
+                            fullWidth
+                            onChange={(e) =>
+                              handleChangeAntecedents(e, 'general', index)
+                            }
+                            value={m.descripcion}
+                            required
+                          />
+                          <IconButton>
+                            <Delete
+                              onClick={() => {
+                                const updatedData = general.filter(
+                                  (md) => md._id !== m._id
+                                );
+                                setGeneral(updatedData);
                               }}
                             />
                           </IconButton>
