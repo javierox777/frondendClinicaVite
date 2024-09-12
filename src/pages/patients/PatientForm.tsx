@@ -106,6 +106,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
   ]);
   const [habits, setHabits] = useState([
     {
+      id: 0,
       descripcion: '',
     },
   ]);
@@ -274,6 +275,13 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const morbidWithoutId = morbid.map(({ _id, ...rest }) => rest);
+    const familiarWithoutId = familiar.map(({ _id, ...rest }) => rest);
+    const generalWithoutId = general.map(({ _id, ...rest }) => rest);
+    const allergiesWithoutId = allergies.map(({ _id, ...rest }) => rest);
+    const habitsWithoutId = habits.map(({ id, ...rest }) => rest);
+
     const newPerson = {
       nombre1: firstName,
       nombre2: secondName,
@@ -288,10 +296,11 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
       contactos: contacts,
       direcciones: addresses,
       antecedentes: {
-        morbidos: morbid,
-        familiares: familiar,
-        habitos: habits,
-        alergias: allergies,
+        morbidos: morbidWithoutId,
+        familiares: familiarWithoutId,
+        habitos: habitsWithoutId,
+        alergias: allergiesWithoutId,
+        generales: generalWithoutId,
       },
     };
 
@@ -345,10 +354,29 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
     setContacts([...contacts]);
   };
 
+  const getPatientAntecedents = async (patientId: string) => {
+    const response = await axios.get(
+      `${generalConfig.baseUrl}/antecedents/getantecedents/${patientId}`
+    );
+
+    const antecedents = response.data.body[0];
+
+    if (!antecedents) {
+      return;
+    }
+
+    setMorbid([...antecedents.morbidos]);
+    setAllergies([...antecedents.alergias]);
+    setHabits([...antecedents.habitos]);
+    setFamiliar([...antecedents.familiares]);
+    setGeneral([...antecedents.generales]);
+  };
+
   useEffect(() => {
     if (patient) {
       getPatientAddresses(patient._id);
       getPatientContacts(patient._id);
+      getPatientAntecedents(patient._id);
       setFirstName(patient.nombre1);
       setSecondName(patient.nombre2);
       setFirstSurname(patient.apellPat);
@@ -754,7 +782,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                         Agregar antecedente
                       </Typography>
                       <IconButton
-                        onClick={() => handleAddAntecedent('allergy')}
+                        onClick={() => handleAddAntecedent('general')}
                       >
                         <AddCircleOutline />
                       </IconButton>

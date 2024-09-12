@@ -1,6 +1,7 @@
 import { Person } from "./Person";
 
 interface AntecedentType {
+    _id:string
     descripcion:string;
 }
 

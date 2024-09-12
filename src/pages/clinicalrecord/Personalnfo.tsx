@@ -1,22 +1,22 @@
-import React from 'react';
-import { Person } from '../../interfaces/Person';
 import {
   Box,
-  Card,
   Divider,
   Grid,
   LinearProgress,
+  Tab,
+  Tabs,
   Typography,
 } from '@mui/material';
-import { useThemeContext } from '../../componemts/themeContext';
-import colors from '../../styles/colors';
-import { generalConfig } from '../../config';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { Contact } from '../../interfaces/Contact';
+import { useThemeContext } from '../../componemts/themeContext';
+import { generalConfig } from '../../config';
 import { Address } from '../../interfaces/Address';
-import { ContactEmergency } from '@mui/icons-material';
-import Toooth from '../../componemts/Toooth';
+import { Contact } from '../../interfaces/Contact';
+import { Person } from '../../interfaces/Person';
+import colors from '../../styles/colors';
+import { useState } from 'react';
+import { IAntecedent } from '../../interfaces/Antecedents';
 
 interface Props {
   patient: Person;
@@ -24,6 +24,7 @@ interface Props {
 
 const Personalnfo = ({ patient }: Props) => {
   const { mode } = useThemeContext();
+  const [tab, setTab] = useState(0);
 
   const { data: contacts } = useQuery({
     queryKey: ['contacts'],
@@ -32,6 +33,16 @@ const Personalnfo = ({ patient }: Props) => {
         `${generalConfig.baseUrl}/contact-book/getcontacts/${patient._id}`
       );
 
+      return response.data.body;
+    },
+  });
+
+  const { data: antecedents, isLoading } = useQuery<IAntecedent[]>({
+    queryKey: ['antecedents'],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${generalConfig.baseUrl}/antecedents/getantecedents/${patient._id}`
+      );
       return response.data.body;
     },
   });
@@ -51,6 +62,12 @@ const Personalnfo = ({ patient }: Props) => {
 
   const validAddresses = addresses?.filter((a: any) => a.vigente === '1');
 
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTab(newValue);
+  };
+
+  console.log(antecedents);
+
   return (
     <Grid container spacing={4}>
       <Grid
@@ -58,8 +75,8 @@ const Personalnfo = ({ patient }: Props) => {
         xs={12}
         sm={12}
         md={12}
-        lg={6}
-        xl={6}
+        lg={12}
+        xl={12}
         className="shadow-lg p-7"
       >
         <Grid container spacing={2}>
@@ -140,7 +157,7 @@ const Personalnfo = ({ patient }: Props) => {
             </Typography>
             <Grid container spacing={1}>
               {!validContacts && (
-                <Box sx={{ width: '40%' }}>
+                <Box sx={{ width: '40%', marginTop: 5 }}>
                   <LinearProgress />
                 </Box>
               )}
@@ -187,7 +204,7 @@ const Personalnfo = ({ patient }: Props) => {
             </Typography>
             <Grid container spacing={1}>
               {!validAddresses && (
-                <Box sx={{ width: '40%' }}>
+                <Box sx={{ width: '40%', marginTop: 5 }}>
                   <LinearProgress />
                 </Box>
               )}
@@ -224,8 +241,201 @@ const Personalnfo = ({ patient }: Props) => {
           </Grid>
         </Grid>
       </Grid>
+      <Grid
+        item
+        xs={12}
+        sm={12}
+        md={12}
+        lg={6}
+        xl={6}
+        className="shadow-lg p-7"
+      >
+        <Box
+        // sx={{
+        //   backgroundColor:
+        //     mode === 'light'
+        //       ? colors.lightModeTableHead
+        //       : colors.darkModeTableHead,
+        // }}
+        >
+          <Typography
+            style={{
+              fontWeight: 'bold',
+              color: mode === 'light' ? colors.lightModeTableText : 'white',
+            }}
+          >
+            Antecedentes
+          </Typography>
+          <Tabs
+            value={tab}
+            onChange={handleChange}
+            aria-label="basic tabs example"
+            variant="fullWidth"
+          >
+            <Tab label="Mórbidos" {...a11yProps(0)} />
+            <Tab label="Familiares" {...a11yProps(1)} />
+            <Tab label="Malos hábitos" {...a11yProps(2)} />
+            <Tab label="Alergias" {...a11yProps(3)} />
+            <Tab label="Generales" {...a11yProps(4)} />
+          </Tabs>
+        </Box>
+        <CustomTabPanel value={tab} index={0}>
+          {isLoading && <LinearProgress />}
+          {antecedents && !antecedents[0] && (
+            <Box>
+              <Typography
+                style={{ fontWeight: 'lighter', fontStyle: 'italic' }}
+              >
+                No se han registrado antecedentes
+              </Typography>
+            </Box>
+          )}
+          {antecedents &&
+            antecedents[0]?.morbidos?.map((item) => {
+              if (item.descripcion === '') {
+                return null;
+              }
+              return (
+                <Box key={item._id}>
+                  <ul style={{ listStyle: 'circle' }}>
+                    <li style={{ display: 'list-item' }}>{item.descripcion}</li>
+                  </ul>
+                </Box>
+              );
+            })}
+        </CustomTabPanel>
+        <CustomTabPanel value={tab} index={1}>
+          {isLoading && <LinearProgress />}
+          {antecedents && !antecedents[0] && (
+            <Box>
+              <Typography
+                style={{ fontWeight: 'lighter', fontStyle: 'italic' }}
+              >
+                No se han registrado antecedentes
+              </Typography>
+            </Box>
+          )}
+          {antecedents &&
+            antecedents[0]?.familiares?.map((item) => {
+              if (item.descripcion === '') {
+                return null;
+              }
+              return (
+                <Box key={item._id}>
+                  <ul style={{ listStyle: 'circle' }}>
+                    <li style={{ display: 'list-item' }}>{item.descripcion}</li>
+                  </ul>
+                </Box>
+              );
+            })}
+        </CustomTabPanel>
+        <CustomTabPanel value={tab} index={2}>
+          {isLoading && <LinearProgress />}
+          {antecedents && !antecedents[0] && (
+            <Box>
+              <Typography
+                style={{ fontWeight: 'lighter', fontStyle: 'italic' }}
+              >
+                No se han registrado antecedentes
+              </Typography>
+            </Box>
+          )}
+          {antecedents &&
+            antecedents[0]?.habitos?.map((item) => {
+              if (item.descripcion === '') {
+                return null;
+              }
+              return (
+                <Box key={item._id}>
+                  <ul style={{ listStyle: 'circle' }}>
+                    <li style={{ display: 'list-item' }}>{item.descripcion}</li>
+                  </ul>
+                </Box>
+              );
+            })}
+        </CustomTabPanel>
+        <CustomTabPanel value={tab} index={3}>
+          {isLoading && <LinearProgress />}
+          {antecedents && !antecedents[0] && (
+            <Box>
+              <Typography
+                style={{ fontWeight: 'lighter', fontStyle: 'italic' }}
+              >
+                No se han registrado antecedentes
+              </Typography>
+            </Box>
+          )}
+
+          {antecedents &&
+            antecedents[0]?.alergias?.map((item) => {
+              if (item.descripcion === '') {
+                return null;
+              }
+              return (
+                <Box key={item._id}>
+                  <ul style={{ listStyle: 'circle' }}>
+                    <li style={{ display: 'list-item' }}>{item.descripcion}</li>
+                  </ul>
+                </Box>
+              );
+            })}
+        </CustomTabPanel>
+        <CustomTabPanel value={tab} index={4}>
+          {isLoading && <LinearProgress />}
+          {antecedents && !antecedents[0] && (
+            <Box>
+              <Typography
+                style={{ fontWeight: 'lighter', fontStyle: 'italic' }}
+              >
+                No se han registrado antecedentes
+              </Typography>
+            </Box>
+          )}
+          {antecedents &&
+            antecedents[0]?.generales?.map((item) => {
+              if (item.descripcion === '') {
+                return null;
+              }
+              return (
+                <Box key={item._id}>
+                  <ul style={{ listStyle: 'circle' }}>
+                    <li style={{ display: 'list-item' }}>{item.descripcion}</li>
+                  </ul>
+                </Box>
+              );
+            })}
+        </CustomTabPanel>
+      </Grid>
     </Grid>
   );
 };
+
+function a11yProps(index: number) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+function CustomTabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+    </div>
+  );
+}
 
 export default Personalnfo;
