@@ -25,13 +25,16 @@ import colors from '../../styles/colors';
 import { useThemeContext } from '../../componemts/themeContext';
 import { OdontogramInterface } from '../../interfaces/Odontogram';
 import { Diente } from '../../interfaces/Diente';
-import { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import { TransitionProps } from '@mui/material/transitions';
 import { Close } from '@mui/icons-material';
 import { Person } from '../../interfaces/Person';
 import { useUser } from '../../auth/userContext';
 import { User } from '../../interfaces/User';
 import Odontogramm from './Odontogramm';
+import axios from 'axios';
+import { generalConfig } from '../../config';
+import { format } from 'date-fns';
 
 interface Props {
   odontograms: OdontogramInterface[];
@@ -53,8 +56,34 @@ const OdontogramTab = ({ odontograms, afterSubmit, persona }: Props) => {
 
   const { mode } = useThemeContext();
   const [openForm, setOpenForm] = useState(false);
+  const [isCreating, setCreating] = useState(false);
 
   const [selectedOdontogram, setOdontogram] = useState<OdontogramInterface>();
+
+  const createOdontogram = async () => {
+    try {
+      setCreating(true);
+      const response = await axios.post(
+        `${generalConfig.baseUrl}/odontogramas`,
+        {
+          profesionalModifica: (user as User).profesionalId,
+          persona: persona._id,
+          fecha: format(new Date(), 'yyyy/mm/dd'),
+        }
+      );
+
+      if (response.data.message === 'success') {
+        toast.success('Odontograma se ha registrado.');
+        setOdontogram(response.data.body[0]);
+        afterSubmit();
+      }
+      setCreating(false);
+    } catch (error) {
+      console.log(error);
+      toast.error('No se pudo crear odontograma, inténtelo nuevamente.');
+      setCreating(false);
+    }
+  };
 
   useEffect(() => {
     if (odontograms) setOdontogram(odontograms[0]);
@@ -62,27 +91,31 @@ const OdontogramTab = ({ odontograms, afterSubmit, persona }: Props) => {
 
   if (odontograms && odontograms.length === 0)
     return (
-      <Grid container gap={5}>
-        {odontograms && odontograms.length === 0 && (
-          <Grid item>
-            <Typography>
-              No se ha registrado odontograma para este paciente.
-            </Typography>
-          </Grid>
-        )}
-        <Grid item xs={12}>
+      <>
+        <Grid container gap={5}>
           {odontograms && odontograms.length === 0 && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => setOpenForm(true)}
-              fullWidth
-            >
-              Registrar odontograma
-            </Button>
+            <Grid item>
+              <Typography>
+                No se ha registrado odontograma para este paciente.
+              </Typography>
+            </Grid>
           )}
+          <Grid item xs={12}>
+            {odontograms && odontograms.length === 0 && (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={createOdontogram}
+                fullWidth
+                disabled={isCreating}
+              >
+                Registrar odontograma
+              </Button>
+            )}
+          </Grid>
         </Grid>
-      </Grid>
+        <Toaster />
+      </>
     );
 
   return (
