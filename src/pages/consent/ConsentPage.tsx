@@ -11,11 +11,15 @@ import { LoggedUser, useUser } from '../../auth/userContext';
 import { Budget } from '../../interfaces/Budget';
 
 //Se agregó interfaz estado en el código
-import { Status } from '../../interfaces/Status';
 import { Company } from '../../interfaces/Company';
 import { Person } from '../../interfaces/Person';
 import { Professional } from '../../interfaces/Professional';
-import { useEstado, useCompanies, usePaciente, useProfesional } from './ConsentPage.api';
+import {
+  useEstado,
+  useCompanies,
+  usePaciente,
+  useProfesional,
+} from './ConsentPage.api';
 import toast, { Toaster } from 'react-hot-toast';
 
 import {
@@ -40,37 +44,55 @@ import {
   Select,
   SelectChangeEvent,
   Box,
+  LinearProgress,
+  IconButton,
 } from '@mui/material';
-
-
+import { Delete } from '@mui/icons-material';
 
 interface Props {
   open: boolean;
   onClose: CallableFunction;
   budget?: Budget;
   afterSubmit?: CallableFunction;
-  status?: Status;
+  status?: ShortModel;
 }
 
 const ConsentForm = ({ onClose, open, budget, afterSubmit, status }: Props) => {
   const { mode } = useThemeContext();
   const { user } = useUser();
-  
+
   const [registerDate, setRegisterDate] = useState('');
   const [subFormSubmitted, setSubFormSubmitted] = useState(false);
-  
+
   const [pacienteId, setPacienteId] = useState('');
   const [statusId, setStatusId] = useState('');
   const [companiesId, setCompaniesId] = useState('');
   const [profesionalId, setProfesionalId] = useState('');
 
-  const { data: estados, isLoading: loadingEstados, isError: errorEstados } = useEstado();
-  const { data: paciente, isLoading: loadingPaciente, isError: errorPaciente } = usePaciente();
-  const { data: profesional, isLoading: loadingProfesional, isError: errorProfesional } = useProfesional();
-  const { data: companies, isLoading: loadingCompanies, isError: errorCompanies } = useCompanies();
+  const {
+    data: estados,
+    isLoading: loadingEstados,
+    isError: errorEstados,
+  } = useEstado();
+  const {
+    data: paciente,
+    isLoading: loadingPaciente,
+    isError: errorPaciente,
+  } = usePaciente();
+  const {
+    data: profesional,
+    isLoading: loadingProfesional,
+    isError: errorProfesional,
+  } = useProfesional();
+  const {
+    data: companies,
+    isLoading: loadingCompanies,
+    isError: errorCompanies,
+  } = useCompanies();
 
   const [detalles, setDetalles] = useState([
     {
+      id: (Math.random() * 1000).toString(),
       diagnostico: '',
       tratamiento: '',
       complicaciones: '',
@@ -89,32 +111,39 @@ const ConsentForm = ({ onClose, open, budget, afterSubmit, status }: Props) => {
 
   // Función para manejar el envío del formulario
   const handleSubmit = async (event: React.FormEvent) => {
-
     event.preventDefault();
-   
+
+    const detailsWithoutId = detalles.map(({ id, ...rest }) => rest);
+
     const consentData = {
-      registerDate,
-      pacienteId,
-      statusId,
-      companiesId,
-      profesionalId,
-      //detalles,
+      fechaRegistro: new Date(registerDate),
+      persona: pacienteId,
+      estado: statusId,
+      empresa: companiesId,
+      profesional: profesionalId,
+      detalles: detailsWithoutId,
     };
 
-    console.log(consentData)
+    console.log(consentData);
     try {
-      const response = await axios.post(`${generalConfig.baseUrl}/consentments`, consentData, {
-        /*headers: {
+      const response = await axios.post(
+        `${generalConfig.baseUrl}/consentments`,
+        consentData,
+        {
+          /*headers: {
           'Authorization': `Bearer ${user?.token}`,  // Asumiendo que el token se almacena en el usuario autenticado
         },*/
-      });
+        }
+      );
       if (response.status === 201) {
+        toast.success('Consentimiento registrado exitosamente');
         console.log('Consentimiento registrado exitosamente:', response.data);
         if (afterSubmit) {
           afterSubmit(); // Llamar función después del envío, si está definida
         }
       }
     } catch (error) {
+      toast.error('Error al registrar el consentimiento, intentelo nuevamente');
       console.error('Error al registrar el consentimiento:', error);
     }
   };
@@ -123,6 +152,7 @@ const ConsentForm = ({ onClose, open, budget, afterSubmit, status }: Props) => {
     setDetalles([
       ...detalles,
       {
+        id: (Math.random() * 1000).toString(),
         diagnostico: '',
         tratamiento: '',
         complicaciones: '',
@@ -130,14 +160,18 @@ const ConsentForm = ({ onClose, open, budget, afterSubmit, status }: Props) => {
     ]);
   };
 
-  const handleChangeDetalle = (index: number, field: string, value: string) => {
+  const handleChangeDetalle = (
+    index: number,
+    field: 'diagnostico' | 'tratamiento' | 'complicaciones',
+    value: string
+  ) => {
     const nuevosDetalles = [...detalles];
     nuevosDetalles[index][field] = value;
     setDetalles(nuevosDetalles);
   };
 
   if (isLoading) {
-    return <div>Cargando...</div>;
+    return <LinearProgress />;
   }
 
   if (isError) {
@@ -145,9 +179,9 @@ const ConsentForm = ({ onClose, open, budget, afterSubmit, status }: Props) => {
   }
 
   return (
-    <div>
+    <>
       <Container>
-        <Container maxWidth="sm" style={{ marginTop: '20px' }}>
+        <Container style={{ marginTop: '20px' }}>
           <AppBar position="static">
             <Toolbar>
               <Typography variant="h6">Consentimiento Informado</Typography>
@@ -270,12 +304,12 @@ const ConsentForm = ({ onClose, open, budget, afterSubmit, status }: Props) => {
               <Grid item xs={12}>
                 <Typography variant="body1">
                   He sido informado a cerca de mi diagnóstico, pronóstico y plan
-                  de tratamiento así como sus posibles complicaciones mencionadas
-                  en este documento. Por lo tanto, de forma consciente y
-                  voluntaria doy mi consentimiento y aprobación para que se
-                  realice el tratamiento teniendo pleno conocimiento de los
-                  posibles riesgos, complicaciones y beneficios que podría
-                  desprenderse de dicho acto.
+                  de tratamiento así como sus posibles complicaciones
+                  mencionadas en este documento. Por lo tanto, de forma
+                  consciente y voluntaria doy mi consentimiento y aprobación
+                  para que se realice el tratamiento teniendo pleno conocimiento
+                  de los posibles riesgos, complicaciones y beneficios que
+                  podría desprenderse de dicho acto.
                 </Typography>
               </Grid>
               <Grid item xs={12}>
@@ -295,6 +329,7 @@ const ConsentForm = ({ onClose, open, budget, afterSubmit, status }: Props) => {
                         <TableCell>Diagnóstico</TableCell>
                         <TableCell>Tratamiento</TableCell>
                         <TableCell>Complicaciones</TableCell>
+                        <TableCell></TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -342,6 +377,18 @@ const ConsentForm = ({ onClose, open, budget, afterSubmit, status }: Props) => {
                               }
                             />
                           </TableCell>
+                          <TableCell>
+                            <IconButton
+                              onClick={() => {
+                                const updatedDetails = detalles.filter(
+                                  (d) => d.id !== detalle.id
+                                );
+                                setDetalles(updatedDetails);
+                              }}
+                            >
+                              <Delete />
+                            </IconButton>
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -357,7 +404,8 @@ const ConsentForm = ({ onClose, open, budget, afterSubmit, status }: Props) => {
           </form>
         </Container>
       </Container>
-    </div>
+      <Toaster />
+    </>
   );
 };
 

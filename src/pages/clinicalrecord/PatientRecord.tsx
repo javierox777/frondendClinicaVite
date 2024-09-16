@@ -33,6 +33,7 @@ import { Badge, ContactEmergency } from '@mui/icons-material';
 import Personalnfo from './Personalnfo';
 import PatientReceipts from './PatientReceipts';
 import { update } from '@react-spring/web';
+import ConsentmentsTab from './ConsentmentsTab';
 
 const tableHeadings = [
   { id: 1, label: 'Fecha' },
@@ -130,7 +131,7 @@ const PatientRecord = () => {
         md={12}
         lg={12}
         xl={12}
-        className="shadow-lg rounded-lg p-5"
+        className="shadow-lg rounded-lg pt-5 pl-5 pr-5"
       >
         <Grid container spacing={1}>
           <Grid item xs={12}>
@@ -212,6 +213,7 @@ const PatientRecord = () => {
               <Tab label="Odontograma" {...a11yProps(1)} />
               <Tab label="Historial de citas" {...a11yProps(2)} />
               <Tab label="Medicamentos" {...a11yProps(3)} />
+              <Tab label="Consentimientos" {...a11yProps(4)} />
             </Tabs>
           </Box>
         </Grid>
@@ -309,6 +311,9 @@ const PatientRecord = () => {
         </CustomTabPanel>
         <CustomTabPanel value={value} index={3}>
           <PatientReceipts patient={patient} />
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={4}>
+          <ConsentmentsTab patient={patient} />
         </CustomTabPanel>
       </Grid>
     </Grid>

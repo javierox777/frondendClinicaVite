@@ -74,6 +74,7 @@ import AttentionPage from '../../pages/attention/AttentionPage';
 import CurrentPatient from '../../pages/attention/CurrentPatient';
 import ClinicalRecordPage from '../../pages/clinicalrecord/ClinicalRecordPage';
 import PatientRecord from '../../pages/clinicalrecord/PatientRecord';
+import ConsentForm from '../../pages/consent/ConsentPage';
 
 const drawerWidth = 240;
 
@@ -347,6 +348,7 @@ const DashboardLayout: React.FC = () => {
             <Route path="/sexo" element={<Sexo />} />
             <Route path="/atencion" element={<AtencionTipo />} />
             <Route path="/ciudad" element={<Ciudad />} />
+            <Route path="/consentimiento" element={<ConsentForm />} />
             <Route path="/contacto" element={<Contacto />} />
             <Route path="/estado" element={<Estado />} />
             <Route path="/mensaje" element={<Mensaje />} />
