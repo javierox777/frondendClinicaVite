@@ -29,22 +29,22 @@ const ProfessionalsPage = () => {
                   mode === 'light'
                     ? colors.lightModeHeaderColor
                     : colors.darkModeHeaderColor,
+                justifyContent: 'space-between',
               }}
             >
               <Typography variant="h6">Profesionales</Typography>
+              <Button
+                variant="contained"
+                onClick={() => {
+                  setModal(true);
+                }}
+              >
+                Registrar nuevo profesional
+              </Button>
             </Toolbar>
           </AppBar>
         </Grid>
-        <Grid item xs={6}>
-          <Button
-            variant="contained"
-            onClick={() => {
-              setModal(true);
-            }}
-          >
-            Registrar nuevo profesional
-          </Button>
-        </Grid>
+
         <Grid item xs={12}>
           <ProfessionalsTable refetch={formSubmitted} />
         </Grid>

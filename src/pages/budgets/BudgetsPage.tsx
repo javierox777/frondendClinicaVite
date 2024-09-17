@@ -43,17 +43,17 @@ const BudgetsPage = () => {
                   mode === 'light'
                     ? colors.lightModeHeaderColor
                     : colors.darkModeHeaderColor,
+                justifyContent: 'space-between',
               }}
             >
               <Typography variant="h6">Presupuestos</Typography>
+              <Button variant="contained" onClick={() => setOpen(true)}>
+                Generar presupuesto
+              </Button>
             </Toolbar>
           </AppBar>
         </Grid>
-        <Grid item>
-          <Button variant="contained" onClick={() => setOpen(true)}>
-            Generar presupuesto
-          </Button>
-        </Grid>
+
         <Grid item xs={12}>
           <BudgetVisualizer budgets={budgets} isLoading={isLoading} />
         </Grid>

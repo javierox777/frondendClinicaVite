@@ -75,6 +75,7 @@ import CurrentPatient from '../../pages/attention/CurrentPatient';
 import ClinicalRecordPage from '../../pages/clinicalrecord/ClinicalRecordPage';
 import PatientRecord from '../../pages/clinicalrecord/PatientRecord';
 import ConsentForm from '../../pages/consent/ConsentPage';
+import colors from '../../styles/colors';
 
 const drawerWidth = 240;
 
@@ -161,7 +162,10 @@ const DashboardLayout: React.FC = () => {
         position="fixed"
         sx={{
           zIndex: (theme: any) => theme.zIndex.drawer + 1,
-          backgroundColor: mode === 'light' ? 'dark' : 'AppWorkspace',
+          backgroundColor:
+            mode === 'light'
+              ? colors.lightModeHeaderColor
+              : colors.darkModeHeaderColor,
         }}
       >
         <Toolbar>

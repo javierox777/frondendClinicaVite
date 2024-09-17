@@ -24,21 +24,20 @@ const PatientsPage = () => {
                   mode === 'light'
                     ? colors.lightModeHeaderColor
                     : colors.darkModeHeaderColor,
+                justifyContent: 'space-between',
               }}
             >
               <Typography variant="h6">Pacientes</Typography>
+              <Button
+                variant="contained"
+                onClick={() => {
+                  setModal(true);
+                }}
+              >
+                Registrar nuevo paciente
+              </Button>
             </Toolbar>
           </AppBar>
-        </Grid>
-        <Grid item xs={12}>
-          <Button
-            variant="contained"
-            onClick={() => {
-              setModal(true);
-            }}
-          >
-            Registrar nuevo paciente
-          </Button>
         </Grid>
         <Grid item xs={12}>
           <PatientsTable refetch={formSubmitted} />
