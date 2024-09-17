@@ -7,6 +7,7 @@ import {
   PlusOne,
 } from '@mui/icons-material';
 import {
+  AppBar,
   Box,
   Button,
   Card,
@@ -414,7 +415,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
           <Toolbar
             component={Paper}
             elevation={3}
-            style={{ backgroundColor: 'teal' }}
+            style={{ backgroundColor: colors.lightModeHeaderColor }}
           >
             <IconButton onClick={() => onClose()}>
               <Close />
@@ -426,6 +427,18 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
             </Typography>
           </Container>
           <Container className="p-5">
+            <AppBar position="static" className="mb-5">
+              <Toolbar
+                style={{
+                  backgroundColor:
+                    mode === 'light'
+                      ? colors.lightModeHeaderColor
+                      : colors.darkModeHeaderColor,
+                }}
+              >
+                <Typography variant="h6">Datos Personales</Typography>
+              </Toolbar>
+            </AppBar>
             <Grid container spacing={5}>
               <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <FormControl fullWidth>
@@ -623,9 +636,18 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                   alignItems="center"
                   style={{ marginBottom: 10 }}
                 >
-                  <Typography style={{ fontWeight: 'bold' }}>
-                    Antecedentes
-                  </Typography>
+                  <AppBar position="static" className="mb-5">
+                    <Toolbar
+                      style={{
+                        backgroundColor:
+                          mode === 'light'
+                            ? colors.lightModeHeaderColor
+                            : colors.darkModeHeaderColor,
+                      }}
+                    >
+                      <Typography variant="h6">Antecedentes</Typography>
+                    </Toolbar>
+                  </AppBar>
                 </Box>
                 <Box
                   sx={{
@@ -857,9 +879,30 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                   alignItems="center"
                   style={{ marginBottom: 10 }}
                 >
+                  <AppBar position="static" className="mb-5">
+                    <Toolbar
+                      style={{
+                        backgroundColor:
+                          mode === 'light'
+                            ? colors.lightModeHeaderColor
+                            : colors.darkModeHeaderColor,
+                      }}
+                    >
+                      <Typography variant="h6">
+                        Direcciones y contactos
+                      </Typography>
+                    </Toolbar>
+                  </AppBar>
+                </Box>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  style={{ marginBottom: 10 }}
+                >
                   <Typography style={{ fontWeight: 'bold' }}>
-                    Contactos
+                    Libreta de contactos
                   </Typography>
+
                   <IconButton onClick={handleAddContact}>
                     <AddCircleOutline />
                   </IconButton>

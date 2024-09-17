@@ -9,5 +9,9 @@ export default {
     lightModeHeadingGrey:"#807e7e",
     darkModeHeadingWhite:'#c9c2c2',
     ligthModeSoftText:'#999696',
-    darkModeSoftText: '#d7d2d2'
+    darkModeSoftText: '#d7d2d2',
+
+    lightModeHeaderColor:'#18a6da',
+    darkModeHeaderColor:'##072161',
+
 }

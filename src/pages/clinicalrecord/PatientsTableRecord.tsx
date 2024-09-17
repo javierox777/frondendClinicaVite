@@ -1,5 +1,6 @@
 import { Edit, Search } from '@mui/icons-material';
 import {
+  AppBar,
   Box,
   Button,
   IconButton,
@@ -14,6 +15,8 @@ import {
   TablePagination,
   TableRow,
   TextField,
+  Toolbar,
+  Typography,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
@@ -101,10 +104,23 @@ const PatientsTableRecord = ({ refetch }: Props) => {
 
   return (
     <>
+      {' '}
+      <AppBar position="static">
+        <Toolbar
+          style={{
+            backgroundColor:
+              mode === 'light'
+                ? colors.lightModeHeaderColor
+                : colors.darkModeHeaderColor,
+          }}
+        >
+          <Typography variant="h6">Módulo dental</Typography>
+        </Toolbar>
+      </AppBar>
       <TextField
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
-        style={{ marginBlock: '16px' }}
+        style={{ marginBlock: '16px', width: '30%' }}
         placeholder="Buscar..."
         InputProps={{
           startAdornment: (

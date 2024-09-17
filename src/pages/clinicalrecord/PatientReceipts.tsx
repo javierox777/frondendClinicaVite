@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { generalConfig } from '../../config';
 import { Person } from '../../interfaces/Person';
 import {
+  AppBar,
   Grid,
   IconButton,
   LinearProgress,
@@ -15,6 +16,8 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  Toolbar,
+  Typography,
 } from '@mui/material';
 import { useThemeContext } from '../../componemts/themeContext';
 import colors from '../../styles/colors';
@@ -71,8 +74,21 @@ const PatientReceipts = ({ patient }: Props) => {
           <LinearProgress />
         </Grid>
       )}
+
       {!isLoading && (
         <Grid item xs={5} className="shadow-lg rounded-lg">
+          <AppBar position="static">
+            <Toolbar
+              style={{
+                backgroundColor:
+                  mode === 'light'
+                    ? colors.lightModeHeaderColor
+                    : colors.darkModeHeaderColor,
+              }}
+            >
+              <Typography variant="h6">Recetas y medicamentos</Typography>
+            </Toolbar>
+          </AppBar>
           <TableContainer component={Paper} elevation={0}>
             <Table>
               <TableHead

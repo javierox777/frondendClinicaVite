@@ -102,18 +102,9 @@ const DetailsForm = ({
     <Card elevation={3} sx={{ padding: 3 }}>
       <Grid container spacing={1}>
         <Grid item xs={12}>
-          <Typography
-            sx={{
-              fontSize: 20,
-              fontWeight: 'lighter',
-              paddingTop: 2,
-            }}
-          >
-            DETALLES DE PRESUPUESTO
-          </Typography>
-          <IconButton color="primary" onClick={handleAddRow}>
-            <AddCircle />
-          </IconButton>
+          <Button variant="contained" color="primary" onClick={handleAddRow}>
+            Agregar detalle
+          </Button>
         </Grid>
         {budgetDetails.length === 0 && (
           <Grid item xs={12}>

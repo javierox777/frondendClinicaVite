@@ -3,5 +3,5 @@ export interface ConsentmentDetail {
     consentimiento: string;
     diagnostico: string;
     tratamiento: string;
-    posiblesComplicaicones:string,
+    posiblesComplicaciones:string,
   }

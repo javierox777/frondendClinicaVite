@@ -14,6 +14,8 @@ import {
   Typography,
   Button as MuiButton,
   LinearProgress,
+  AppBar,
+  Toolbar,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { ITreatment, OdontogramInterface } from '../../interfaces/Odontogram';
@@ -353,7 +355,7 @@ const Odontogramm = ({ odontogram }: Props) => {
         <Grid item xs={12} style={{ marginBottom: 15 }}>
           <MuiButton
             variant="contained"
-            color="success"
+            color="primary"
             fullWidth
             onClick={handleSubmit}
             disabled={isSubmitting}
@@ -642,15 +644,18 @@ const Odontogramm = ({ odontogram }: Props) => {
             marginBlock: 15,
           }}
         >
-          <Typography
-            style={{
-              fontWeight: 'bold',
-              color: mode === 'light' ? colors.lightModeTableText : 'white',
-              textAlign: 'center',
-            }}
-          >
-            Registro Clínico De Dientes.
-          </Typography>
+          <AppBar position="static">
+            <Toolbar
+              style={{
+                backgroundColor:
+                  mode === 'light'
+                    ? colors.lightModeHeaderColor
+                    : colors.darkModeHeaderColor,
+              }}
+            >
+              <Typography variant="h6">Registro clínico de dientes</Typography>
+            </Toolbar>
+          </AppBar>
         </Grid>
         <Grid item xs={12} sm={12} md={12} lg={6} xl={6} className="border-t-2">
           <TableContainer>

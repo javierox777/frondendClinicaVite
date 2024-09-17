@@ -1,4 +1,5 @@
 import {
+  AppBar,
   Card,
   Grid,
   LinearProgress,
@@ -10,6 +11,7 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  Toolbar,
   Typography,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
@@ -65,13 +67,18 @@ const TodaysSchedule = () => {
   return (
     <Grid container>
       <Grid item xs={12}>
-        <Typography
-          style={{
-            fontSize: 20,
-          }}
-        >
-          Citaciones del dia de hoy
-        </Typography>
+        <AppBar position="static">
+          <Toolbar
+            style={{
+              backgroundColor:
+                mode === 'light'
+                  ? colors.lightModeHeaderColor
+                  : colors.darkModeHeaderColor,
+            }}
+          >
+            <Typography variant="h6">Citaciones del día de hoy</Typography>
+          </Toolbar>
+        </AppBar>
       </Grid>
       {isLoading && (
         <Grid item xs={12}>

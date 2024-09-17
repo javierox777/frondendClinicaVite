@@ -1,4 +1,5 @@
 import {
+  AppBar,
   Button,
   Container,
   Dialog,
@@ -20,6 +21,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import axios from 'axios';
 import { generalConfig } from '../../config';
 import colors from '../../styles/colors';
+import { useThemeContext } from '../../componemts/themeContext';
 
 interface Props {
   open: boolean;
@@ -45,6 +47,8 @@ const ProfessionalForm = ({
   afterSubmit,
   edit,
 }: Props) => {
+  const { mode } = useThemeContext();
+
   const [showPassword, setShowPassword] = useState(false);
 
   const [firstName, setFirstName] = useState('');
@@ -170,17 +174,20 @@ const ProfessionalForm = ({
             <Close />
           </IconButton>
         </Toolbar>
-        <Container>
+        <Container className="p-5">
           <form onSubmit={handleSubmit}>
-            <Grid item xs={12}>
-              <Typography className="p-3">DATOS PERSONALES</Typography>
-              <Typography
-                className="p-3 italic"
-                style={{ color: colors.ligthModeSoftText }}
+            <AppBar position="static" className="mb-5">
+              <Toolbar
+                style={{
+                  backgroundColor:
+                    mode === 'light'
+                      ? colors.lightModeHeaderColor
+                      : colors.darkModeHeaderColor,
+                }}
               >
-                Rellene todos los datos requeridos
-              </Typography>
-            </Grid>
+                <Typography variant="h6">Datos Personales</Typography>
+              </Toolbar>
+            </AppBar>
             <Grid container spacing={5}>
               <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <FormControl fullWidth>
@@ -284,7 +291,18 @@ const ProfessionalForm = ({
               {!edit && (
                 <>
                   <Grid item xs={12}>
-                    <Typography className="p-3">DATOS DE USUARIO</Typography>
+                    <AppBar position="static" className="mb-5">
+                      <Toolbar
+                        style={{
+                          backgroundColor:
+                            mode === 'light'
+                              ? colors.lightModeHeaderColor
+                              : colors.darkModeHeaderColor,
+                        }}
+                      >
+                        <Typography variant="h6">Datos de usuario</Typography>
+                      </Toolbar>
+                    </AppBar>
                     <Typography
                       className="p-3 italic"
                       style={{ color: colors.ligthModeSoftText }}

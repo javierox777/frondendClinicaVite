@@ -1,5 +1,6 @@
 import { AttachMoney, Close } from '@mui/icons-material';
 import {
+  AppBar,
   Autocomplete,
   Box,
   Button,
@@ -244,15 +245,20 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
                 {/* <Card sx={{ padding: 3 }} elevation={3}> */}
                 <Grid container spacing={3} alignItems="end">
                   <Grid item xs={12}>
-                    <Typography
-                      sx={{
-                        fontSize: 20,
-                        fontWeight: 'lighter',
-                        paddingTop: 3,
-                      }}
-                    >
-                      DATOS DE PRESUPUESTO
-                    </Typography>
+                    <AppBar position="static" className="mb-5">
+                      <Toolbar
+                        style={{
+                          backgroundColor:
+                            mode === 'light'
+                              ? colors.lightModeHeaderColor
+                              : colors.darkModeHeaderColor,
+                        }}
+                      >
+                        <Typography variant="h6">
+                          Datos de presupuesto
+                        </Typography>
+                      </Toolbar>
+                    </AppBar>
                   </Grid>
                   <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                     {data && (
@@ -474,6 +480,20 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
 
               {/* DETALLES DE PRESUPUESTO        */}
               <Grid item xs={12}>
+                <AppBar position="static" className="mb-5">
+                  <Toolbar
+                    style={{
+                      backgroundColor:
+                        mode === 'light'
+                          ? colors.lightModeHeaderColor
+                          : colors.darkModeHeaderColor,
+                    }}
+                  >
+                    <Typography variant="h6">
+                      Detalles de presupuesto
+                    </Typography>
+                  </Toolbar>
+                </AppBar>
                 <DetailsForm
                   budgetDetails={budgetDetails}
                   setDetails={setDetails}
@@ -484,14 +504,21 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
               {/* DETALLES DE PRESUPUESTO        */}
               {/* FOOTER DE PRESUPUESTO CON LOS PRECIOS A PAGAR */}
               <Grid item xs={12}>
+                <AppBar position="static" className="mb-5">
+                  <Toolbar
+                    style={{
+                      backgroundColor:
+                        mode === 'light'
+                          ? colors.lightModeHeaderColor
+                          : colors.darkModeHeaderColor,
+                    }}
+                  >
+                    <Typography variant="h6">Total a pagar</Typography>
+                  </Toolbar>
+                </AppBar>
                 <Card sx={{ padding: 3 }} elevation={3}>
                   <Grid container alignItems="center" spacing={3}>
                     <Grid item xs={12}>
-                      <Grid item xs={6}>
-                        <Typography sx={{ fontSize: 20, fontWeight: 'bold' }}>
-                          TOTAL A PAGAR
-                        </Typography>
-                      </Grid>
                       <Grid item xs={6}>
                         <Typography
                           sx={{ fontSize: 30, fontWeight: 'lighter' }}
@@ -530,6 +557,7 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
               <Grid item xs={12}>
                 <FormControl fullWidth>
                   <Button
+                    style={{ marginBottom: 20 }}
                     fullWidth
                     variant="contained"
                     type="submit"

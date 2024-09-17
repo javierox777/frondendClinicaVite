@@ -20,6 +20,8 @@ import {
   Table,
   Button,
   Container,
+  AppBar,
+  Toolbar,
 } from '@mui/material';
 
 import { Company } from '../../interfaces/Company';
@@ -35,7 +37,7 @@ interface Response {
 }
 
 interface Props {
-  consentment: Response;
+  consentment: Response | undefined;
 }
 
 const ConsentmentVisualizer = ({ consentment }: Props) => {
@@ -63,6 +65,21 @@ const ConsentmentVisualizer = ({ consentment }: Props) => {
     <Grid container spacing={2}>
       <Grid item xs={6}></Grid>
       <Grid item xs={6}></Grid>
+      <Grid item xs={12}>
+        <AppBar position="static">
+          <Toolbar
+            style={{
+              backgroundColor:
+                mode === 'light'
+                  ? colors.lightModeHeaderColor
+                  : colors.darkModeHeaderColor,
+            }}
+          >
+            <Typography variant="h6">Consentimiento</Typography>
+          </Toolbar>
+        </AppBar>
+      </Grid>
+
       <Grid item xs={12}>
         <Typography variant="body1">
           Por medio del presente consentimiento, Yo{' '}
@@ -106,7 +123,14 @@ const ConsentmentVisualizer = ({ consentment }: Props) => {
       <Grid item xs={12}>
         <TableContainer component={Paper}>
           <Table>
-            <TableHead>
+            <TableHead
+              style={{
+                backgroundColor:
+                  mode === 'light'
+                    ? colors.lightModeTableHead
+                    : colors.darkModeTableHead,
+              }}
+            >
               <TableRow>
                 <TableCell>Diagnóstico</TableCell>
                 <TableCell>Tratamiento</TableCell>
@@ -118,8 +142,9 @@ const ConsentmentVisualizer = ({ consentment }: Props) => {
               {consentment.detalles.map((d: ConsentmentDetail) => {
                 return (
                   <TableRow key={d._id}>
+                    <TableCell>{d.diagnostico}</TableCell>
                     <TableCell>{d.tratamiento}</TableCell>
-                    <TableCell>{d.tratamiento}</TableCell>
+                    <TableCell>{d.posiblesComplicaciones}</TableCell>
                   </TableRow>
                 );
               })}

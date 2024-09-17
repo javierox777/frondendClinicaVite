@@ -1,10 +1,12 @@
 import {
+  AppBar,
   Box,
   Divider,
   Grid,
   LinearProgress,
   Tab,
   Tabs,
+  Toolbar,
   Typography,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
@@ -66,20 +68,24 @@ const Personalnfo = ({ patient }: Props) => {
     setTab(newValue);
   };
 
-  console.log(antecedents);
-
   return (
-    <Grid container spacing={4}>
-      <Grid
-        item
-        xs={12}
-        sm={12}
-        md={12}
-        lg={12}
-        xl={12}
-        className="shadow-lg p-7"
-      >
-        <Grid container spacing={2}>
+    <Grid container spacing={1}>
+      <Grid item xs={12}>
+        <AppBar position="static">
+          <Toolbar
+            style={{
+              backgroundColor:
+                mode === 'light'
+                  ? colors.lightModeHeaderColor
+                  : colors.darkModeHeaderColor,
+            }}
+          >
+            <Typography variant="h6">Datos Personales</Typography>
+          </Toolbar>
+        </AppBar>
+      </Grid>
+      <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+        <Grid container spacing={2} className="p-2">
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <Typography
               style={{
@@ -136,24 +142,30 @@ const Personalnfo = ({ patient }: Props) => {
           </Grid>
         </Grid>
       </Grid>
-      <Grid
-        item
-        xs={12}
-        sm={12}
-        md={12}
-        lg={6}
-        xl={6}
-        className="shadow-lg p-7"
-      >
+      <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
         <Grid container>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          <Grid item xs={12}>
+            <AppBar position="static">
+              <Toolbar
+                style={{
+                  backgroundColor:
+                    mode === 'light'
+                      ? colors.lightModeHeaderColor
+                      : colors.darkModeHeaderColor,
+                }}
+              >
+                <Typography variant="h6">Contactos y Direcciones</Typography>
+              </Toolbar>
+            </AppBar>
+          </Grid>
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12} className="p-2">
             <Typography
               style={{
                 fontWeight: 'bold',
                 color: mode === 'light' ? colors.lightModeTableText : 'white',
               }}
             >
-              Contacto
+              Contactos
             </Typography>
             <Grid container spacing={1}>
               {!validContacts && (
@@ -193,7 +205,7 @@ const Personalnfo = ({ patient }: Props) => {
               <Grid item xs={12}></Grid>
             </Grid>
           </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12} className="p-2">
             <Typography
               style={{
                 fontWeight: 'bold',
@@ -241,31 +253,27 @@ const Personalnfo = ({ patient }: Props) => {
           </Grid>
         </Grid>
       </Grid>
-      <Grid
-        item
-        xs={12}
-        sm={12}
-        md={12}
-        lg={6}
-        xl={6}
-        className="shadow-lg p-7"
-      >
-        <Box
-        // sx={{
-        //   backgroundColor:
-        //     mode === 'light'
-        //       ? colors.lightModeTableHead
-        //       : colors.darkModeTableHead,
-        // }}
-        >
-          <Typography
+      <Grid item xs={12} sm={12} md={12} lg={6} xl={6} className="p-7">
+        <AppBar position="static" className="mb-5">
+          <Toolbar
             style={{
-              fontWeight: 'bold',
-              color: mode === 'light' ? colors.lightModeTableText : 'white',
+              backgroundColor:
+                mode === 'light'
+                  ? colors.lightModeHeaderColor
+                  : colors.darkModeHeaderColor,
             }}
           >
-            Antecedentes
-          </Typography>
+            <Typography variant="h6">Antecedentes</Typography>
+          </Toolbar>
+        </AppBar>
+        <Box
+          sx={{
+            backgroundColor:
+              mode === 'light'
+                ? colors.lightModeTableHead
+                : colors.darkModeTableHead,
+          }}
+        >
           <Tabs
             value={tab}
             onChange={handleChange}

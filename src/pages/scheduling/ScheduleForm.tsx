@@ -1,5 +1,6 @@
 import { Close } from '@mui/icons-material';
 import {
+  AppBar,
   Autocomplete,
   Box,
   Button,
@@ -199,12 +200,20 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
         </Toolbar>
         <Container sx={{ paddingBlock: 3 }}>
           <form onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
+            <Grid container spacing={1}>
               <Grid item xs={12}>
-                <Typography>Rellena los datos para generar agenda</Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Divider />
+                <AppBar position="static" className="mb-5">
+                  <Toolbar
+                    style={{
+                      backgroundColor:
+                        mode === 'light'
+                          ? colors.lightModeHeaderColor
+                          : colors.darkModeHeaderColor,
+                    }}
+                  >
+                    <Typography variant="h6">Datos de agenda</Typography>
+                  </Toolbar>
+                </AppBar>
               </Grid>
               {schedule && (
                 <Grid item>
@@ -343,9 +352,18 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
               <Grid item xs={12}>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={12}>
-                    <Typography style={{ fontSize: 20 }}>
-                      Hora de inicio
-                    </Typography>
+                    <AppBar position="static" className="mb-5">
+                      <Toolbar
+                        style={{
+                          backgroundColor:
+                            mode === 'light'
+                              ? colors.lightModeHeaderColor
+                              : colors.darkModeHeaderColor,
+                        }}
+                      >
+                        <Typography variant="h6">Hora de inicio</Typography>
+                      </Toolbar>
+                    </AppBar>
                   </Grid>
                   <Grid item xs={5} sm={5} md={5} lg={2} xl={2}>
                     <FormControl fullWidth>
@@ -411,9 +429,18 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
                     <Divider />
                   </Grid>
                   <Grid item xs={12}>
-                    <Typography style={{ fontSize: 20 }}>
-                      Dias de atención
-                    </Typography>
+                    <AppBar position="static" className="mb-5">
+                      <Toolbar
+                        style={{
+                          backgroundColor:
+                            mode === 'light'
+                              ? colors.lightModeHeaderColor
+                              : colors.darkModeHeaderColor,
+                        }}
+                      >
+                        <Typography variant="h6">Días de atención</Typography>
+                      </Toolbar>
+                    </AppBar>
                   </Grid>
                   <Grid item xs={12}>
                     <Grid container>
@@ -455,9 +482,18 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
                   </Grid>
                   {/* DIAS LIBRES */}
                   <Grid item xs={12}>
-                    <Typography style={{ fontSize: 20 }}>
-                      Agrega días libres si es necesario.
-                    </Typography>
+                    <AppBar position="static" className="mb-5">
+                      <Toolbar
+                        style={{
+                          backgroundColor:
+                            mode === 'light'
+                              ? colors.lightModeHeaderColor
+                              : colors.darkModeHeaderColor,
+                        }}
+                      >
+                        <Typography variant="h6">Días libres</Typography>
+                      </Toolbar>
+                    </AppBar>
                   </Grid>
                   <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
                     <FormControl fullWidth>
@@ -481,7 +517,7 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
                   <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                     <Box>
                       <Typography style={{ fontWeight: 'bold' }}>
-                        Días Libres
+                        Días libres agregados
                       </Typography>
                     </Box>
                     {!daysOff.length && (

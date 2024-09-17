@@ -11,6 +11,9 @@ import {
   TableCell,
   TableBody,
   TablePagination,
+  AppBar,
+  Toolbar,
+  Typography,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
@@ -87,6 +90,18 @@ const ConsentmentsTab = ({ patient }: Props) => {
       )}
       {!isLoading && (
         <Grid item xs={5} className="shadow-lg rounded-lg">
+          <AppBar position="static">
+            <Toolbar
+              style={{
+                backgroundColor:
+                  mode === 'light'
+                    ? colors.lightModeHeaderColor
+                    : colors.darkModeHeaderColor,
+              }}
+            >
+              <Typography variant="h6">Consentimientos</Typography>
+            </Toolbar>
+          </AppBar>
           <TableContainer component={Paper} elevation={0}>
             <Table>
               <TableHead
