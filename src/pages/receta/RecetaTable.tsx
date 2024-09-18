@@ -16,6 +16,9 @@ import {
   IconButton,
   TextField,
   Switch,
+  AppBar,
+  Toolbar,
+  Typography,
 } from '@mui/material';
 import { useSpring, animated } from '@react-spring/web';
 import RecetaForm from './RecetaForm';
@@ -362,13 +365,10 @@ const Receta: React.FC = () => {
       <AnimatedDialog
         open={open}
         onClose={handleClose}
-        maxWidth="sm"
+        maxWidth="md"
         fullWidth
         style={createAnimation}
       >
-        <AnimatedDialogTitle className="modal-title" style={textAnimationProps}>
-          Crear Receta
-        </AnimatedDialogTitle>
         <AnimatedDialogContent
           className="modal-content"
           style={createAnimation}
