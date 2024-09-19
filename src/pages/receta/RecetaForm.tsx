@@ -22,7 +22,7 @@ import {
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useUser } from '../../auth/userContext';
 import { useThemeContext } from '../../componemts/themeContext';
@@ -35,6 +35,7 @@ import { ShortModel } from '../../interfaces/ShortModel';
 import { User } from '../../interfaces/User';
 import colors from '../../styles/colors';
 import { Receipt } from '../../interfaces/Receipt';
+import { format } from 'date-fns';
 
 interface FormData {
   estado: string;
@@ -158,6 +159,18 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
     },
   });
 
+  const { data: receiptDetails, isLoading: receiptDetailsLoading } = useQuery({
+    queryKey: ['details', receipt],
+    queryFn: async () => {
+      if (receipt) {
+        const response = await axios.get(
+          `${generalConfig.baseUrl}/receipt-details/getreceiptdetails/${receipt._id}`
+        );
+        return response.data.body;
+      }
+    },
+  });
+
   const handleDetailChange = (
     e: ChangeEvent<HTMLInputElement> | SelectChangeEvent<string>,
     field: 'objeto' | 'dias' | 'intervalo',
@@ -231,6 +244,22 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
     }
   };
 
+  useEffect(() => {
+    if (receipt) {
+      setFormData({
+        estado: receipt.estado as string,
+        profesional: (receipt.profesional as Professional)._id,
+        empresa: (receipt.empresa as Company)._id,
+        fechaRegistro: format(new Date(receipt.fechaRegistro), 'yyyy-MM-dd'),
+        direccion: receipt.direccion,
+        persona: (receipt.persona as Person)._id,
+      });
+      if (receiptDetails) {
+        setDetails(receiptDetails);
+      }
+    }
+  }, [receipt]);
+
   return (
     <>
       <form onSubmit={handleSubmit}>
@@ -256,7 +285,7 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
                 <Autocomplete
                   disablePortal
                   options={persons}
-                  // defaultValue={budget?.persona}
+                  defaultValue={receipt?.persona as Person}
                   renderInput={(params) => (
                     <TextField {...params} label="Paciente" />
                   )}
@@ -381,7 +410,7 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
               <FormControl fullWidth>
                 <Autocomplete
                   disablePortal
-                  // defaultValue={budget?.empresa}
+                  defaultValue={receipt?.empresa as Company}
                   options={companies}
                   renderInput={(params) => (
                     <TextField {...params} label="Clínica" />
@@ -620,7 +649,8 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
               type="submit"
               disabled={isSubmitting}
             >
-              Crear receta
+              {!receipt && 'Crear receta'}
+              {receipt && 'Editar receta'}
             </Button>
           </Grid>
         </Grid>

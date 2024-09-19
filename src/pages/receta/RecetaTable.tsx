@@ -40,6 +40,8 @@ import { ShortModel } from '../../interfaces/ShortModel';
 import { useTheme } from '@emotion/react';
 import { useThemeContext } from '../../componemts/themeContext';
 import colors from '../../styles/colors';
+import { useQuery } from '@tanstack/react-query';
+import { generalConfig } from '../../config';
 
 interface IPersona {
   _id: string;
@@ -81,18 +83,13 @@ const Receta: React.FC = () => {
   const [selectedRow, setSelectedRow] = useState<Receipt | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    try {
-      const response = await axios.get('http://localhost:3000/api/receipt');
-      setFormData(response.data.body);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
+  const { data: fetchData } = useQuery({
+    queryKey: ['fetchData'],
+    queryFn: async () => {
+      const response = await axios.get(`${generalConfig.baseUrl}/receipt`);
+      return setFormData(response.data.body);
+    },
+  });
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
@@ -205,47 +202,10 @@ const Receta: React.FC = () => {
   };
 
   const handleSuccess = () => {
-    fetchData();
     handleClose();
     handleEditClose();
     handlePdfClose();
     handleRowClose();
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      await axios.delete(`http://localhost:3000/api/receipt/${id}`);
-      fetchData(); // Refresca los datos después de eliminar la receta
-    } catch (error) {
-      console.error('Error deleting data:', error);
-    }
-  };
-
-  const handleEstadoChange = async (id: string, estado: boolean) => {
-    try {
-      await axios.put(`http://localhost:3000/api/receipt/${id}`, {
-        estado_id: estado,
-      });
-      setFormData((prevData) =>
-        prevData.map((item) =>
-          item._id === id ? { ...item, estado_id: estado } : item
-        )
-      ); // Actualiza el estado localmente
-    } catch (error) {
-      console.error('Error updating estado:', error);
-    }
-  };
-
-  const transformReceta = (receta: Receipt) => {
-    return {
-      _id: receta._id,
-      estado: (receta.estado as ShortModel)._id,
-      profesional: (receta.profesional as Professional)._id,
-      empresa: (receta.empresa as Company)._id,
-      fechaRegistro: new Date(receta.fechaRegistro),
-      direccion: receta.direccion, // Asegúrate de incluir la dirección aquí
-      persona: (receta.persona as Person)._id,
-    };
   };
 
   const exportPDF = async () => {
@@ -275,7 +235,7 @@ const Receta: React.FC = () => {
               justifyContent: 'space-between',
             }}
           >
-            <Typography variant="h6">Pacientes</Typography>
+            <Typography variant="h6">Recetas</Typography>
             <Button
               variant="contained"
               color="primary"
@@ -294,13 +254,55 @@ const Receta: React.FC = () => {
       />
       <TableContainer component={Paper}>
         <Table>
-          <TableHead>
+          <TableHead
+            style={{
+              backgroundColor:
+                mode === 'light'
+                  ? colors.lightModeTableHead
+                  : colors.darkModeTableHead,
+            }}
+          >
             <TableRow>
-              <TableCell>N°</TableCell>
-              <TableCell>Rut</TableCell>
-              <TableCell>Nombre</TableCell>
-              <TableCell>Fecha Registro</TableCell>
-              <TableCell>Acciones</TableCell>
+              <TableCell
+                style={{
+                  fontWeight: 'bold',
+                  color: mode === 'light' ? colors.lightModeTableText : 'white',
+                }}
+              >
+                N°
+              </TableCell>
+              <TableCell
+                style={{
+                  fontWeight: 'bold',
+                  color: mode === 'light' ? colors.lightModeTableText : 'white',
+                }}
+              >
+                Rut
+              </TableCell>
+              <TableCell
+                style={{
+                  fontWeight: 'bold',
+                  color: mode === 'light' ? colors.lightModeTableText : 'white',
+                }}
+              >
+                Nombre
+              </TableCell>
+              <TableCell
+                style={{
+                  fontWeight: 'bold',
+                  color: mode === 'light' ? colors.lightModeTableText : 'white',
+                }}
+              >
+                Fecha Registro
+              </TableCell>
+              <TableCell
+                style={{
+                  fontWeight: 'bold',
+                  color: mode === 'light' ? colors.lightModeTableText : 'white',
+                }}
+              >
+                Acciones
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -387,19 +389,13 @@ const Receta: React.FC = () => {
         fullWidth
         style={editAnimation}
       >
-        <AnimatedDialogTitle className="modal-title" style={textAnimationProps}>
-          Editar Receta
-        </AnimatedDialogTitle>
-        {/* <AnimatedDialogContent className="modal-content" style={editAnimation}>
+        <AnimatedDialogContent className="modal-content" style={editAnimation}>
           {selectedReceta && (
-            <EditRecetaForm
-              receta={transformReceta(selectedReceta)}
-              onSuccess={handleSuccess}
-            />
+            <RecetaForm receipt={selectedReceta} onSuccess={handleSuccess} />
           )}
-        </AnimatedDialogContent> */}
+        </AnimatedDialogContent>
         <DialogActions className="modal-actions">
-          <Button onClick={handleEditClose} color="primary">
+          <Button onClick={handleEditClose} color="inherit" variant="contained">
             Cancelar
           </Button>
         </DialogActions>
