@@ -14,6 +14,8 @@ import {
   AppBar,
   Toolbar,
   Typography,
+  Button,
+  Dialog,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
@@ -27,6 +29,8 @@ import { Person } from '../../interfaces/Person';
 import { Consentment } from '../../interfaces/Consentment';
 import { Company } from '../../interfaces/Company';
 import ConsentmentVisualizer from './ConsentmentVisualizer';
+import ConsentForm from '../consent/ConsentPage';
+import { ConsentmentDetail } from '../../interfaces/ConsentmentDetails';
 
 const tableHeadings = [
   { id: 1, label: 'Fecha' },
@@ -37,14 +41,7 @@ interface Props {
   patient: Person;
 }
 
-interface ConsentmentDetail {
-  _id?: string;
-  consentimiento: string;
-  diagnostico: string;
-  tratamiento: string;
-}
-
-interface Response {
+export interface ConsentmentResponse {
   consentimiento: Consentment;
   detalles: ConsentmentDetail[];
 }
@@ -54,7 +51,9 @@ const ConsentmentsTab = ({ patient }: Props) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const [showConsentment, setConsentment] = useState<Response>();
+  const [formOpen, setFormOpen] = useState(false);
+
+  const [showConsentment, setConsentment] = useState<ConsentmentResponse>();
 
   const { data: consentments, isLoading } = useQuery({
     queryKey: ['consentments'],
@@ -82,95 +81,104 @@ const ConsentmentsTab = ({ patient }: Props) => {
   };
 
   return (
-    <Grid container gap={2}>
-      {isLoading && (
-        <Grid item xs={12}>
-          <LinearProgress />
-        </Grid>
-      )}
-      {!isLoading && (
-        <Grid item xs={5} className="shadow-lg rounded-lg">
-          <AppBar position="static">
-            <Toolbar
-              style={{
-                backgroundColor:
-                  mode === 'light'
-                    ? colors.lightModeHeaderColor
-                    : colors.darkModeHeaderColor,
-              }}
-            >
-              <Typography variant="h6">Consentimientos</Typography>
-            </Toolbar>
-          </AppBar>
-          <TableContainer component={Paper} elevation={0}>
-            <Table>
-              <TableHead
+    <>
+      <Grid container gap={2}>
+        {isLoading && (
+          <Grid item xs={12}>
+            <LinearProgress />
+          </Grid>
+        )}
+        {!isLoading && (
+          <Grid item xs={5} className="shadow-lg rounded-lg">
+            <AppBar position="static">
+              <Toolbar
                 style={{
                   backgroundColor:
                     mode === 'light'
-                      ? colors.lightModeTableHead
-                      : colors.darkModeTableHead,
+                      ? colors.lightModeHeaderColor
+                      : colors.darkModeHeaderColor,
+                  justifyContent: 'space-between',
                 }}
               >
-                <TableRow>
-                  {tableHeadings.map((h) => {
+                <Typography variant="h6">Consentimientos</Typography>
+                <Button variant="contained" onClick={() => setFormOpen(true)}>
+                  Nuevo consentimiento
+                </Button>
+              </Toolbar>
+            </AppBar>
+            <TableContainer component={Paper} elevation={0}>
+              <Table>
+                <TableHead
+                  style={{
+                    backgroundColor:
+                      mode === 'light'
+                        ? colors.lightModeTableHead
+                        : colors.darkModeTableHead,
+                  }}
+                >
+                  <TableRow>
+                    {tableHeadings.map((h) => {
+                      return (
+                        <TableCell
+                          style={{
+                            fontWeight: 'bold',
+                            color:
+                              mode === 'light'
+                                ? colors.lightModeTableText
+                                : 'white',
+                          }}
+                          key={h.id}
+                        >
+                          {h.label}
+                        </TableCell>
+                      );
+                    })}
+                    <TableCell></TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {consentments?.map((c: ConsentmentResponse) => {
                     return (
-                      <TableCell
-                        style={{
-                          fontWeight: 'bold',
-                          color:
-                            mode === 'light'
-                              ? colors.lightModeTableText
-                              : 'white',
-                        }}
-                        key={h.id}
-                      >
-                        {h.label}
-                      </TableCell>
+                      <TableRow key={c.consentimiento._id}>
+                        <TableCell>
+                          {new Date(
+                            c.consentimiento.fechaRegistro
+                          ).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          {(c.consentimiento.empresa as Company).razonSocial}
+                        </TableCell>
+                        <TableCell>
+                          <IconButton>
+                            <Visibility onClick={() => setConsentment(c)} />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
                     );
                   })}
-                  <TableCell></TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {consentments?.map((c: Response) => {
-                  return (
-                    <TableRow key={c.consentimiento._id}>
-                      <TableCell>
-                        {new Date(
-                          c.consentimiento.fechaRegistro
-                        ).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>
-                        {(c.consentimiento.empresa as Company).razonSocial}
-                      </TableCell>
-                      <TableCell>
-                        <IconButton>
-                          <Visibility onClick={() => setConsentment(c)} />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-            <TablePagination
-              page={page}
-              onPageChange={handleChangePage}
-              count={consentments?.length}
-              component="div"
-              rowsPerPage={rowsPerPage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          </TableContainer>
-        </Grid>
-      )}
-      {!isLoading && (
-        <Grid item xs={6} className="border border-zinc-200 rounded-lg p-3">
-          <ConsentmentVisualizer consentment={showConsentment} />
-        </Grid>
-      )}
-    </Grid>
+                </TableBody>
+              </Table>
+              <TablePagination
+                page={page}
+                onPageChange={handleChangePage}
+                count={consentments?.length}
+                component="div"
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </TableContainer>
+          </Grid>
+        )}
+        {!isLoading && (
+          <Grid item xs={6} className="border border-zinc-200 rounded-lg p-3">
+            <ConsentmentVisualizer consentment={showConsentment} />
+          </Grid>
+        )}
+      </Grid>
+      <Dialog open={formOpen} onClose={() => setFormOpen(false)}>
+        <ConsentForm />
+      </Dialog>
+    </>
   );
 };
 

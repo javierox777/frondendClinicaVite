@@ -30,14 +30,10 @@ import { Professional } from '../../interfaces/Professional';
 import { ShortModel } from '../../interfaces/ShortModel';
 import colors from '../../styles/colors';
 import { useThemeContext } from '../../componemts/themeContext';
-
-interface Response {
-  consentimiento: Consentment;
-  detalles: ConsentmentDetail[];
-}
+import { ConsentmentResponse } from './ConsentmentsTab';
 
 interface Props {
-  consentment: Response | undefined;
+  consentment: ConsentmentResponse | undefined;
 }
 
 const ConsentmentVisualizer = ({ consentment }: Props) => {

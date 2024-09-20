@@ -50,14 +50,10 @@ import {
 import { Delete } from '@mui/icons-material';
 
 interface Props {
-  open: boolean;
-  onClose: CallableFunction;
-  budget?: Budget;
   afterSubmit?: CallableFunction;
-  status?: ShortModel;
 }
 
-const ConsentForm = ({ onClose, open, budget, afterSubmit, status }: Props) => {
+const ConsentForm = ({ afterSubmit }: Props) => {
   const { mode } = useThemeContext();
   const { user } = useUser();
 
@@ -396,7 +392,15 @@ const ConsentForm = ({ onClose, open, budget, afterSubmit, status }: Props) => {
                 </TableContainer>
               </Grid>
               <Grid item xs={12}>
-                <Button type="submit" variant="contained" color="primary">
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  fullWidth
+                  style={{
+                    marginBottom: 20,
+                  }}
+                >
                   Registrar Consentimiento
                 </Button>
               </Grid>
