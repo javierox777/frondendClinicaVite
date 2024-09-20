@@ -42,6 +42,7 @@ import { useThemeContext } from '../../componemts/themeContext';
 import colors from '../../styles/colors';
 import { useQuery } from '@tanstack/react-query';
 import { generalConfig } from '../../config';
+import { Toaster } from 'react-hot-toast';
 
 interface IPersona {
   _id: string;
@@ -223,7 +224,7 @@ const Receta: React.FC = () => {
   };
 
   return (
-    <div>
+    <>
       <Box display="flex" justifyContent="space-between" mb={2}>
         <AppBar position="static">
           <Toolbar
@@ -445,7 +446,8 @@ const Receta: React.FC = () => {
           </Button>
         </DialogActions>
       </AnimatedDialog>
-    </div>
+      <Toaster />
+    </>
   );
 };
 

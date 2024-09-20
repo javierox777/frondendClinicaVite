@@ -205,45 +205,65 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const newData = {
-        estado: formData.estado,
-        profesional: (user as User).profesionalId,
-        empresa: formData.empresa,
-        fechaRegistro: new Date(formData.fechaRegistro),
-        direccion: formData.direccion,
-        persona: formData.persona,
-        detalles: details,
-      };
-
       setSubmitting(true);
 
-      const response = await axios.post(
-        `${generalConfig.baseUrl}/receipt`,
-        newData
-      );
+      if (receipt) {
+        const newData = {
+          estado: formData.estado,
+          profesional: (user as User).profesionalId,
+          empresa: formData.empresa,
+          fechaRegistro: new Date(formData.fechaRegistro),
+          direccion: formData.direccion,
+          persona: formData.persona,
+          detalles: details,
+        };
+        const response = await axios.patch(
+          `${generalConfig.baseUrl}/receipt/${receipt._id}`,
+          newData
+        );
+        if (response.data.message === 'success') {
+          toast.success('Receta actualizada');
+          setSubmitting(false);
+        }
+      } else {
+        const newData = {
+          estado: formData.estado,
+          profesional: (user as User).profesionalId,
+          empresa: formData.empresa,
+          fechaRegistro: new Date(formData.fechaRegistro),
+          direccion: formData.direccion,
+          persona: formData.persona,
+          detalles: details,
+        };
 
-      if (response.data.message === 'success') {
-        toast.success('Nueva receta registrada');
-        setSubmitting(false);
-        setFormData({
-          estado: '',
-          profesional: '',
-          empresa: '',
-          fechaRegistro: '',
-          direccion: '',
-          persona: '',
-        });
-        setDetails([
-          {
-            objeto: '',
-            dias: 0,
-            intervalo: '',
-            id: (Math.random() * 1000).toString(),
-          },
-        ]);
-      }
-      if (onSuccess) {
-        onSuccess();
+        const response = await axios.post(
+          `${generalConfig.baseUrl}/receipt`,
+          newData
+        );
+
+        if (response.data.message === 'success') {
+          toast.success('Nueva receta registrada');
+          setSubmitting(false);
+          setFormData({
+            estado: '',
+            profesional: '',
+            empresa: '',
+            fechaRegistro: '',
+            direccion: '',
+            persona: '',
+          });
+          setDetails([
+            {
+              objeto: '',
+              dias: 0,
+              intervalo: '',
+              id: (Math.random() * 1000).toString(),
+            },
+          ]);
+        }
+        if (onSuccess) {
+          onSuccess();
+        }
       }
     } catch (error) {
       console.log(error);
@@ -665,7 +685,6 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
           </Grid>
         </Grid>
       </form>
-      <Toaster />
     </>
   );
 };
