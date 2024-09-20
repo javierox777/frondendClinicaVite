@@ -21,9 +21,12 @@ import {
 } from '@mui/material';
 import { useThemeContext } from '../../componemts/themeContext';
 import colors from '../../styles/colors';
-import { Receipt } from '../receta/types';
+
 import { Visibility } from '@mui/icons-material';
 import ReceiptVisualizer from './ReceiptVisualizer';
+import { Receipt } from '../../interfaces/Receipt';
+import { Professional } from '../../interfaces/Professional';
+import { Company } from '../../interfaces/Company';
 
 interface Props {
   patient: Person;
@@ -127,9 +130,12 @@ const PatientReceipts = ({ patient }: Props) => {
                         {new Date(r.fechaRegistro).toLocaleDateString()}
                       </TableCell>
                       <TableCell>
-                        {r.profesional_id.nombre1} {r.profesional_id.apellPat}
+                        {(r.profesional as Professional).nombre1}{' '}
+                        {(r.profesional as Professional).apellPat}
                       </TableCell>
-                      <TableCell>{r.empresa_id.razonSocial}</TableCell>
+                      <TableCell>
+                        {(r.empresa as Company).razonSocial}
+                      </TableCell>
                       <TableCell>
                         <IconButton onClick={() => setReceipt(r)}>
                           <Visibility />
