@@ -8,6 +8,7 @@ import axios from 'axios';
 import { generalConfig } from '../../config';
 import { TableContainer } from '@mui/material';
 import { ReceiptDetail } from '../../interfaces/ReceiptDetail';
+import { Address } from '../../interfaces/Address';
 interface IPersona {
   _id: string;
   apellMat: string;
@@ -42,6 +43,17 @@ const RecetaTemplate = ({ receta }: Props) => {
     queryFn: async () => {
       const response = await axios.get(
         `${generalConfig.baseUrl}/receipt-details/getreceiptdetails/${receta._id}`
+      );
+
+      return response.data.body;
+    },
+  });
+
+  const { data: address } = useQuery({
+    queryKey: ['address'],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${generalConfig.baseUrl}/address-book/${receta.direccion}`
       );
 
       return response.data.body;
@@ -151,7 +163,7 @@ const RecetaTemplate = ({ receta }: Props) => {
                 marginLeft: '10px',
               }}
             >
-              {receta.direccion}
+              {address && (address as Address).nombre}
             </span>
           </div>
           <div
