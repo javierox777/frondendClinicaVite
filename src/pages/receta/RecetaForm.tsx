@@ -7,6 +7,7 @@ import {
   Grid,
   IconButton,
   InputLabel,
+  LinearProgress,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -142,11 +143,15 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
   const { data: addresses, isLoading: addressesLoading } = useQuery({
     queryKey: ['addresses', formData.persona],
     queryFn: async () => {
-      const response = await axios.get(
-        `${generalConfig.baseUrl}/address-book/getaddresses/${formData.persona}`
-      );
+      if (formData.persona) {
+        const response = await axios.get(
+          `${generalConfig.baseUrl}/address-book/getaddresses/${formData.persona}`
+        );
 
-      return response.data.body;
+        return response.data.body;
+      } else {
+        return null;
+      }
     },
   });
 
@@ -163,13 +168,16 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
     queryKey: ['details', receipt],
     queryFn: async () => {
       if (receipt) {
+        console.log('fetcheando detalles');
         const response = await axios.get(
           `${generalConfig.baseUrl}/receipt-details/getreceiptdetails/${receipt._id}`
         );
-        return response.data.body;
+        return setDetails(response.data.body);
+      } else {
+        return null;
       }
     },
-  });
+  }); //NO BORRAR, SI BIEN NO ESTAN SIENDO USADOS Y LEIDOS, ESTA FUNCION TIENE UNA TAREA DE FETCHEAR LOS DETALLES A LA BASE DE DATOS DE LA RECETA
 
   const handleDetailChange = (
     e: ChangeEvent<HTMLInputElement> | SelectChangeEvent<string>,
@@ -254,9 +262,6 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
         direccion: receipt.direccion,
         persona: (receipt.persona as Person)._id,
       });
-      if (receiptDetails) {
-        setDetails(receiptDetails);
-      }
     }
   }, [receipt]);
 
@@ -517,6 +522,11 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
               </Toolbar>
             </AppBar>
           </Grid>
+          {receiptDetailsLoading && (
+            <Grid item xs={12}>
+              <LinearProgress />
+            </Grid>
+          )}
           <Grid item xs={12}>
             <TableContainer>
               <Table>
