@@ -52,11 +52,12 @@ const ConsentmentsTab = ({ patient }: Props) => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const [formOpen, setFormOpen] = useState(false);
+  const [dataUpdated, setUpdated] = useState(false);
 
   const [showConsentment, setConsentment] = useState<ConsentmentResponse>();
 
   const { data: consentments, isLoading } = useQuery({
-    queryKey: ['consentments'],
+    queryKey: ['consentments', dataUpdated],
     queryFn: async () => {
       const response = await axios.get(
         `${generalConfig.baseUrl}/consentments/getconsentments/${patient._id}`
@@ -176,7 +177,7 @@ const ConsentmentsTab = ({ patient }: Props) => {
         )}
       </Grid>
       <Dialog open={formOpen} onClose={() => setFormOpen(false)}>
-        <ConsentForm />
+        <ConsentForm afterSubmit={() => setUpdated(!dataUpdated)} />
       </Dialog>
     </>
   );
