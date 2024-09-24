@@ -196,6 +196,13 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
     }
   };
 
+  const [agreements, setAgreements] = useState([
+    {
+      _id: (Math.random() * 1000).toString(),
+      prestacionTipo: '',
+    },
+  ]);
+
   const [contacts, setContacts] = useState([
     {
       _id: (Math.random() * 1000).toString(),
@@ -215,6 +222,16 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
       vigente: '1',
     },
   ]);
+
+  const handleAddAgreement = () => {
+    setAgreements([
+      ...agreements,
+      {
+        _id: (Math.random() * 1000).toString(),
+        prestacionTipo: '',
+      },
+    ]);
+  };
 
   const handleAddContact = () => {
     setContacts([
@@ -241,6 +258,17 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
         vigente: '1',
       },
     ]);
+  };
+
+  const handleAgreementChange = (
+    e: ChangeEvent<HTMLInputElement> | SelectChangeEvent<string>,
+    index: number
+  ) => {
+    const updatedAgreements = [...agreements];
+
+    updatedAgreements[index].prestacionTipo = e.target.value;
+
+    setAgreements(updatedAgreements);
   };
 
   const handleAddressChange = (
@@ -296,6 +324,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
       sexo: gender,
       contactos: contacts,
       direcciones: addresses,
+      convenios: agreements,
       antecedentes: {
         morbidos: morbidWithoutId,
         familiares: familiarWithoutId,
@@ -630,6 +659,75 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                   </Select>
                 </FormControl>
               </Grid>
+              <Grid item xs={12}>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  style={{ marginBottom: 10 }}
+                >
+                  <AppBar position="static">
+                    <Toolbar
+                      style={{
+                        backgroundColor:
+                          mode === 'light'
+                            ? colors.lightModeHeaderColor
+                            : colors.darkModeHeaderColor,
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <Typography variant="h6">Convenios</Typography>
+                    </Toolbar>
+                  </AppBar>
+                </Box>
+              </Grid>
+              <Grid item xs={12}>
+                <Box display="flex" alignItems="center">
+                  <Typography style={{ fontWeight: 'bold' }}>
+                    Agregar convenio
+                  </Typography>
+                  <IconButton onClick={handleAddAgreement}>
+                    <AddCircleOutline />
+                  </IconButton>
+                </Box>
+                {agreements.map((a, index) => {
+                  return (
+                    <Box className="flex items-center mb-2" key={a._id}>
+                      <FormControl style={{ width: '50%' }}>
+                        <InputLabel id="serviceType-select-label">
+                          Convenio
+                        </InputLabel>
+                        <Select
+                          label="serviceType"
+                          id="serviceType-select"
+                          labelId="serviceType-select-label"
+                          onChange={(e: SelectChangeEvent<string>) =>
+                            handleAgreementChange(e, index)
+                          }
+                          value={a.prestacionTipo}
+                        >
+                          {formData?.serviceTypes.map((st: any) => {
+                            return (
+                              <MenuItem key={st._id} value={st._id}>
+                                {st.nombre}
+                              </MenuItem>
+                            );
+                          })}
+                        </Select>
+                      </FormControl>
+                      <IconButton
+                        onClick={() => {
+                          const updatedAgreements = agreements.filter(
+                            (ag) => ag._id !== a._id
+                          );
+                          setAgreements(updatedAgreements);
+                        }}
+                      >
+                        <Delete />
+                      </IconButton>
+                    </Box>
+                  );
+                })}
+              </Grid>
               <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                 <Box
                   display="flex"
@@ -696,15 +794,15 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                             value={m.descripcion}
                             required
                           />
-                          <IconButton>
-                            <Delete
-                              onClick={() => {
-                                const updatedData = morbid.filter(
-                                  (md) => md._id !== m._id
-                                );
-                                setMorbid(updatedData);
-                              }}
-                            />
+                          <IconButton
+                            onClick={() => {
+                              const updatedData = morbid.filter(
+                                (md) => md._id !== m._id
+                              );
+                              setMorbid(updatedData);
+                            }}
+                          >
+                            <Delete />
                           </IconButton>
                         </Box>
                       );
@@ -739,15 +837,15 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                             value={m.descripcion}
                             required
                           />
-                          <IconButton>
-                            <Delete
-                              onClick={() => {
-                                const updatedData = familiar.filter(
-                                  (md) => md._id !== m._id
-                                );
-                                setFamiliar(updatedData);
-                              }}
-                            />
+                          <IconButton
+                            onClick={() => {
+                              const updatedData = familiar.filter(
+                                (md) => md._id !== m._id
+                              );
+                              setFamiliar(updatedData);
+                            }}
+                          >
+                            <Delete />
                           </IconButton>
                         </Box>
                       );
@@ -782,15 +880,15 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                             value={m.descripcion}
                             required
                           />
-                          <IconButton>
-                            <Delete
-                              onClick={() => {
-                                const updatedData = allergies.filter(
-                                  (md) => md._id !== m._id
-                                );
-                                setAllergies(updatedData);
-                              }}
-                            />
+                          <IconButton
+                            onClick={() => {
+                              const updatedData = allergies.filter(
+                                (md) => md._id !== m._id
+                              );
+                              setAllergies(updatedData);
+                            }}
+                          >
+                            <Delete />
                           </IconButton>
                         </Box>
                       );
@@ -825,15 +923,15 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                             value={m.descripcion}
                             required
                           />
-                          <IconButton>
-                            <Delete
-                              onClick={() => {
-                                const updatedData = general.filter(
-                                  (md) => md._id !== m._id
-                                );
-                                setGeneral(updatedData);
-                              }}
-                            />
+                          <IconButton
+                            onClick={() => {
+                              const updatedData = general.filter(
+                                (md) => md._id !== m._id
+                              );
+                              setGeneral(updatedData);
+                            }}
+                          >
+                            <Delete />
                           </IconButton>
                         </Box>
                       );

@@ -108,7 +108,7 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
       objeto: '',
       dias: 0,
       intervalo: '',
-      id: (Math.random() * 1000).toString(),
+      _id: (Math.random() * 1000).toString(),
     },
   ]);
 
@@ -167,15 +167,11 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
   const { data: receiptDetails, isLoading: receiptDetailsLoading } = useQuery({
     queryKey: ['details', receipt],
     queryFn: async () => {
-      if (receipt) {
-        console.log('fetcheando detalles');
-        const response = await axios.get(
-          `${generalConfig.baseUrl}/receipt-details/getreceiptdetails/${receipt._id}`
-        );
-        return setDetails(response.data.body);
-      } else {
-        return null;
-      }
+      const response = await axios.get(
+        `${generalConfig.baseUrl}/receipt-details/getreceiptdetails/${receipt!._id}`
+      );
+      setDetails(response.data.body);
+      return response.data.body;
     },
   }); //NO BORRAR, SI BIEN NO ESTAN SIENDO USADOS Y LEIDOS, ESTA FUNCION TIENE UNA TAREA DE FETCHEAR LOS DETALLES A LA BASE DE DATOS DE LA RECETA
 
@@ -257,7 +253,7 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
               objeto: '',
               dias: 0,
               intervalo: '',
-              id: (Math.random() * 1000).toString(),
+              _id: (Math.random() * 1000).toString(),
             },
           ]);
         }
@@ -531,7 +527,7 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
                         objeto: '',
                         dias: 0,
                         intervalo: '',
-                        id: (Math.random() * 1000).toString(),
+                        _id: (Math.random() * 1000).toString(),
                       },
                     ]);
                   }}
@@ -605,7 +601,7 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
                 <TableBody>
                   {details.map((d, index) => {
                     return (
-                      <TableRow key={d.id}>
+                      <TableRow key={d._id}>
                         <TableCell>
                           <FormControl fullWidth>
                             <TextField
@@ -657,7 +653,7 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
                           <IconButton
                             onClick={() => {
                               const updatedDetails = details.filter(
-                                (dt) => dt.id !== d.id
+                                (dt) => dt._id !== d._id
                               );
                               setDetails(updatedDetails);
                             }}

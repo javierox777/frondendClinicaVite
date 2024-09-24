@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useSpring, useTransition, animated, useSpringRef, useChain, config } from '@react-spring/web';
+import {
+  useSpring,
+  useTransition,
+  animated,
+  useSpringRef,
+  useChain,
+  config,
+} from '@react-spring/web';
 import axios from 'axios';
 import { Receipt } from './types';
 import styles from './styles.module.css';
@@ -67,10 +74,15 @@ const App: React.FC = () => {
           <animated.div
             key={item._id}
             className={styles.item}
-            style={{ ...style, background: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' }}
+            style={{
+              ...style,
+              background: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+            }}
           >
             <div>
-              <div className={styles.name}>{item.profesional_id.nombre1} {item.profesional_id.apellPat}</div>
+              <div className={styles.name}>
+                {item.profesional_id.nombre1} {item.profesional_id.apellPat}
+              </div>
               <div className={styles.name}>{item.persona_id.rut}</div>
             </div>
           </animated.div>
@@ -78,6 +90,6 @@ const App: React.FC = () => {
       </animated.div>
     </div>
   );
-}
+};
 
 export default App;

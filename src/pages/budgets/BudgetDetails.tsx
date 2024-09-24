@@ -368,7 +368,7 @@ const BudgetDetails = ({ budget }: Props) => {
                       return (
                         <TableRow key={d._id}>
                           <TableCell>{d.objeto.nombre}</TableCell>
-                          <TableCell>{d.prestacion.nombre}</TableCell>
+                          <TableCell>{d.prestacion?.nombre}</TableCell>
                           <TableCell>$ {d.valor}</TableCell>
                           <TableCell>
                             {d.pagado ? (

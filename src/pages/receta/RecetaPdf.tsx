@@ -6,7 +6,7 @@ import { Professional } from '../../interfaces/Professional';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { generalConfig } from '../../config';
-import { TableContainer } from '@mui/material';
+import { LinearProgress, TableContainer } from '@mui/material';
 import { ReceiptDetail } from '../../interfaces/ReceiptDetail';
 import { Address } from '../../interfaces/Address';
 interface IPersona {
@@ -39,7 +39,7 @@ interface Props {
 
 const RecetaTemplate = ({ receta }: Props) => {
   const { data: details, isLoading } = useQuery({
-    queryKey: ['details'],
+    queryKey: ['details', receta],
     queryFn: async () => {
       const response = await axios.get(
         `${generalConfig.baseUrl}/receipt-details/getreceiptdetails/${receta._id}`
@@ -50,7 +50,7 @@ const RecetaTemplate = ({ receta }: Props) => {
   });
 
   const { data: address } = useQuery({
-    queryKey: ['address'],
+    queryKey: ['address', receta],
     queryFn: async () => {
       const response = await axios.get(
         `${generalConfig.baseUrl}/address-book/${receta.direccion}`
@@ -122,7 +122,8 @@ const RecetaTemplate = ({ receta }: Props) => {
               fontWeight: 'bold',
             }}
           >
-            Fecha: {new Date(receta.fechaRegistro).toLocaleDateString()}
+            Fecha:{' '}
+            {receta && new Date(receta.fechaRegistro).toLocaleDateString()}
           </p>
           <div>
             <br />
@@ -142,10 +143,10 @@ const RecetaTemplate = ({ receta }: Props) => {
                 marginLeft: '10px',
               }}
             >
-              {(receta.persona as Person).nombre1}{' '}
-              {(receta.persona as Person).nombre2}{' '}
-              {(receta.persona as Person).apellPat}{' '}
-              {(receta.persona as Person).apellMat}
+              {receta.persona && (receta.persona as Person).nombre1}{' '}
+              {receta.persona && (receta.persona as Person).nombre2}{' '}
+              {receta.persona && (receta.persona as Person).apellPat}{' '}
+              {receta.persona && (receta.persona as Person).apellMat}
             </span>
           </div>
           <div
@@ -163,7 +164,7 @@ const RecetaTemplate = ({ receta }: Props) => {
                 marginLeft: '10px',
               }}
             >
-              {address && (address as Address).nombre}
+              {address ? (address as Address).nombre : <LinearProgress />}
             </span>
           </div>
           <div
@@ -181,8 +182,9 @@ const RecetaTemplate = ({ receta }: Props) => {
                 marginLeft: '10px',
               }}
             >
-              {new Date().getFullYear() -
-                new Date((receta.persona as Person).fechaNac).getFullYear()}
+              {receta &&
+                new Date().getFullYear() -
+                  new Date((receta.persona as Person).fechaNac).getFullYear()}
             </span>
             <span>C. Identidad:</span>
             <span
@@ -203,20 +205,23 @@ const RecetaTemplate = ({ receta }: Props) => {
             <br />
           </div>
           <table style={{ width: '100%' }}>
-            <tr className="border-blue-700 border">
-              <th className="border-blue-700 border">Medicamento</th>
-              <th className="border-blue-700 border">Fracción</th>
-              <th className="border-blue-700 border">Días</th>
-            </tr>
-            {details?.map((d: ReceiptDetail) => {
-              return (
-                <tr key={d._id}>
-                  <td className="text-center">{d.objeto}</td>
-                  <td className="text-center">{d.intervalo}</td>
-                  <td className="text-center">{d.dias}</td>
-                </tr>
-              );
-            })}
+            <thead>
+              <tr className="border-blue-700 border">
+                <th className="border-blue-700 border">Medicamento</th>
+                <th className="border-blue-700 border">Fracción</th>
+                <th className="border-blue-700 border">Días</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.isArray(details) &&
+                details.map((d: ReceiptDetail) => (
+                  <tr key={d._id}>
+                    <td className="text-center">{d.objeto}</td>
+                    <td className="text-center">{d.intervalo}</td>
+                    <td className="text-center">{d.dias}</td>
+                  </tr>
+                ))}
+            </tbody>
           </table>
           <br />
           <br />
@@ -244,10 +249,14 @@ const RecetaTemplate = ({ receta }: Props) => {
                   margin: '0 auto',
                 }}
               >
-                {(receta.profesional as Professional).nombre1}{' '}
-                {(receta.profesional as Professional).nombre2}{' '}
-                {(receta.profesional as Professional).apellPat}{' '}
-                {(receta.profesional as Professional).apellMat}
+                {receta.profesional &&
+                  (receta.profesional as Professional).nombre1}{' '}
+                {receta.profesional &&
+                  (receta.profesional as Professional).nombre2}{' '}
+                {receta.profesional &&
+                  (receta.profesional as Professional).apellPat}{' '}
+                {receta.profesional &&
+                  (receta.profesional as Professional).apellMat}
               </p>
               <p style={{ width: '200px', margin: '0 auto' }}>Profesional</p>
             </div>

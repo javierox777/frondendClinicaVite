@@ -88,7 +88,8 @@ const Receta: React.FC = () => {
     queryKey: ['fetchData'],
     queryFn: async () => {
       const response = await axios.get(`${generalConfig.baseUrl}/receipt`);
-      return setFormData(response.data.body);
+      setFormData(response.data.body);
+      return response.data.body;
     },
   });
 
@@ -308,7 +309,7 @@ const Receta: React.FC = () => {
           </TableHead>
           <TableBody>
             {filteredData.map((row, index) => (
-              <TableRow key={index} onClick={() => handleRowClickOpen(row)}>
+              <TableRow key={row._id} onClick={() => handleRowClickOpen(row)}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{(row.persona as Person).rut}</TableCell>
                 <TableCell
