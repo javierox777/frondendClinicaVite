@@ -163,8 +163,6 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
       data.convenio = agreement;
     }
 
-    console.log(data);
-
     if (budget) {
       try {
         setSubmitting(true);
