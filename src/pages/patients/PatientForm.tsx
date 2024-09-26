@@ -305,11 +305,12 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const morbidWithoutId = morbid.map(({ _id, ...rest }) => rest);
-    const familiarWithoutId = familiar.map(({ _id, ...rest }) => rest);
-    const generalWithoutId = general.map(({ _id, ...rest }) => rest);
-    const allergiesWithoutId = allergies.map(({ _id, ...rest }) => rest);
-    const habitsWithoutId = habits.map(({ id, ...rest }) => rest);
+    // const morbidWithoutId = morbid.map(({ _id, ...rest }) => rest);
+    // const familiarWithoutId = familiar.map(({ _id, ...rest }) => rest);
+    // const generalWithoutId = general.map(({ _id, ...rest }) => rest);
+    // const allergiesWithoutId = allergies.map(({ _id, ...rest }) => rest);
+    // const habitsWithoutId = habits.map(({ id, ...rest }) => rest);
+    const agreementsWithoutId = agreements.map(({ _id, ...rest }) => rest);
 
     const newPerson = {
       nombre1: firstName,
@@ -324,14 +325,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
       sexo: gender,
       contactos: contacts,
       direcciones: addresses,
-      convenios: agreements,
-      antecedentes: {
-        morbidos: morbidWithoutId,
-        familiares: familiarWithoutId,
-        habitos: habitsWithoutId,
-        alergias: allergiesWithoutId,
-        generales: generalWithoutId,
-      },
+      convenios: agreementsWithoutId,
     };
 
     try {
@@ -365,48 +359,40 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
   };
 
   const getPatientAddresses = async (patientId: string) => {
-    const response = await axios.get(`${generalConfig.baseUrl}/address-book`);
+    const response = await axios.get(
+      `${generalConfig.baseUrl}/address-book/getaddresses/${patientId}`
+    );
 
-    const addresses = response.data.body.filter((a: Address) => {
-      return a.persona._id === patientId;
-    });
+    const addresses = response.data.body;
 
     setAddresses([...addresses]);
   };
 
   const getPatientContacts = async (patientId: string) => {
-    const response = await axios.get(`${generalConfig.baseUrl}/contact-book`);
+    const response = await axios.get(
+      `${generalConfig.baseUrl}/contact-book/getcontacts/${patientId}`
+    );
 
-    const contacts = response.data.body.filter((c: Contact) => {
-      return c.persona._id === patientId;
-    });
+    const contacts = response.data.body;
 
     setContacts([...contacts]);
   };
 
-  const getPatientAntecedents = async (patientId: string) => {
+  const getPatientAgreements = async (patientId: string) => {
     const response = await axios.get(
-      `${generalConfig.baseUrl}/antecedents/getantecedents/${patientId}`
+      `${generalConfig.baseUrl}/agreements/getagreements/${patientId}`
     );
 
-    const antecedents = response.data.body[0];
+    const agreements = response.data.body;
 
-    if (!antecedents) {
-      return;
-    }
-
-    setMorbid([...antecedents.morbidos]);
-    setAllergies([...antecedents.alergias]);
-    setHabits([...antecedents.habitos]);
-    setFamiliar([...antecedents.familiares]);
-    setGeneral([...antecedents.generales]);
+    setAgreements([...agreements]);
   };
 
   useEffect(() => {
     if (patient) {
       getPatientAddresses(patient._id);
       getPatientContacts(patient._id);
-      getPatientAntecedents(patient._id);
+      getPatientAgreements(patient._id);
       setFirstName(patient.nombre1);
       setSecondName(patient.nombre2);
       setFirstSurname(patient.apellPat);
@@ -728,249 +714,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                   );
                 })}
               </Grid>
-              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  style={{ marginBottom: 10 }}
-                >
-                  <AppBar position="static" className="mb-5">
-                    <Toolbar
-                      style={{
-                        backgroundColor:
-                          mode === 'light'
-                            ? colors.lightModeHeaderColor
-                            : colors.darkModeHeaderColor,
-                      }}
-                    >
-                      <Typography variant="h6">Antecedentes</Typography>
-                    </Toolbar>
-                  </AppBar>
-                </Box>
-                <Box
-                  sx={{
-                    backgroundColor:
-                      mode === 'light'
-                        ? colors.lightModeTableHead
-                        : colors.darkModeTableHead,
-                  }}
-                >
-                  <Tabs
-                    value={value}
-                    onChange={handleChange}
-                    aria-label="basic tabs example"
-                    variant="fullWidth"
-                  >
-                    <Tab label="Mórbidos" {...a11yProps(0)} />
-                    <Tab label="Familiares" {...a11yProps(1)} />
-                    <Tab label="Malos hábitos" {...a11yProps(2)} />
-                    <Tab label="Alergias" {...a11yProps(3)} />
-                    <Tab label="Generales" {...a11yProps(4)} />
-                  </Tabs>
-                </Box>
-                <CustomTabPanel value={value} index={0}>
-                  <Box display="flex-column" gap={1}>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <Typography style={{ fontWeight: 'bold' }}>
-                        Agregar antecedente
-                      </Typography>
-                      <IconButton onClick={() => handleAddAntecedent('morbid')}>
-                        <AddCircleOutline />
-                      </IconButton>
-                    </Box>
-                    {morbid.map((m: any, index: number) => {
-                      return (
-                        <Box
-                          key={m._id}
-                          className="flex items-center"
-                          style={{ marginBottom: 5 }}
-                        >
-                          <TextField
-                            label="Antecedente mórbido"
-                            fullWidth
-                            onChange={(e) =>
-                              handleChangeAntecedents(e, 'morbid', index)
-                            }
-                            value={m.descripcion}
-                            required
-                          />
-                          <IconButton
-                            onClick={() => {
-                              const updatedData = morbid.filter(
-                                (md) => md._id !== m._id
-                              );
-                              setMorbid(updatedData);
-                            }}
-                          >
-                            <Delete />
-                          </IconButton>
-                        </Box>
-                      );
-                    })}
-                  </Box>
-                </CustomTabPanel>
-                <CustomTabPanel value={value} index={1}>
-                  <Box display="flex-column" gap={1}>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <Typography style={{ fontWeight: 'bold' }}>
-                        Agregar antecedente
-                      </Typography>
-                      <IconButton
-                        onClick={() => handleAddAntecedent('familiar')}
-                      >
-                        <AddCircleOutline />
-                      </IconButton>
-                    </Box>
-                    {familiar.map((m: any, index: number) => {
-                      return (
-                        <Box
-                          key={m._id}
-                          className="flex items-center"
-                          style={{ marginBottom: 5 }}
-                        >
-                          <TextField
-                            label="Antecedente familiar"
-                            fullWidth
-                            onChange={(e) =>
-                              handleChangeAntecedents(e, 'familiar', index)
-                            }
-                            value={m.descripcion}
-                            required
-                          />
-                          <IconButton
-                            onClick={() => {
-                              const updatedData = familiar.filter(
-                                (md) => md._id !== m._id
-                              );
-                              setFamiliar(updatedData);
-                            }}
-                          >
-                            <Delete />
-                          </IconButton>
-                        </Box>
-                      );
-                    })}
-                  </Box>
-                </CustomTabPanel>
-                <CustomTabPanel value={value} index={3}>
-                  <Box display="flex-column" gap={1}>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <Typography style={{ fontWeight: 'bold' }}>
-                        Agregar alérgia
-                      </Typography>
-                      <IconButton
-                        onClick={() => handleAddAntecedent('allergy')}
-                      >
-                        <AddCircleOutline />
-                      </IconButton>
-                    </Box>
-                    {allergies.map((m: any, index: number) => {
-                      return (
-                        <Box
-                          key={m._id}
-                          className="flex items-center"
-                          style={{ marginBottom: 5 }}
-                        >
-                          <TextField
-                            label="Alérgia"
-                            fullWidth
-                            onChange={(e) =>
-                              handleChangeAntecedents(e, 'allergy', index)
-                            }
-                            value={m.descripcion}
-                            required
-                          />
-                          <IconButton
-                            onClick={() => {
-                              const updatedData = allergies.filter(
-                                (md) => md._id !== m._id
-                              );
-                              setAllergies(updatedData);
-                            }}
-                          >
-                            <Delete />
-                          </IconButton>
-                        </Box>
-                      );
-                    })}
-                  </Box>
-                </CustomTabPanel>
-                <CustomTabPanel value={value} index={4}>
-                  <Box display="flex-column" gap={1}>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <Typography style={{ fontWeight: 'bold' }}>
-                        Agregar antecedente
-                      </Typography>
-                      <IconButton
-                        onClick={() => handleAddAntecedent('general')}
-                      >
-                        <AddCircleOutline />
-                      </IconButton>
-                    </Box>
-                    {general.map((m: any, index: number) => {
-                      return (
-                        <Box
-                          key={m._id}
-                          className="flex items-center"
-                          style={{ marginBottom: 5 }}
-                        >
-                          <TextField
-                            label="Antecedente general"
-                            fullWidth
-                            onChange={(e) =>
-                              handleChangeAntecedents(e, 'general', index)
-                            }
-                            value={m.descripcion}
-                            required
-                          />
-                          <IconButton
-                            onClick={() => {
-                              const updatedData = general.filter(
-                                (md) => md._id !== m._id
-                              );
-                              setGeneral(updatedData);
-                            }}
-                          >
-                            <Delete />
-                          </IconButton>
-                        </Box>
-                      );
-                    })}
-                  </Box>
-                </CustomTabPanel>
-                <CustomTabPanel value={value} index={2}>
-                  <Box display="flex-column" gap={1}>
-                    <Box className="">
-                      {badHabits.map((bh: any) => {
-                        return (
-                          <FormControl fullWidth key={bh.id}>
-                            <FormControlLabel
-                              label={bh.descripcion}
-                              control={
-                                <Checkbox
-                                  checked={habits.some(
-                                    (h) => h.descripcion === bh.descripcion
-                                  )}
-                                  onChange={(e, checked) => {
-                                    if (checked) {
-                                      setHabits([...habits, bh]);
-                                    } else {
-                                      const updatedHabits = habits.filter(
-                                        (h) => h.descripcion !== bh.descripcion
-                                      );
-                                      setHabits(updatedHabits);
-                                    }
-                                  }}
-                                />
-                              }
-                            />
-                          </FormControl>
-                        );
-                      })}
-                    </Box>
-                  </Box>
-                </CustomTabPanel>
-              </Grid>
+
               <Grid item xs={12}>
                 <Box
                   display="flex"

@@ -8,6 +8,7 @@ interface AntecedentType {
 
 
 export interface IAntecedent extends Document {
+    _id?:string
     persona: Person | string,
     morbidos: AntecedentType[],
     familiares: AntecedentType[],

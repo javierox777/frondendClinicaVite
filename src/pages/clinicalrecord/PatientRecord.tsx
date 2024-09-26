@@ -34,6 +34,9 @@ import Personalnfo from './Personalnfo';
 import PatientReceipts from './PatientReceipts';
 import { update } from '@react-spring/web';
 import ConsentmentsTab from './ConsentmentsTab';
+import { formatRut } from '../../helpers/formatRut';
+import PatientAntecedents from './PatientAntecedents';
+import { Toaster } from 'react-hot-toast';
 
 const tableHeadings = [
   { id: 1, label: 'Fecha' },
@@ -73,6 +76,17 @@ const PatientRecord = () => {
       const data = await axios.get(
         `${generalConfig.baseUrl}/odontogramas/getpatientodontograms/${patient._id}`
       );
+      return data.data.body;
+    },
+  });
+
+  const { data: agreements, isLoading: agreementsLoading } = useQuery({
+    queryKey: ['agreements'],
+    queryFn: async () => {
+      const data = await axios.get(
+        `${generalConfig.baseUrl}/agreements/getagreements/${patient._id}`
+      );
+
       return data.data.body;
     },
   });
@@ -122,201 +136,253 @@ const PatientRecord = () => {
   }
 
   return (
-    <Grid container>
-      {/* INFORMACION DE PACIENTE  */}
-      <Grid
-        item
-        xs={12}
-        sm={12}
-        md={12}
-        lg={12}
-        xl={12}
-        className="shadow-lg rounded-lg pt-5 pl-5 pr-5"
-      >
-        <Grid container spacing={1}>
-          <Grid item xs={12}>
-            <Typography
-              style={{
-                fontWeight: 'bold',
-                fontSize: 23,
-                color:
-                  mode === 'light'
-                    ? colors.ligthModeSoftText
-                    : colors.darkModeSoftText,
-              }}
-            >
-              {patient.nombre1} {patient.nombre2} {patient.apellPat}{' '}
-              {patient.apellMat}
-            </Typography>
+    <>
+      <Grid container>
+        {/* INFORMACION DE PACIENTE  */}
+        <Grid
+          item
+          xs={12}
+          sm={12}
+          md={12}
+          lg={12}
+          xl={12}
+          className="shadow-lg rounded-lg pt-5 pl-5 pr-5"
+        >
+          <Grid container spacing={1}>
+            <Grid item xs={12}>
+              <Typography
+                style={{
+                  fontWeight: 'bold',
+                  fontSize: 23,
+                  color:
+                    mode === 'light'
+                      ? colors.ligthModeSoftText
+                      : colors.darkModeSoftText,
+                }}
+              >
+                {patient.nombre1} {patient.nombre2} {patient.apellPat}{' '}
+                {patient.apellMat}
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography
+                style={{
+                  fontWeight: 'lighter',
+                  fontSize: 20,
+                  color:
+                    mode === 'light'
+                      ? colors.ligthModeSoftText
+                      : colors.darkModeSoftText,
+                }}
+              >
+                {calculateAge(patient.fechaNac, 'años', 'mes(es)')}
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography
+                style={{
+                  fontWeight: 'bold',
+                  color:
+                    mode === 'light'
+                      ? colors.ligthModeSoftText
+                      : colors.darkModeSoftText,
+                }}
+              >
+                {!agreementsLoading && agreements.length === 0
+                  ? 'SIN CONVENIO(S)'
+                  : 'CON CONVENIO(S)'}
+              </Typography>
+            </Grid>
+            <Divider orientation="vertical" flexItem />
+            <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+              <Typography
+                style={{
+                  fontWeight: 'bold',
+                  color:
+                    mode === 'light'
+                      ? colors.ligthModeSoftText
+                      : colors.darkModeSoftText,
+                }}
+              >
+                RUT
+              </Typography>
+              <Typography>
+                {formatRut(patient.rut)} - {patient.dv}
+              </Typography>
+            </Grid>
+            <Divider orientation="vertical" flexItem />
+            <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+              <Typography
+                style={{
+                  fontWeight: 'bold',
+                  color:
+                    mode === 'light'
+                      ? colors.ligthModeSoftText
+                      : colors.darkModeSoftText,
+                }}
+              >
+                Fecha de nacimiento
+              </Typography>
+              <Typography>
+                {new Date(patient.fechaNac).toLocaleDateString()}
+              </Typography>
+            </Grid>
+            <Divider orientation="vertical" flexItem />
+            <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+              <Typography
+                style={{
+                  fontWeight: 'bold',
+                  color:
+                    mode === 'light'
+                      ? colors.ligthModeSoftText
+                      : colors.darkModeSoftText,
+                }}
+              >
+                SEXO
+              </Typography>
+              <Typography>{patient.sexo.nombre}</Typography>
+            </Grid>
+            <Divider orientation="vertical" flexItem />
+            <Grid item xs={12} sm={12} md={12} lg={2} xl={2}>
+              <Typography
+                style={{
+                  fontWeight: 'bold',
+                  color:
+                    mode === 'light'
+                      ? colors.ligthModeSoftText
+                      : colors.darkModeSoftText,
+                }}
+              >
+                Previsión
+              </Typography>
+              <Typography>
+                {patient.institucion.prevision.nombre}{' '}
+                {patient.institucion.nombre}
+              </Typography>
+            </Grid>
           </Grid>
-          <Grid item xs={12}>
-            <Typography
-              style={{
-                fontWeight: 'bold',
-                color:
-                  mode === 'light'
-                    ? colors.ligthModeSoftText
-                    : colors.darkModeSoftText,
-              }}
-            >
-              SIN CONVENIO
-              {/* hacerlo dinamico */}
-            </Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Box className="flex gap-4">
-              <Box className="flex gap-1 justify-center items-center">
-                <Box>
-                  <ContactEmergency color="disabled" />
-                </Box>
-                <Box>
-                  <Typography
-                    style={{
-                      fontWeight: 'lighter',
-                      color:
-                        mode === 'light'
-                          ? colors.ligthModeSoftText
-                          : colors.darkModeSoftText,
-                    }}
-                  >
-                    Rut {patient.rut}-{patient.dv}{' '}
-                  </Typography>
-                </Box>
-              </Box>
-              <Divider orientation="vertical" flexItem />
-              <Box>
-                <Typography
-                  style={{
-                    fontWeight: 'lighter',
-                    color:
-                      mode === 'light'
-                        ? colors.ligthModeSoftText
-                        : colors.darkModeSoftText,
-                  }}
-                >
-                  Edad{' '}
-                  {calculateAge(new Date(patient.fechaNac), 'años', 'meses')}
-                </Typography>
-              </Box>
+          <Grid item>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <Tabs
+                value={value}
+                onChange={handleChange}
+                aria-label="basic tabs example"
+                variant="fullWidth"
+              >
+                <Tab label="Contactos y Direcciones" {...a11yProps(0)} />
+                <Tab label="Odontograma" {...a11yProps(1)} />
+                <Tab label="Historial de citas" {...a11yProps(2)} />
+                <Tab label="Medicamentos" {...a11yProps(3)} />
+                <Tab label="Consentimientos" {...a11yProps(4)} />
+                <Tab label="Antecedentes" {...a11yProps(5)} />
+              </Tabs>
             </Box>
           </Grid>
         </Grid>
-        <Grid item>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs
-              value={value}
-              onChange={handleChange}
-              aria-label="basic tabs example"
-              variant="fullWidth"
-            >
-              <Tab label="Datos Personales" {...a11yProps(0)} />
-              <Tab label="Odontograma" {...a11yProps(1)} />
-              <Tab label="Historial de citas" {...a11yProps(2)} />
-              <Tab label="Medicamentos" {...a11yProps(3)} />
-              <Tab label="Consentimientos" {...a11yProps(4)} />
-            </Tabs>
-          </Box>
+        {/* INFORMACION DE PACIENTE  */}
+
+        <Grid item xs={12}>
+          <CustomTabPanel value={value} index={2}>
+            {appointmentsFetching && (
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <LinearProgress />
+              </Grid>
+            )}
+            {appointments && !appointmentsFetching && (
+              <Grid
+                item
+                xs={12}
+                sm={12}
+                md={12}
+                lg={12}
+                xl={12}
+                className="shadow-lg"
+              >
+                <TableContainer component={Paper} elevation={0}>
+                  <Table>
+                    <TableHead
+                      style={{
+                        backgroundColor:
+                          mode === 'light'
+                            ? colors.lightModeTableHead
+                            : colors.darkModeTableHead,
+                      }}
+                    >
+                      <TableRow>
+                        {tableHeadings.map((h) => {
+                          return (
+                            <TableCell
+                              style={{
+                                fontWeight: 'bold',
+                                color:
+                                  mode === 'light'
+                                    ? colors.lightModeTableText
+                                    : 'white',
+                              }}
+                              key={h.id}
+                            >
+                              {h.label}
+                            </TableCell>
+                          );
+                        })}
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {appointments
+                        ?.slice(
+                          page * rowsPerPage,
+                          page * rowsPerPage + rowsPerPage
+                        )
+                        .map((a: Appointment) => {
+                          return (
+                            <TableRow key={a._id}>
+                              <TableCell>
+                                {new Date(a.fecha).toLocaleDateString()}
+                              </TableCell>
+                              <TableCell>
+                                {a.profesional.nombre1} {a.profesional.apellPat}
+                              </TableCell>
+                              <TableCell>{a.razon}</TableCell>
+                            </TableRow>
+                          );
+                        })}
+                    </TableBody>
+                  </Table>
+                  <TablePagination
+                    page={page}
+                    onPageChange={handleChangePage}
+                    count={appointments?.length}
+                    component="div"
+                    rowsPerPage={rowsPerPage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                  />
+                </TableContainer>
+              </Grid>
+            )}
+          </CustomTabPanel>
+          <CustomTabPanel value={value} index={1}>
+            <OdontogramTab
+              odontograms={odontograms}
+              afterSubmit={() => setUpdated(!dataUpdated)}
+              persona={patient}
+            />
+          </CustomTabPanel>
+          <CustomTabPanel value={value} index={0}>
+            <Personalnfo patient={patient} />
+          </CustomTabPanel>
+          <CustomTabPanel value={value} index={3}>
+            <PatientReceipts patient={patient} />
+          </CustomTabPanel>
+          <CustomTabPanel value={value} index={4}>
+            <ConsentmentsTab patient={patient} />
+          </CustomTabPanel>
+          <CustomTabPanel value={value} index={5}>
+            <PatientAntecedents patient={patient} />
+          </CustomTabPanel>
         </Grid>
       </Grid>
-      {/* INFORMACION DE PACIENTE  */}
-
-      <Grid item xs={12}>
-        <CustomTabPanel value={value} index={2}>
-          {appointmentsFetching && (
-            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-              <LinearProgress />
-            </Grid>
-          )}
-          {appointments && !appointmentsFetching && (
-            <Grid
-              item
-              xs={12}
-              sm={12}
-              md={12}
-              lg={12}
-              xl={12}
-              className="shadow-lg"
-            >
-              <TableContainer component={Paper} elevation={0}>
-                <Table>
-                  <TableHead
-                    style={{
-                      backgroundColor:
-                        mode === 'light'
-                          ? colors.lightModeTableHead
-                          : colors.darkModeTableHead,
-                    }}
-                  >
-                    <TableRow>
-                      {tableHeadings.map((h) => {
-                        return (
-                          <TableCell
-                            style={{
-                              fontWeight: 'bold',
-                              color:
-                                mode === 'light'
-                                  ? colors.lightModeTableText
-                                  : 'white',
-                            }}
-                            key={h.id}
-                          >
-                            {h.label}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {appointments
-                      ?.slice(
-                        page * rowsPerPage,
-                        page * rowsPerPage + rowsPerPage
-                      )
-                      .map((a: Appointment) => {
-                        return (
-                          <TableRow key={a._id}>
-                            <TableCell>
-                              {new Date(a.fecha).toLocaleDateString()}
-                            </TableCell>
-                            <TableCell>
-                              {a.profesional.nombre1} {a.profesional.apellPat}
-                            </TableCell>
-                            <TableCell>{a.razon}</TableCell>
-                          </TableRow>
-                        );
-                      })}
-                  </TableBody>
-                </Table>
-                <TablePagination
-                  page={page}
-                  onPageChange={handleChangePage}
-                  count={appointments?.length}
-                  component="div"
-                  rowsPerPage={rowsPerPage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-              </TableContainer>
-            </Grid>
-          )}
-        </CustomTabPanel>
-        <CustomTabPanel value={value} index={1}>
-          <OdontogramTab
-            odontograms={odontograms}
-            afterSubmit={() => setUpdated(!dataUpdated)}
-            persona={patient}
-          />
-        </CustomTabPanel>
-        <CustomTabPanel value={value} index={0}>
-          <Personalnfo patient={patient} />
-        </CustomTabPanel>
-        <CustomTabPanel value={value} index={3}>
-          <PatientReceipts patient={patient} />
-        </CustomTabPanel>
-        <CustomTabPanel value={value} index={4}>
-          <ConsentmentsTab patient={patient} />
-        </CustomTabPanel>
-      </Grid>
-    </Grid>
+      <Toaster />
+    </>
   );
 };
 
