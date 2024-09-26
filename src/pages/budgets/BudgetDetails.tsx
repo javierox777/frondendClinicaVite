@@ -33,6 +33,7 @@ import { Check } from '@mui/icons-material';
 import { LoggedUser, useUser } from '../../auth/userContext';
 import { useState } from 'react';
 import jsPDF from 'jspdf';
+import HeaderBar from '../../componemts/HeaderBar';
 
 interface Props {
   budget: Budget;
@@ -118,8 +119,9 @@ const BudgetDetails = ({ budget }: Props) => {
       <Container>
         <Grid container direction="column" spacing={4}>
           {/* Datos del presupuesto */}
-          <Grid item className="shadow-lg rounded-lg p-5">
+          <Grid item className="rounded p-5">
             <Grid container spacing={3}>
+              <HeaderBar title="datos de presupuesto" />
               <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
                 <Typography sx={{ fontWeight: 'bold' }}>
                   Estado del presupuesto
@@ -238,13 +240,9 @@ const BudgetDetails = ({ budget }: Props) => {
           {/* Datos del presupuesto */}
 
           {/* Datos del paciente */}
-          <Grid item className="shadow-lg rounded-lg p-5">
+          <Grid item className=" p-5">
             <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <Typography sx={{ fontWeight: 'lighter', fontSize: 22 }}>
-                  Datos de paciente
-                </Typography>
-              </Grid>
+              <HeaderBar title="Datos de paciente" />
               <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <Typography sx={{ fontWeight: 'bold' }}>Nombre</Typography>
                 <Typography>
@@ -343,6 +341,7 @@ const BudgetDetails = ({ budget }: Props) => {
 
           {/* Detalles del presupuesto  */}
           <Grid item>
+            <HeaderBar title="Detalles de presupuesto" />
             {!details && <TableSkeleton />}
             {details && (
               <TableContainer>

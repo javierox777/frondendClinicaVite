@@ -9,6 +9,7 @@ import {
   Dialog,
   Divider,
   FormControl,
+  FormControlLabel,
   Grid,
   IconButton,
   InputLabel,
@@ -17,6 +18,7 @@ import {
   Select,
   SelectChangeEvent,
   Slide,
+  Switch,
   TextField,
   Toolbar,
   Typography,
@@ -41,6 +43,7 @@ import BudgetFormSkeleton from './BudgetFormSkeleton';
 import { format } from 'date-fns';
 import toast, { Toaster } from 'react-hot-toast';
 import { LoggedUser, useUser } from '../../auth/userContext';
+import HeaderBar from '../../componemts/HeaderBar';
 
 interface Props {
   open: boolean;
@@ -85,6 +88,9 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
   const [registerDate, setRegisterDate] = useState('');
   const [validDate, setValidDate] = useState('');
   const [isSubmitting, setSubmitting] = useState(false);
+  const [agreement, setAgreement] = useState('');
+
+  const [agreementSelected, setAgreementSelected] = useState(false);
 
   const [budgetDetails, setDetails] = useState<BudgetDetailType[]>([
     {
@@ -113,13 +119,37 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
     },
   });
 
+  const { data: patientAgreements, isLoading: agreementsLoading } = useQuery({
+    queryKey: ['patientAgreements', patientId],
+    queryFn: async () => {
+      if (patientId) {
+        const response = await axios.get(
+          `${generalConfig.baseUrl}/agreements/getagreements/${patientId}`
+        );
+
+        return response.data.body;
+      } else {
+        return [];
+      }
+    },
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
       toast.error('No se ha iniciado sesión.');
     } // solo para desarrollo, al protejer las rutas, quitar esto
 
-    const data = {
+    const data: {
+      estado: string;
+      profesional: string;
+      empresa: string;
+      fechaRegistro: string;
+      persona: string;
+      presupuestoTipo: string;
+      budgetDetails: BudgetDetailType[];
+      convenio?: string;
+    } = {
       estado: statusId,
       profesional: (user as LoggedUser).profesionalId,
       empresa: clinicId,
@@ -128,6 +158,12 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
       presupuestoTipo: budgetTypeId,
       budgetDetails,
     };
+
+    if (agreement !== '') {
+      data.convenio = agreement;
+    }
+
+    console.log(data);
 
     if (budget) {
       try {
@@ -245,20 +281,7 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
                 {/* <Card sx={{ padding: 3 }} elevation={3}> */}
                 <Grid container spacing={3} alignItems="end">
                   <Grid item xs={12}>
-                    <AppBar position="static" className="mb-5">
-                      <Toolbar
-                        style={{
-                          backgroundColor:
-                            mode === 'light'
-                              ? colors.lightModeHeaderColor
-                              : colors.darkModeHeaderColor,
-                        }}
-                      >
-                        <Typography variant="h6">
-                          Datos de presupuesto
-                        </Typography>
-                      </Toolbar>
-                    </AppBar>
+                    <HeaderBar title="Datos de presupuesto" />
                   </Grid>
                   <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                     {data && (
@@ -473,6 +496,45 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
                       />
                     </FormControl>
                   </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={agreementSelected}
+                          onChange={() => {
+                            setAgreementSelected(!agreementSelected);
+                            setAgreement('');
+                          }}
+                        />
+                      }
+                      label={`Convenio/ ${agreementSelected ? 'Sí' : 'No'}`}
+                    />
+                    <FormControl fullWidth>
+                      <InputLabel id="budget-type-label">Convenio</InputLabel>
+                      <Select
+                        required
+                        label="budget-types"
+                        id="budget-type-select"
+                        labelId="budget-type-label"
+                        onChange={(e: SelectChangeEvent<string>) =>
+                          setAgreement(e.target.value)
+                        }
+                        value={agreement}
+                        disabled={!agreementSelected}
+                      >
+                        {patientId === '' && (
+                          <MenuItem disabled>Seleccione paciente</MenuItem>
+                        )}
+                        {patientAgreements?.map((a: any) => {
+                          return (
+                            <MenuItem key={a._id} value={a._id}>
+                              {a.prestacionTipo.nombre}
+                            </MenuItem>
+                          );
+                        })}
+                      </Select>
+                    </FormControl>
+                  </Grid>
                 </Grid>
                 {/* </Card> */}
               </Grid>
@@ -480,20 +542,7 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
 
               {/* DETALLES DE PRESUPUESTO        */}
               <Grid item xs={12}>
-                <AppBar position="static" className="mb-5">
-                  <Toolbar
-                    style={{
-                      backgroundColor:
-                        mode === 'light'
-                          ? colors.lightModeHeaderColor
-                          : colors.darkModeHeaderColor,
-                    }}
-                  >
-                    <Typography variant="h6">
-                      Detalles de presupuesto
-                    </Typography>
-                  </Toolbar>
-                </AppBar>
+                <HeaderBar title="detalles de presupuesto" />
                 <DetailsForm
                   budgetDetails={budgetDetails}
                   setDetails={setDetails}
@@ -504,18 +553,7 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
               {/* DETALLES DE PRESUPUESTO        */}
               {/* FOOTER DE PRESUPUESTO CON LOS PRECIOS A PAGAR */}
               <Grid item xs={12}>
-                <AppBar position="static" className="mb-5">
-                  <Toolbar
-                    style={{
-                      backgroundColor:
-                        mode === 'light'
-                          ? colors.lightModeHeaderColor
-                          : colors.darkModeHeaderColor,
-                    }}
-                  >
-                    <Typography variant="h6">Total a pagar</Typography>
-                  </Toolbar>
-                </AppBar>
+                <HeaderBar title="total a pagar" />
                 <Card sx={{ padding: 3 }} elevation={3}>
                   <Grid container alignItems="center" spacing={3}>
                     <Grid item xs={12}>
