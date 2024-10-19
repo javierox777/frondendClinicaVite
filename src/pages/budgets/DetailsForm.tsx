@@ -75,8 +75,6 @@ const DetailsForm = ({
       // updatedDetails[rowIndex].valorTotalIva = service[0].precioUniIva;
     }
 
-    console.log(updatedDetails);
-
     setDetails(updatedDetails);
   };
 

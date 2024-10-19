@@ -44,6 +44,8 @@ import { format } from 'date-fns';
 import toast, { Toaster } from 'react-hot-toast';
 import { LoggedUser, useUser } from '../../auth/userContext';
 import HeaderBar from '../../componemts/HeaderBar';
+import { ServiceType } from '../../interfaces/ServiceType';
+import { Agreement } from '../../interfaces/Agreement';
 
 interface Props {
   open: boolean;
@@ -90,6 +92,8 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
   const [isSubmitting, setSubmitting] = useState(false);
   const [agreement, setAgreement] = useState('');
 
+  const [services, setServices] = useState<ServiceInterface[]>([]);
+
   const [agreementSelected, setAgreementSelected] = useState(false);
 
   const [budgetDetails, setDetails] = useState<BudgetDetailType[]>([
@@ -97,11 +101,7 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
       _id: (Math.random() * 1000).toString(),
       presupuesto: '',
       objeto: '',
-      // valorTotalNeto: 0,
-      // valorUniNeto: 0,
-      // valorTotalIva: 0,
       valor: 0,
-      // valorUniIva: 0,
       prestacion: '',
       cantidad: 1,
       pagado: false,
@@ -114,6 +114,11 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
       const response = await axios.get(
         `${generalConfig.baseUrl}/budgets/generateform`
       );
+
+      const standardServices = response.data.body.services.filter(
+        (s: ServiceInterface) => s.standard
+      );
+      setServices(standardServices);
 
       return response.data.body;
     },
@@ -171,7 +176,7 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
           data
         );
         if (response.data.message === 'success') {
-          toast.success('Presupueto actualizado');
+          toast.success('Presupuesto actualizado');
           setSubmitting(false);
           if (afterSubmit) {
             afterSubmit();
@@ -198,7 +203,7 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
           setRegisterDate('');
           setDetails([]);
 
-          toast.success('Presupueto registrado');
+          toast.success('Presupuesto registrado');
           setSubmitting(false);
           if (afterSubmit) {
             afterSubmit();
@@ -219,6 +224,37 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
 
     setDetails(response.data.body);
   };
+  const filterServices = () => {
+    if (agreementSelected && agreement) {
+      const selectedAgreement = patientAgreements?.find(
+        (a: any) => a._id === agreement
+      );
+
+      const nonStandardServices = data?.services.filter(
+        (s: ServiceInterface) => !s.standard
+      );
+
+      const filteredServices = nonStandardServices.filter(
+        (s: ServiceInterface) => {
+          return (
+            (s.prestacionesTipo as ServiceType)._id ===
+            selectedAgreement.prestacionTipo._id
+          );
+        }
+      );
+
+      setServices(filteredServices);
+    } else if (!agreementSelected) {
+      const standardServices = data?.services.filter(
+        (s: ServiceInterface) => s.standard
+      );
+      setServices(standardServices);
+    }
+  };
+
+  useEffect(() => {
+    filterServices();
+  }, [agreement, agreementSelected]);
 
   useEffect(() => {
     if (budget) {
@@ -229,6 +265,10 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
       setClinicId(budget.empresa._id);
       setRegisterDate(format(new Date(budget.fechaRegistro), 'yyyy-MM-dd'));
       getBudgetDetails();
+      if (budget.convenio) {
+        setAgreement((budget.convenio as Agreement)._id!);
+        setAgreementSelected(true);
+      }
     }
   }, [budget]);
 
@@ -514,9 +554,9 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
                         label="budget-types"
                         id="budget-type-select"
                         labelId="budget-type-label"
-                        onChange={(e: SelectChangeEvent<string>) =>
-                          setAgreement(e.target.value)
-                        }
+                        onChange={(e: SelectChangeEvent<string>) => {
+                          setAgreement(e.target.value);
+                        }}
                         value={agreement}
                         disabled={!agreementSelected}
                       >
@@ -545,7 +585,7 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
                   budgetDetails={budgetDetails}
                   setDetails={setDetails}
                   objects={data?.objects}
-                  services={data?.services}
+                  services={services}
                 />
               </Grid>
               {/* DETALLES DE PRESUPUESTO        */}

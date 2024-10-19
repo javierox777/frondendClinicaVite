@@ -1,3 +1,4 @@
+import { Agreement } from "./Agreement";
 import { Company } from "./Company";
 import { Person } from "./Person";
 import { Professional } from "./Professional";
@@ -13,5 +14,5 @@ export interface Budget {
     presupuestoTipo: ShortModel;
     fechaRegistroValida: string;
     profesionalValida? : Professional
-  
+    convenio: string | Agreement
 }
