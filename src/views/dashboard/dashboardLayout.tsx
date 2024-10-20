@@ -85,6 +85,8 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
 
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import logo from '/logo.png';
+import { Grid } from 'rsuite';
 
 
 
@@ -198,6 +200,13 @@ const DashboardLayout: React.FC = () => {
           >
             <MenuIcon />
           </IconButton>
+          
+            <img
+              src={logo}
+              style={{ width: '4%' }}
+              alt="logo"
+            />
+          
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Clinica Dental
           </Typography>
