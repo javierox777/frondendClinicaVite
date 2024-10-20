@@ -77,6 +77,19 @@ import PatientRecord from '../../pages/clinicalrecord/PatientRecord';
 import ConsentForm from '../../pages/consent/ConsentPage';
 import colors from '../../styles/colors';
 
+
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import ParticlesIcon from '@mui/icons-material/Cloud';
+import LogoutIcon from '@mui/icons-material/Logout';
+
+import { useNavigate } from 'react-router-dom';
+
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+
+
+
+
+
 const drawerWidth = 240;
 
 const DashboardLayout: React.FC = () => {
@@ -87,6 +100,7 @@ const DashboardLayout: React.FC = () => {
   const open = Boolean(anchorEl);
   const { user, setUser } = useUser();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -105,6 +119,12 @@ const DashboardLayout: React.FC = () => {
     if (user) setUser(user);
     return;
   };
+  const handleLogout = async () => {
+    await authStorage.removeToken(); // Eliminar el token
+    setUser(null); // Restablecer el usuario a null en el contexto
+    navigate('/login'); // Redirigir al usuario a la página de inicio de sesión
+  };
+
 
   useEffect(() => {
     restoreUser();
@@ -154,7 +174,7 @@ const DashboardLayout: React.FC = () => {
   ];
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box >
       {particlesEnabled && <ParticlesContainer />}{' '}
       {/* Renderiza las partículas solo si están habilitadas */}
       <CssBaseline />
@@ -179,7 +199,7 @@ const DashboardLayout: React.FC = () => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            Dashboard
+            Clinica Dental
           </Typography>
           <IconButton
             size="large"
@@ -206,8 +226,23 @@ const DashboardLayout: React.FC = () => {
             }}
             open={open}
             onClose={handleClose}
+            PaperProps={{
+              sx: {
+                bgcolor: 'background.paper', // Color de fondo según el tema
+                boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // Sombra
+                borderRadius: '8px', // Bordes redondeados
+              },
+            }}
           >
+            <MenuItem disabled>
+              <Typography variant="subtitle1" color="text.secondary">
+                Configuración
+              </Typography>
+            </MenuItem>
             <MenuItem>
+              <ListItemIcon>
+                <Brightness4Icon fontSize="small" />
+              </ListItemIcon>
               <FormControlLabel
                 control={<Switch onChange={toggleColorMode} />}
                 label={`Modo ${mode === 'light' ? 'oscuro' : 'claro'}`}
@@ -215,6 +250,9 @@ const DashboardLayout: React.FC = () => {
               />
             </MenuItem>
             <MenuItem>
+              <ListItemIcon>
+                <ParticlesIcon fontSize="small" />
+              </ListItemIcon>
               <FormControlLabel
                 control={
                   <Switch
@@ -226,11 +264,18 @@ const DashboardLayout: React.FC = () => {
                 labelPlacement="start"
               />
             </MenuItem>
+            <Divider />
+            <MenuItem onClick={handleLogout}>
+              <ListItemIcon>
+                <LogoutIcon fontSize="small" />
+              </ListItemIcon>
+              Cerrar sesión
+            </MenuItem>
           </Menu>
         </Toolbar>
       </AppBar>
       <Drawer
-        variant="temporary"
+        variant="persistent"
         open={drawerOpen}
         onClose={handleDrawerToggle}
         ModalProps={{
@@ -238,16 +283,40 @@ const DashboardLayout: React.FC = () => {
         }}
         sx={{
           width: drawerWidth,
-          flexShrink: 0,
+          flexShrink: 2,
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
-            background: 'rgba(0, 0, 0, 0.2)', // Establecer el fondo del Drawer como transparente
+            backgroundColor: `${mode === 'light'
+                ? 'rgba(78, 163, 213, 0.8)' // Transparencia en modo claro
+                : 'rgba(0, 0, 0, 0.8)'      // Transparencia en modo oscuro
+              }`,// Establecer el fondo del Drawer como transparente
           },
         }}
       >
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'flex-end', // Alinea el contenido al final (derecha)
+              padding: 1, // Espacio alrededor del botón
+            }}
+          >
+            <IconButton
+              onClick={handleDrawerToggle}
+              sx={{
+                backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                borderRadius: '50%',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                },
+              }}
+            >
+              <ChevronLeftIcon />
+            </IconButton>
+          </Box>
+
           <List>
             {/* Menu items */}
             {menuItems.map((item) => (

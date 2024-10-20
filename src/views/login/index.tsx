@@ -74,7 +74,7 @@ const Login: React.FC = () => {
         // const name = data.name;
         if (token) authStorage.storeToken(token);
 
-        navigate('/dashboard');
+        navigate('/inicio');
       }
     } catch (error) {
       Swal.fire({
