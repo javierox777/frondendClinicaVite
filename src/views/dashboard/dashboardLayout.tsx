@@ -242,7 +242,11 @@ const DashboardLayout: React.FC = () => {
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
-            background: 'rgba(0, 0, 0, 0.2)', // Establecer el fondo del Drawer como transparente
+            backgroundColor: `${
+              mode === 'light'
+                ? 'rgba(78, 163, 213, 0.8)' // Transparencia en modo claro
+                : 'rgba(0, 0, 0, 0.8)'      // Transparencia en modo oscuro
+            }`,// Establecer el fondo del Drawer como transparente
           },
         }}
       >
