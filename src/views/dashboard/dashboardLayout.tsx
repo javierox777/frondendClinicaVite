@@ -77,6 +77,16 @@ import PatientRecord from '../../pages/clinicalrecord/PatientRecord';
 import ConsentForm from '../../pages/consent/ConsentPage';
 import colors from '../../styles/colors';
 
+
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import ParticlesIcon from '@mui/icons-material/Cloud';
+import LogoutIcon from '@mui/icons-material/Logout';
+
+import { useNavigate } from 'react-router-dom';
+
+
+
+
 const drawerWidth = 240;
 
 const DashboardLayout: React.FC = () => {
@@ -87,6 +97,7 @@ const DashboardLayout: React.FC = () => {
   const open = Boolean(anchorEl);
   const { user, setUser } = useUser();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -105,6 +116,12 @@ const DashboardLayout: React.FC = () => {
     if (user) setUser(user);
     return;
   };
+  const handleLogout = async () => {
+    await authStorage.removeToken(); // Eliminar el token
+    setUser(null); // Restablecer el usuario a null en el contexto
+    navigate('/login'); // Redirigir al usuario a la página de inicio de sesión
+  };
+  
 
   useEffect(() => {
     restoreUser();
@@ -193,40 +210,65 @@ const DashboardLayout: React.FC = () => {
             <SettingsIcon />
           </IconButton>
           <Menu
-            id="menu-appbar"
-            anchorEl={anchorEl}
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            keepMounted
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            open={open}
-            onClose={handleClose}
-          >
-            <MenuItem>
-              <FormControlLabel
-                control={<Switch onChange={toggleColorMode} />}
-                label={`Modo ${mode === 'light' ? 'oscuro' : 'claro'}`}
-                labelPlacement="start"
-              />
-            </MenuItem>
-            <MenuItem>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={particlesEnabled}
-                    onChange={() => setParticlesEnabled(!particlesEnabled)}
-                  />
-                }
-                label="Partículas"
-                labelPlacement="start"
-              />
-            </MenuItem>
-          </Menu>
+      id="menu-appbar"
+      anchorEl={anchorEl}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      keepMounted
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      open={open}
+      onClose={handleClose}
+      PaperProps={{
+        sx: {
+          bgcolor: 'background.paper', // Color de fondo según el tema
+          boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // Sombra
+          borderRadius: '8px', // Bordes redondeados
+        },
+      }}
+    >
+      <MenuItem disabled>
+        <Typography variant="subtitle1" color="text.secondary">
+          Configuración
+        </Typography>
+      </MenuItem>
+      <MenuItem>
+        <ListItemIcon>
+          <Brightness4Icon fontSize="small" />
+        </ListItemIcon>
+        <FormControlLabel
+          control={<Switch onChange={toggleColorMode} />}
+          label={`Modo ${mode === 'light' ? 'oscuro' : 'claro'}`}
+          labelPlacement="start"
+        />
+      </MenuItem>
+      <MenuItem>
+        <ListItemIcon>
+          <ParticlesIcon fontSize="small" />
+        </ListItemIcon>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={particlesEnabled}
+              onChange={() => setParticlesEnabled(!particlesEnabled)}
+            />
+          }
+          label="Partículas"
+          labelPlacement="start"
+        />
+      </MenuItem>
+      <Divider />
+      <MenuItem onClick={handleLogout}>
+        <ListItemIcon>
+          <LogoutIcon fontSize="small" />
+        </ListItemIcon>
+        Cerrar sesión
+      </MenuItem>
+    </Menu>
         </Toolbar>
       </AppBar>
       <Drawer
