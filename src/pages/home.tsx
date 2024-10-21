@@ -242,10 +242,7 @@ const Inicio: React.FC = () => {
         </Grid>
       </Grid>
       <Box sx={{ flexGrow: 1, p: 3, textAlign: 'center' }}>
-      <Typography variant="h5" gutterBottom sx={{ fontWeight: 'light', fontSize: '1.5rem', color: '#333' }}>
-        Bienvenido al Dashboard
-      </Typography>
-
+      
       <Grid container spacing={3} mt={2}>
         {/* Contadores */}
         <Grid item xs={12} sm={4}>
