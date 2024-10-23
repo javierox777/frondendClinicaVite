@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Grid, Paper, CircularProgress, Card, CardContent, Avatar } from '@mui/material';
+import { Box, Typography, Grid, Paper, CircularProgress, Card, CardContent, Avatar, Button } from '@mui/material';
 import axios from 'axios';
 import { PieChart, Pie, Cell, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line, ResponsiveContainer } from 'recharts';
-import dayjs from 'dayjs'; // Asegúrate de tener instalada esta librería
+import dayjs from 'dayjs';
+import authStorage from '../auth/storage';
+import { useNavigate } from 'react-router-dom';
+import HistorialCitasModal from './HistorialCitasModal';
+import { generalConfig } from '../config';
+
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF69B4'];
-
+const baseUrl = generalConfig.baseUrl;
 const Inicio: React.FC = () => {
   interface Profesional {
     _id: string;
@@ -40,16 +45,44 @@ const Inicio: React.FC = () => {
   const [tratamientosPorProfesional, setTratamientosPorProfesional] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [totalPacientes, setTotalPacientes] = useState<number>(0);
   const [totalCitas, setTotalCitas] = useState<number>(0);
+  const [totalPassCitas, setPassTotalCitas] = useState<number>(0);
+  const [totadasPassCitas, setPassTotasCitas] = useState<[]>([]);
+
   const [totalTratamientos, setTotalTratamientos] = useState<number>(0);
+  const [user, setUser] = useState<any>(null);
+  const navigate = useNavigate(); // Instanciar el hook
+  const [modalOpen, setModalOpen] = useState(false);
+
+
+  const handleOpenModal = () => {
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+  };
+
+
+
 
   useEffect(() => {
     const fetchCitas = async () => {
+
       try {
-        const response = await axios.get('http://localhost:3000/api/odontogramas');
+        const loggedUser = await authStorage.getUser();
+        await setUser(loggedUser);
+        const response = await axios.get(`${baseUrl}/odontogramas`);
         const citas: Cita[] = response.data.body;
 
+        //citas para hoy filtrada por medico 
+        const data = await axios.get(`${baseUrl}/appointments/idprofesional/${loggedUser?.profesionalId}`)
+        setTotalCitas(data.data.body.length)
+
+        //historial de citas del año apartir de ayer
+        const citasResponse = await axios.get(`${baseUrl}/appointments/idpassprofesional/${loggedUser?.profesionalId}`)
+        setPassTotalCitas(citasResponse.data.body.length)
+        setPassTotasCitas(citasResponse.data.body)
         // Tratamientos por año
         const tratamientosAnuales = citas.flatMap(cita => cita.tratamientos);
         const tratamientosCountAnual = tratamientosAnuales.reduce((acc: any, tratamiento: any) => {
@@ -59,8 +92,8 @@ const Inicio: React.FC = () => {
         const dataTratamientosAnual = Object.keys(tratamientosCountAnual).map(key => ({
           name: key,
           value: tratamientosCountAnual[key],
-           // Simular datos adicionales de ejemplo
-       
+          // Simular datos adicionales de ejemplo
+
 
         }));
         setTratamientosDataAnual(dataTratamientosAnual);
@@ -99,7 +132,11 @@ const Inicio: React.FC = () => {
     };
 
     fetchCitas();
+
   }, []);
+  const handleRedirect = () => {
+    navigate('/agenda');
+  }
 
   return (
     <Box sx={{ flexGrow: 1, p: 3, textAlign: 'center' }}>
@@ -242,88 +279,139 @@ const Inicio: React.FC = () => {
         </Grid>
       </Grid>
       <Box sx={{ flexGrow: 1, p: 3, textAlign: 'center' }}>
-      
-      <Grid container spacing={3} mt={2}>
-        {/* Contadores */}
-        <Grid item xs={12} sm={4}>
-          <Card sx={{ boxShadow: 3, transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}>
-            <CardContent>
-              <Avatar sx={{ bgcolor: '#0088FE', margin: 'auto' }}>P</Avatar>
-              <Typography variant="h6" gutterBottom>Total Pacientes</Typography>
-              <Typography variant="h4">{totalPacientes}</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
 
-        <Grid item xs={12} sm={4}>
-          <Card sx={{ boxShadow: 3, transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}>
-            <CardContent>
-              <Avatar sx={{ bgcolor: '#00C49F', margin: 'auto' }}>C</Avatar>
-              <Typography variant="h6" gutterBottom>Total Citas</Typography>
-              <Typography variant="h4">{totalCitas}</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+        <Grid container spacing={3} mt={2}>
+          {/* Contadores */}
+          <Grid item xs={12} sm={4}>
+            <Card sx={{ boxShadow: 3, transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}>
+              <CardContent>
+                <Avatar sx={{ bgcolor: '#0088FE', margin: 'auto' }}>P</Avatar>
+                <Typography variant="h6" gutterBottom onClick={handleOpenModal}>Total Historial citas Del Año</Typography>
+                <Button
+                  onClick={handleOpenModal}
+                  variant="contained"
+                  color="primary"
+                  sx={{
+                    backgroundColor: '#4caf50', // Color de fondo
+                    color: '#fff', // Color del texto
+                    padding: '10px 20px', // Relleno alrededor del texto
+                    borderRadius: '20px', // Bordes redondeados
+                    fontWeight: 'bold', // Negrita
+                    textTransform: 'none', // Evitar que el texto sea todo mayúsculas
+                    fontSize: '1rem', // Tamaño de fuente
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)', // Sombra ligera
+                    transition: 'background-color 0.3s ease', // Transición suave para el hover
+                    '&:hover': {
+                      backgroundColor: '#388e3c', // Color de fondo al pasar el mouse
+                    },
+                  }}
+                >
+                  Ver Historial de Citas
+                </Button>
 
-        <Grid item xs={12} sm={4}>
-          <Card sx={{ boxShadow: 3, transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}>
-            <CardContent>
-              <Avatar sx={{ bgcolor: '#FF8042', margin: 'auto' }}>T</Avatar>
-              <Typography variant="h6" gutterBottom>Total Tratamientos</Typography>
-              <Typography variant="h4">{totalTratamientos}</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
 
-        {/* Gráficos existentes */}
-        <Grid item xs={12} sm={4}>
-          {/* Pie chart anual */}
-        </Grid>
+                <HistorialCitasModal open={modalOpen} onClose={handleCloseModal} visitas={totadasPassCitas} />
 
-        <Grid item xs={12} sm={4}>
-          {/* Pie chart mensual */}
-        </Grid>
+                <Typography variant="h4">{totalPassCitas}</Typography>
+              </CardContent>
+            </Card>
 
-        <Grid item xs={12} sm={4}>
-          {/* Bar chart por profesional */}
-        </Grid>
 
-        {/* Gráfico de línea - Progreso mensual */}
-        <Grid item xs={12} sm={12}>
-          <Paper
-            sx={{
-              p: 2,
-              boxShadow: 3,
-              borderRadius: '8px',
-              transition: 'transform 0.3s ease-in-out',
-              '&:hover': { transform: 'scale(1.05)' },
-            }}
-          >
-            <Typography
-              variant="h6"
-              gutterBottom
-              sx={{ fontWeight: 'medium', fontSize: '1rem', color: '#555' }}
+          </Grid>
+
+          <Grid item xs={12} sm={4}>
+            <Card sx={{ boxShadow: 3, transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}>
+              <CardContent>
+                <Avatar sx={{ bgcolor: '#00C49F', margin: 'auto' }}>C</Avatar>
+                <Typography variant="h6" gutterBottom >Citas Para Hoy</Typography>
+                <Button
+                  onClick={handleRedirect}
+                 
+                  variant="contained"
+                  color="primary"
+                  sx={{
+                    backgroundColor: '#4caf50', // Color de fondo
+                    color: '#fff', // Color del texto
+                    padding: '10px 20px', // Relleno alrededor del texto
+                    borderRadius: '20px', // Bordes redondeados
+                    fontWeight: 'bold', // Negrita
+                    textTransform: 'none', // Evitar que el texto sea todo mayúsculas
+                    fontSize: '1rem', // Tamaño de fuente
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)', // Sombra ligera
+                    transition: 'background-color 0.3s ease', // Transición suave para el hover
+                    '&:hover': {
+                      backgroundColor: '#388e3c', // Color de fondo al pasar el mouse
+                    },
+                  }}
+                >
+                 Ver Citas Para Hoy
+                </Button>
+
+                <Typography variant="h4">{totalCitas}</Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} sm={4}>
+            <Card sx={{ boxShadow: 3, transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}>
+              <CardContent>
+                <Avatar sx={{ bgcolor: '#FF8042', margin: 'auto' }}>T</Avatar>
+                <Typography variant="h6" gutterBottom>Total Tratamientos</Typography>
+                <Typography variant="h4">{totalTratamientos}</Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Gráficos existentes */}
+          <Grid item xs={12} sm={4}>
+            {/* Pie chart anual */}
+          </Grid>
+
+          <Grid item xs={12} sm={4}>
+            {/* Pie chart mensual */}
+          </Grid>
+
+          <Grid item xs={12} sm={4}>
+            {/* Bar chart por profesional */}
+          </Grid>
+
+          {/* Gráfico de línea - Progreso mensual */}
+          <Grid item xs={12} sm={12}>
+            <Paper
+              sx={{
+                p: 2,
+                boxShadow: 3,
+                borderRadius: '8px',
+                transition: 'transform 0.3s ease-in-out',
+                '&:hover': { transform: 'scale(1.05)' },
+              }}
             >
-              Progreso Mensual de Tratamientos
-            </Typography>
-            {loading ? (
-              <CircularProgress />
-            ) : (
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={tratamientosDataMensual}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="value" stroke="#FF8042" activeDot={{ r: 8 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            )}
-          </Paper>
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{ fontWeight: 'medium', fontSize: '1rem', color: '#555' }}
+              >
+                Progreso Mensual de Tratamientos
+              </Typography>
+              {loading ? (
+                <CircularProgress />
+              ) : (
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={tratamientosDataMensual}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="value" stroke="#FF8042" activeDot={{ r: 8 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
-    </Box>
+
+      </Box>
     </Box>
   );
 };

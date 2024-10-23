@@ -5,7 +5,7 @@ import Axios from 'axios';
 import { generalConfig } from '../../config';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
-import { UserContext, useUser } from '../../auth/userContext';
+import {  useUser } from '../../auth/userContext';
 import authStorage from '../../auth/storage';
 
 const baseUrl = generalConfig.baseUrl;
