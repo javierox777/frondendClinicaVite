@@ -52,6 +52,13 @@ const Login: React.FC = () => {
 
       if (message === 'Bienvenido') {
         setUser(data.data);
+
+        const token = data.token;
+        // const id = data._id;
+        // const name = data.name;
+        if (token) authStorage.storeToken(token);
+
+        navigate('/inicio');
       }
 
       if (message !== 'Bienvenido') {
@@ -69,12 +76,7 @@ const Login: React.FC = () => {
           timer: 1500,
         });
 
-        const token = data.token;
-        // const id = data._id;
-        // const name = data.name;
-        if (token) authStorage.storeToken(token);
-
-        navigate('/inicio');
+    
       }
     } catch (error) {
       Swal.fire({

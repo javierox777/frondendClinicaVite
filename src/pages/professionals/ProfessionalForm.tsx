@@ -7,7 +7,9 @@ import {
   Grid,
   IconButton,
   InputAdornment,
+  MenuItem,
   Paper,
+  Select,
   Slide,
   TextField,
   Toolbar,
@@ -63,6 +65,7 @@ const ProfessionalForm = ({
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('');
 
   const [isSubmitting, setSubmitting] = useState(false);
 
@@ -76,6 +79,7 @@ const ProfessionalForm = ({
       setEmail(professional.email);
       setPhone(professional.celular);
       setAddress(professional.direccion);
+      setRole(professional.role);
       setVerificationDigit(professional.dv);
     }
   }, [professional]);
@@ -95,6 +99,7 @@ const ProfessionalForm = ({
       email: email,
       login: username,
       password: password,
+      role: role
     };
 
     if (professional) {
@@ -111,6 +116,7 @@ const ProfessionalForm = ({
             celular: phone,
             direccion: address,
             email: email,
+          
           }
         );
         if (response.data.message === 'success') {
@@ -131,6 +137,7 @@ const ProfessionalForm = ({
           `${generalConfig.baseUrl}/professionals`,
           data
         );
+        console.log('Datos a enviar:', data);
         if (response.data.message === 'success') {
           toast.success('Se han registrado los datos.');
           setFirstName('');
@@ -144,6 +151,7 @@ const ProfessionalForm = ({
           setVerificationDigit('');
           setUsername('');
           setPassword('');
+          setRole('');
           setSubmitting(false);
           if (afterSubmit) {
             afterSubmit();
@@ -351,6 +359,24 @@ const ProfessionalForm = ({
                       />
                     </FormControl>
                   </Grid>
+                        {/* Campo de selección de Rol */}
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                <FormControl fullWidth>
+                  <Typography variant="subtitle1">Rol</Typography>
+                  <Select
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    displayEmpty
+                    required
+                  >
+                    <MenuItem value="" disabled>
+                      Seleccionar rol
+                    </MenuItem>
+                    <MenuItem value="admin">Admin</MenuItem>
+                    <MenuItem value="user">User</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
                 </>
               )}
               <Grid item xs={12}>

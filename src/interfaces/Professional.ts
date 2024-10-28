@@ -9,4 +9,5 @@ export interface Professional {
  nombre1: string;
  nombre2: string;
  email: string;
+ role: string
 }

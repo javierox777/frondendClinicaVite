@@ -1,11 +1,9 @@
 import { Edit, Search } from '@mui/icons-material';
 import {
   Box,
-  Button,
   IconButton,
   InputAdornment,
   Paper,
-  Switch,
   Table,
   TableBody,
   TableCell,
@@ -24,6 +22,17 @@ import { useThemeContext } from '../../componemts/themeContext';
 import { generalConfig } from '../../config';
 import { Person } from '../../interfaces/Person';
 import colors from '../../styles/colors';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  ResponsiveContainer,
+  LabelList,
+  Legend,
+} from 'recharts';
 
 interface Props {
   refetch?: boolean;
@@ -33,59 +42,20 @@ const PatientsTable = ({ refetch }: Props) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchText, setSearchText] = useState('');
-
-  const [validUpdated, setValidUpdated] = useState(false);
-
   const { mode } = useThemeContext();
-
   const navigation = useNavigate();
-
-  const handleChangePage = (
-    event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
-  ) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
 
   const {
     data: patients,
-    error, // en caso que haya error, es true
-    isLoading, //variable que se puede usar para mostrar loaders, es true mientras se hace la peticion
+    error,
+    isLoading,
   } = useQuery({
-    queryKey: ['patients', refetch, validUpdated],
+    queryKey: ['patients', refetch],
     queryFn: async () => {
-      //funcion que hace fetching
       const response = await axios.get(`${generalConfig.baseUrl}/persons`);
-
-      return response.data.body; // lo que se retorna aca, va a la variable data, que en este caso se le dio el alias de patients
+      return response.data.body;
     },
   });
-
-  const tableHeadings = [
-    {
-      id: 1,
-      label: 'Nombre',
-    },
-    {
-      id: 2,
-      label: 'Rut',
-    },
-    {
-      id: 3,
-      label: 'Institución',
-    },
-    {
-      id: 4,
-      label: 'Acciones',
-    },
-  ];
 
   const filteredPatients = patients?.filter((p: Person) => {
     const rut = p.rut.toLowerCase();
@@ -100,69 +70,68 @@ const PatientsTable = ({ refetch }: Props) => {
 
   if (isLoading) return <TableSkeleton />;
 
+  // Preparar datos para el gráfico
+  const chartData = patients?.map((p: Person) => ({
+    name: `${p.nombre1} ${p.apellPat}`,
+    edad: new Date().getFullYear() - new Date(p.fechaNac).getFullYear(),
+  }));
+
+  // Contar número de pacientes por rango de edad
+  const ageGroups = [
+    { name: '0-20', value: 0 },
+    { name: '21-40', value: 0 },
+    { name: '41-60', value: 0 },
+    { name: '61+', value: 0 },
+  ];
+
+  chartData?.forEach(({ edad }:{edad:any}) => {
+    if (edad <= 20) ageGroups[0].value++;
+    else if (edad <= 40) ageGroups[1].value++;
+    else if (edad <= 60) ageGroups[2].value++;
+    else ageGroups[3].value++;
+  });
+
   return (
-    <>
-      <TextField
-        value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
-        style={{ marginBlock: '16px', width: '30%' }}
-        placeholder="Buscar..."
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <Search />
-            </InputAdornment>
-          ),
-        }}
-      />
-      <Box className="shadow-lg rounded-lg">
-        <TableContainer component={Paper} elevation={0}>
-          <Table>
-            <TableHead
-              style={{
-                backgroundColor:
-                  mode === 'light'
-                    ? colors.lightModeTableHead
-                    : colors.darkModeTableHead,
-              }}
-            >
-              <TableRow>
-                {tableHeadings.map((h) => {
-                  return (
-                    <TableCell
-                      style={{
-                        fontWeight: 'bold',
-                        color:
-                          mode === 'light'
-                            ? colors.lightModeTableText
-                            : 'white',
-                      }}
-                      key={h.id}
-                    >
-                      {h.label}
+    <Box display="flex" alignItems="flex-start" justifyContent="space-between">
+      <Box flexGrow={1} width="70%">
+        <TextField
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          style={{ marginBlock: '16px', width: '30%' }}
+          placeholder="Buscar..."
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search />
+              </InputAdornment>
+            ),
+          }}
+        />
+        <Box className="shadow-lg rounded-lg">
+          <TableContainer component={Paper} elevation={0}>
+            <Table>
+              <TableHead
+                style={{
+                  backgroundColor:
+                    mode === 'light'
+                      ? colors.lightModeTableHead
+                      : colors.darkModeTableHead,
+                }}
+              >
+                <TableRow>
+                  {['Nombre', 'Rut', 'Institución', 'Acciones'].map((label, index) => (
+                    <TableCell key={index} style={{ fontWeight: 'bold', color: mode === 'light' ? colors.lightModeTableText : 'white' }}>
+                      {label}
                     </TableCell>
-                  );
-                })}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredPatients
-                ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((p: Person, index: number) => {
-                  return (
-                    <TableRow
-                      key={p._id}
-                      // className={`${index % 2 === 0 && mode === 'light' ? 'bg-slate-100' : 'white'}`}
-                    >
-                      <TableCell
-                        style={{
-                          fontWeight: 'bold',
-                          color:
-                            mode === 'light'
-                              ? colors.lightModeTableText
-                              : 'white',
-                        }}
-                      >
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredPatients
+                  ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((p: Person) => (
+                    <TableRow key={p._id}>
+                      <TableCell style={{ fontWeight: 'bold', color: mode === 'light' ? colors.lightModeTableText : 'white' }}>
                         {p.nombre1} {p.apellPat}
                       </TableCell>
                       <TableCell>{p.rut}</TableCell>
@@ -170,31 +139,55 @@ const PatientsTable = ({ refetch }: Props) => {
                       <TableCell>
                         <IconButton
                           color="success"
-                          onClick={() =>
-                            navigation('/editarpaciente', {
-                              state: { patient: p },
-                            })
-                          }
+                          onClick={() => navigation('/editarpaciente', { state: { patient: p } })}
                         >
                           <Edit />
                         </IconButton>
                       </TableCell>
                     </TableRow>
-                  );
-                })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          page={page}
-          onPageChange={handleChangePage}
-          count={patients?.length}
-          component="div"
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            page={page}
+            onPageChange={(_, newPage) => setPage(newPage)}
+            count={patients?.length}
+            component="div"
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={(e) => {
+              setRowsPerPage(parseInt(e.target.value, 10));
+              setPage(0);
+            }}
+          />
+        </Box>
       </Box>
-    </>
+
+      <Box
+  sx={{
+    width: '30%',
+    height: '300px',
+    display: 'flex',
+    alignItems: 'flex-start', // Mantenerlo alineado en la parte superior
+    ml: 2, // Margen izquierdo para separarlo de la tabla
+    mt: 10, // Ajustar el margen superior para bajar el gráfico un poco
+  }}
+>
+  <ResponsiveContainer width="100%" height="100%">
+    <BarChart data={ageGroups} barSize={30}>
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis dataKey="name"  label={{ value: 'Rango de Edad', position: 'bottom', ml:10 }} />
+      <YAxis label={{ value: 'Número de Pacientes', angle: -90}} />
+      <Tooltip />
+      <Legend />
+      <Bar dataKey="value" fill="#4CAF50">
+        <LabelList dataKey="value" position="top" />
+      </Bar>
+    </BarChart>
+  </ResponsiveContainer>
+</Box>
+
+    </Box>
   );
 };
 
