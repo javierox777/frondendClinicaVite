@@ -75,6 +75,7 @@ import CurrentPatient from '../../pages/attention/CurrentPatient';
 import ClinicalRecordPage from '../../pages/clinicalrecord/ClinicalRecordPage';
 import PatientRecord from '../../pages/clinicalrecord/PatientRecord';
 import ConsentForm from '../../pages/consent/ConsentPage';
+import Administracion from '../../pages/admin/Admin'
 import colors from '../../styles/colors';
 
 
@@ -87,6 +88,8 @@ import { useNavigate } from 'react-router-dom';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import logo from '/logo.png';
 import { Grid } from 'rsuite';
+import { JwtPayload } from 'jwt-decode';
+import { decodeJwt } from '../../auth/decodeJwt';
 
 
 
@@ -95,6 +98,7 @@ import { Grid } from 'rsuite';
 const drawerWidth = 240;
 
 const DashboardLayout: React.FC = () => {
+  
   const { toggleColorMode, mode } = useThemeContext();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -103,6 +107,8 @@ const DashboardLayout: React.FC = () => {
   const { user, setUser } = useUser();
   const location = useLocation();
   const navigate = useNavigate();
+
+  
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -117,9 +123,24 @@ const DashboardLayout: React.FC = () => {
   };
 
   const restoreUser = async () => {
-    const user = await authStorage.getUser();
-    if (user) setUser(user);
-    return;
+    const token = localStorage.getItem('token'); // Obtén el token de `localStorage`
+    if (token) {
+      const decodedToken = decodeJwt(token); // Decodifica el token
+  
+      // Mapea los valores decodificados a la estructura `LoggedUser`
+      const user: LoggedUser = {
+        _id: decodedToken._id!,
+        login: decodedToken.login!,
+        vigencia: decodedToken.vigencia!,
+        fechaRegistro: decodedToken.fechaRegistro!,
+        nombre: decodedToken.nombre!,
+        profesionalId: decodedToken.profesionalId!,
+        role: decodedToken.role!,
+      };
+  
+      // Asignar el usuario al estado solo si tiene todas las propiedades necesarias
+      setUser(user);
+    }
   };
   const handleLogout = async () => {
     await authStorage.removeToken(); // Eliminar el token
@@ -133,47 +154,21 @@ const DashboardLayout: React.FC = () => {
   }, []);
 
   const menuItems = [
-    { id: 1, label: 'Inicio', icon: <HomeIcon />, path: '/inicio' },
-    { id: 2, label: 'Pacientes', icon: <AssignmentInd />, path: '/pacientes' },
-    {
-      id: 3,
-      label: 'Profesionales',
-      icon: <ContactEmergency />,
-      path: '/profesionales',
-    },
-    {
-      id: 4,
-      label: 'Presupuestos',
-      icon: <RequestQuote />,
-      path: '/presupuestos',
-    },
-    { id: 5, label: 'Agenda', icon: <CalendarMonth />, path: '/agenda' },
-    {
-      id: 6,
-      label: 'Programación',
-      icon: <EditCalendar />,
-      path: '/programacion',
-    },
-    { id: 7, label: 'Receta', icon: <RequestQuote />, path: '/receta' },
-    {
-      id: 8,
-      label: 'Módulo dental',
-      icon: <RequestQuote />,
-      path: '/modulodental',
-    },
-    {
-      id: 9,
-      label: 'Consentimiento',
-      icon: <DescriptionIcon />,
-      path: '/consentimiento',
-    },
-    {
-      id: 10,
-      label: 'Atención',
-      icon: <AssignmentLate />,
-      path: '/atencionhoy',
-    },
+    { id: 1, label: 'Inicio', icon: <HomeIcon />, path: '/inicio', roles: ['admin', 'user'] },
+    { id: 2, label: 'Administración', icon: <HomeIcon />, path: '/administracion', roles: ['admin'] },
+    { id: 3, label: 'Pacientes', icon: <AssignmentInd />, path: '/pacientes', roles: ['admin', 'user'] },
+    { id: 4, label: 'Profesionales', icon: <ContactEmergency />, path: '/profesionales', roles: ['admin'] },
+    { id: 5, label: 'Presupuestos', icon: <RequestQuote />, path: '/presupuestos', roles: ['admin', 'user'] },
+    { id: 6, label: 'Agenda', icon: <CalendarMonth />, path: '/agenda', roles: ['admin', 'user'] },
+    { id: 7, label: 'Programación', icon: <EditCalendar />, path: '/programacion', roles: ['admin'] },
+    { id: 8, label: 'Receta', icon: <RequestQuote />, path: '/receta', roles: ['admin', 'user'] },
+    { id: 9, label: 'Módulo dental', icon: <RequestQuote />, path: '/modulodental', roles: ['admin', 'user'] },
+    { id: 10, label: 'Consentimiento', icon: <DescriptionIcon />, path: '/consentimiento', roles: ['admin', 'user'] },
+    { id: 11, label: 'Atención', icon: <AssignmentLate />, path: '/atencionhoy', roles: ['admin', 'user'] },
   ];
+  function isLoggedUser(user: LoggedUser | JwtPayload | null): user is LoggedUser {
+    return (user as LoggedUser)?.role !== undefined;
+  }
 
   return (
     <Box >
@@ -328,7 +323,9 @@ const DashboardLayout: React.FC = () => {
 
           <List>
             {/* Menu items */}
-            {menuItems.map((item) => (
+            {menuItems
+          .filter((item) => isLoggedUser(user) && item.roles.includes(user.role)) // Filtrar los elementos según el rol del usuario
+          .map((item) => (
               <ListItemButton
                 key={item.id}
                 component={Link}
@@ -425,6 +422,7 @@ const DashboardLayout: React.FC = () => {
           <Toolbar />
           <Routes>
             <Route path="/inicio" element={<Inicio />} />
+            <Route path="/administracion" element={<Administracion />} />
             <Route path="/pacientes" element={<PatientsPage />} />
             <Route path="/ingreso" element={<InstitutionForm />} />
             <Route path="/sexo" element={<Sexo />} />

@@ -1,4 +1,3 @@
-import { JwtPayload } from 'jwt-decode';
 import React, {
   createContext,
   PropsWithChildren,
@@ -8,6 +7,7 @@ import React, {
   Dispatch,
   SetStateAction,
 } from 'react';
+import { decodeJwt } from './decodeJwt'; // Importa la función que decodifica el token
 
 export interface LoggedUser {
   _id: string;
@@ -16,48 +16,55 @@ export interface LoggedUser {
   fechaRegistro: string;
   nombre: string;
   profesionalId: string;
+  role: string;
 }
 
 interface UserContextType {
-  user: LoggedUser | null | JwtPayload;
-  setUser: Dispatch<SetStateAction<LoggedUser | null | JwtPayload>>;
+  user: LoggedUser | null;
+  setUser: Dispatch<SetStateAction<LoggedUser | null>>;
   loading: boolean;
 }
 
 export const UserContext = createContext<UserContextType | null>(null);
 
 export const UserProvider = ({ children }: PropsWithChildren) => {
-  const [user, setUser] = useState<LoggedUser | null | JwtPayload>(null);
-  const [loading, setLoading] = useState(true); // Estado de carga
+  const [user, setUser] = useState<LoggedUser | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Restaurar el estado del usuario desde localStorage al cargar el componente
   useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
+    const savedToken = localStorage.getItem('token');
+    if (savedToken) {
+      const decodedUser = decodeJwt(savedToken);
+      if (decodedUser) {
+        setUser(decodedUser);
+      }
     }
-    setLoading(false); // Marcar que terminó de cargar
+    setLoading(false);
   }, []);
 
   const setUserWithStorage = (
-    value: LoggedUser | null | JwtPayload | ((prevUser: LoggedUser | null | JwtPayload) => LoggedUser | null | JwtPayload)
+    value: LoggedUser | null | ((prevUser: LoggedUser | null) => LoggedUser | null)
   ) => {
     if (typeof value === 'function') {
       setUser((prevUser) => {
         const newValue = value(prevUser);
         if (newValue) {
-          localStorage.setItem('user', JSON.stringify(newValue));
+          // Supón que recibes un token en algún lugar y necesitas almacenarlo
+          const token = 'EL_TOKEN_DEL_BACKEND'; // Reemplaza esto con el token que recibes
+          localStorage.setItem('token', token);
         } else {
-          localStorage.removeItem('user');
+          localStorage.removeItem('token');
         }
         return newValue;
       });
     } else {
       setUser(value);
       if (value) {
-        localStorage.setItem('user', JSON.stringify(value));
+        // Supón que recibes un token en algún lugar y necesitas almacenarlo
+        const token = 'EL_TOKEN_DEL_BACKEND'; // Reemplaza esto con el token que recibes
+        localStorage.setItem('token', token);
       } else {
-        localStorage.removeItem('user');
+        localStorage.removeItem('token');
       }
     }
   };
