@@ -24,6 +24,7 @@ import {
 import { Edit, Save, Security, VerifiedUser } from '@mui/icons-material';
 import axios from 'axios';
 import { generalConfig } from '../../config';
+import { useUser } from '../../auth/userContext';
 
 const PERMISSIONS = {
   CREATE: 'C',
@@ -45,6 +46,7 @@ const RolesDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedRole, setSelectedRole] = useState<Record<string, string>>({});
   const [selectedPermissions, setSelectedPermissions] = useState<Record<string, string[]>>({});
+  const { user: currentUser } = useUser();
 
   useEffect(() => {
     const fetchProfessionals = async () => {
@@ -106,24 +108,22 @@ const RolesDashboard: React.FC = () => {
 
   if (loading) return <CircularProgress />;
 
+
+
   return (
     <Container maxWidth="lg" sx={{ marginTop: 4 }}>
       <Typography variant="h4" gutterBottom align="center">
-        User Roles Dashboard
+        Administración de Roles
       </Typography>
-      <Typography variant="subtitle1" align="center" color="textSecondary" gutterBottom>
-        Manage user roles and permissions effectively
-      </Typography>
-      <Paper elevation={4} sx={{ padding: 3, marginTop: 2 }}>
+
+      <Paper elevation={4} sx={{ padding: 2, marginTop: 2 }}>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
                 <TableCell><strong>Avatar</strong></TableCell>
-                <TableCell><strong>Name</strong></TableCell>
-                <TableCell><strong>Role</strong></TableCell>
-                <TableCell><strong>Permissions</strong></TableCell>
-                <TableCell><strong>Actions</strong></TableCell>
+                <TableCell><strong>Nombre</strong></TableCell>
+                <TableCell><strong>Roles</strong></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -137,7 +137,7 @@ const RolesDashboard: React.FC = () => {
                   <TableCell>{`${professional.nombre1} ${professional.apellPat}`}</TableCell>
                   <TableCell>
                     <FormControl variant="outlined" fullWidth>
-                      <InputLabel>Role</InputLabel>
+
                       <Select
                         value={selectedRole[professional._id] || professional.role}
                         onChange={(e) => {
@@ -150,35 +150,39 @@ const RolesDashboard: React.FC = () => {
                       >
 
                         <MenuItem value="admin">
-                          <Security fontSize="small" /> Admin
+                          <Security fontSize="small" /> Administrador Clinica
                         </MenuItem>
                         <MenuItem value="user">
-                          <VerifiedUser fontSize="small" /> User
+                          <VerifiedUser fontSize="small" /> Dentista
                         </MenuItem>
                       </Select>
                     </FormControl>
                   </TableCell>
                   <TableCell>
-
-
                     <Button
-                      variant="contained"
-                      color="secondary"
+                      variant="outlined" // Botón con borde
+                      color="success" // Verde en el borde y el texto/ícono
                       startIcon={<Save />}
                       onClick={() => handleRoleChange(professional._id)}
-                      sx={{ marginTop: 1 }}
+                      sx={{
+                        marginLeft:"20%",
+                        fontSize: '0.75rem', 
+                        padding: '4px 8px', 
+                        borderColor: 'rgba(76, 175, 80, 0.5)',
+                        color: 'rgba(76, 175, 80, 0.9)', 
+                        backgroundColor: 'transparent', 
+                        '&:hover': {
+                          backgroundColor: 'rgba(76, 175, 80, 0.05)', 
+                          borderColor: 'rgba(76, 175, 80, 0.9)', 
+                        },
+                      }}
                     >
-                      Save Permissions
+                      Guardar
                     </Button>
+
                   </TableCell>
-                  <TableCell>
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleRoleChange(professional._id)}
-                    >
-                      <Edit />
-                    </IconButton>
-                  </TableCell>
+
+
                 </TableRow>
               ))}
             </TableBody>
