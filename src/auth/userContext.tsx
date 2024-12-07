@@ -43,31 +43,31 @@ export const UserProvider = ({ children }: PropsWithChildren) => {
   }, []);
 
   const setUserWithStorage = (
-    value: LoggedUser | null | ((prevUser: LoggedUser | null) => LoggedUser | null)
+    value: LoggedUser | null | ((prevUser: LoggedUser | null) => LoggedUser | null),
+    token?: string // Nuevo parámetro opcional para el token
   ) => {
     if (typeof value === 'function') {
       setUser((prevUser) => {
         const newValue = value(prevUser);
         if (newValue) {
-          // Supón que recibes un token en algún lugar y necesitas almacenarlo
-          const token = 'EL_TOKEN_DEL_BACKEND'; // Reemplaza esto con el token que recibes
-          localStorage.setItem('token', token);
+          if (token) {
+            localStorage.setItem('token', token); 
+          }
         } else {
-          localStorage.removeItem('token');
+          localStorage.removeItem('token'); 
         }
         return newValue;
       });
     } else {
       setUser(value);
-      if (value) {
-        // Supón que recibes un token en algún lugar y necesitas almacenarlo
-        const token = 'EL_TOKEN_DEL_BACKEND'; // Reemplaza esto con el token que recibes
-        localStorage.setItem('token', token);
-      } else {
-        localStorage.removeItem('token');
+      if (value && token) {
+        localStorage.setItem('token', token); 
+      } else if (!value) {
+        localStorage.removeItem('token'); 
       }
     }
   };
+  
 
   return (
     <UserContext.Provider value={{ user, setUser: setUserWithStorage, loading }}>
