@@ -9,8 +9,12 @@ import HistorialCitasModal from './HistorialCitasModal';
 import { generalConfig } from '../config';
 
 
+
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF69B4'];
 const baseUrl = generalConfig.baseUrl;
+
+
+
 const Inicio: React.FC = () => {
   interface Profesional {
     _id: string;
@@ -53,6 +57,7 @@ const Inicio: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const navigate = useNavigate(); // Instanciar el hook
   const [modalOpen, setModalOpen] = useState(false);
+ 
 
 
   const handleOpenModal = () => {
@@ -138,10 +143,25 @@ const Inicio: React.FC = () => {
     navigate('/agenda');
   }
 
+  if (loading) {
+    return <p>Cargando...</p>;
+  }
+
+  if (!user) {
+    return <p>No hay información de usuario disponible.</p>;
+  }
+
+  // Mapeo de roles a etiquetas legibles
+  const roleLabels: Record<string, string> = {
+    admin: 'Administrador Clínica',
+    user: 'Dentista',
+  };
+
+
   return (
     <Box sx={{ flexGrow: 1, p: 3, textAlign: 'center' }}>
       <Typography variant="h5" gutterBottom sx={{ fontWeight: 'light', fontSize: '1.5rem', color: '#333' }}>
-        Bienvenido al Dashboard
+        Bienvenido {`${user.nombre}`}
       </Typography>
 
       {error && (

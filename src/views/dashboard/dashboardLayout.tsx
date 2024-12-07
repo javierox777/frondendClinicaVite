@@ -98,17 +98,17 @@ import { decodeJwt } from '../../auth/decodeJwt';
 const drawerWidth = 240;
 
 const DashboardLayout: React.FC = () => {
-  
+
   const { toggleColorMode, mode } = useThemeContext();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [particlesEnabled, setParticlesEnabled] = useState(true); // Estado para controlar las partículas
   const open = Boolean(anchorEl);
-  const { user, setUser } = useUser();
+  const { user, setUser, loading } = useUser();
   const location = useLocation();
   const navigate = useNavigate();
 
-  
+
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -126,7 +126,7 @@ const DashboardLayout: React.FC = () => {
     const token = localStorage.getItem('token'); // Obtén el token de `localStorage`
     if (token) {
       const decodedToken = decodeJwt(token); // Decodifica el token
-  
+
       // Mapea los valores decodificados a la estructura `LoggedUser`
       const user: LoggedUser = {
         _id: decodedToken._id!,
@@ -137,7 +137,7 @@ const DashboardLayout: React.FC = () => {
         profesionalId: decodedToken.profesionalId!,
         role: decodedToken.role!,
       };
-  
+
       // Asignar el usuario al estado solo si tiene todas las propiedades necesarias
       setUser(user);
     }
@@ -170,6 +170,21 @@ const DashboardLayout: React.FC = () => {
     return (user as LoggedUser)?.role !== undefined;
   }
 
+  if (loading) {
+    return <p>Cargando...</p>;
+  }
+
+  if (!user) {
+    return <p>No hay información de usuario disponible.</p>;
+  }
+
+  // Mapeo de roles a etiquetas legibles
+  const roleLabels: Record<string, string> = {
+    admin: 'Administrador Clínica',
+    user: 'Dentista',
+  };
+
+
   return (
     <Box >
       {particlesEnabled && <ParticlesContainer />}{' '}
@@ -195,15 +210,26 @@ const DashboardLayout: React.FC = () => {
           >
             <MenuIcon />
           </IconButton>
-          
-            <img
-              src={logo}
-              style={{ width: '4%' }}
-              alt="logo"
-            />
-          
+
+          <img
+            src={logo}
+            style={{ width: '4%' }}
+            alt="logo"
+          />
+
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Clinica Dental
+          </Typography>
+          <Typography
+            noWrap
+            component="div"
+            sx={{
+              flexGrow: 1,
+              textAlign: 'right', // Alinea el texto a la derecha
+              marginLeft: 'auto', // Empuja el contenido hacia la derecha
+            }}
+          >
+            {`${user.nombre}  ${roleLabels[user.role] || 'Sin rol definido'}`}
           </Typography>
           <IconButton
             size="large"
@@ -238,6 +264,7 @@ const DashboardLayout: React.FC = () => {
               },
             }}
           >
+
             <MenuItem disabled>
               <Typography variant="subtitle1" color="text.secondary">
                 Configuración
@@ -253,6 +280,7 @@ const DashboardLayout: React.FC = () => {
                 labelPlacement="start"
               />
             </MenuItem>
+
             <MenuItem>
               <ListItemIcon>
                 <ParticlesIcon fontSize="small" />
@@ -292,8 +320,8 @@ const DashboardLayout: React.FC = () => {
             width: drawerWidth,
             boxSizing: 'border-box',
             backgroundColor: `${mode === 'light'
-                ? 'rgba(78, 163, 213, 0.8)' // Transparencia en modo claro
-                : 'rgba(0, 0, 0, 0.8)'      // Transparencia en modo oscuro
+              ? 'rgba(78, 163, 213, 0.8)' // Transparencia en modo claro
+              : 'rgba(0, 0, 0, 0.8)'      // Transparencia en modo oscuro
               }`,// Establecer el fondo del Drawer como transparente
           },
         }}
@@ -324,34 +352,34 @@ const DashboardLayout: React.FC = () => {
           <List>
             {/* Menu items */}
             {menuItems
-          .filter((item) => isLoggedUser(user) && item.roles.includes(user.role)) // Filtrar los elementos según el rol del usuario
-          .map((item) => (
-              <ListItemButton
-                key={item.id}
-                component={Link}
-                to={item.path}
-                style={{
-                  textDecoration: 'none',
-                  color: 'inherit',
-                  background:
-                    location.pathname === item.path
-                      ? 'rgba(255, 255, 255, 0.2)'
-                      : 'transparent', // Resaltar la pestaña seleccionada
-                }}
-              >
-                <ListItemIcon
-                  sx={{
-                    color:
+              .filter((item) => isLoggedUser(user) && item.roles.includes(user.role)) // Filtrar los elementos según el rol del usuario
+              .map((item) => (
+                <ListItemButton
+                  key={item.id}
+                  component={Link}
+                  to={item.path}
+                  style={{
+                    textDecoration: 'none',
+                    color: 'inherit',
+                    background:
                       location.pathname === item.path
-                        ? 'primary.main'
-                        : 'inherit',
-                  }} // Cambiar el color del icono si está seleccionado
+                        ? 'rgba(255, 255, 255, 0.2)'
+                        : 'transparent', // Resaltar la pestaña seleccionada
+                  }}
                 >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.label} sx={{ color: 'white' }} />
-              </ListItemButton>
-            ))}
+                  <ListItemIcon
+                    sx={{
+                      color:
+                        location.pathname === item.path
+                          ? 'primary.main'
+                          : 'inherit',
+                    }} // Cambiar el color del icono si está seleccionado
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText primary={item.label} sx={{ color: 'white' }} />
+                </ListItemButton>
+              ))}
             {/* Submenu */}
             <Accordion sx={{ background: 'transparent', color: 'white' }}>
               <AccordionSummary

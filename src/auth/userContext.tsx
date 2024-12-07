@@ -16,8 +16,9 @@ export interface LoggedUser {
   fechaRegistro: string;
   nombre: string;
   profesionalId: string;
-  role: string;
+  role: 'admin' | 'user'; 
 }
+
 
 interface UserContextType {
   user: LoggedUser | null;
