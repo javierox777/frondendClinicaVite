@@ -1,4 +1,5 @@
 import {
+  AppBar,
   Box,
   Button,
   Card,
@@ -15,6 +16,7 @@ import {
   TableFooter,
   TableHead,
   TableRow,
+  Toolbar,
   Typography,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
@@ -34,6 +36,8 @@ import { LoggedUser, useUser } from '../../auth/userContext';
 import { useState } from 'react';
 import jsPDF from 'jspdf';
 import HeaderBar from '../../componemts/HeaderBar';
+import { Agreement } from '../../interfaces/Agreement';
+import { ServiceType } from '../../interfaces/ServiceType';
 
 interface Props {
   budget: Budget;
@@ -121,7 +125,50 @@ const BudgetDetails = ({ budget }: Props) => {
           {/* Datos del presupuesto */}
           <Grid item className="rounded p-5">
             <Grid container spacing={3}>
-              <HeaderBar title="datos de presupuesto" />
+              <AppBar position="static" className="mb-5">
+                <Toolbar
+                  style={{
+                    backgroundColor:
+                      mode === 'light'
+                        ? colors.lightModeHeaderColor
+                        : colors.darkModeHeaderColor,
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <Typography variant="h6" className="capitalize">
+                    Datos de presupuesto
+                  </Typography>
+                  <Box>
+                    <Button
+                      onClick={() =>
+                        navigate('/editarpresupuesto', {
+                          state: { budget: budget },
+                        })
+                      }
+                      color="success"
+                      variant="contained"
+                    >
+                      Editar
+                    </Button>
+                    <Button
+                      onClick={() =>
+                        navigate('/presupuestopdf', {
+                          state: {
+                            budget: budget,
+                            contacts: contacts,
+                            addresses: addresses,
+                            details: details,
+                          },
+                        })
+                      }
+                      color="info"
+                      variant="contained"
+                    >
+                      Ver PDF
+                    </Button>
+                  </Box>
+                </Toolbar>
+              </AppBar>
               <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
                 <Typography sx={{ fontWeight: 'bold' }}>
                   Estado del presupuesto
@@ -158,6 +205,17 @@ const BudgetDetails = ({ budget }: Props) => {
                   Tipo de presupuesto
                 </Typography>
                 <Typography>{presupuestoTipo.nombre}</Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
+                <Typography sx={{ fontWeight: 'bold' }}>Convenio</Typography>
+                <Typography>
+                  {budget.convenio &&
+                    (
+                      (budget.convenio as Agreement)
+                        .prestacionTipo as ServiceType
+                    ).nombre}
+                  {!budget.convenio && 'Sin convenio'}
+                </Typography>
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
                 <Typography sx={{ fontWeight: 'bold' }}>Clínica</Typography>
@@ -204,36 +262,6 @@ const BudgetDetails = ({ budget }: Props) => {
                     </Typography>
                   </>
                 )}
-              </Grid>
-              <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
-                <Button
-                  onClick={() =>
-                    navigate('/editarpresupuesto', {
-                      state: { budget: budget },
-                    })
-                  }
-                  color="success"
-                  variant="outlined"
-                  style={{ marginRight: 5 }}
-                >
-                  Editar
-                </Button>
-                <Button
-                  onClick={() =>
-                    navigate('/presupuestopdf', {
-                      state: {
-                        budget: budget,
-                        contacts: contacts,
-                        addresses: addresses,
-                        details: details,
-                      },
-                    })
-                  }
-                  color="info"
-                  variant="outlined"
-                >
-                  Ver PDF
-                </Button>
               </Grid>
             </Grid>
           </Grid>
