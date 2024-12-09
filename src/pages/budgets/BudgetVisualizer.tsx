@@ -29,6 +29,7 @@ import {
   CloseRounded,
   Edit,
   Pending,
+  PictureAsPdf,
   Search,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -64,6 +65,10 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
       id: 4,
       label: 'Validado',
       hide: true,
+    },
+    {
+      id: 5,
+      label: 'Acciones',
     },
   ];
 
@@ -200,6 +205,28 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
                           ) : (
                             <Pending color="warning" />
                           )}
+                        </TableCell>
+                        <TableCell>
+                          <IconButton
+                            color="primary"
+                            onClick={() =>
+                              navigation('/presupuestopdf', {
+                                state: { budget: b },
+                              })
+                            }
+                          >
+                            <PictureAsPdf />
+                          </IconButton>
+                          <IconButton
+                            color="success"
+                            onClick={() =>
+                              navigation('/editarpresupuesto', {
+                                state: { budget: b },
+                              })
+                            }
+                          >
+                            <Edit />
+                          </IconButton>
                         </TableCell>
                       </TableRow>
                     );

@@ -155,9 +155,6 @@ const BudgetDetails = ({ budget }: Props) => {
                         navigate('/presupuestopdf', {
                           state: {
                             budget: budget,
-                            contacts: contacts,
-                            addresses: addresses,
-                            details: details,
                           },
                         })
                       }

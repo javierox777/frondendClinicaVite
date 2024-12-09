@@ -330,7 +330,7 @@ const Receta: React.FC = () => {
                       <PictureAsPdfIcon />
                     </IconButton>
                     <IconButton
-                      color="primary"
+                      color="success"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleEditClickOpen(row);

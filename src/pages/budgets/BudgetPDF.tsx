@@ -8,12 +8,49 @@ import { BudgetDetail } from '../../interfaces/BudgetDetail';
 import { Button } from '@mui/material';
 import { Download } from '@mui/icons-material';
 import jsPDF from 'jspdf';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import { generalConfig } from '../../config';
 
 const BudgetPDF = () => {
   const budget: Budget = useLocation().state.budget;
-  const contacts = useLocation().state.contacts;
-  const addresses = useLocation().state.addresses;
-  const details = useLocation().state.details;
+
+  const { data: contacts } = useQuery({
+    queryKey: ['contacts'],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${generalConfig.baseUrl}/contact-book/getcontacts/${budget.persona._id}`
+      );
+
+      return response.data.body;
+    },
+  });
+
+  const { data: addresses } = useQuery({
+    queryKey: ['addresses'],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${generalConfig.baseUrl}/address-book/getaddresses/${budget.persona._id}`
+      );
+
+      return response.data.body;
+    },
+  });
+
+  const { data: details } = useQuery({
+    queryKey: ['details'],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${generalConfig.baseUrl}/budget-details/getdetails/${budget._id}`
+      );
+
+      return response.data.body;
+    },
+  });
+
+  const validContacts = contacts?.filter((c: any) => c.vigente === '1');
+
+  const validAddresses = addresses?.filter((a: any) => a.vigente === '1');
 
   const generatePdf = () => {
     let doc = new jsPDF({
@@ -98,7 +135,7 @@ const BudgetPDF = () => {
           </div>
           <div className="flex flex-col my-1">
             <div className="font-bold">Contacto</div>
-            {contacts.map((c: Contact) => {
+            {validContacts?.map((c: Contact) => {
               return (
                 <div key={c._id} className="flex-col my-1">
                   <div className="font-extralight">{c.contacto.nombre}</div>
@@ -109,7 +146,7 @@ const BudgetPDF = () => {
           </div>
           <div className="flex flex-col my-1">
             <div className="font-bold">Direccion(es)</div>
-            {addresses.map((a: Address) => {
+            {validAddresses?.map((a: Address) => {
               return (
                 <div key={a._id} className="flex-col my-1">
                   <div className="font-extralight">
@@ -123,6 +160,11 @@ const BudgetPDF = () => {
         </div>
         {/* datos de paciente */}
         {/* detalles del presupuesto */}
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
         <div>
           <div className="flex flex-col mb-5">
             <div className="text-xl font-extralight py-5 border-b-2 border-slate-300">
@@ -130,6 +172,9 @@ const BudgetPDF = () => {
             </div>
           </div>
         </div>
+        <br />
+        <br />
+        <br />
         <div className="content-center">
           <table className="w-full">
             <thead>
@@ -140,7 +185,7 @@ const BudgetPDF = () => {
               </tr>
             </thead>
             <tbody>
-              {details.map((d: BudgetDetail) => {
+              {details?.map((d: BudgetDetail) => {
                 return (
                   <tr key={d._id}>
                     <td className="p-2">{d.objeto.nombre}</td>
@@ -162,7 +207,12 @@ const BudgetPDF = () => {
               </tr>
             </tfoot>
           </table>
+          <br />
+          <br />
+          <br />
+          <br />
         </div>
+
         {/* detalles del presupuesto */}
       </div>
     </>

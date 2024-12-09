@@ -14,7 +14,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import React, { ChangeEvent, Dispatch, SetStateAction } from 'react';
+import React, { ChangeEvent, Dispatch, SetStateAction, useEffect } from 'react';
 import { BudgetDetail } from '../../interfaces/BudgetDetail';
 import { ShortModel } from '../../interfaces/ShortModel';
 import { ServiceInterface } from '../../interfaces/ServiceInterface';
@@ -69,7 +69,19 @@ const DetailsForm = ({
         (s: ServiceInterface) => s._id === e.target.value
       );
 
+      updatedDetails[rowIndex].prestacion = service[0];
       updatedDetails[rowIndex].valor = service[0].valor;
+      // updatedDetails[rowIndex].valorTotalNeto = service[0].precioUniNeto;
+      // updatedDetails[rowIndex].valorUniIva = service[0].precioUniIva;
+      // updatedDetails[rowIndex].valorTotalIva = service[0].precioUniIva;
+    }
+    if (field === 'objeto') {
+      const object = objects.filter(
+        (o: ShortModel) => o._id === e.target.value
+      );
+
+      updatedDetails[rowIndex].objeto = object[0];
+
       // updatedDetails[rowIndex].valorTotalNeto = service[0].precioUniNeto;
       // updatedDetails[rowIndex].valorUniIva = service[0].precioUniIva;
       // updatedDetails[rowIndex].valorTotalIva = service[0].precioUniIva;
@@ -148,7 +160,7 @@ const DetailsForm = ({
             </Grid>
           </Grid>
         </Grid>
-        {budgetDetails.map((b: BudgetDetail, index: number) => {
+        {budgetDetails?.map((b: BudgetDetail, index: number) => {
           return (
             <Grid item xs={12} key={b._id}>
               <Grid container spacing={1} alignItems="center">
@@ -188,7 +200,6 @@ const DetailsForm = ({
                       onChange={(e: SelectChangeEvent<string>) =>
                         handleStringValuechange(e, index, 'prestacion')
                       }
-                      // value={}
                     >
                       {services?.map((s: ServiceInterface) => {
                         return (

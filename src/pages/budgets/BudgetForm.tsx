@@ -92,6 +92,8 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
   const [isSubmitting, setSubmitting] = useState(false);
   const [agreement, setAgreement] = useState('');
 
+  const [formDataLoaded, setFormData] = useState(false);
+
   const [services, setServices] = useState<ServiceInterface[]>([]);
 
   const [agreementSelected, setAgreementSelected] = useState(false);
@@ -109,7 +111,7 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
   ]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['data', subFormSubmitted],
+    queryKey: ['data', subFormSubmitted, budget],
     queryFn: async () => {
       const response = await axios.get(
         `${generalConfig.baseUrl}/budgets/generateform`
@@ -118,7 +120,9 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
       const standardServices = response.data.body.services.filter(
         (s: ServiceInterface) => s.standard
       );
+
       setServices(standardServices);
+      setFormData(!formDataLoaded);
 
       return response.data.body;
     },
@@ -234,11 +238,11 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
         (s: ServiceInterface) => !s.standard
       );
 
-      const filteredServices = nonStandardServices.filter(
+      const filteredServices = nonStandardServices?.filter(
         (s: ServiceInterface) => {
           return (
             (s.prestacionesTipo as ServiceType)._id ===
-            selectedAgreement.prestacionTipo._id
+            selectedAgreement?.prestacionTipo._id
           );
         }
       );
@@ -254,7 +258,7 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
 
   useEffect(() => {
     filterServices();
-  }, [agreement, agreementSelected]);
+  }, [agreement, agreementSelected, formDataLoaded]);
 
   useEffect(() => {
     if (budget) {
@@ -266,8 +270,8 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
       setRegisterDate(format(new Date(budget.fechaRegistro), 'yyyy-MM-dd'));
       getBudgetDetails();
       if (budget.convenio) {
-        setAgreement((budget.convenio as Agreement)._id!);
         setAgreementSelected(true);
+        setAgreement((budget.convenio as Agreement)._id!);
       }
     }
   }, [budget]);
@@ -581,12 +585,14 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
               {/* DETALLES DE PRESUPUESTO        */}
               <Grid item xs={12}>
                 <HeaderBar title="detalles de presupuesto" />
-                <DetailsForm
-                  budgetDetails={budgetDetails}
-                  setDetails={setDetails}
-                  objects={data?.objects}
-                  services={services}
-                />
+                {services && (
+                  <DetailsForm
+                    budgetDetails={budgetDetails}
+                    setDetails={setDetails}
+                    objects={data?.objects}
+                    services={services}
+                  />
+                )}
               </Grid>
               {/* DETALLES DE PRESUPUESTO        */}
               {/* FOOTER DE PRESUPUESTO CON LOS PRECIOS A PAGAR */}
