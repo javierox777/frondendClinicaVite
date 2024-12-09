@@ -31,11 +31,10 @@ import authStorage from '../auth/storage';
 import { useNavigate } from 'react-router-dom';
 import HistorialCitasModal from './HistorialCitasModal';
 import { generalConfig } from '../config';
-import { UserContext, useUser } from '../auth/userContext';
-import { User } from '../interfaces/User';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF69B4'];
 const baseUrl = generalConfig.baseUrl;
+
 const Inicio: React.FC = () => {
   interface Profesional {
     _id: string;
@@ -173,7 +172,7 @@ const Inicio: React.FC = () => {
         setLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
-        setError('Error fetching data');
+        // setError('Error fetching data');
         setLoading(false);
       }
     };

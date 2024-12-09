@@ -163,29 +163,7 @@ const PatientsTable = ({ refetch }: Props) => {
         </Box>
       </Box>
 
-      <Box
-  sx={{
-    width: '30%',
-    height: '300px',
-    display: 'flex',
-    alignItems: 'flex-start', // Mantenerlo alineado en la parte superior
-    ml: 2, // Margen izquierdo para separarlo de la tabla
-    mt: 10, // Ajustar el margen superior para bajar el gráfico un poco
-  }}
->
-  <ResponsiveContainer width="100%" height="100%">
-    <BarChart data={ageGroups} barSize={30}>
-      <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="name"  label={{ value: 'Rango de Edad', position: 'bottom', ml:10 }} />
-      <YAxis label={{ value: 'Número de Pacientes', angle: -90}} />
-      <Tooltip />
-      <Legend />
-      <Bar dataKey="value" fill="#4CAF50">
-        <LabelList dataKey="value" position="top" />
-      </Bar>
-    </BarChart>
-  </ResponsiveContainer>
-</Box>
+
 
     </Box>
   );

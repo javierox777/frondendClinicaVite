@@ -4,11 +4,11 @@ import { jwtDecode } from 'jwt-decode';
 const key = 'token';
 
 type JwtPayload = {
-    sub?: string; // Sujeto o ID del usuario
-    name?: string; // Nombre del usuario
-    exp?: number; // Fecha de expiración del token
-    iat?: number; // Fecha de emisión del token
-    // Agrega más campos si los necesitas
+    sub?: string; 
+    name?: string; 
+    exp?: number; 
+    iat?: number; 
+  
   };
 
 const storeToken = async (authToken: string) => {
