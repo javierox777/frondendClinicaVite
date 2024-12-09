@@ -82,8 +82,6 @@ const Inicio: React.FC = () => {
   const navigate = useNavigate(); // Instanciar el hook
   const [modalOpen, setModalOpen] = useState(false);
 
-  const { user: userContext } = useUser();
-
   const handleOpenModal = () => {
     setModalOpen(true);
   };
@@ -192,12 +190,6 @@ const Inicio: React.FC = () => {
       >
         Bienvenido al Dashboard
       </Typography>
-
-      {userContext && (
-        <Typography color="ButtonFace" variant="h4" gutterBottom>
-          {userContext.nombre.toLocaleUpperCase()}
-        </Typography>
-      )}
 
       <Grid container spacing={3} mt={2}>
         {/* Gráfico de tratamientos por año */}
