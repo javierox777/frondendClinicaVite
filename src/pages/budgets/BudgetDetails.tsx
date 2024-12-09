@@ -300,66 +300,79 @@ const BudgetDetails = ({ budget }: Props) => {
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                <Typography sx={{ fontWeight: 'bold' }}>Contacto</Typography>
+                <HeaderBar title="Libreta de contactos" />
                 <Grid container>
                   {!validContacts && (
                     <Box sx={{ width: '40%' }}>
                       <LinearProgress />
                     </Box>
                   )}
-                  {validContacts?.map((c: Contact) => {
-                    return (
-                      <Grid
-                        item
-                        key={c._id}
-                        xs={12}
-                        sm={12}
-                        md={12}
-                        lg={6}
-                        xl={6}
+                  <TableContainer>
+                    <Table>
+                      <TableHead
+                        style={{
+                          backgroundColor:
+                            mode === 'light'
+                              ? colors.lightModeTableHead
+                              : colors.darkModeTableHead,
+                        }}
                       >
-                        <Divider />
-                        <Typography sx={{ fontWeight: 'bold' }}>
-                          {' '}
-                          {c.contacto.nombre}
-                        </Typography>
-                        <Typography>{c.descripcion}</Typography>
-                        <Divider />
-                      </Grid>
-                    );
-                  })}
+                        <TableRow>
+                          <TableCell>Tipo de contacto</TableCell>
+                          <TableCell>Descripción</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {validContacts?.map((c: Contact) => {
+                          return (
+                            <TableRow key={c._id}>
+                              <TableCell>{c.contacto.nombre}</TableCell>
+                              <TableCell>{c.descripcion}</TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+
                   <Grid item xs={12}></Grid>
                 </Grid>
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                <Typography sx={{ fontWeight: 'bold' }}>Direcciones</Typography>
+                <HeaderBar title="libreta de direcciones" />
                 <Grid container>
                   {!validAddresses && (
                     <Box sx={{ width: '40%' }}>
                       <LinearProgress />
                     </Box>
                   )}
-                  {validAddresses?.map((a: Address) => {
-                    return (
-                      <Grid
-                        item
-                        key={a._id}
-                        xs={12}
-                        sm={12}
-                        md={12}
-                        lg={6}
-                        xl={6}
+                  <TableContainer>
+                    <Table>
+                      <TableHead
+                        style={{
+                          backgroundColor:
+                            mode === 'light'
+                              ? colors.lightModeTableHead
+                              : colors.darkModeTableHead,
+                        }}
                       >
-                        <Divider />
-                        <Typography sx={{ fontWeight: 'bold' }}>
-                          {' '}
-                          {a.tipoDireccion.nombre}
-                        </Typography>
-                        <Typography>{a.nombre}</Typography>
-                        <Divider />
-                      </Grid>
-                    );
-                  })}
+                        <TableRow>
+                          <TableCell>Tipo de dirección</TableCell>
+                          <TableCell>Descripción</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {validAddresses?.map((a: Address) => {
+                          return (
+                            <TableRow key={a._id}>
+                              <TableCell>{a.tipoDireccion.nombre}</TableCell>
+                              <TableCell>{a.nombre}</TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
                   <Grid item xs={12}></Grid>
                 </Grid>
               </Grid>
@@ -368,8 +381,8 @@ const BudgetDetails = ({ budget }: Props) => {
           {/* Datos del paciente */}
 
           {/* Detalles del presupuesto  */}
+          <HeaderBar title="Detalles de presupuesto" />
           <Grid item>
-            <HeaderBar title="Detalles de presupuesto" />
             {!details && <TableSkeleton />}
             {details && (
               <TableContainer>
