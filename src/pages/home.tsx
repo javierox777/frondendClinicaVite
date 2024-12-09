@@ -1,13 +1,38 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Typography, Grid, Paper, CircularProgress, Card, CardContent, Avatar, Button } from '@mui/material';
+import React, { useContext, useEffect, useState } from 'react';
+import {
+  Box,
+  Typography,
+  Grid,
+  Paper,
+  CircularProgress,
+  Card,
+  CardContent,
+  Avatar,
+  Button,
+} from '@mui/material';
 import axios from 'axios';
-import { PieChart, Pie, Cell, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line, ResponsiveContainer } from 'recharts';
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  LineChart,
+  Line,
+  ResponsiveContainer,
+} from 'recharts';
 import dayjs from 'dayjs';
 import authStorage from '../auth/storage';
 import { useNavigate } from 'react-router-dom';
 import HistorialCitasModal from './HistorialCitasModal';
 import { generalConfig } from '../config';
-
+import { UserContext, useUser } from '../auth/userContext';
+import { User } from '../interfaces/User';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF69B4'];
 const baseUrl = generalConfig.baseUrl;
@@ -41,8 +66,12 @@ const Inicio: React.FC = () => {
   }
 
   const [tratamientosDataAnual, setTratamientosDataAnual] = useState<any[]>([]);
-  const [tratamientosDataMensual, setTratamientosDataMensual] = useState<any[]>([]);
-  const [tratamientosPorProfesional, setTratamientosPorProfesional] = useState<any[]>([]);
+  const [tratamientosDataMensual, setTratamientosDataMensual] = useState<any[]>(
+    []
+  );
+  const [tratamientosPorProfesional, setTratamientosPorProfesional] = useState<
+    any[]
+  >([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [totalCitas, setTotalCitas] = useState<number>(0);
@@ -54,6 +83,7 @@ const Inicio: React.FC = () => {
   const navigate = useNavigate(); // Instanciar el hook
   const [modalOpen, setModalOpen] = useState(false);
 
+  const { user: userContext } = useUser();
 
   const handleOpenModal = () => {
     setModalOpen(true);
@@ -63,61 +93,78 @@ const Inicio: React.FC = () => {
     setModalOpen(false);
   };
 
-
-
-
   useEffect(() => {
     const fetchCitas = async () => {
-
       try {
         const loggedUser = await authStorage.getUser();
         await setUser(loggedUser);
         const response = await axios.get(`${baseUrl}/odontogramas`);
         const citas: Cita[] = response.data.body;
 
-        //citas para hoy filtrada por medico 
-        const data = await axios.get(`${baseUrl}/appointments/idprofesional/${loggedUser?.profesionalId}`)
-        setTotalCitas(data.data.body.length)
+        //citas para hoy filtrada por medico
+        const data = await axios.get(
+          `${baseUrl}/appointments/idprofesional/${loggedUser?.profesionalId}`
+        );
+        setTotalCitas(data.data.body.length);
 
         //historial de citas del año apartir de ayer
-        const citasResponse = await axios.get(`${baseUrl}/appointments/idpassprofesional/${loggedUser?.profesionalId}`)
-        setPassTotalCitas(citasResponse.data.body.length)
-        setPassTotasCitas(citasResponse.data.body)
+        const citasResponse = await axios.get(
+          `${baseUrl}/appointments/idpassprofesional/${loggedUser?.profesionalId}`
+        );
+        setPassTotalCitas(citasResponse.data.body.length);
+        setPassTotasCitas(citasResponse.data.body);
         // Tratamientos por año
-        const tratamientosAnuales = citas.flatMap(cita => cita.tratamientos);
-        const tratamientosCountAnual = tratamientosAnuales.reduce((acc: any, tratamiento: any) => {
-          acc[tratamiento.detalle] = (acc[tratamiento.detalle] || 0) + 1;
-          return acc;
-        }, {});
-        const dataTratamientosAnual = Object.keys(tratamientosCountAnual).map(key => ({
-          name: key,
-          value: tratamientosCountAnual[key],
-          // Simular datos adicionales de ejemplo
-
-
-        }));
+        const tratamientosAnuales = citas.flatMap((cita) => cita.tratamientos);
+        const tratamientosCountAnual = tratamientosAnuales.reduce(
+          (acc: any, tratamiento: any) => {
+            acc[tratamiento.detalle] = (acc[tratamiento.detalle] || 0) + 1;
+            return acc;
+          },
+          {}
+        );
+        const dataTratamientosAnual = Object.keys(tratamientosCountAnual).map(
+          (key) => ({
+            name: key,
+            value: tratamientosCountAnual[key],
+            // Simular datos adicionales de ejemplo
+          })
+        );
         setTratamientosDataAnual(dataTratamientosAnual);
 
         // Tratamientos por mes
         const mesActual = dayjs().month();
-        const tratamientosMensuales = tratamientosAnuales.filter(tratamiento => dayjs(tratamiento.fecha).month() === mesActual);
-        const tratamientosCountMensual = tratamientosMensuales.reduce((acc: any, tratamiento: any) => {
-          acc[tratamiento.detalle] = (acc[tratamiento.detalle] || 0) + 1;
-          return acc;
-        }, {});
-        const dataTratamientosMensual = Object.keys(tratamientosCountMensual).map(key => ({
+        const tratamientosMensuales = tratamientosAnuales.filter(
+          (tratamiento) => {
+            dayjs(tratamiento.fecha).month() === mesActual;
+          }
+        );
+        const tratamientosCountMensual = tratamientosMensuales.reduce(
+          (acc: any, tratamiento: any) => {
+            acc[tratamiento.detalle] = (acc[tratamiento.detalle] || 0) + 1;
+            return acc;
+          },
+          {}
+        );
+        const dataTratamientosMensual = Object.keys(
+          tratamientosCountMensual
+        ).map((key) => ({
           name: key,
           value: tratamientosCountMensual[key],
         }));
         setTratamientosDataMensual(dataTratamientosMensual);
 
         // Tratamientos por profesional
-        const tratamientosPorProfesionalCount = tratamientosAnuales.reduce((acc: any, tratamiento: Tratamiento) => {
-          const profesional = `${tratamiento.profesional.nombre1} ${tratamiento.profesional.apellPat}`;
-          acc[profesional] = (acc[profesional] || 0) + 1;
-          return acc;
-        }, {});
-        const dataTratamientosPorProfesional = Object.keys(tratamientosPorProfesionalCount).map(key => ({
+        const tratamientosPorProfesionalCount = tratamientosAnuales.reduce(
+          (acc: any, tratamiento: Tratamiento) => {
+            const profesional = `${tratamiento.profesional.nombre1} ${tratamiento.profesional.apellPat}`;
+            acc[profesional] = (acc[profesional] || 0) + 1;
+            return acc;
+          },
+          {}
+        );
+        const dataTratamientosPorProfesional = Object.keys(
+          tratamientosPorProfesionalCount
+        ).map((key) => ({
           name: key,
           value: tratamientosPorProfesionalCount[key],
         }));
@@ -132,21 +179,24 @@ const Inicio: React.FC = () => {
     };
 
     fetchCitas();
-
   }, []);
   const handleRedirect = () => {
     navigate('/agenda');
-  }
+  };
 
   return (
     <Box sx={{ flexGrow: 1, p: 3, textAlign: 'center' }}>
-      <Typography variant="h5" gutterBottom sx={{ fontWeight: 'light', fontSize: '1.5rem', color: '#333' }}>
+      <Typography
+        variant="h5"
+        gutterBottom
+        sx={{ fontWeight: 'light', fontSize: '1.5rem', color: '#333' }}
+      >
         Bienvenido al Dashboard
       </Typography>
 
-      {error && (
-        <Typography color="error" variant="body1" gutterBottom>
-          {error}
+      {userContext && (
+        <Typography color="ButtonFace" variant="h4" gutterBottom>
+          {userContext.nombre.toLocaleUpperCase()}
         </Typography>
       )}
 
@@ -183,7 +233,10 @@ const Inicio: React.FC = () => {
                   dataKey="value"
                 >
                   {tratamientosDataAnual.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
                   ))}
                 </Pie>
                 <Tooltip />
@@ -225,7 +278,10 @@ const Inicio: React.FC = () => {
                   dataKey="value"
                 >
                   {tratamientosDataMensual.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
                   ))}
                 </Pie>
                 <Tooltip />
@@ -279,14 +335,30 @@ const Inicio: React.FC = () => {
         </Grid>
       </Grid>
       <Box sx={{ flexGrow: 1, p: 3, textAlign: 'center' }}>
-
         <Grid container spacing={3} mt={2}>
           {/* Contadores */}
           <Grid item xs={12} sm={4}>
-            <Card sx={{ boxShadow: 3, transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}>
+            <Card
+              sx={{
+                boxShadow: 3,
+                transition: 'transform 0.3s',
+                '&:hover': { transform: 'scale(1.05)' },
+                height: '100%',
+              }}
+            >
               <CardContent>
                 <Avatar sx={{ bgcolor: '#0088FE', margin: 'auto' }}>P</Avatar>
-                <Typography variant="h6" gutterBottom onClick={handleOpenModal}>Total Historial citas Del Año</Typography>
+                <Typography variant="h6" gutterBottom onClick={handleOpenModal}>
+                  Total Historial citas Del Año
+                </Typography>
+
+                <HistorialCitasModal
+                  open={modalOpen}
+                  onClose={handleCloseModal}
+                  visitas={totadasPassCitas}
+                />
+
+                <Typography variant="h4">{totalPassCitas}</Typography>
                 <Button
                   onClick={handleOpenModal}
                   variant="contained"
@@ -308,25 +380,28 @@ const Inicio: React.FC = () => {
                 >
                   Ver Historial de Citas
                 </Button>
-
-
-                <HistorialCitasModal open={modalOpen} onClose={handleCloseModal} visitas={totadasPassCitas} />
-
-                <Typography variant="h4">{totalPassCitas}</Typography>
               </CardContent>
             </Card>
-
-
           </Grid>
 
           <Grid item xs={12} sm={4}>
-            <Card sx={{ boxShadow: 3, transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}>
+            <Card
+              sx={{
+                boxShadow: 3,
+                transition: 'transform 0.3s',
+                '&:hover': { transform: 'scale(1.05)' },
+                height: '100%',
+              }}
+            >
               <CardContent>
                 <Avatar sx={{ bgcolor: '#00C49F', margin: 'auto' }}>C</Avatar>
-                <Typography variant="h6" gutterBottom >Citas Para Hoy</Typography>
+                <Typography variant="h6" gutterBottom>
+                  Citas Para Hoy
+                </Typography>
+
+                <Typography variant="h4">{totalCitas}</Typography>
                 <Button
                   onClick={handleRedirect}
-                 
                   variant="contained"
                   color="primary"
                   sx={{
@@ -344,19 +419,26 @@ const Inicio: React.FC = () => {
                     },
                   }}
                 >
-                 Ver Citas Para Hoy
+                  Ver Citas Para Hoy
                 </Button>
-
-                <Typography variant="h4">{totalCitas}</Typography>
               </CardContent>
             </Card>
           </Grid>
 
           <Grid item xs={12} sm={4}>
-            <Card sx={{ boxShadow: 3, transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}>
+            <Card
+              sx={{
+                boxShadow: 3,
+                transition: 'transform 0.3s',
+                '&:hover': { transform: 'scale(1.05)' },
+                height: '100%',
+              }}
+            >
               <CardContent>
                 <Avatar sx={{ bgcolor: '#FF8042', margin: 'auto' }}>T</Avatar>
-                <Typography variant="h6" gutterBottom>Total Tratamientos</Typography>
+                <Typography variant="h6" gutterBottom>
+                  Total Tratamientos
+                </Typography>
                 <Typography variant="h4">{totalTratamientos}</Typography>
               </CardContent>
             </Card>
@@ -403,14 +485,18 @@ const Inicio: React.FC = () => {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Line type="monotone" dataKey="value" stroke="#FF8042" activeDot={{ r: 8 }} />
+                    <Line
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#FF8042"
+                      activeDot={{ r: 8 }}
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               )}
             </Paper>
           </Grid>
         </Grid>
-
       </Box>
     </Box>
   );
