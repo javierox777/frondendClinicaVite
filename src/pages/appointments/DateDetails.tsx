@@ -31,6 +31,7 @@ import { Professional } from '../../interfaces/Professional';
 import { TimeSlot } from '../../interfaces/TimeSlot';
 import colors from '../../styles/colors';
 import { Toys } from '@mui/icons-material';
+import HeaderBar from '../../componemts/HeaderBar';
 
 interface Props {
   timeSlots: TimeSlot[];
@@ -112,10 +113,9 @@ const DateDetails = ({
         fullWidth
       >
         <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">
-          <Typography style={{ fontWeight: 'bold' }}>
-            {weekDays[weekDay]} {date.getDate()} {months[month]}{' '}
-            {date.getFullYear()}
-          </Typography>
+          <HeaderBar
+            title={`${weekDays[weekDay]} ${date.getDate()} ${months[month]} ${date.getFullYear()}`}
+          />
         </DialogTitle>
         <DialogContent>
           {timeSlots.map((slot: TimeSlot) => {
@@ -203,6 +203,7 @@ const SlotDetail = ({
       }
     } catch (error) {
       toast.error('No se pudo reservar la hora deseada, inténtelo nuevamente.');
+      setSubmitting(false);
     }
   };
 
@@ -211,17 +212,31 @@ const SlotDetail = ({
     slot.content.estado !== 'CANCELADO'
   ) {
     return (
-      <Grid container spacing={2} direction="column">
+      <Grid container spacing={3} direction="column">
         <Grid item justifyContent="center" alignItems="center" display="flex">
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item xs={12} sm={12} md={12} lg={9} xl={6}>
               <Grid
                 container
-                spacing={1}
+                spacing={2}
                 justifyContent="center"
                 direction="column"
               >
                 <Grid item>
+                  <Typography
+                    style={{
+                      textTransform: 'capitalize',
+                      fontWeight: 'bold',
+                      color:
+                        mode === 'light' ? 'white' : colors.darkModeSoftText,
+                      backgroundColor:
+                        mode === 'light'
+                          ? colors.lightModeHeaderColor
+                          : colors.darkModeTableHead,
+                    }}
+                  >
+                    Motivo
+                  </Typography>
                   <Typography
                     style={{
                       textTransform: 'capitalize',
@@ -241,9 +256,11 @@ const SlotDetail = ({
                       textTransform: 'capitalize',
                       fontWeight: 'bold',
                       color:
+                        mode === 'light' ? 'white' : colors.darkModeSoftText,
+                      backgroundColor:
                         mode === 'light'
-                          ? colors.lightModeTableText
-                          : colors.darkModeSoftText,
+                          ? colors.lightModeHeaderColor
+                          : colors.darkModeTableHead,
                     }}
                   >
                     Paciente
@@ -269,9 +286,11 @@ const SlotDetail = ({
                       textTransform: 'capitalize',
                       fontWeight: 'bold',
                       color:
+                        mode === 'light' ? 'white' : colors.darkModeSoftText,
+                      backgroundColor:
                         mode === 'light'
-                          ? colors.lightModeTableText
-                          : colors.darkModeSoftText,
+                          ? colors.lightModeHeaderColor
+                          : colors.darkModeTableHead,
                     }}
                   >
                     Atiende
@@ -363,12 +382,13 @@ const SlotDetail = ({
         <Grid item>
           <Divider />
         </Grid>
+        <Grid item></Grid>
       </Grid>
     );
   }
 
   return (
-    <Grid container spacing={2} direction="column">
+    <Grid container spacing={1} direction="column">
       <Grid item justifyContent="center" alignItems="center" display="flex">
         <Grid container justifyContent="space-between" alignItems="center">
           <Grid item xs={12} sm={12} md={12} lg={9} xl={6}>

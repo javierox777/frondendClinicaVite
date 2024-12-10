@@ -304,7 +304,9 @@ const AppointmentsCalendar = () => {
                 <li key={index}>
                   <Badge color="yellow" />{' '}
                   <b className="capitalize">
-                    {slot.content.razon?.toLowerCase()}
+                    {slot.content.razon
+                      ? `${slot.content.razon.toLowerCase().slice(0, 20)}${slot.content.razon.length > 20 ? '...' : ''}`
+                      : ''}
                   </b>
                 </li>
               );
