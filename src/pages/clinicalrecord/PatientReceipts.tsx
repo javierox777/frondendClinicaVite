@@ -25,13 +25,15 @@ import {
 import { useThemeContext } from '../../componemts/themeContext';
 import colors from '../../styles/colors';
 
-import { Visibility } from '@mui/icons-material';
+import { Download, Visibility } from '@mui/icons-material';
 import ReceiptVisualizer from './ReceiptVisualizer';
 import { Receipt } from '../../interfaces/Receipt';
 import { Professional } from '../../interfaces/Professional';
 import { Company } from '../../interfaces/Company';
 import RecetaForm from '../receta/RecetaForm';
 import { Toaster } from 'react-hot-toast';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 interface Props {
   patient: Person;
@@ -77,6 +79,21 @@ const PatientReceipts = ({ patient }: Props) => {
   ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+  };
+
+  const exportPDF = async () => {
+    const input = document.getElementById('pdf-content');
+    if (!input) return;
+
+    const pdf = new jsPDF('portrait', 'px', 'a2'); // Portrait, mm units, A4 size
+
+    // Use jsPDF's `html` method to render HTML directly
+    pdf.html(input, {
+      callback: (pdf) => {
+        pdf.save('receta.pdf'); // Save the generated PDF
+      },
+      width: 190, // Maximum width in mm (A4 width minus margins)
+    });
   };
 
   return (
@@ -134,6 +151,7 @@ const PatientReceipts = ({ patient }: Props) => {
                       );
                     })}
                     <TableCell></TableCell>
+                    <TableCell></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -173,7 +191,15 @@ const PatientReceipts = ({ patient }: Props) => {
         )}
         {!isLoading && (
           <Grid item xs={6} className="border border-zinc-200 rounded-lg p-3">
-            <ReceiptVisualizer receipt={showReceipt} />
+            {showReceipt && (
+              <IconButton onClick={exportPDF} color="primary">
+                <Download />
+                Descargar
+              </IconButton>
+            )}
+            <div id="pdf-content">
+              <ReceiptVisualizer receipt={showReceipt} />
+            </div>
           </Grid>
         )}
       </Grid>
