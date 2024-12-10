@@ -5,6 +5,12 @@ import {
   Grid,
   LinearProgress,
   Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Tabs,
   Toolbar,
   Typography,
@@ -19,6 +25,7 @@ import { Person } from '../../interfaces/Person';
 import colors from '../../styles/colors';
 import { useState } from 'react';
 import { IAntecedent } from '../../interfaces/Antecedents';
+import HeaderBar from '../../componemts/HeaderBar';
 
 interface Props {
   patient: Person;
@@ -58,111 +65,139 @@ const Personalnfo = ({ patient }: Props) => {
     <Grid container spacing={1}>
       <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
         <Grid container>
-          <Grid item xs={12}>
-            <AppBar position="static">
-              <Toolbar
-                style={{
-                  backgroundColor:
-                    mode === 'light'
-                      ? colors.lightModeHeaderColor
-                      : colors.darkModeHeaderColor,
-                }}
-              >
-                <Typography variant="h6">Contactos y Direcciones</Typography>
-              </Toolbar>
-            </AppBar>
-          </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12} className="p-2">
-            <Typography
-              style={{
-                fontWeight: 'bold',
-                color: mode === 'light' ? colors.lightModeTableText : 'white',
-              }}
-            >
-              Contactos
-            </Typography>
+            <HeaderBar title="Libreta de contactos" />
             <Grid container spacing={1}>
               {!validContacts && (
                 <Box sx={{ width: '40%', marginTop: 5 }}>
                   <LinearProgress />
                 </Box>
               )}
-              {validContacts?.map((c: Contact) => {
-                return (
-                  <Grid
-                    item
-                    key={c._id}
-                    xs={12}
-                    sm={12}
-                    md={12}
-                    lg={12}
-                    xl={12}
-                  >
-                    <Divider />
-                    <Typography
+              {validContacts && (
+                <TableContainer>
+                  <Table>
+                    <TableHead
                       style={{
-                        fontWeight: 'lighter',
-                        color:
+                        backgroundColor:
                           mode === 'light'
-                            ? colors.lightModeTableText
-                            : 'white',
-                        textTransform: 'capitalize',
+                            ? colors.lightModeTableHead
+                            : colors.darkModeTableHead,
                       }}
                     >
-                      {' '}
-                      {c.contacto.nombre}
-                    </Typography>
-                    <Typography>{c.descripcion}</Typography>
-                  </Grid>
-                );
-              })}
+                      <TableRow
+                        style={{
+                          fontWeight: 'bold',
+                          color:
+                            mode === 'light'
+                              ? colors.lightModeTableText
+                              : 'white',
+                        }}
+                      >
+                        <TableCell
+                          style={{
+                            fontWeight: 'bold',
+                            color:
+                              mode === 'light'
+                                ? colors.lightModeTableText
+                                : 'white',
+                          }}
+                        >
+                          Tipo de contacto
+                        </TableCell>
+                        <TableCell
+                          style={{
+                            fontWeight: 'bold',
+                            color:
+                              mode === 'light'
+                                ? colors.lightModeTableText
+                                : 'white',
+                          }}
+                        >
+                          Descripción
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {validContacts.map((c: Contact) => {
+                        return (
+                          <TableRow key={c._id}>
+                            <TableCell>{c.contacto.nombre}</TableCell>
+                            <TableCell>{c.descripcion}</TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
               <Grid item xs={12}></Grid>
             </Grid>
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12} className="p-2">
-            <Typography
-              style={{
-                fontWeight: 'bold',
-                color: mode === 'light' ? colors.lightModeTableText : 'white',
-              }}
-            >
-              Direcciones
-            </Typography>
+            <HeaderBar title="Libreta de direcciones" />
             <Grid container spacing={1}>
               {!validAddresses && (
                 <Box sx={{ width: '40%', marginTop: 5 }}>
                   <LinearProgress />
                 </Box>
               )}
-              {validAddresses?.map((a: Address) => {
-                return (
-                  <Grid
-                    item
-                    key={a._id}
-                    xs={12}
-                    sm={12}
-                    md={12}
-                    lg={12}
-                    xl={12}
-                  >
-                    <Divider />
-                    <Typography
+              {validAddresses && (
+                <TableContainer>
+                  <Table>
+                    <TableHead
                       style={{
-                        fontWeight: 'lighter',
-                        color:
+                        backgroundColor:
                           mode === 'light'
-                            ? colors.lightModeTableText
-                            : 'white',
-                        textTransform: 'capitalize',
+                            ? colors.lightModeTableHead
+                            : colors.darkModeTableHead,
                       }}
                     >
-                      {' '}
-                      {a.tipoDireccion.nombre.toLowerCase()}
-                    </Typography>
-                    <Typography>{a.nombre}</Typography>
-                  </Grid>
-                );
-              })}
+                      <TableRow
+                        style={{
+                          fontWeight: 'bold',
+                          color:
+                            mode === 'light'
+                              ? colors.lightModeTableText
+                              : 'white',
+                        }}
+                      >
+                        <TableCell
+                          style={{
+                            fontWeight: 'bold',
+                            color:
+                              mode === 'light'
+                                ? colors.lightModeTableText
+                                : 'white',
+                          }}
+                        >
+                          Tipo de dirección
+                        </TableCell>
+                        <TableCell
+                          style={{
+                            fontWeight: 'bold',
+                            color:
+                              mode === 'light'
+                                ? colors.lightModeTableText
+                                : 'white',
+                          }}
+                        >
+                          Descripción
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {validAddresses.map((a: Address) => {
+                        return (
+                          <TableRow key={a._id}>
+                            <TableCell>{a.tipoDireccion.nombre}</TableCell>
+                            <TableCell>{a.nombre}</TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
             </Grid>
           </Grid>
         </Grid>
