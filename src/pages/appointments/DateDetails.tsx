@@ -118,7 +118,7 @@ const DateDetails = ({
           />
         </DialogTitle>
         <DialogContent>
-          {timeSlots.map((slot: TimeSlot) => {
+          {timeSlots.map((slot: TimeSlot, index: number) => {
             return (
               <SlotDetail
                 slot={slot}
@@ -127,6 +127,7 @@ const DateDetails = ({
                 patients={formData.persons}
                 refetch={refetch}
                 professional={professionalId}
+                index={index}
               />
             );
           })}
@@ -153,12 +154,14 @@ const SlotDetail = ({
   patients,
   refetch,
   professional,
+  index,
 }: {
   slot: TimeSlot;
   professionals: Professional[];
   patients: Person[];
   refetch?: CallableFunction;
   professional: string;
+  index: number;
 }) => {
   const [reservationOpen, setReservationOpen] = useState<boolean>(false);
   const [patientId, setPatientId] = useState<string>('');
@@ -212,7 +215,19 @@ const SlotDetail = ({
     slot.content.estado !== 'CANCELADO'
   ) {
     return (
-      <Grid container spacing={3} direction="column">
+      <Grid
+        container
+        spacing={3}
+        direction="column"
+        style={{
+          backgroundColor:
+            index % 2 !== 0 && mode === 'light'
+              ? colors.lightModeTableHead
+              : index % 2 !== 0 && mode === 'dark'
+                ? colors.darkModeTableHead
+                : '',
+        }}
+      >
         <Grid item justifyContent="center" alignItems="center" display="flex">
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item xs={12} sm={12} md={12} lg={9} xl={6}>
@@ -259,7 +274,7 @@ const SlotDetail = ({
                         mode === 'light' ? 'white' : colors.darkModeSoftText,
                       backgroundColor:
                         mode === 'light'
-                          ? colors.lightModeHeaderColor
+                          ? colors.lightModeHeadingGrey
                           : colors.darkModeTableHead,
                     }}
                   >
@@ -289,7 +304,7 @@ const SlotDetail = ({
                         mode === 'light' ? 'white' : colors.darkModeSoftText,
                       backgroundColor:
                         mode === 'light'
-                          ? colors.lightModeHeaderColor
+                          ? colors.lightModeHeadingGrey
                           : colors.darkModeTableHead,
                     }}
                   >
@@ -379,16 +394,26 @@ const SlotDetail = ({
             </Grid>
           </Grid>
         </Grid>
-        <Grid item>
-          <Divider />
-        </Grid>
+        <Grid item></Grid>
         <Grid item></Grid>
       </Grid>
     );
   }
 
   return (
-    <Grid container spacing={1} direction="column">
+    <Grid
+      container
+      spacing={1}
+      direction="column"
+      style={{
+        backgroundColor:
+          index % 2 !== 0 && mode === 'light'
+            ? colors.lightModeTableHead
+            : index % 2 !== 0 && mode === 'dark'
+              ? colors.darkModeTableHead
+              : '',
+      }}
+    >
       <Grid item justifyContent="center" alignItems="center" display="flex">
         <Grid container justifyContent="space-between" alignItems="center">
           <Grid item xs={12} sm={12} md={12} lg={9} xl={6}>
@@ -541,9 +566,6 @@ const SlotDetail = ({
             </Dialog>
           </Grid>
         </Grid>
-      </Grid>
-      <Grid item>
-        <Divider />
       </Grid>
     </Grid>
   );

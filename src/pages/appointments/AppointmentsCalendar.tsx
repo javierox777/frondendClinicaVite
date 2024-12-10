@@ -20,12 +20,16 @@ import { TimeSlot } from '../../interfaces/TimeSlot';
 import colors from '../../styles/colors';
 import DateDetails from './DateDetails';
 import { format } from 'date-fns';
+import DateHistory from './DateHistory';
 
 const AppointmentsCalendar = () => {
   const { mode } = useThemeContext();
 
   const [showSlots, setSlots] = useState<TimeSlot[]>([]);
   const [open, setOpen] = useState(false);
+
+  const [historyOpen, setOpenHistory] = useState(false);
+
   const [showDate, setShowDate] = useState<Date>(new Date());
   const [refetch, setRefetch] = useState(false);
   const [filteredAppointments, setFilteredAppointments] = useState<
@@ -217,7 +221,12 @@ const AppointmentsCalendar = () => {
             .map((item: Appointment, index: number) => {
               return (
                 <li key={index}>
-                  <Badge color="blue" /> <b>{item.razon}</b>
+                  <Badge color="blue" />{' '}
+                  <b className="capitalize">
+                    {item.razon
+                      ? `${item.razon.toLowerCase().slice(0, 20)}${item.razon.length > 20 ? '...' : ''}`
+                      : ''}
+                  </b>
                 </li>
               );
             })}
@@ -244,7 +253,15 @@ const AppointmentsCalendar = () => {
                   </Popover>
                 }
               >
-                <a>Ver más</a>
+                <a
+                  onClick={() => {
+                    setSlots(slotsToShow);
+                    setShowDate(date);
+                    setOpenHistory(!open);
+                  }}
+                >
+                  Ver más
+                </a>
               </Whisper>
             </li>
           )}
@@ -313,7 +330,7 @@ const AppointmentsCalendar = () => {
             } else if (slot.content.type === 'day off') {
               return (
                 <li key={index}>
-                  <Badge color="green" />
+                  <Badge color="red" />
                   <span className="text-red-500 ml-1">LIBRE</span>
                 </li>
               );
@@ -456,6 +473,12 @@ const AppointmentsCalendar = () => {
           setRefetch(!refetch);
           setOpen(false);
         }}
+      />
+      <DateHistory
+        onClose={() => setOpenHistory(false)}
+        open={historyOpen}
+        date={showDate}
+        timeSlots={showSlots}
       />
     </>
   );
