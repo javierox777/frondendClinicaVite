@@ -84,8 +84,10 @@ const Receta: React.FC = () => {
   const [selectedRow, setSelectedRow] = useState<Receipt | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
+  const [dataUpdated, setUpdated] = useState(false);
+
   const { data: fetchData } = useQuery({
-    queryKey: ['fetchData'],
+    queryKey: ['fetchData', dataUpdated],
     queryFn: async () => {
       const response = await axios.get(`${generalConfig.baseUrl}/receipt`);
       setFormData(response.data.body);
@@ -208,6 +210,7 @@ const Receta: React.FC = () => {
     handleEditClose();
     handlePdfClose();
     handleRowClose();
+    setUpdated(!dataUpdated);
   };
 
   const exportPDF = async () => {
