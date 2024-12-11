@@ -75,9 +75,8 @@ import CurrentPatient from '../../pages/attention/CurrentPatient';
 import ClinicalRecordPage from '../../pages/clinicalrecord/ClinicalRecordPage';
 import PatientRecord from '../../pages/clinicalrecord/PatientRecord';
 import ConsentForm from '../../pages/consent/ConsentPage';
-import Administracion from '../../pages/admin/Admin'
+import Administracion from '../../pages/admin/Admin';
 import colors from '../../styles/colors';
-
 
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import ParticlesIcon from '@mui/icons-material/Cloud';
@@ -90,15 +89,12 @@ import logo from '/logo.png';
 import { Grid } from 'rsuite';
 import { JwtPayload } from 'jwt-decode';
 import { decodeJwt } from '../../auth/decodeJwt';
-
-
-
-
+import ConsentMain from '../../pages/consent/ConsentMain';
+import EditConsentPage from '../../pages/consent/EditConsentPage';
 
 const drawerWidth = 240;
 
 const DashboardLayout: React.FC = () => {
-
   const { toggleColorMode, mode } = useThemeContext();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -107,8 +103,6 @@ const DashboardLayout: React.FC = () => {
   const { user, setUser, loading } = useUser();
   const location = useLocation();
   const navigate = useNavigate();
-
-
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -148,25 +142,92 @@ const DashboardLayout: React.FC = () => {
     navigate('/login'); // Redirigir al usuario a la página de inicio de sesión
   };
 
-
   useEffect(() => {
     restoreUser();
   }, []);
 
   const menuItems = [
-    { id: 1, label: 'Inicio', icon: <HomeIcon />, path: '/inicio', roles: ['admin', 'user'] },
-    { id: 2, label: 'Administración', icon: <HomeIcon />, path: '/administracion', roles: ['admin'] },
-    { id: 3, label: 'Pacientes', icon: <AssignmentInd />, path: '/pacientes', roles: ['admin', 'user'] },
-    { id: 4, label: 'Profesionales', icon: <ContactEmergency />, path: '/profesionales', roles: ['admin'] },
-    { id: 5, label: 'Presupuestos', icon: <RequestQuote />, path: '/presupuestos', roles: ['admin', 'user'] },
-    { id: 6, label: 'Agenda', icon: <CalendarMonth />, path: '/agenda', roles: ['admin', 'user'] },
-    { id: 7, label: 'Programación', icon: <EditCalendar />, path: '/programacion', roles: ['admin'] },
-    { id: 8, label: 'Receta', icon: <RequestQuote />, path: '/receta', roles: ['admin', 'user'] },
-    { id: 9, label: 'Módulo dental', icon: <RequestQuote />, path: '/modulodental', roles: ['admin', 'user'] },
-    { id: 10, label: 'Consentimiento', icon: <DescriptionIcon />, path: '/consentimiento', roles: ['admin', 'user'] },
-    { id: 11, label: 'Atención', icon: <AssignmentLate />, path: '/atencionhoy', roles: ['admin', 'user'] },
+    {
+      id: 1,
+      label: 'Inicio',
+      icon: <HomeIcon />,
+      path: '/inicio',
+      roles: ['admin', 'user'],
+    },
+    {
+      id: 2,
+      label: 'Administración',
+      icon: <HomeIcon />,
+      path: '/administracion',
+      roles: ['admin'],
+    },
+    {
+      id: 3,
+      label: 'Pacientes',
+      icon: <AssignmentInd />,
+      path: '/pacientes',
+      roles: ['admin', 'user'],
+    },
+    {
+      id: 4,
+      label: 'Profesionales',
+      icon: <ContactEmergency />,
+      path: '/profesionales',
+      roles: ['admin'],
+    },
+    {
+      id: 5,
+      label: 'Presupuestos',
+      icon: <RequestQuote />,
+      path: '/presupuestos',
+      roles: ['admin', 'user'],
+    },
+    {
+      id: 6,
+      label: 'Agenda',
+      icon: <CalendarMonth />,
+      path: '/agenda',
+      roles: ['admin', 'user'],
+    },
+    {
+      id: 7,
+      label: 'Programación',
+      icon: <EditCalendar />,
+      path: '/programacion',
+      roles: ['admin'],
+    },
+    {
+      id: 8,
+      label: 'Receta',
+      icon: <RequestQuote />,
+      path: '/receta',
+      roles: ['admin', 'user'],
+    },
+    {
+      id: 9,
+      label: 'Módulo dental',
+      icon: <RequestQuote />,
+      path: '/modulodental',
+      roles: ['admin', 'user'],
+    },
+    {
+      id: 10,
+      label: 'Consentimiento',
+      icon: <DescriptionIcon />,
+      path: '/consentimiento',
+      roles: ['admin', 'user'],
+    },
+    {
+      id: 11,
+      label: 'Atención',
+      icon: <AssignmentLate />,
+      path: '/atencionhoy',
+      roles: ['admin', 'user'],
+    },
   ];
-  function isLoggedUser(user: LoggedUser | JwtPayload | null): user is LoggedUser {
+  function isLoggedUser(
+    user: LoggedUser | JwtPayload | null
+  ): user is LoggedUser {
     return (user as LoggedUser)?.role !== undefined;
   }
 
@@ -184,9 +245,8 @@ const DashboardLayout: React.FC = () => {
     user: 'Dentista',
   };
 
-
   return (
-    <Box >
+    <Box>
       {particlesEnabled && <ParticlesContainer />}{' '}
       {/* Renderiza las partículas solo si están habilitadas */}
       <CssBaseline />
@@ -211,11 +271,7 @@ const DashboardLayout: React.FC = () => {
             <MenuIcon />
           </IconButton>
 
-          <img
-            src={logo}
-            style={{ width: '4%' }}
-            alt="logo"
-          />
+          <img src={logo} style={{ width: '4%' }} alt="logo" />
 
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Clinica Dental
@@ -264,7 +320,6 @@ const DashboardLayout: React.FC = () => {
               },
             }}
           >
-
             <MenuItem disabled>
               <Typography variant="subtitle1" color="text.secondary">
                 Configuración
@@ -319,10 +374,11 @@ const DashboardLayout: React.FC = () => {
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
-            backgroundColor: `${mode === 'light'
-              ? 'rgba(78, 163, 213, 0.8)' // Transparencia en modo claro
-              : 'rgba(0, 0, 0, 0.8)'      // Transparencia en modo oscuro
-              }`,// Establecer el fondo del Drawer como transparente
+            backgroundColor: `${
+              mode === 'light'
+                ? 'rgba(78, 163, 213, 0.8)' // Transparencia en modo claro
+                : 'rgba(0, 0, 0, 0.8)' // Transparencia en modo oscuro
+            }`, // Establecer el fondo del Drawer como transparente
           },
         }}
       >
@@ -352,7 +408,9 @@ const DashboardLayout: React.FC = () => {
           <List>
             {/* Menu items */}
             {menuItems
-              .filter((item) => isLoggedUser(user) && item.roles.includes(user.role)) // Filtrar los elementos según el rol del usuario
+              .filter(
+                (item) => isLoggedUser(user) && item.roles.includes(user.role)
+              ) // Filtrar los elementos según el rol del usuario
               .map((item) => (
                 <ListItemButton
                   key={item.id}
@@ -456,7 +514,8 @@ const DashboardLayout: React.FC = () => {
             <Route path="/sexo" element={<Sexo />} />
             <Route path="/atencion" element={<AtencionTipo />} />
             <Route path="/ciudad" element={<Ciudad />} />
-            <Route path="/consentimiento" element={<ConsentForm />} />
+            <Route path="/consentimiento" element={<ConsentMain />} />
+            <Route path="/editarconsentimiento" element={<EditConsentPage />} />
             <Route path="/contacto" element={<Contacto />} />
             <Route path="/estado" element={<Estado />} />
             <Route path="/mensaje" element={<Mensaje />} />
