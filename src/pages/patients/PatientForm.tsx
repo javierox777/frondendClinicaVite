@@ -50,7 +50,8 @@ import { ShortModel } from '../../interfaces/ShortModel';
 import { Institution } from '../../interfaces/Institution';
 import HeaderMenu from './Menu';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-
+import { ServiceType } from '../../interfaces/ServiceType';
+import { Agreement } from '../../interfaces/Agreement';
 
 interface Props {
   open: boolean;
@@ -127,10 +128,11 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
     },
   ]);
 
-  const [agreements, setAgreements] = useState([
+  const [agreements, setAgreements] = useState<Agreement[]>([
     {
       _id: (Math.random() * 1000).toString(),
       prestacionTipo: '',
+      persona: '',
     },
   ]);
 
@@ -154,10 +156,6 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
       ),
     },
   ];
-
-
-
-
 
   const handleAddAntecedent = (
     type: 'morbid' | 'familiar' | 'allergy' | 'general'
@@ -231,8 +229,6 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
     }
   };
 
-
-
   const [contacts, setContacts] = useState([
     {
       _id: (Math.random() * 1000).toString(),
@@ -259,10 +255,10 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
       {
         _id: (Math.random() * 1000).toString(), // Genera un ID único
         prestacionTipo: '', // Inicializa sin convenio seleccionado
+        persona: '',
       },
     ]);
   };
-
 
   const handleAddContact = () => {
     setContacts([
@@ -302,7 +298,12 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
       (agreement) => agreement.prestacionTipo === selectedServiceTypeId
     );
 
-    if (!alreadyExists) {
+    const alreadyExistSecondCheck = agreements.some(
+      (agreement) =>
+        (agreement.prestacionTipo as ServiceType)._id === selectedServiceTypeId
+    );
+
+    if (!alreadyExists && !alreadyExistSecondCheck) {
       const updatedAgreements = [...agreements];
       updatedAgreements[index].prestacionTipo = selectedServiceTypeId;
 
@@ -351,7 +352,9 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
     // const generalWithoutId = general.map(({ _id, ...rest }) => rest);
     // const allergiesWithoutId = allergies.map(({ _id, ...rest }) => rest);
     // const habitsWithoutId = habits.map(({ id, ...rest }) => rest);
-    const agreementsWithoutId = agreements.map(({ _id, ...rest }) => rest);
+    const agreementsWithoutId = agreements.map(
+      ({ _id, persona, ...rest }) => rest
+    );
 
     const newPerson = {
       nombre1: firstName,
@@ -461,10 +464,12 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
   const rows = agreements.map((a, index) => ({
     id: index + 1,
     _id: a._id,
-    prestacionTipo: formData?.serviceTypes.find(
-      (st: any) => st._id === a.prestacionTipo
-    )?.nombre || '',
+    prestacionTipo:
+      formData?.serviceTypes.find((st: any) => st._id === a.prestacionTipo)
+        ?.nombre || '',
   }));
+
+  console.log(agreements);
 
   return (
     <>
@@ -695,10 +700,8 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                 </FormControl>
               </Grid>
 
-
-
               <Grid item xs={12}>
-              <Box
+                <Box
                   display="flex"
                   alignItems="center"
                   style={{ marginBottom: 2 }}
@@ -718,7 +721,9 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                   </AppBar>
                 </Box>
                 <Box display="flex" alignItems="center" mb={2}>
-                  <Typography style={{ fontWeight: 'bold', marginRight: '10px' }}>
+                  <Typography
+                    style={{ fontWeight: 'bold', marginRight: '10px' }}
+                  >
                     Agregar convenio
                   </Typography>
                   <IconButton onClick={handleAddAgreement}>
@@ -747,20 +752,23 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                           );
                           return (
                             <FormControl fullWidth>
-                              <InputLabel id={`select-label-${params.row.id}`}>
-                              
-                              </InputLabel>
+                              <InputLabel
+                                id={`select-label-${params.row.id}`}
+                              ></InputLabel>
                               <Select
                                 labelId={`select-label-${params.row.id}`}
-                                value={currentAgreement?.prestacionTipo || ''}
-                                onChange={(e: SelectChangeEvent<string>) => {
-                                  const updatedAgreements = agreements.map((a) =>
-                                    a._id === params.row._id
-                                      ? { ...a, prestacionTipo: e.target.value }
-                                      : a
-                                  );
-                                  setAgreements(updatedAgreements);
-                                }}
+                                value={
+                                  typeof currentAgreement?.prestacionTipo ===
+                                  'string'
+                                    ? currentAgreement.prestacionTipo
+                                    : typeof currentAgreement?.prestacionTipo ===
+                                        'object'
+                                      ? currentAgreement?.prestacionTipo._id
+                                      : ''
+                                }
+                                onChange={(e: SelectChangeEvent<string>) =>
+                                  handleAgreementChange(e, params.row.id - 1)
+                                }
                               >
                                 {formData?.serviceTypes.map((st: any) => (
                                   <MenuItem key={st._id} value={st._id}>
@@ -780,7 +788,9 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                           <IconButton
                             onClick={() =>
                               setAgreements(
-                                agreements.filter((a) => a._id !== params.row._id)
+                                agreements.filter(
+                                  (a) => a._id !== params.row._id
+                                )
                               )
                             }
                           >
@@ -793,19 +803,15 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                     //   pagination: {
                     //     paginationModel: {
                     //       pageSize: 5,
-                    //       page: 0, 
+                    //       page: 0,
                     //     },
                     //   },
                     // }}
                     // pageSizeOptions={[5, 10, 20]}
-                    // disableRowSelectionOnClick 
+                    // disableRowSelectionOnClick
                   />
                 </Box>
               </Grid>
-
-
-
-
 
               <Grid item xs={12}>
                 <Box
@@ -822,9 +828,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                             : colors.darkModeHeaderColor,
                       }}
                     >
-                      <Typography variant="h6">
-                        Direcciones
-                      </Typography>
+                      <Typography variant="h6">Direcciones</Typography>
                     </Toolbar>
                   </AppBar>
                 </Box>
@@ -960,9 +964,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                           : colors.darkModeHeaderColor,
                     }}
                   >
-                    <Typography variant="h6">
-                      Contactos
-                    </Typography>
+                    <Typography variant="h6">Contactos</Typography>
                   </Toolbar>
                 </AppBar>
                 <Box
@@ -1130,10 +1132,9 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                 </FormControl>
               </Grid>
             </Grid>
-          
-        </Container>
-      </form>
-    </Dialog >
+          </Container>
+        </form>
+      </Dialog>
       <Toaster />
     </>
   );
