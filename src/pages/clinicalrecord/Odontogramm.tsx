@@ -568,10 +568,24 @@ const Odontogramm = ({ odontogram }: Props) => {
       let toothY = 20;
   
       // Encabezado
-      doc.setFontSize(14).setFont('helvetica', 'bold');
-      doc.text('ODONTOGRAMA', pageWidth / 2, 20, { align: 'center' });
+     // Título "Clínica Dental" (color rosa)
+doc.setFontSize(18);
+doc.setTextColor(255, 105, 180); 
+doc.setFont('helvetica', 'bold');
+doc.text('Clínica Dental', pageWidth / 2 - 20, 20, { align: 'center' });
+
+// Título "AMANIA" (color azul)
+doc.setTextColor(0, 102, 204); // Azul (RGB: 0, 102, 204)
+doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
+
+// Subtítulo "ODONTOGRAMA" (azul también)
+doc.setFontSize(16);
+doc.setTextColor(0, 102, 204); // Azul (igual que "AMANIA")
+doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' })
+
+doc.addImage(logoUrl, 'PNG', 10, 3, 30, 30);
   
-      // Función para pintar las secciones de la cruz
+     
      // Función para pintar las secciones de la cruz
 const drawToothShape = (x: number, y: number, toothParts: any) => {
   const size = 2;
@@ -593,12 +607,12 @@ const drawToothShape = (x: number, y: number, toothParts: any) => {
 // Función para dibujar una fila de dientes
 const drawTeethRow = (teeth: Diente[], treatmentsData: any, startY: number, startX: number) => {
   let toothX = startX;
-  let toothY = startY;
+  let toothY = startY + 30;
 
   teeth.forEach((tooth) => {
     if (toothX + toothWidth > pageWidth - startX) {
       toothX = startX;
-      toothY += toothHeight + gap * 3;
+      toothY += toothHeight + gap * 8;
     }
 
     // Dibujar número del diente
@@ -643,7 +657,7 @@ const totalHeight = (toothHeight + gap * 3) * 2; // Dos filas de dientes
 // Dibujar el rectángulo envolvente
 doc.setDrawColor(0); // Color del borde (negro)
 doc.setLineWidth(0.1); // Grosor del borde
-doc.rect(startX - 5, 30 - 5, totalWidth + 10, totalHeight + 10); // Rectángulo envolvente
+doc.rect(startX - 5, 60 - 5, totalWidth + 10, totalHeight + 10); // Rectángulo envolvente
 
 // Dibujar filas de dientes
 drawTeethRow(upperTeeth, treatmentsData, 30, startX);
