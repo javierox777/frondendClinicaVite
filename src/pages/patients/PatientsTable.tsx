@@ -1,4 +1,4 @@
-import { Edit, Search } from '@mui/icons-material';
+import { Edit, Search, PictureAsPdf } from '@mui/icons-material';
 import {
   Box,
   IconButton,
@@ -17,28 +17,14 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { jsPDF } from 'jspdf';
 import TableSkeleton from '../../componemts/TableSkeleton';
 import { useThemeContext } from '../../componemts/themeContext';
 import { generalConfig } from '../../config';
 import { Person } from '../../interfaces/Person';
 import colors from '../../styles/colors';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  ResponsiveContainer,
-  LabelList,
-  Legend,
-} from 'recharts';
 
-interface Props {
-  refetch?: boolean;
-}
-
-const PatientsTable = ({ refetch }: Props) => {
+const PatientsTable = ({ refetch }: { refetch?: boolean }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchText, setSearchText] = useState('');
@@ -68,28 +54,94 @@ const PatientsTable = ({ refetch }: Props) => {
     );
   });
 
+  const handleDownloadPdf = async (patient: Person) => {
+    try {
+      
+      const response = await axios.get(`${generalConfig.baseUrl}/persons/${patient._id}`);
+      const detailedPatient = response.data.body;
+  
+      // Crear el PDF
+      const doc = new jsPDF();
+  
+      // Configurar colores como tuplas
+      const primaryColor: [number, number, number] = [0, 102, 204];
+      const secondaryColor: [number, number, number] = [220, 220, 220];
+      const textColor: [number, number, number] = [40, 40, 40];
+  
+     
+      const logoBase64 = '/public/logo.png'; 
+      doc.addImage(logoBase64, 'PNG', 10, 10, 20, 20);
+  
+      // Encabezado con título y fecha
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...primaryColor);
+      doc.text('Formulario del Paciente', 70, 25);
+  
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'italic');
+      doc.setTextColor(...textColor);
+      const today = new Date().toLocaleDateString();
+      doc.text(`Fecha de generación: ${today}`, 70, 35);
+  
+      // Línea decorativa
+      doc.setDrawColor(...primaryColor);
+      doc.setLineWidth(1);
+      doc.line(10, 45, 200, 45);
+  
+      // Información Personal
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...primaryColor);
+      doc.text('Información Personal', 10, 55);
+  
+      // Sección: Datos personales
+      doc.setDrawColor(...secondaryColor);
+      doc.setFillColor(...secondaryColor);
+      doc.rect(10, 60, 190, 40, 'F');
+  
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...textColor);
+      doc.text(`Nombre Completo: ${detailedPatient.nombre1} ${detailedPatient.nombre2 || ''} ${detailedPatient.apellPat} ${detailedPatient.apellMat}`, 12, 70);
+      doc.text(`RUT: ${detailedPatient.rut}-${detailedPatient.dv}`, 12, 78);
+      doc.text(`Fecha de Nacimiento: ${new Date(detailedPatient.fechaNac).toLocaleDateString()}`, 12, 86);
+      doc.text(`Nacionalidad: ${detailedPatient.nacionalidad.nombre}`, 12, 94);
+  
+      // Información Médica
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...primaryColor);
+      doc.text('Información Médica', 10, 110);
+  
+      // Sección: Datos médicos
+      doc.setDrawColor(...secondaryColor);
+      doc.setFillColor(...secondaryColor);
+      doc.rect(10, 115, 190, 30, 'F');
+  
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...textColor);
+      doc.text(`Institución: ${detailedPatient.institucion.nombre}`, 12, 125);
+      doc.text(`Previsión: ${detailedPatient.institucion.prevision.nombre}`, 12, 133);
+      doc.text(`Sexo: ${detailedPatient.sexo.nombre}`, 12, 141);
+  
+      // Pie de página
+      doc.setFont('helvetica', 'italic');
+      doc.setFontSize(10);
+      doc.setTextColor(150);
+      doc.text('Generado por el Sistema de Gestión Dental © 2024', 10, 290);
+  
+      // Guardar el PDF
+      doc.save(`Formulario_${detailedPatient.nombre1}_${detailedPatient.apellPat}.pdf`);
+    } catch (error) {
+      console.error('Error al generar el PDF:', error);
+      alert('No se pudo generar el PDF. Intente nuevamente.');
+    }
+  };
+  
+  
+
   if (isLoading) return <TableSkeleton />;
-
-  // Preparar datos para el gráfico
-  const chartData = patients?.map((p: Person) => ({
-    name: `${p.nombre1} ${p.apellPat}`,
-    edad: new Date().getFullYear() - new Date(p.fechaNac).getFullYear(),
-  }));
-
-  // Contar número de pacientes por rango de edad
-  const ageGroups = [
-    { name: '0-20', value: 0 },
-    { name: '21-40', value: 0 },
-    { name: '41-60', value: 0 },
-    { name: '61+', value: 0 },
-  ];
-
-  chartData?.forEach(({ edad }:{edad:any}) => {
-    if (edad <= 20) ageGroups[0].value++;
-    else if (edad <= 40) ageGroups[1].value++;
-    else if (edad <= 60) ageGroups[2].value++;
-    else ageGroups[3].value++;
-  });
 
   return (
     <Box display="flex" alignItems="flex-start" justifyContent="space-between">
@@ -143,6 +195,12 @@ const PatientsTable = ({ refetch }: Props) => {
                         >
                           <Edit />
                         </IconButton>
+                        <IconButton
+                          color="primary"
+                          onClick={() => handleDownloadPdf(p)}
+                        >
+                          <PictureAsPdf />
+                        </IconButton>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -162,9 +220,6 @@ const PatientsTable = ({ refetch }: Props) => {
           />
         </Box>
       </Box>
-
-
-
     </Box>
   );
 };

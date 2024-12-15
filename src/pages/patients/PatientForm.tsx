@@ -78,6 +78,7 @@ const badHabits = [
 ];
 
 const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
+
   const { mode } = useThemeContext();
   const [value, setValue] = useState(0);
 
@@ -329,10 +330,12 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
     field: 'descripcion' | 'contacto'
   ) => {
     const updatedContacts = [...contacts];
+
+    
     updatedContacts[rowIndex][field] = (e.target as HTMLInputElement).value;
     setContacts(updatedContacts);
   };
-
+ 
   const { data: formData } = useQuery({
     queryKey: ['formData', subFormSubmitted],
     queryFn: async () => {
@@ -376,8 +379,10 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
       setSubmitting(true);
 
       if (patient) {
+        console.log("updatedContacts", patient?._id)
         const response = await axios.patch(
           `${generalConfig.baseUrl}/persons/${patient._id}`,
+          
           newPerson
         );
 
