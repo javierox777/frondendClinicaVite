@@ -572,72 +572,83 @@ const Odontogramm = ({ odontogram }: Props) => {
       doc.text('ODONTOGRAMA', pageWidth / 2, 20, { align: 'center' });
   
       // Función para pintar las secciones de la cruz
-      const drawToothShape = (x: number, y: number, toothParts: any) => {
-        const size = 2;
-        const parts = [
-          { key: 'bucal', x: x + size, y: y, w: size, h: size },            // Arriba
-          { key: 'mesial', x: x, y: y + size, w: size, h: size },           // Izquierda
-          { key: 'oclusal', x: x + size, y: y + size, w: size, h: size },   // Centro
-          { key: 'distal', x: x + 2 * size, y: y + size, w: size, h: size },// Derecha
-          { key: 'lingualpalatino', x: x + size, y: y + 2 * size, w: size, h: size }, // Abajo
-        ];
-  
-        parts.forEach((part) => {
-          const color = toothParts?.[part.key]?.color || '#FFFFFF';
-          doc.setFillColor(color);
-          doc.rect(part.x, part.y, part.w, part.h, 'FD'); // Pintar sección
-        });
-      };
-  
-      // Función para dibujar una fila de dientes
-      const drawTeethRow = (teeth: Diente[], treatmentsData: any, startY: number) => {
-        toothX = startX;
-        toothY = startY;
-  
-        teeth.forEach((tooth) => {
-          if (toothX + toothWidth > pageWidth - startX) {
-            toothX = startX;
-            toothY += toothHeight + gap * 3;
-          }
-  
-          // Dibujar número del diente
-          doc.setFontSize(8).text(`${tooth.pieza}`, toothX + toothWidth / 3, toothY - 2);
-  
-          // Imagen del diente
-          const toothImage = dientesImages[`diente${tooth.pieza}` as DienteKeys];
-          if (toothImage) {
-            doc.addImage(toothImage, 'PNG', toothX, toothY, toothWidth, toothHeight);
-          }
-  
-          // Obtener tratamiento dinámico del backend
-          const toothParts = treatmentsData[tooth.pieza] || {};
-          drawToothShape(toothX + 1, toothY + toothHeight + 3, toothParts);
-  
-          toothX += toothWidth + gap;
-        });
-      };
-  
-      // Datos dinámicos de tratamientos desde el backend
-      const treatmentsData = {};
-      teeth?.forEach((tooth) => {
-        treatmentsData[tooth.pieza!] = {
-          bucal: { color: tooth.bucal.color },
-          mesial: { color: tooth.mesial.color },
-          distal: { color: tooth.distal.color },
-          lingualpalatino: { color: tooth.lingualpalatino.color },
-          oclusal: { color: tooth.oclusal.color },
-        };
-      });
-  
-      // Definir dientes superiores e inferiores
-      const upperTeeth = teeth!.filter((t: Diente) => parseInt(t.pieza!) < 31);
-      const lowerTeeth = teeth!.filter(
-        (t: Diente) => parseInt(t.pieza!) >= 31 && parseInt(t.pieza!) < 51
-      );
-  
-      // Dibujar filas de dientes
-      drawTeethRow(upperTeeth, treatmentsData, 30);
-      drawTeethRow(lowerTeeth, treatmentsData, 60);
+     // Función para pintar las secciones de la cruz
+const drawToothShape = (x: number, y: number, toothParts: any) => {
+  const size = 2;
+  const parts = [
+    { key: 'bucal', x: x + size, y: y, w: size, h: size },            // Arriba
+    { key: 'mesial', x: x, y: y + size, w: size, h: size },           // Izquierda
+    { key: 'oclusal', x: x + size, y: y + size, w: size, h: size },   // Centro
+    { key: 'distal', x: x + 2 * size, y: y + size, w: size, h: size },// Derecha
+    { key: 'lingualpalatino', x: x + size, y: y + 2 * size, w: size, h: size }, // Abajo
+  ];
+
+  parts.forEach((part) => {
+    const color = toothParts?.[part.key]?.color || '#FFFFFF';
+    doc.setFillColor(color);
+    doc.rect(part.x, part.y, part.w, part.h, 'FD'); // Pintar sección
+  });
+};
+
+// Función para dibujar una fila de dientes
+const drawTeethRow = (teeth: Diente[], treatmentsData: any, startY: number, startX: number) => {
+  let toothX = startX;
+  let toothY = startY;
+
+  teeth.forEach((tooth) => {
+    if (toothX + toothWidth > pageWidth - startX) {
+      toothX = startX;
+      toothY += toothHeight + gap * 3;
+    }
+
+    // Dibujar número del diente
+    doc.setFontSize(8).text(`${tooth.pieza}`, toothX + toothWidth / 3, toothY - 2);
+
+    // Imagen del diente
+    const toothImage = dientesImages[`diente${tooth.pieza}` as DienteKeys];
+    if (toothImage) {
+      doc.addImage(toothImage, 'PNG', toothX, toothY, toothWidth, toothHeight);
+    }
+
+    // Obtener tratamiento dinámico del backend
+    const toothParts = treatmentsData[tooth.pieza] || {};
+    drawToothShape(toothX + 1, toothY + toothHeight + 3, toothParts);
+
+    toothX += toothWidth + gap;
+  });
+};
+
+// Datos dinámicos de tratamientos desde el backend
+const treatmentsData = {};
+teeth?.forEach((tooth) => {
+  treatmentsData[tooth.pieza!] = {
+    bucal: { color: tooth.bucal.color },
+    mesial: { color: tooth.mesial.color },
+    distal: { color: tooth.distal.color },
+    lingualpalatino: { color: tooth.lingualpalatino.color },
+    oclusal: { color: tooth.oclusal.color },
+  };
+});
+
+// Definir dientes superiores e inferiores
+const upperTeeth = teeth!.filter((t: Diente) => parseInt(t.pieza!) < 31);
+const lowerTeeth = teeth!.filter(
+  (t: Diente) => parseInt(t.pieza!) >= 31 && parseInt(t.pieza!) < 51
+);
+
+// Calcular el área total de los dientes
+const totalWidth = upperTeeth.length * toothWidth + (upperTeeth.length - 1) * gap;
+const totalHeight = (toothHeight + gap * 3) * 2; // Dos filas de dientes
+
+// Dibujar el rectángulo envolvente
+doc.setDrawColor(0); // Color del borde (negro)
+doc.setLineWidth(0.1); // Grosor del borde
+doc.rect(startX - 5, 30 - 5, totalWidth + 10, totalHeight + 10); // Rectángulo envolvente
+
+// Dibujar filas de dientes
+drawTeethRow(upperTeeth, treatmentsData, 30, startX);
+drawTeethRow(lowerTeeth, treatmentsData, 30 + toothHeight + gap * 4, startX);
+
   
       // Guardar PDF
       doc.save('ficha_dental.pdf');
