@@ -34,7 +34,7 @@ import { ConsentmentDetail } from '../../interfaces/ConsentmentDetails';
 
 const tableHeadings = [
   { id: 1, label: 'Fecha' },
-  { id: 1, label: 'Clínica' },
+  { id: 2, label: 'Clínica' },
 ];
 
 interface Props {
@@ -150,8 +150,8 @@ const ConsentmentsTab = ({ patient }: Props) => {
                           {(c.consentimiento.empresa as Company).razonSocial}
                         </TableCell>
                         <TableCell>
-                          <IconButton>
-                            <Visibility onClick={() => setConsentment(c)} />
+                          <IconButton onClick={() => setConsentment(c)}>
+                            <Visibility />
                           </IconButton>
                         </TableCell>
                       </TableRow>
@@ -176,9 +176,12 @@ const ConsentmentsTab = ({ patient }: Props) => {
           </Grid>
         )}
       </Grid>
-      <Dialog open={formOpen} onClose={() => setFormOpen(false)}>
-        <ConsentForm afterSubmit={() => setUpdated(!dataUpdated)} />
-      </Dialog>
+
+      <ConsentForm
+        afterSubmit={() => setUpdated(!dataUpdated)}
+        open={formOpen}
+        onClose={() => setFormOpen(false)}
+      />
     </>
   );
 };
