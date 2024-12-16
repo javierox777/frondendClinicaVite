@@ -241,7 +241,9 @@ const ScheduleTable = () => {
       <Toaster />
       <ScheduleForm
         open={formOpen}
-        onClose={() => setFormOpen(false)}
+        onClose={() => {
+          setFormOpen(false);
+        }}
         schedule={scheduleToEdit && scheduleToEdit}
         refetch={() => {
           setRefetch(!refetch);

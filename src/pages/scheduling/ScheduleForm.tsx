@@ -23,7 +23,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { format } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
@@ -159,7 +159,18 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
       }
     } catch (error) {
       setSubmitting(false);
-      toast.error('No se ha podido registrar agenda.');
+      if (axios.isAxiosError(error)) {
+        if (
+          error.response?.status === 400 &&
+          error.response.data.message === 'schedule exists'
+        ) {
+          toast.error(
+            `Ya existe agenda para las fechas:\n${error.response.data.overlappingDates.map((date: string) => `${weekDaysOptions[new Date(date).getDay()].label} ${date}`).join('\n')}`
+          );
+        }
+      } else {
+        toast.error('No se ha podido registrar agenda.');
+      }
     }
   };
 

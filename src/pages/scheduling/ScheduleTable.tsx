@@ -38,7 +38,12 @@ const tableHeadings = [
   { id: 5, label: 'Acciones' },
 ];
 
-const ScheduleTable = () => {
+interface Props {
+  refetch?: boolean;
+  refetchFn?: CallableFunction;
+}
+
+const ScheduleTable = ({ refetch, refetchFn }: Props) => {
   const { mode } = useThemeContext();
   const [professionalId, setProfessionalId] = useState<string>('');
   const [scheduletoShow, setSchedule] = useState<ProfessionalSchedule[]>();
@@ -46,7 +51,6 @@ const ScheduleTable = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [formOpen, setFormOpen] = useState<boolean>(false);
-  const [refetch, setRefetch] = useState<boolean>(false);
 
   const [scheduleToEdit, setEditSchedule] = useState<
     ProfessionalSchedule | undefined
@@ -157,9 +161,6 @@ const ScheduleTable = () => {
                   Buscar Agenda
                 </Button>
               </FormControl>
-              <Button variant="contained" onClick={() => setFormOpen(true)}>
-                Crear Agenda
-              </Button>
             </ButtonGroup>
           </Grid>
 
@@ -245,11 +246,17 @@ const ScheduleTable = () => {
         onClose={() => setFormOpen(false)}
         schedule={scheduleToEdit && scheduleToEdit}
         refetch={() => {
-          setRefetch(!refetch);
+          if (refetchFn) {
+            refetchFn();
+          }
           handleSearch();
         }}
       />
-      <AppointmentsCalendar proId={professionalId} searchBar={false} />
+      <AppointmentsCalendar
+        proId={professionalId}
+        searchBar={false}
+        dataUpdated={refetch}
+      />
     </>
   );
 };

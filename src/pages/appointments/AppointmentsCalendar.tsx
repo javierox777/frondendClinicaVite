@@ -25,9 +25,14 @@ import DateHistory from './DateHistory';
 interface Props {
   proId?: string;
   searchBar?: boolean;
+  dataUpdated?: boolean;
 }
 
-const AppointmentsCalendar = ({ proId, searchBar = true }: Props) => {
+const AppointmentsCalendar = ({
+  proId,
+  searchBar = true,
+  dataUpdated,
+}: Props) => {
   const { mode } = useThemeContext();
 
   const [showSlots, setSlots] = useState<TimeSlot[]>([]);
@@ -72,7 +77,7 @@ const AppointmentsCalendar = ({ proId, searchBar = true }: Props) => {
   });
 
   const { data: professionalSchedule } = useQuery({
-    queryKey: ['professionalSchedule', professionalId],
+    queryKey: ['professionalSchedule', professionalId, dataUpdated],
     queryFn: async () => {
       try {
         if (professionalId) {
