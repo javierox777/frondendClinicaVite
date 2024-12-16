@@ -1,4 +1,4 @@
-import { Visibility } from '@mui/icons-material';
+import { Visibility, PictureAsPdf } from "@mui/icons-material";
 import {
   LinearProgress,
   TableContainer,
@@ -15,26 +15,23 @@ import {
   Toolbar,
   Typography,
   Button,
-  Dialog,
-} from '@mui/material';
-import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
-import React, { useState } from 'react';
-import { useThemeContext } from '../../componemts/themeContext';
-import { generalConfig } from '../../config';
-import { Receipt } from '../receta/types';
-import ReceiptVisualizer from './ReceiptVisualizer';
-import colors from '../../styles/colors';
-import { Person } from '../../interfaces/Person';
-import { Consentment } from '../../interfaces/Consentment';
-import { Company } from '../../interfaces/Company';
-import ConsentmentVisualizer from './ConsentmentVisualizer';
-import ConsentForm from '../consent/ConsentPage';
-import { ConsentmentDetail } from '../../interfaces/ConsentmentDetails';
+} from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import React, { useRef, useState } from "react";
+import { useThemeContext } from "../../componemts/themeContext";
+import { generalConfig } from "../../config";
+import colors from "../../styles/colors";
+import { Person } from "../../interfaces/Person";
+import { Consentment } from "../../interfaces/Consentment";
+import { Company } from "../../interfaces/Company";
+import { ConsentmentDetail } from "../../interfaces/ConsentmentDetails";
+import ConsentmentVisualizer from "./ConsentmentVisualizer";
+import ConsentForm from "../consent/ConsentPage";
 
 const tableHeadings = [
-  { id: 1, label: 'Fecha' },
-  { id: 2, label: 'Clínica' },
+  { id: 1, label: "Fecha" },
+  { id: 2, label: "Clínica" },
 ];
 
 interface Props {
@@ -50,35 +47,31 @@ const ConsentmentsTab = ({ patient }: Props) => {
   const { mode } = useThemeContext();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-
   const [formOpen, setFormOpen] = useState(false);
   const [dataUpdated, setUpdated] = useState(false);
-
   const [showConsentment, setConsentment] = useState<ConsentmentResponse>();
 
+  // Referencia al componente ConsentmentVisualizer
+  const visualizerRef = useRef<any>(null);
+
   const { data: consentments, isLoading } = useQuery({
-    queryKey: ['consentments', dataUpdated],
+    queryKey: ["consentments", dataUpdated],
     queryFn: async () => {
       const response = await axios.get(
         `${generalConfig.baseUrl}/consentments/getconsentments/${patient._id}`
       );
-
       return response.data.body;
     },
   });
 
-  const handleChangePage = (
-    event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
-  ) => {
-    setPage(newPage);
-  };
+  const handleDownloadPDF = (consentment: ConsentmentResponse) => {
+    // Establecer el consentimiento actual para visualización
+    setConsentment(consentment);
 
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+    // Llamar a la función `generatePDF` dentro del componente `ConsentmentVisualizer`
+    setTimeout(() => {
+      visualizerRef.current?.generatePDF();
+    }, 100); // Esperar a que se actualice el estado de `showConsentment`
   };
 
   return (
@@ -90,56 +83,45 @@ const ConsentmentsTab = ({ patient }: Props) => {
           </Grid>
         )}
         {!isLoading && (
-          <Grid item xs={5} className="shadow-lg rounded-lg">
-            <AppBar position="static">
-              <Toolbar
-                style={{
-                  backgroundColor:
-                    mode === 'light'
-                      ? colors.lightModeHeaderColor
-                      : colors.darkModeHeaderColor,
-                  justifyContent: 'space-between',
-                }}
-              >
-                <Typography variant="h6">Consentimientos</Typography>
-                <Button variant="contained" onClick={() => setFormOpen(true)}>
-                  Nuevo consentimiento
-                </Button>
-              </Toolbar>
-            </AppBar>
-            <TableContainer component={Paper} elevation={0}>
-              <Table>
-                <TableHead
+          <>
+            <Grid item xs={5} className="shadow-lg rounded-lg">
+              <AppBar position="static">
+                <Toolbar
                   style={{
                     backgroundColor:
-                      mode === 'light'
-                        ? colors.lightModeTableHead
-                        : colors.darkModeTableHead,
+                      mode === "light"
+                        ? colors.lightModeHeaderColor
+                        : colors.darkModeHeaderColor,
+                    justifyContent: "space-between",
                   }}
                 >
-                  <TableRow>
-                    {tableHeadings.map((h) => {
-                      return (
-                        <TableCell
-                          style={{
-                            fontWeight: 'bold',
-                            color:
-                              mode === 'light'
-                                ? colors.lightModeTableText
-                                : 'white',
-                          }}
-                          key={h.id}
-                        >
+                  <Typography variant="h6">Consentimientos</Typography>
+                  <Button variant="contained" onClick={() => setFormOpen(true)}>
+                    Nuevo consentimiento
+                  </Button>
+                </Toolbar>
+              </AppBar>
+              <TableContainer component={Paper} elevation={0}>
+                <Table>
+                  <TableHead
+                    style={{
+                      backgroundColor:
+                        mode === "light"
+                          ? colors.lightModeTableHead
+                          : colors.darkModeTableHead,
+                    }}
+                  >
+                    <TableRow>
+                      {tableHeadings.map((h) => (
+                        <TableCell key={h.id} style={{ fontWeight: "bold" }}>
                           {h.label}
                         </TableCell>
-                      );
-                    })}
-                    <TableCell></TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {consentments?.map((c: ConsentmentResponse) => {
-                    return (
+                      ))}
+                      <TableCell></TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {consentments?.map((c: ConsentmentResponse) => (
                       <TableRow key={c.consentimiento._id}>
                         <TableCell>
                           {new Date(
@@ -153,30 +135,36 @@ const ConsentmentsTab = ({ patient }: Props) => {
                           <IconButton onClick={() => setConsentment(c)}>
                             <Visibility />
                           </IconButton>
+                          <IconButton onClick={() => handleDownloadPDF(c)}>
+                            <PictureAsPdf />
+                          </IconButton>
                         </TableCell>
                       </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-              <TablePagination
-                page={page}
-                onPageChange={handleChangePage}
-                count={consentments?.length}
-                component="div"
-                rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
+                    ))}
+                  </TableBody>
+                </Table>
+                <TablePagination
+                  page={page}
+                  onPageChange={(e, newPage) => setPage(newPage)}
+                  count={consentments?.length || 0}
+                  component="div"
+                  rowsPerPage={rowsPerPage}
+                  onRowsPerPageChange={(e) =>
+                    setRowsPerPage(parseInt(e.target.value, 10))
+                  }
+                />
+              </TableContainer>
+            </Grid>
+
+            <Grid item xs={6} className="border border-zinc-200 rounded-lg p-3 pl-20 pr-20 ml-5 pt-0">
+              <ConsentmentVisualizer
+                ref={visualizerRef}
+                consentment={showConsentment}
               />
-            </TableContainer>
-          </Grid>
-        )}
-        {!isLoading && (
-          <Grid item xs={6} className="border border-zinc-200 rounded-lg p-3">
-            <ConsentmentVisualizer consentment={showConsentment} />
-          </Grid>
+            </Grid>
+          </>
         )}
       </Grid>
-
       <ConsentForm
         afterSubmit={() => setUpdated(!dataUpdated)}
         open={formOpen}
