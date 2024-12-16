@@ -566,105 +566,153 @@ const Odontogramm = ({ odontogram }: Props) => {
       const gap = 5;
       let toothX = startX;
       let toothY = 20;
-  
+
       // Encabezado
-     // Título "Clínica Dental" (color rosa)
-doc.setFontSize(18);
-doc.setTextColor(255, 105, 180); 
-doc.setFont('helvetica', 'bold');
-doc.text('Clínica Dental', pageWidth / 2 - 20, 20, { align: 'center' });
+      // Título "Clínica Dental" (color rosa)
+      doc.setFontSize(18);
+      doc.setTextColor(255, 105, 180);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Clínica Dental', pageWidth / 2 - 20, 20, { align: 'center' });
 
-// Título "AMANIA" (color azul)
-doc.setTextColor(0, 102, 204); // Azul (RGB: 0, 102, 204)
-doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
+      // Título "AMANIA" (color azul)
+      doc.setTextColor(0, 102, 204); // Azul (RGB: 0, 102, 204)
+      doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
 
-// Subtítulo "ODONTOGRAMA" (azul también)
-doc.setFontSize(16);
-doc.setTextColor(0, 102, 204); // Azul (igual que "AMANIA")
-doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' })
+      // Subtítulo "ODONTOGRAMA" (azul también)
+      doc.setFontSize(16);
+      doc.setTextColor(0, 102, 204); // Azul (igual que "AMANIA")
+      doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' })
 
-doc.addImage(logoUrl, 'PNG', 10, 3, 30, 30);
-  
-     
-     // Función para pintar las secciones de la cruz
-const drawToothShape = (x: number, y: number, toothParts: any) => {
-  const size = 2;
-  const parts = [
-    { key: 'bucal', x: x + size, y: y, w: size, h: size },            // Arriba
-    { key: 'mesial', x: x, y: y + size, w: size, h: size },           // Izquierda
-    { key: 'oclusal', x: x + size, y: y + size, w: size, h: size },   // Centro
-    { key: 'distal', x: x + 2 * size, y: y + size, w: size, h: size },// Derecha
-    { key: 'lingualpalatino', x: x + size, y: y + 2 * size, w: size, h: size }, // Abajo
-  ];
+      doc.addImage(logoUrl, 'PNG', 10, 3, 30, 30);
 
-  parts.forEach((part) => {
-    const color = toothParts?.[part.key]?.color || '#FFFFFF';
-    doc.setFillColor(color);
-    doc.rect(part.x, part.y, part.w, part.h, 'FD'); // Pintar sección
-  });
-};
 
-// Función para dibujar una fila de dientes
-const drawTeethRow = (teeth: Diente[], treatmentsData: any, startY: number, startX: number) => {
-  let toothX = startX;
-  let toothY = startY + 30;
+      // Función para pintar las secciones de la cruz
+      const drawToothShape = (x: number, y: number, toothParts: any) => {
+        const size = 2;
+        const parts = [
+          { key: 'bucal', x: x + size, y: y, w: size, h: size },            // Arriba
+          { key: 'distal', x: x, y: y + size, w: size, h: size },           // Izquierda
+          { key: 'oclusal', x: x + size, y: y + size, w: size, h: size },   // Centro
+          { key: 'mesial', x: x + 2 * size, y: y + size, w: size, h: size },// Derecha
+          { key: 'lingualpalatino', x: x + size, y: y + 2 * size, w: size, h: size }, // Abajo
+        ];
 
-  teeth.forEach((tooth) => {
-    if (toothX + toothWidth > pageWidth - startX) {
-      toothX = startX;
-      toothY += toothHeight + gap * 8;
-    }
+        parts.forEach((part) => {
+          const color = toothParts?.[part.key]?.color || '#FFFFFF';
+          doc.setFillColor(color);
+          doc.rect(part.x, part.y, part.w, part.h, 'FD'); // Pintar sección
+        });
+      };
 
-    // Dibujar número del diente
-    doc.setFontSize(8).text(`${tooth.pieza}`, toothX + toothWidth / 3, toothY - 2);
+      // Función para dibujar una fila de dientes
+      const drawTeethRow = (teeth: Diente[], treatmentsData: any, startY: number, startX: number) => {
+        let toothX = startX;
+        let toothY = startY + 30;
 
-    // Imagen del diente
-    const toothImage = dientesImages[`diente${tooth.pieza}` as DienteKeys];
-    if (toothImage) {
-      doc.addImage(toothImage, 'PNG', toothX, toothY, toothWidth, toothHeight);
-    }
+        teeth.forEach((tooth) => {
+          if (toothX + toothWidth > pageWidth - startX) {
+            toothX = startX;
+            toothY += toothHeight + gap * 8;
+          }
 
-    // Obtener tratamiento dinámico del backend
-    const toothParts = treatmentsData[tooth.pieza] || {};
-    drawToothShape(toothX + 1, toothY + toothHeight + 3, toothParts);
+          // Dibujar número del diente
+          doc.setFontSize(8).text(`${tooth.pieza}`, toothX + toothWidth / 3, toothY - 2);
 
-    toothX += toothWidth + gap;
-  });
-};
+          // Imagen del diente
+          const toothImage = dientesImages[`diente${tooth.pieza}` as DienteKeys];
+          if (toothImage) {
+            doc.addImage(toothImage, 'PNG', toothX, toothY, toothWidth, toothHeight);
+          }
 
-// Datos dinámicos de tratamientos desde el backend
-const treatmentsData = {};
-teeth?.forEach((tooth) => {
-  treatmentsData[tooth.pieza!] = {
-    bucal: { color: tooth.bucal.color },
-    mesial: { color: tooth.mesial.color },
-    distal: { color: tooth.distal.color },
-    lingualpalatino: { color: tooth.lingualpalatino.color },
-    oclusal: { color: tooth.oclusal.color },
-  };
-});
+          // Obtener tratamiento dinámico del backend
+          const toothParts = treatmentsData[tooth.pieza] || {};
+          drawToothShape(toothX + 1, toothY + toothHeight + 3, toothParts);
 
-// Definir dientes superiores e inferiores
-const upperTeeth = teeth!.filter((t: Diente) => parseInt(t.pieza!) < 31);
-const lowerTeeth = teeth!.filter(
-  (t: Diente) => parseInt(t.pieza!) >= 31 && parseInt(t.pieza!) < 51
-);
+          toothX += toothWidth + gap;
+        });
+      };
 
-// Calcular el área total de los dientes
-const totalWidth = upperTeeth.length * toothWidth + (upperTeeth.length - 1) * gap;
-const totalHeight = (toothHeight + gap * 3) * 2; // Dos filas de dientes
+      // Datos dinámicos de tratamientos desde el backend
+      const treatmentsData = {};
+      teeth?.forEach((tooth) => {
+        treatmentsData[tooth.pieza!] = {
+          bucal: { color: tooth.bucal.color },
+          mesial: { color: tooth.mesial.color },
+          distal: { color: tooth.distal.color },
+          lingualpalatino: { color: tooth.lingualpalatino.color },
+          oclusal: { color: tooth.oclusal.color },
+        };
+      });
 
-// Dibujar el rectángulo envolvente
-doc.setDrawColor(0); // Color del borde (negro)
-doc.setLineWidth(0.1); // Grosor del borde
-doc.rect(startX - 5, 60 - 5, totalWidth + 10, totalHeight + 10); // Rectángulo envolvente
+      // Definir dientes superiores e inferiores
+      const upperTeeth = teeth!.filter((t: Diente) => parseInt(t.pieza!) < 31);
+      const lowerTeeth = teeth!.filter(
+        (t: Diente) => parseInt(t.pieza!) >= 31 && parseInt(t.pieza!) < 51
+      );
 
-// Dibujar filas de dientes
-drawTeethRow(upperTeeth, treatmentsData, 30, startX);
-drawTeethRow(lowerTeeth, treatmentsData, 30 + toothHeight + gap * 4, startX);
+      // Calcular el área total de los dientes
+      const totalWidth = upperTeeth.length * toothWidth + (upperTeeth.length - 1) * gap;
+      const totalHeight = (toothHeight + gap * 3) * 2; // Dos filas de dientes
 
-  
-      // Guardar PDF
+      // Dibujar el rectángulo envolvente
+      doc.setDrawColor(0); // Color del borde (negro)
+      doc.setLineWidth(0.1); // Grosor del borde
+      doc.rect(startX - 5, 60 - 5, totalWidth + 10, totalHeight + 10); // Rectángulo envolvente
+
+      // Dibujar filas de dientes
+      drawTeethRow(upperTeeth, treatmentsData, 30, startX);
+      drawTeethRow(lowerTeeth, treatmentsData, 30 + toothHeight + gap * 4, startX);
+
+      const cellHeight1 = 8;
+      const totalRows = 40; // Total de filas para la tabla
+
+
+      currentY = 100;
+
+
+      currentY += cellHeight1 * 2;
+      // Título de la página
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(0, 0, 0)
+
+      currentY += cellHeight1 * 2;
+
+      // Dibujar tabla de EVOLUCIÓN
+      const headers = ['FECHA', 'DIENTE', 'EVOLUCIÓN'];
+      const columnWidths = [40, 30, 120];
+
+
+      // Agregar encabezado
+      doc.setFont('helvetica', 'bold');
+      headers.forEach((header, index) => {
+        doc.rect(startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0), currentY, columnWidths[index], 10);
+        doc.text(header, startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0) + 2, currentY + 7);
+      });
+      currentY += 10;
+
+      // Agregar filas dinámicas desde el estado `treatments`
+      treatments.forEach((treatment) => {
+        const values = [
+          new Date(treatment.fecha).toLocaleDateString(), // FECHA
+          `${treatment.pieza.diente} ${treatment.pieza.parte}`, // DIENTE
+          treatment.detalle, // EVOLUCIÓN
+        ];
+
+        values.forEach((value, index) => {
+          doc.rect(startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0), currentY, columnWidths[index], 10);
+          doc.text(value, startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0) + 2, currentY + 7);
+        });
+
+        currentY += 10;
+
+        // Agregar una nueva página si la tabla excede el límite de la página actual
+        if (currentY > 280) {
+          doc.addPage();
+          currentY = 20; // Reiniciar posición Y
+        }
+      });
+
       doc.save('ficha_dental.pdf');
 
     } catch (error) {
@@ -691,7 +739,7 @@ drawTeethRow(lowerTeeth, treatmentsData, 30 + toothHeight + gap * 4, startX);
                 >
                   Fecha de registro
                 </Typography>
-                
+
                 <Typography
                   style={{
                     color:
@@ -715,7 +763,7 @@ drawTeethRow(lowerTeeth, treatmentsData, 30 + toothHeight + gap * 4, startX);
                 >
                   Última modificación
                 </Typography>
-                
+
                 <Typography
                   style={{
                     color:
@@ -730,20 +778,20 @@ drawTeethRow(lowerTeeth, treatmentsData, 30 + toothHeight + gap * 4, startX);
                     (odontogram.profesionalModifica as Professional).apellPat}
                 </Typography>
               </Box>
-              
+
             </Grid>
           </Grid>
-          <div style={{  display: 'flex', justifyContent: 'flex-end' }}>
-                  <MuiButton
-                    variant="contained"
-                    color="primary" // Funciona correctamente con Material-UI
-                    onClick={generateDentistPDF}
-                  >
-                    Descargar PDF
-                  </MuiButton>
-                </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <MuiButton
+              variant="contained"
+              color="primary" // Funciona correctamente con Material-UI
+              onClick={generateDentistPDF}
+            >
+              Descargar PDF
+            </MuiButton>
+          </div>
         </Grid>
-       
+
         <Grid item xs={12} style={{ marginBottom: 15 }}>
           <MuiButton
             variant="contained"
