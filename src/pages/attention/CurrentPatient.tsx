@@ -23,6 +23,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import StatusBadge from '../../componemts/StatusBadge';
 import RecetaDetailsPage from '../receta/RecetaDetailsPage';
 import PatientRecord from '../clinicalrecord/PatientRecord';
+import HeaderBar from '../../componemts/HeaderBar';
 
 const CurrentPatient = () => {
   const [completed, setCompleted] = useState(false);
@@ -96,9 +97,7 @@ const CurrentPatient = () => {
             />
           </Grid>
           <Grid item xs={12}>
-            <Typography style={{ fontWeight: 'bold', fontSize: 20 }}>
-              Datos de paciente
-            </Typography>
+            <HeaderBar title="datos de paciente" />
           </Grid>
           {/* DATOS DEL PACIENTE */}
           <Grid item xs={12}>
@@ -152,9 +151,7 @@ const CurrentPatient = () => {
             <Divider />
           </Grid>
           <Grid item xs={12}>
-            <Typography style={{ fontWeight: 'bold', fontSize: 20 }}>
-              Datos de citación
-            </Typography>
+            <HeaderBar title="datos de citación" />
           </Grid>
           <Grid item xs={12}>
             <Grid container spacing={2}>
