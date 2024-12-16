@@ -4,6 +4,7 @@ import { Appointment } from '../../interfaces/Appointment';
 import {
   Button,
   ButtonGroup,
+  Card,
   Container,
   Dialog,
   DialogActions,
@@ -33,6 +34,7 @@ const CurrentPatient = () => {
   const appointment: Appointment = useLocation().state.appointment;
 
   const handleComplete = async () => {
+    setSubmitting(true);
     try {
       const response = await axios.patch(
         `${generalConfig.baseUrl}/appointments/${appointment._id}`,
@@ -43,9 +45,12 @@ const CurrentPatient = () => {
       if (response.data.message === 'success') {
         toast.success('Cita completada');
         setCompleted(true);
+        setSubmitting(false);
+        setAlert(false);
       }
     } catch (error) {
       toast.success('Cita no pudo ser completada.');
+      setSubmitting(false);
     }
   };
 
@@ -78,7 +83,7 @@ const CurrentPatient = () => {
                 variant="contained"
                 color="secondary"
                 onClick={() => setAlert(true)}
-                disabled={appointment.estado === 'COMPLETADO'}
+                disabled={completed}
               >
                 FINALIZAR CITA
               </Button>
@@ -186,9 +191,11 @@ const CurrentPatient = () => {
         </Grid>
       </Container>
       <Toaster />
-      <Modal open={recepitOpen} onClose={() => setReceipt(false)}>
-        <RecetaForm onSuccess={() => console.log('hola')} />
-      </Modal>
+      <Dialog open={recepitOpen} onClose={() => setReceipt(false)}>
+        <Card className="p-5">
+          <RecetaForm onSuccess={() => console.log('hola')} />
+        </Card>
+      </Dialog>
       <Dialog
         open={alertOpen}
         onClose={() => setAlert(false)}
@@ -213,7 +220,7 @@ const CurrentPatient = () => {
             onClick={handleComplete}
             autoFocus
             variant="contained"
-            disabled={isSubmitting}
+            disabled={isSubmitting || completed}
           >
             {isSubmitting && 'Finalizando cita'}
             {!isSubmitting && 'Finalizar Cita'}
