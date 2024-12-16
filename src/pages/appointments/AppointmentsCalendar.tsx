@@ -22,7 +22,12 @@ import DateDetails from './DateDetails';
 import { format } from 'date-fns';
 import DateHistory from './DateHistory';
 
-const AppointmentsCalendar = () => {
+interface Props {
+  proId?: string;
+  searchBar?: boolean;
+}
+
+const AppointmentsCalendar = ({ proId, searchBar = true }: Props) => {
   const { mode } = useThemeContext();
 
   const [showSlots, setSlots] = useState<TimeSlot[]>([]);
@@ -37,6 +42,12 @@ const AppointmentsCalendar = () => {
   >([]);
 
   const [professionalId, setProfessionalId] = useState('');
+
+  useEffect(() => {
+    if (proId) {
+      setProfessionalId(proId);
+    }
+  }, [proId]);
 
   const { data: scheduleData, isFetching } = useQuery({
     queryKey: ['scheduleData', refetch],
@@ -401,7 +412,7 @@ const AppointmentsCalendar = () => {
 
   return (
     <>
-      {professionals && (
+      {professionals && searchBar && (
         <FormControl fullWidth>
           <Typography
             style={{

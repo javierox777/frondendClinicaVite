@@ -28,6 +28,7 @@ import { ProfessionalSchedule } from '../../interfaces/ProfessionalSchedule';
 import toast, { Toaster } from 'react-hot-toast';
 import ScheduleForm from './ScheduleForm';
 import EditIcon from '@mui/icons-material/Edit';
+import AppointmentsCalendar from '../appointments/AppointmentsCalendar';
 
 const tableHeadings = [
   { id: 1, label: 'Fecha Inicio' },
@@ -248,6 +249,7 @@ const ScheduleTable = () => {
           handleSearch();
         }}
       />
+      <AppointmentsCalendar proId={professionalId} searchBar={false} />
     </>
   );
 };

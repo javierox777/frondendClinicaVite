@@ -41,21 +41,6 @@ const SchedulingPage = () => {
         <Grid item xs={12}>
           <ScheduleTable />
         </Grid>
-        <Grid item>
-          <Button
-            onClick={() => setCalendar(!showCalendar)}
-            variant="contained"
-            color="secondary"
-          >
-            <CalendarMonth />
-            {showCalendar ? 'Cerrar Calendario' : 'Abrir Calendario'}
-          </Button>
-        </Grid>
-        {showCalendar && (
-          <Grid item>
-            <AppointmentsCalendar />
-          </Grid>
-        )}
       </Grid>
     </>
   );
