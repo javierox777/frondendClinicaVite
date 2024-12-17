@@ -671,9 +671,9 @@ const Odontogramm = ({ odontogram }: Props) => {
         const size = 2;
         const parts = [
           { key: 'bucal', x: x + size, y: y, w: size, h: size }, // Arriba
-          { key: 'mesial', x: x, y: y + size, w: size, h: size }, // Izquierda
+          { key: 'distal', x: x, y: y + size, w: size, h: size }, // Izquierda
           { key: 'oclusal', x: x + size, y: y + size, w: size, h: size }, // Centro
-          { key: 'distal', x: x + 2 * size, y: y + size, w: size, h: size }, // Derecha
+          { key: 'mesial', x: x + 2 * size, y: y + size, w: size, h: size }, // Derecha
           {
             key: 'lingualpalatino',
             x: x + size,
@@ -735,7 +735,7 @@ const Odontogramm = ({ odontogram }: Props) => {
 
       // Datos dinámicos de tratamientos desde el backend
       const treatmentsData = {};
-      teeth?.forEach((tooth: any) => {
+      teeth?.forEach((tooth) => {
         treatmentsData[tooth.pieza!] = {
           bucal: { color: tooth.bucal.color },
           mesial: { color: tooth.mesial.color },
@@ -770,7 +770,73 @@ const Odontogramm = ({ odontogram }: Props) => {
         startX
       );
 
-      // Guardar PDF
+      const cellHeight1 = 8;
+      const totalRows = 40; // Total de filas para la tabla
+
+      currentY = 100;
+
+      currentY += cellHeight1 * 2;
+      // Título de la página
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(0, 0, 0);
+
+      currentY += cellHeight1 * 2;
+
+      // Dibujar tabla de EVOLUCIÓN
+      const headers = ['FECHA', 'DIENTE', 'EVOLUCIÓN'];
+      const columnWidths = [40, 30, 120];
+
+      // Agregar encabezado
+      doc.setFont('helvetica', 'bold');
+      headers.forEach((header, index) => {
+        doc.rect(
+          startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0),
+          currentY,
+          columnWidths[index],
+          10
+        );
+        doc.text(
+          header,
+          startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0) + 2,
+          currentY + 7
+        );
+      });
+      currentY += 10;
+
+      // Agregar filas dinámicas desde el estado `treatments`
+      treatments.forEach((treatment) => {
+        const values = [
+          new Date(treatment.fecha).toLocaleDateString(), // FECHA
+          `${treatment.pieza.diente} ${treatment.pieza.parte}`, // DIENTE
+          treatment.detalle, // EVOLUCIÓN
+        ];
+
+        values.forEach((value, index) => {
+          doc.rect(
+            startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0),
+            currentY,
+            columnWidths[index],
+            10
+          );
+          doc.text(
+            value,
+            startX +
+              columnWidths.slice(0, index).reduce((a, b) => a + b, 0) +
+              2,
+            currentY + 7
+          );
+        });
+
+        currentY += 10;
+
+        // Agregar una nueva página si la tabla excede el límite de la página actual
+        if (currentY > 280) {
+          doc.addPage();
+          currentY = 20; // Reiniciar posición Y
+        }
+      });
+
       doc.save('ficha_dental.pdf');
     } catch (error) {
       console.error('Error al generar el PDF:', error);

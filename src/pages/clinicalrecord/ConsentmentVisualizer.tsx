@@ -1,43 +1,104 @@
-import React from 'react';
-import { Consentment } from '../../interfaces/Consentment';
-import { ConsentmentDetail } from '../../interfaces/ConsentmentDetails';
-import { Delete } from '@mui/icons-material';
-import {
-  FormControl,
-  InputLabel,
-  Select,
-  SelectChangeEvent,
-  MenuItem,
-  Typography,
-  TextField,
-  TableContainer,
-  Paper,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Grid,
-  Table,
-  Button,
-  Container,
-  AppBar,
-  Toolbar,
-} from '@mui/material';
+import React, { forwardRef, useImperativeHandle } from "react";
+import { jsPDF } from "jspdf";
 
-import { Company } from '../../interfaces/Company';
-import { Person } from '../../interfaces/Person';
-import { Professional } from '../../interfaces/Professional';
-import { ShortModel } from '../../interfaces/ShortModel';
-import colors from '../../styles/colors';
-import { useThemeContext } from '../../componemts/themeContext';
-import { ConsentmentResponse } from './ConsentmentsTab';
+import { ConsentmentResponse } from "./ConsentmentsTab";
+import { Grid, Typography, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper, AppBar, Toolbar, Container } from "@mui/material";
+import colors from "../../styles/colors";
+import { useThemeContext } from "../../componemts/themeContext";
+import { Person } from "../../interfaces/Person";
+import { Professional } from "../../interfaces/Professional";
 
 interface Props {
   consentment: ConsentmentResponse | undefined;
 }
 
-const ConsentmentVisualizer = ({ consentment }: Props) => {
+const ConsentmentVisualizer = forwardRef(({ consentment }: Props, ref) => {
   const { mode } = useThemeContext();
+
+  // Exponer la función generatePDF al componente padre
+  useImperativeHandle(ref, () => ({
+    generatePDF,
+  }));
+
+  const generatePDF = () => {
+    if (!consentment) return;
+  
+    const { consentimiento, detalles } = consentment;
+    const doc = new jsPDF();
+  
+    // Título principal
+    doc.setFontSize(12);
+    doc.text("CONSENTIMIENTO INFORMADO", 105, 20, { align: "center" });
+  
+    let y = 30;
+    const startX = 20;
+    const columnWidths = [60, 60, 50]; // Anchos de columnas para la tabla
+  
+    // Dibujar encabezado de la tabla
+    doc.setFontSize(9);
+    doc.rect(startX, y, columnWidths[0], 10); // Diagnóstico
+    doc.rect(startX + columnWidths[0], y, columnWidths[1], 10); // Tratamiento
+    doc.rect(startX + columnWidths[0] + columnWidths[1], y, columnWidths[2], 10); // Complicaciones
+  
+    doc.text("DIAGNÓSTICO", startX + 2, y + 7);
+    doc.text("TRATAMIENTO", startX + columnWidths[0] + 2, y + 7);
+    doc.text("POSIBLES COMPLICACIONES", startX + columnWidths[0] + columnWidths[1] + 2, y + 7);
+  
+    y += 10;
+    doc.line(startX, y, startX + columnWidths[0] + columnWidths[1] + columnWidths[2], y); // Línea horizontal
+  
+    // Dibujar filas de la tabla
+    detalles.forEach((d) => {
+      const rowHeight = 10;
+  
+      doc.rect(startX, y, columnWidths[0], rowHeight);
+      doc.rect(startX + columnWidths[0], y, columnWidths[1], rowHeight);
+      doc.rect(startX + columnWidths[0] + columnWidths[1], y, columnWidths[2], rowHeight);
+  
+      doc.text(d.diagnostico || "", startX + 2, y + 7);
+      doc.text(d.tratamiento || "", startX + columnWidths[0] + 2, y + 7);
+      doc.text(d.posiblesComplicaciones || "", startX + columnWidths[0] + columnWidths[1] + 2, y + 7);
+  
+      y += rowHeight;
+    });
+  
+    y += 15; // Espacio después de la tabla
+    doc.setFontSize(10);
+  
+    // Texto alineado en una sola línea
+    const textLine = `Por medio del presente consentimiento, Yo ${(consentimiento.persona as Person).nombre1} ${(consentimiento.persona as Person).apellPat}, RUT: ${(consentimiento.persona as Person).rut || "N/A"}, en atención comenzada el día ${new Date(consentimiento.fechaRegistro).toLocaleDateString()}, con el/la profesional ${(consentimiento.profesional as Professional).nombre1} ${(consentimiento.profesional as Professional).apellPat}.`;
+  
+    // Dividir el texto largo en líneas controladas
+    const textLines = doc.splitTextToSize(textLine, 170); // Ajustar al ancho máximo
+    doc.text(textLines, startX, y);
+  
+    y += textLines.length * 5;
+  
+    // Texto adicional
+    const finalText =
+      "He sido informado acerca de mi diagnóstico, pronóstico y plan de tratamiento así como sus posibles complicaciones mencionadas en este documento.";
+    
+      const finalText1 =
+      "Por lo tanto, de forma consciente y voluntaria doy mi consentimiento y aprobación para que se realice el tratamiento teniendo pleno conocimiento de los posibles riesgos, complicaciones y beneficios que podría desprenderse de dicho acto.";
+  
+    const finalLines = doc.splitTextToSize(finalText,  170);
+    const finalLines1 = doc.splitTextToSize(finalText1,  170);
+    doc.text(finalLines,   startX, y);
+    doc.text(finalLines1,   startX, y + 10);
+  
+    y += finalLines.length * 5;
+  
+    // Firmas
+    doc.text("________________________", startX + 10, y + 25);
+    doc.text(`${(consentimiento.persona as Person).nombre1} ${(consentimiento.persona as Person).apellPat}`, startX + 10, y + 30);
+    // doc.text(" SU REPRESENTANTE", startX + 10, y + 35);
+    doc.text("________________________", startX + 90, y + 25);
+    doc.text(`${(consentimiento.profesional as Professional).nombre1} ${(consentimiento.profesional as Professional).apellPat}`, startX + 90, y + 30);
+  
+    // Guardar PDF
+    doc.save("consentimiento_informado.pdf");
+  };
+  
 
   if (!consentment)
     return (
@@ -46,8 +107,8 @@ const ConsentmentVisualizer = ({ consentment }: Props) => {
           <Grid item>
             <Typography
               style={{
-                fontWeight: 'lighter',
-                color: mode === 'light' ? colors.lightModeTableText : 'white',
+                fontWeight: "lighter",
+                color: mode === "light" ? colors.lightModeTableText : "white",
               }}
             >
               Selecciona consentimiento para ver más.
@@ -59,14 +120,12 @@ const ConsentmentVisualizer = ({ consentment }: Props) => {
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={6}></Grid>
-      <Grid item xs={6}></Grid>
       <Grid item xs={12}>
         <AppBar position="static">
           <Toolbar
             style={{
               backgroundColor:
-                mode === 'light'
+                mode === "light"
                   ? colors.lightModeHeaderColor
                   : colors.darkModeHeaderColor,
             }}
@@ -76,19 +135,18 @@ const ConsentmentVisualizer = ({ consentment }: Props) => {
         </AppBar>
       </Grid>
 
+      {/* Visualización Actual */}
       <Grid item xs={12}>
         <Typography variant="body1">
-          Por medio del presente consentimiento, Yo{' '}
-          {(consentment.consentimiento.persona as Person).nombre1}{' '}
-          {(consentment.consentimiento.persona as Person).nombre2}{' '}
-          {(consentment.consentimiento.persona as Person).apellPat}{' '}
-          {(consentment.consentimiento.persona as Person).apellMat}
+          Por medio del presente consentimiento, Yo{" "}
+          {(consentment.consentimiento.persona as Person).nombre1}{" "}
+          {(consentment.consentimiento.persona as Person).apellPat}
         </Typography>
       </Grid>
-      <Grid item xs={12}></Grid>
+
       <Grid item xs={6}>
         <Typography variant="body1">
-          En atención comenzada el día{' '}
+          En atención comenzada el día{" "}
           {new Date(
             consentment.consentimiento.fechaRegistro
           ).toLocaleDateString()}
@@ -96,60 +154,46 @@ const ConsentmentVisualizer = ({ consentment }: Props) => {
       </Grid>
       <Grid item xs={6}>
         <Typography variant="body1">
-          con el/ la profesional{' '}
-          {(consentment.consentimiento.profesional as Professional).nombre1}{' '}
-          {(consentment.consentimiento.profesional as Professional).nombre2}{' '}
-          {(consentment.consentimiento.profesional as Professional).apellPat}{' '}
-          {(consentment.consentimiento.profesional as Professional).apellMat}
+          con el/la profesional{" "}
+          {(consentment.consentimiento.profesional as Professional).nombre1}{" "}
+          {(consentment.consentimiento.profesional as Professional).apellPat}
         </Typography>
       </Grid>
-      <Grid item xs={6}></Grid>
-      <Grid item xs={6}></Grid>
+
       <Grid item xs={12}>
         <Typography variant="body1">
-          He sido informado a cerca de mi diagnóstico, pronóstico y plan de
+          He sido informado acerca de mi diagnóstico, pronóstico y plan de
           tratamiento así como sus posibles complicaciones mencionadas en este
           documento. Por lo tanto, de forma consciente y voluntaria doy mi
-          consentimiento y aprobación para que se realice el tratamiento
-          teniendo pleno conocimiento de los posibles riesgos, complicaciones y
-          beneficios que podría desprenderse de dicho acto.
+          consentimiento y aprobación para que se realice el tratamiento.
         </Typography>
       </Grid>
-      <Grid item xs={12}></Grid>
+
+      {/* Tabla */}
       <Grid item xs={12}>
         <TableContainer component={Paper}>
           <Table>
-            <TableHead
-              style={{
-                backgroundColor:
-                  mode === 'light'
-                    ? colors.lightModeTableHead
-                    : colors.darkModeTableHead,
-              }}
-            >
+            <TableHead>
               <TableRow>
                 <TableCell>Diagnóstico</TableCell>
                 <TableCell>Tratamiento</TableCell>
                 <TableCell>Complicaciones</TableCell>
-                <TableCell></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {consentment.detalles.map((d: ConsentmentDetail) => {
-                return (
-                  <TableRow key={d._id}>
-                    <TableCell>{d.diagnostico}</TableCell>
-                    <TableCell>{d.tratamiento}</TableCell>
-                    <TableCell>{d.posiblesComplicaciones}</TableCell>
-                  </TableRow>
-                );
-              })}
+              {consentment.detalles.map((d) => (
+                <TableRow key={d._id}>
+                  <TableCell>{d.diagnostico}</TableCell>
+                  <TableCell>{d.tratamiento}</TableCell>
+                  <TableCell>{d.posiblesComplicaciones}</TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </TableContainer>
       </Grid>
     </Grid>
   );
-};
+});
 
 export default ConsentmentVisualizer;
