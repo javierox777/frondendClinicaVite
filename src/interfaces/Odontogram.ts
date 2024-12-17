@@ -12,6 +12,7 @@ export interface ITreatment {
         diente:string;
         parte:string;
     }
+    observacion:string
 }
 
 

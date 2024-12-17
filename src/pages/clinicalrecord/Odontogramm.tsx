@@ -24,9 +24,6 @@ import { Diente } from '../../interfaces/Diente';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 
-
-
-
 import diente11 from '../../assets/dientes/diente_11.png';
 import diente12 from '../../assets/dientes/diente_12.png';
 import diente13 from '../../assets/dientes/diente_13.png';
@@ -91,6 +88,7 @@ import { useThemeContext } from '../../componemts/themeContext';
 import toast, { Toaster } from 'react-hot-toast';
 import axios from 'axios';
 import { generalConfig } from '../../config';
+import TreatmentForm from './TreatmentForm';
 
 interface Person {
   _id: string;
@@ -209,13 +207,15 @@ interface Props {
   odontogram: OdontogramInterface | undefined;
 }
 
-
 const Odontogramm = ({ odontogram }: Props) => {
   const [treatments, setTreatments] = useState<ITreatment[]>([]);
   const { user } = useUser();
   const { mode } = useThemeContext();
 
   const [odontogramLoading, setLoading] = useState(true);
+
+  const [treatmentForm, setTreatmentForm] = useState(false);
+  const [treatmentToEdit, setEditTreatment] = useState<ITreatment>();
 
   const [isSubmitting, setSubmitting] = useState(false);
 
@@ -275,6 +275,7 @@ const Odontogramm = ({ odontogram }: Props) => {
             parte: part,
           },
           _id: (Math.random() * 1000).toString(),
+          observacion: 'sin novedad',
         },
       ]);
     }
@@ -300,7 +301,6 @@ const Odontogramm = ({ odontogram }: Props) => {
       const treatmentsWithoutId = treatments.map(({ _id, ...rest }) => rest);
 
       const response = await axios.patch(
-
         `${generalConfig.baseUrl}/odontogramas/${odontogram?._id}`,
 
         {
@@ -309,7 +309,7 @@ const Odontogramm = ({ odontogram }: Props) => {
           dientes: teeth,
         }
       );
-      console.log("id de odontograma", odontogram?.persona)
+      console.log('id de odontograma', odontogram?.persona);
 
       if (response.data.message === 'success') {
         toast.success('Cambios guardados.');
@@ -322,7 +322,6 @@ const Odontogramm = ({ odontogram }: Props) => {
     }
   };
 
-
   const calculateAge = (fechaNac: string): number => {
     const today = new Date();
     const birthDate = new Date(fechaNac);
@@ -331,7 +330,10 @@ const Odontogramm = ({ odontogram }: Props) => {
 
     // Verificar si el cumpleaños ya ocurrió este año
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
       age--;
     }
 
@@ -371,15 +373,14 @@ const Odontogramm = ({ odontogram }: Props) => {
       const startX = 10;
       let currentY = 50;
 
-
       // Sección Forma de ingreso y convenio
       doc.rect(startX, currentY, 190, cellHeight * 3);
-      doc.line(startX + 95, currentY, startX + 95, currentY + cellHeight)
+      doc.line(startX + 95, currentY, startX + 95, currentY + cellHeight);
       doc.text('FORMA DE INGRESO A LA CONSULTA:', startX + 2, currentY + 5);
 
       // Primera columna: 1 y 2
-      doc.rect(startX, currentY, 190, cellHeight)
-      doc.text('1.- Volante', startX + 2, currentY + 14,);
+      doc.rect(startX, currentY, 190, cellHeight);
+      doc.text('1.- Volante', startX + 2, currentY + 14);
       doc.rect(startX, currentY + 8, 45, cellHeight);
       doc.rect(startX + 45, currentY + 8, 50, cellHeight); // Rectángulo para Volante
       doc.text('2.- Radio', startX + 2, currentY + 22);
@@ -394,8 +395,6 @@ const Odontogramm = ({ odontogram }: Props) => {
       doc.text('4.- Casualidad/Otro', startX + 97, currentY + 22);
       doc.rect(startX + 140, currentY + 16, 50, cellHeight); // R
 
-
-
       // Salto de línea
       currentY += cellHeight;
 
@@ -407,7 +406,12 @@ const Odontogramm = ({ odontogram }: Props) => {
       // Fila 1: APELLIDO PATERNO, APELLIDO MATERNO, NOMBRES
       doc.rect(startX, currentY, 190, cellHeight); // Encabezado
       doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight); // Línea entre APELLIDO PATERNO y APELLIDO MATERNO
-      doc.line(startX + 126.66, currentY, startX + 126.66, currentY + cellHeight); // Línea entre APELLIDO MATERNO y NOMBRES
+      doc.line(
+        startX + 126.66,
+        currentY,
+        startX + 126.66,
+        currentY + cellHeight
+      ); // Línea entre APELLIDO MATERNO y NOMBRES
       doc.text('APELLIDO PATERNO', startX + 2, currentY + 5);
       doc.text('APELLIDO MATERNO', startX + 65, currentY + 5);
       doc.text('NOMBRES', startX + 130, currentY + 5);
@@ -415,20 +419,44 @@ const Odontogramm = ({ odontogram }: Props) => {
 
       doc.rect(startX, currentY, 190, cellHeight); // Valores
       doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight); // Línea entre APELLIDO PATERNO y APELLIDO MATERNO
-      doc.line(startX + 126.66, currentY, startX + 126.66, currentY + cellHeight); // Línea entre APELLIDO MATERNO y NOMBRES
+      doc.line(
+        startX + 126.66,
+        currentY,
+        startX + 126.66,
+        currentY + cellHeight
+      ); // Línea entre APELLIDO MATERNO y NOMBRES
       doc.text(`${persona.apellPat}`, startX + 2, currentY + 5);
       doc.text(`${persona.apellMat}`, startX + 65, currentY + 5);
-      doc.text(`${persona.nombre1} ${persona.nombre2}`, startX + 130, currentY + 5);
+      doc.text(
+        `${persona.nombre1} ${persona.nombre2}`,
+        startX + 130,
+        currentY + 5
+      );
       currentY += cellHeight;
 
       // Fila 2: RUT, EDAD, SEXO, FECHA DE NACIMIENTO
       doc.rect(startX, currentY, 190, cellHeight); // Encabezado
       doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight); // Línea entre RUT y EDAD
-      doc.line(startX + 126.66, currentY, startX + 126.66, currentY + cellHeight); // Línea entre EDAD y SEXO
+      doc.line(
+        startX + 126.66,
+        currentY,
+        startX + 126.66,
+        currentY + cellHeight
+      ); // Línea entre EDAD y SEXO
       doc.text('RUT', startX + 2, currentY + 5);
-      doc.line(startX + 94.995, currentY, startX + 94.995, currentY + cellHeight)
+      doc.line(
+        startX + 94.995,
+        currentY,
+        startX + 94.995,
+        currentY + cellHeight
+      );
       doc.text('EDAD', startX + 65, currentY + 5);
-      doc.line(startX + 198.395, currentY, startX + 198.395, currentY + cellHeight)
+      doc.line(
+        startX + 198.395,
+        currentY,
+        startX + 198.395,
+        currentY + cellHeight
+      );
       doc.text('SEXO', startX + 96, currentY + 5);
 
       doc.text('FECHA DE NACIMIENTO', startX + 130, currentY + 5);
@@ -436,14 +464,23 @@ const Odontogramm = ({ odontogram }: Props) => {
 
       doc.rect(startX, currentY, 190, cellHeight); // Valores
       doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight); // Línea entre RUT y EDAD
-      doc.line(startX + 126.66, currentY, startX + 126.66, currentY + cellHeight); // Línea entre EDAD y SEXO
+      doc.line(
+        startX + 126.66,
+        currentY,
+        startX + 126.66,
+        currentY + cellHeight
+      ); // Línea entre EDAD y SEXO
       doc.text(`${rutCompleto}`, startX + 2, currentY + 5);
-      doc.line(startX + 94.995, currentY, startX + 94.995, currentY + cellHeight)
+      doc.line(
+        startX + 94.995,
+        currentY,
+        startX + 94.995,
+        currentY + cellHeight
+      );
       doc.text(`${edad} años`, startX + 65, currentY + 5);
       doc.text(`${'Hombre'}`, startX + 96, currentY + 5);
       doc.text(`${fechaNacimiento}`, startX + 130, currentY + 5);
       currentY += cellHeight;
-
 
       // Fila 3: DIRECCIÓN
       doc.rect(startX, currentY, 190, cellHeight); // Dirección
@@ -456,26 +493,22 @@ const Odontogramm = ({ odontogram }: Props) => {
       doc.text('FONO:', startX + 2, currentY + 7);
       doc.text('', startX + 20, currentY + 7);
 
-
-
-
       currentY += cellHeight * 2;
 
       // Salto de línea
-
-
 
       // Motivo de consulta
       doc.rect(startX, currentY, 190, cellHeight);
       doc.text('MOTIVO DE CONSULTA:', startX + 2, currentY + 7);
       currentY += cellHeight;
       doc.rect(startX, currentY, 190, cellHeight);
-      doc.text('EVALUACION Y TRATAMIENTO DE ORTODONCIA', startX + 2, currentY + 7);
-
-
+      doc.text(
+        'EVALUACION Y TRATAMIENTO DE ORTODONCIA',
+        startX + 2,
+        currentY + 7
+      );
 
       currentY += cellHeight * 2;
-
 
       // Motivo de consulta
       doc.rect(startX, currentY, 190, cellHeight);
@@ -489,20 +522,39 @@ const Odontogramm = ({ odontogram }: Props) => {
       currentY += cellHeight;
       // Salto de línea
 
-
       // Antecedentes personales
-      doc.line(startX + 94.995, currentY, startX + 94.995, currentY + cellHeight * 3.3)
+      doc.line(
+        startX + 94.995,
+        currentY,
+        startX + 94.995,
+        currentY + cellHeight * 3.3
+      );
       doc.rect(startX, currentY, 190, cellHeight * 3.3);
-      doc.text('Alergias:               SI    NO    ', startX + 2, currentY + 8);
+      doc.text(
+        'Alergias:               SI    NO    ',
+        startX + 2,
+        currentY + 8
+      );
       doc.line(startX, currentY + 10, startX + 190, currentY + 10);
-      doc.text('FRECUENCUA DE CEPILLADO:    SI    NO   ', startX + 102, currentY + 8);
+      doc.text(
+        'FRECUENCUA DE CEPILLADO:    SI    NO   ',
+        startX + 102,
+        currentY + 8
+      );
       currentY += cellHeight;
       doc.text('Hemorragias:       SI    NO   ', startX + 2, currentY + 8);
       doc.line(startX, currentY + 10, startX + 190, currentY + 10);
-      doc.text("CEDA DENTAL:                               SI    NO   ", startX + 102, currentY + 8);
+      doc.text(
+        'CEDA DENTAL:                               SI    NO   ',
+        startX + 102,
+        currentY + 8
+      );
       currentY += cellHeight;
-      doc.text('ENGUAGUE BUCAL:                       SI    NO   ', startX + 102, currentY + 8);
-
+      doc.text(
+        'ENGUAGUE BUCAL:                       SI    NO   ',
+        startX + 102,
+        currentY + 8
+      );
 
       currentY += cellHeight * 3;
 
@@ -511,9 +563,24 @@ const Odontogramm = ({ odontogram }: Props) => {
       doc.rect(startX, currentY, 90, cellHeight * 4);
       doc.text('HÁBITOS ORALES', startX + 2, currentY + 7);
       doc.line(startX, currentY + 8, startX + 90, currentY + 9);
-      doc.line(startX + 50, currentY + 9, startX + 50, currentY + cellHeight * 4)
-      doc.line(startX + 70, currentY + 9, startX + 70, currentY + cellHeight * 4)
-      doc.line(startX + 90, currentY + 9, startX + 90, currentY + cellHeight * 4)
+      doc.line(
+        startX + 50,
+        currentY + 9,
+        startX + 50,
+        currentY + cellHeight * 4
+      );
+      doc.line(
+        startX + 70,
+        currentY + 9,
+        startX + 70,
+        currentY + cellHeight * 4
+      );
+      doc.line(
+        startX + 90,
+        currentY + 9,
+        startX + 90,
+        currentY + cellHeight * 4
+      );
       doc.text('BRUXISMO:', startX + 2, currentY + 14);
       doc.text('SI', startX + 58, currentY + 14);
       doc.text('NO', startX + 78, currentY + 14);
@@ -535,9 +602,24 @@ const Odontogramm = ({ odontogram }: Props) => {
       doc.line(startX + 100, currentY + 9, startX + 190, currentY + 9);
 
       // Líneas verticales para dividir las columnas
-      doc.line(startX + 150, currentY + 9, startX + 150, currentY + cellHeight * 4); // Primera línea vertical
-      doc.line(startX + 170, currentY + 9, startX + 170, currentY + cellHeight * 4); // Segunda línea vertical
-      doc.line(startX + 190, currentY + 9, startX + 190, currentY + cellHeight * 4); // Borde derecho
+      doc.line(
+        startX + 150,
+        currentY + 9,
+        startX + 150,
+        currentY + cellHeight * 4
+      ); // Primera línea vertical
+      doc.line(
+        startX + 170,
+        currentY + 9,
+        startX + 170,
+        currentY + cellHeight * 4
+      ); // Segunda línea vertical
+      doc.line(
+        startX + 190,
+        currentY + 9,
+        startX + 190,
+        currentY + cellHeight * 4
+      ); // Borde derecho
 
       // Primera fila de contenido
       doc.text('ATM:', startX + 102, currentY + 14);
@@ -556,7 +638,6 @@ const Odontogramm = ({ odontogram }: Props) => {
       doc.text('SI', startX + 158, currentY + 28);
       doc.text('NO', startX + 178, currentY + 28);
 
-
       currentY += cellHeight * 4;
       doc.addPage();
 
@@ -566,113 +647,146 @@ const Odontogramm = ({ odontogram }: Props) => {
       const gap = 5;
       let toothX = startX;
       let toothY = 20;
-  
+
       // Encabezado
-     // Título "Clínica Dental" (color rosa)
-doc.setFontSize(18);
-doc.setTextColor(255, 105, 180); 
-doc.setFont('helvetica', 'bold');
-doc.text('Clínica Dental', pageWidth / 2 - 20, 20, { align: 'center' });
+      // Título "Clínica Dental" (color rosa)
+      doc.setFontSize(18);
+      doc.setTextColor(255, 105, 180);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Clínica Dental', pageWidth / 2 - 20, 20, { align: 'center' });
 
-// Título "AMANIA" (color azul)
-doc.setTextColor(0, 102, 204); // Azul (RGB: 0, 102, 204)
-doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
+      // Título "AMANIA" (color azul)
+      doc.setTextColor(0, 102, 204); // Azul (RGB: 0, 102, 204)
+      doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
 
-// Subtítulo "ODONTOGRAMA" (azul también)
-doc.setFontSize(16);
-doc.setTextColor(0, 102, 204); // Azul (igual que "AMANIA")
-doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' })
+      // Subtítulo "ODONTOGRAMA" (azul también)
+      doc.setFontSize(16);
+      doc.setTextColor(0, 102, 204); // Azul (igual que "AMANIA")
+      doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' });
 
-doc.addImage(logoUrl, 'PNG', 10, 3, 30, 30);
-  
-     
-     // Función para pintar las secciones de la cruz
-const drawToothShape = (x: number, y: number, toothParts: any) => {
-  const size = 2;
-  const parts = [
-    { key: 'bucal', x: x + size, y: y, w: size, h: size },            // Arriba
-    { key: 'mesial', x: x, y: y + size, w: size, h: size },           // Izquierda
-    { key: 'oclusal', x: x + size, y: y + size, w: size, h: size },   // Centro
-    { key: 'distal', x: x + 2 * size, y: y + size, w: size, h: size },// Derecha
-    { key: 'lingualpalatino', x: x + size, y: y + 2 * size, w: size, h: size }, // Abajo
-  ];
+      doc.addImage(logoUrl, 'PNG', 10, 3, 30, 30);
 
-  parts.forEach((part) => {
-    const color = toothParts?.[part.key]?.color || '#FFFFFF';
-    doc.setFillColor(color);
-    doc.rect(part.x, part.y, part.w, part.h, 'FD'); // Pintar sección
-  });
-};
+      // Función para pintar las secciones de la cruz
+      const drawToothShape = (x: number, y: number, toothParts: any) => {
+        const size = 2;
+        const parts = [
+          { key: 'bucal', x: x + size, y: y, w: size, h: size }, // Arriba
+          { key: 'mesial', x: x, y: y + size, w: size, h: size }, // Izquierda
+          { key: 'oclusal', x: x + size, y: y + size, w: size, h: size }, // Centro
+          { key: 'distal', x: x + 2 * size, y: y + size, w: size, h: size }, // Derecha
+          {
+            key: 'lingualpalatino',
+            x: x + size,
+            y: y + 2 * size,
+            w: size,
+            h: size,
+          }, // Abajo
+        ];
 
-// Función para dibujar una fila de dientes
-const drawTeethRow = (teeth: Diente[], treatmentsData: any, startY: number, startX: number) => {
-  let toothX = startX;
-  let toothY = startY + 30;
+        parts.forEach((part) => {
+          const color = toothParts?.[part.key]?.color || '#FFFFFF';
+          doc.setFillColor(color);
+          doc.rect(part.x, part.y, part.w, part.h, 'FD'); // Pintar sección
+        });
+      };
 
-  teeth.forEach((tooth) => {
-    if (toothX + toothWidth > pageWidth - startX) {
-      toothX = startX;
-      toothY += toothHeight + gap * 8;
-    }
+      // Función para dibujar una fila de dientes
+      const drawTeethRow = (
+        teeth: Diente[],
+        treatmentsData: any,
+        startY: number,
+        startX: number
+      ) => {
+        let toothX = startX;
+        let toothY = startY + 30;
 
-    // Dibujar número del diente
-    doc.setFontSize(8).text(`${tooth.pieza}`, toothX + toothWidth / 3, toothY - 2);
+        teeth.forEach((tooth) => {
+          if (toothX + toothWidth > pageWidth - startX) {
+            toothX = startX;
+            toothY += toothHeight + gap * 8;
+          }
 
-    // Imagen del diente
-    const toothImage = dientesImages[`diente${tooth.pieza}` as DienteKeys];
-    if (toothImage) {
-      doc.addImage(toothImage, 'PNG', toothX, toothY, toothWidth, toothHeight);
-    }
+          // Dibujar número del diente
+          doc
+            .setFontSize(8)
+            .text(`${tooth.pieza}`, toothX + toothWidth / 3, toothY - 2);
 
-    // Obtener tratamiento dinámico del backend
-    const toothParts = treatmentsData[tooth.pieza] || {};
-    drawToothShape(toothX + 1, toothY + toothHeight + 3, toothParts);
+          // Imagen del diente
+          const toothImage =
+            dientesImages[`diente${tooth.pieza}` as DienteKeys];
+          if (toothImage) {
+            doc.addImage(
+              toothImage,
+              'PNG',
+              toothX,
+              toothY,
+              toothWidth,
+              toothHeight
+            );
+          }
 
-    toothX += toothWidth + gap;
-  });
-};
+          // Obtener tratamiento dinámico del backend
+          const toothParts = treatmentsData[tooth.pieza] || {};
+          drawToothShape(toothX + 1, toothY + toothHeight + 3, toothParts);
 
-// Datos dinámicos de tratamientos desde el backend
-const treatmentsData = {};
-teeth?.forEach((tooth) => {
-  treatmentsData[tooth.pieza!] = {
-    bucal: { color: tooth.bucal.color },
-    mesial: { color: tooth.mesial.color },
-    distal: { color: tooth.distal.color },
-    lingualpalatino: { color: tooth.lingualpalatino.color },
-    oclusal: { color: tooth.oclusal.color },
-  };
-});
+          toothX += toothWidth + gap;
+        });
+      };
 
-// Definir dientes superiores e inferiores
-const upperTeeth = teeth!.filter((t: Diente) => parseInt(t.pieza!) < 31);
-const lowerTeeth = teeth!.filter(
-  (t: Diente) => parseInt(t.pieza!) >= 31 && parseInt(t.pieza!) < 51
-);
+      // Datos dinámicos de tratamientos desde el backend
+      const treatmentsData = {};
+      teeth?.forEach((tooth: any) => {
+        treatmentsData[tooth.pieza!] = {
+          bucal: { color: tooth.bucal.color },
+          mesial: { color: tooth.mesial.color },
+          distal: { color: tooth.distal.color },
+          lingualpalatino: { color: tooth.lingualpalatino.color },
+          oclusal: { color: tooth.oclusal.color },
+        };
+      });
 
-// Calcular el área total de los dientes
-const totalWidth = upperTeeth.length * toothWidth + (upperTeeth.length - 1) * gap;
-const totalHeight = (toothHeight + gap * 3) * 2; // Dos filas de dientes
+      // Definir dientes superiores e inferiores
+      const upperTeeth = teeth!.filter((t: Diente) => parseInt(t.pieza!) < 31);
+      const lowerTeeth = teeth!.filter(
+        (t: Diente) => parseInt(t.pieza!) >= 31 && parseInt(t.pieza!) < 51
+      );
 
-// Dibujar el rectángulo envolvente
-doc.setDrawColor(0); // Color del borde (negro)
-doc.setLineWidth(0.1); // Grosor del borde
-doc.rect(startX - 5, 60 - 5, totalWidth + 10, totalHeight + 10); // Rectángulo envolvente
+      // Calcular el área total de los dientes
+      const totalWidth =
+        upperTeeth.length * toothWidth + (upperTeeth.length - 1) * gap;
+      const totalHeight = (toothHeight + gap * 3) * 2; // Dos filas de dientes
 
-// Dibujar filas de dientes
-drawTeethRow(upperTeeth, treatmentsData, 30, startX);
-drawTeethRow(lowerTeeth, treatmentsData, 30 + toothHeight + gap * 4, startX);
+      // Dibujar el rectángulo envolvente
+      doc.setDrawColor(0); // Color del borde (negro)
+      doc.setLineWidth(0.1); // Grosor del borde
+      doc.rect(startX - 5, 60 - 5, totalWidth + 10, totalHeight + 10); // Rectángulo envolvente
 
-  
+      // Dibujar filas de dientes
+      drawTeethRow(upperTeeth, treatmentsData, 30, startX);
+      drawTeethRow(
+        lowerTeeth,
+        treatmentsData,
+        30 + toothHeight + gap * 4,
+        startX
+      );
+
       // Guardar PDF
       doc.save('ficha_dental.pdf');
-
     } catch (error) {
       console.error('Error al generar el PDF:', error);
     }
   };
 
+  const onChangeTreatment = (obs: string, id: string) => {
+    const updatedTreatments = [...treatments];
+    const index = treatments.findIndex((t: ITreatment) => t._id === id);
 
+    updatedTreatments[index].observacion = obs;
+
+    setTreatments(updatedTreatments);
+  };
+
+  console.log(treatments);
 
   return (
     <>
@@ -691,7 +805,7 @@ drawTeethRow(lowerTeeth, treatmentsData, 30 + toothHeight + gap * 4, startX);
                 >
                   Fecha de registro
                 </Typography>
-                
+
                 <Typography
                   style={{
                     color:
@@ -715,7 +829,7 @@ drawTeethRow(lowerTeeth, treatmentsData, 30 + toothHeight + gap * 4, startX);
                 >
                   Última modificación
                 </Typography>
-                
+
                 <Typography
                   style={{
                     color:
@@ -730,20 +844,19 @@ drawTeethRow(lowerTeeth, treatmentsData, 30 + toothHeight + gap * 4, startX);
                     (odontogram.profesionalModifica as Professional).apellPat}
                 </Typography>
               </Box>
-              
             </Grid>
           </Grid>
-          <div style={{  display: 'flex', justifyContent: 'flex-end' }}>
-                  <MuiButton
-                    variant="contained"
-                    color="primary" // Funciona correctamente con Material-UI
-                    onClick={generateDentistPDF}
-                  >
-                    Descargar PDF
-                  </MuiButton>
-                </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <MuiButton
+              variant="contained"
+              color="primary" // Funciona correctamente con Material-UI
+              onClick={generateDentistPDF}
+            >
+              Descargar PDF
+            </MuiButton>
+          </div>
         </Grid>
-       
+
         <Grid item xs={12} style={{ marginBottom: 15 }}>
           <MuiButton
             variant="contained"
@@ -1049,7 +1162,15 @@ drawTeethRow(lowerTeeth, treatmentsData, 30 + toothHeight + gap * 4, startX);
             </Toolbar>
           </AppBar>
         </Grid>
-        <Grid item xs={12} sm={12} md={12} lg={6} xl={6} className="border-t-2">
+        <Grid
+          item
+          xs={12}
+          sm={12}
+          md={12}
+          lg={12}
+          xl={12}
+          className="border-t-2"
+        >
           <TableContainer>
             <Table>
               <TableHead
@@ -1095,6 +1216,15 @@ drawTeethRow(lowerTeeth, treatmentsData, 30 + toothHeight + gap * 4, startX);
                         mode === 'light' ? colors.lightModeTableText : 'white',
                     }}
                   >
+                    Observación
+                  </TableCell>
+                  <TableCell
+                    style={{
+                      fontWeight: 'bold',
+                      color:
+                        mode === 'light' ? colors.lightModeTableText : 'white',
+                    }}
+                  >
                     Atención
                   </TableCell>
                   <TableCell
@@ -1121,6 +1251,21 @@ drawTeethRow(lowerTeeth, treatmentsData, 30 + toothHeight + gap * 4, startX);
                             {new Date(t.fecha).toLocaleDateString()}
                           </TableCell>
                           <TableCell>
+                            <Tooltip
+                              title={
+                                t.observacion ? t.observacion : 'sin novedad'
+                              }
+                            >
+                              <Typography>
+                                {t.observacion
+                                  ? t.observacion.length > 20
+                                    ? `${t.observacion.slice(0, 20)}...`
+                                    : t.observacion
+                                  : 'sin novedad'}
+                              </Typography>
+                            </Tooltip>
+                          </TableCell>
+                          <TableCell>
                             {(t.profesional as Professional).nombre1}{' '}
                             {(t.profesional as Professional).apellPat}
                           </TableCell>
@@ -1140,35 +1285,35 @@ drawTeethRow(lowerTeeth, treatmentsData, 30 + toothHeight + gap * 4, startX);
 
                                 updatedTeeth[toothIndex][
                                   t.pieza.parte as
-                                  | 'bucal'
-                                  | 'distal'
-                                  | 'oclusal'
-                                  | 'mesial'
-                                  | 'lingualpalatino'
+                                    | 'bucal'
+                                    | 'distal'
+                                    | 'oclusal'
+                                    | 'mesial'
+                                    | 'lingualpalatino'
                                 ].color = '#FFFFFF';
                                 updatedTeeth[toothIndex][
                                   t.pieza.parte as
-                                  | 'bucal'
-                                  | 'distal'
-                                  | 'oclusal'
-                                  | 'mesial'
-                                  | 'lingualpalatino'
+                                    | 'bucal'
+                                    | 'distal'
+                                    | 'oclusal'
+                                    | 'mesial'
+                                    | 'lingualpalatino'
                                 ].detalle = '';
                                 updatedTeeth[toothIndex][
                                   t.pieza.parte as
-                                  | 'bucal'
-                                  | 'distal'
-                                  | 'oclusal'
-                                  | 'mesial'
-                                  | 'lingualpalatino'
+                                    | 'bucal'
+                                    | 'distal'
+                                    | 'oclusal'
+                                    | 'mesial'
+                                    | 'lingualpalatino'
                                 ].diagnostico = '';
                                 updatedTeeth[toothIndex][
                                   t.pieza.parte as
-                                  | 'bucal'
-                                  | 'distal'
-                                  | 'oclusal'
-                                  | 'mesial'
-                                  | 'lingualpalatino'
+                                    | 'bucal'
+                                    | 'distal'
+                                    | 'oclusal'
+                                    | 'mesial'
+                                    | 'lingualpalatino'
                                 ].estado = '';
 
                                 setTeeth(updatedTeeth);
@@ -1176,6 +1321,16 @@ drawTeethRow(lowerTeeth, treatmentsData, 30 + toothHeight + gap * 4, startX);
                             >
                               <Delete />
                             </IconButton>
+                            <MuiButton
+                              color="primary"
+                              variant="contained"
+                              onClick={() => {
+                                setTreatmentForm(true);
+                                setEditTreatment(t);
+                              }}
+                            >
+                              Añadir observación
+                            </MuiButton>
                           </TableCell>
                         </TableRow>
                       );
@@ -1194,6 +1349,12 @@ drawTeethRow(lowerTeeth, treatmentsData, 30 + toothHeight + gap * 4, startX);
         </Grid>
       </Grid>
       <Toaster />
+      <TreatmentForm
+        open={treatmentForm}
+        onClose={() => setTreatmentForm(false)}
+        treatment={treatmentToEdit}
+        onSave={onChangeTreatment}
+      />
     </>
   );
 };
