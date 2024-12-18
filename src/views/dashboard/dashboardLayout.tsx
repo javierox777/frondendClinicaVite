@@ -21,6 +21,21 @@ import {
   FormControlLabel,
   ListItemButton,
 } from '@mui/material';
+import {
+  Dashboard,
+  AdminPanelSettings,
+  Group,
+  Engineering,
+  AttachMoney,
+  Event,
+  Schedule,
+  MedicalServices,
+  HealthAndSafety,
+  AssignmentTurnedIn,
+  FactCheck,
+} from '@mui/icons-material';
+
+
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
@@ -41,6 +56,7 @@ import {
   Receipt,
   RequestQuote,
 } from '@mui/icons-material';
+import PaletteIcon from '@mui/icons-material/Palette';
 
 import DescriptionIcon from '@mui/icons-material/Description';
 
@@ -78,6 +94,8 @@ import ConsentForm from '../../pages/consent/ConsentPage';
 import Administracion from '../../pages/admin/Admin';
 import colors from '../../styles/colors';
 
+import { Button } from '@mui/material';
+
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import ParticlesIcon from '@mui/icons-material/Cloud';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -85,6 +103,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
 
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import logo from '/logo.png';
 import { Grid } from 'rsuite';
 import { JwtPayload } from 'jwt-decode';
@@ -99,6 +118,10 @@ const DashboardLayout: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [particlesEnabled, setParticlesEnabled] = useState(true); // Estado para controlar las partículas
+  const [topbarColor, setTopbarColor] = useState('#1976D2'); // Color por defecto del Topbar
+  const [drawerColor, setDrawerColor] = useState('#424242'); // Color por defecto del Drawer
+  const colorPalette = ['#1976D2', '#FF5722', '#4CAF50', '#9C27B0', '#FFC107', '#607D8B']; // Paleta de colores
+
   const open = Boolean(anchorEl);
   const { user, setUser, loading } = useUser();
   const location = useLocation();
@@ -115,7 +138,10 @@ const DashboardLayout: React.FC = () => {
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen);
   };
-
+  const handleColorChange = (type: 'topbar' | 'drawer', color: string) => {
+    if (type === 'topbar') setTopbarColor(color);
+    else setDrawerColor(color);
+  };
   const restoreUser = async () => {
     const token = localStorage.getItem('token'); // Obtén el token de `localStorage`
     if (token) {
@@ -147,84 +173,42 @@ const DashboardLayout: React.FC = () => {
   }, []);
 
   const menuItems = [
-    {
-      id: 1,
-      label: 'Inicio',
-      icon: <HomeIcon />,
-      path: '/inicio',
-      roles: ['admin', 'user'],
-    },
-    {
-      id: 2,
-      label: 'Administración',
-      icon: <HomeIcon />,
-      path: '/administracion',
-      roles: ['admin'],
-    },
-    {
-      id: 3,
-      label: 'Pacientes',
-      icon: <AssignmentInd />,
-      path: '/pacientes',
-      roles: ['admin', 'user'],
-    },
-    {
-      id: 4,
-      label: 'Profesionales',
-      icon: <ContactEmergency />,
-      path: '/profesionales',
-      roles: ['admin'],
-    },
-    {
-      id: 5,
-      label: 'Presupuestos',
-      icon: <RequestQuote />,
-      path: '/presupuestos',
-      roles: ['admin', 'user'],
-    },
-    {
-      id: 6,
-      label: 'Agenda',
-      icon: <CalendarMonth />,
-      path: '/agenda',
-      roles: ['admin', 'user'],
-    },
-    {
-      id: 7,
-      label: 'Programación',
-      icon: <EditCalendar />,
-      path: '/programacion',
-      roles: ['admin'],
-    },
-    {
-      id: 8,
-      label: 'Receta',
-      icon: <RequestQuote />,
-      path: '/receta',
-      roles: ['admin', 'user'],
-    },
-    {
-      id: 9,
-      label: 'Módulo dental',
-      icon: <RequestQuote />,
-      path: '/modulodental',
-      roles: ['admin', 'user'],
-    },
-    {
-      id: 10,
-      label: 'Consentimiento',
-      icon: <DescriptionIcon />,
-      path: '/consentimiento',
-      roles: ['admin', 'user'],
-    },
-    {
-      id: 11,
-      label: 'Atención',
-      icon: <AssignmentLate />,
-      path: '/atencionhoy',
-      roles: ['admin', 'user'],
-    },
+    { id: 1, label: 'Inicio', icon: <Dashboard />, path: '/inicio', roles: ['admin', 'user'] },
+    { id: 2, label: 'Administración', icon: <AdminPanelSettings />, path: '/administracion', roles: ['admin'] },
+    { id: 3, label: 'Pacientes', icon: <Group />, path: '/pacientes', roles: ['admin', 'user'] },
+    { id: 4, label: 'Profesionales', icon: <Engineering />, path: '/profesionales', roles: ['admin'] },
+    { id: 5, label: 'Presupuestos', icon: <AttachMoney />, path: '/presupuestos', roles: ['admin', 'user'] },
+    { id: 6, label: 'Agenda', icon: <Event />, path: '/agenda', roles: ['admin', 'user'] },
+    { id: 7, label: 'Programación', icon: <Schedule />, path: '/programacion', roles: ['admin'] },
+    { id: 8, label: 'Receta', icon: <MedicalServices />, path: '/receta', roles: ['admin', 'user'] },
+    { id: 9, label: 'Módulo dental', icon: <HealthAndSafety />, path: '/modulodental', roles: ['admin', 'user'] },
+    { id: 10, label: 'Consentimiento', icon: <AssignmentTurnedIn />, path: '/consentimiento', roles: ['admin', 'user'] },
+    { id: 11, label: 'Atención', icon: <FactCheck />, path: '/atencionhoy', roles: ['admin', 'user'] },
   ];
+
+  // Mantén el estado para el anclaje del menú
+  const [anchorElTopbar, setAnchorElTopbar] = useState<null | HTMLElement>(null);
+  const [anchorElDrawer, setAnchorElDrawer] = useState<null | HTMLElement>(null);
+
+  // Manejar apertura y cierre del menú
+  const openTopbarMenu = Boolean(anchorElTopbar);
+  const openDrawerMenu = Boolean(anchorElDrawer);
+
+  const handleOpenTopbarMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElTopbar(event.currentTarget);
+  };
+
+  const handleCloseTopbarMenu = () => {
+    setAnchorElTopbar(null);
+  };
+
+  const handleOpenDrawerMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElDrawer(event.currentTarget);
+  };
+
+  const handleCloseDrawerMenu = () => {
+    setAnchorElDrawer(null);
+  };
   function isLoggedUser(
     user: LoggedUser | JwtPayload | null
   ): user is LoggedUser {
@@ -253,23 +237,26 @@ const DashboardLayout: React.FC = () => {
       <AppBar
         position="fixed"
         sx={{
-          zIndex: (theme: any) => theme.zIndex.drawer + 1,
-          backgroundColor:
-            mode === 'light'
-              ? colors.lightModeHeaderColor
-              : colors.darkModeHeaderColor,
+          backgroundColor: topbarColor,
+          zIndex: (theme) => theme.zIndex.drawer + 1,
         }}
       >
         <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ marginRight: 2, ...(drawerOpen && { display: 'none' }) }}
-          >
-            <MenuIcon />
-          </IconButton>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1, mr: 1 }}>
+            <IconButton
+              onClick={handleDrawerToggle}
+              sx={{
+                position: 'relative',
+                zIndex: 1301, // Asegura que quede sobre el AppBar
+                backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                },
+              }}
+            >
+              {drawerOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            </IconButton>
+          </Box>
 
           <img src={logo} style={{ width: '4%' }} alt="logo" />
 
@@ -364,24 +351,14 @@ const DashboardLayout: React.FC = () => {
       <Drawer
         variant="persistent"
         open={drawerOpen}
-        onClose={handleDrawerToggle}
-        ModalProps={{
-          keepMounted: true,
-        }}
         sx={{
-          width: drawerWidth,
-          flexShrink: 2,
           '& .MuiDrawer-paper': {
             width: drawerWidth,
-            boxSizing: 'border-box',
-            backgroundColor: `${
-              mode === 'light'
-                ? 'rgba(78, 163, 213, 0.8)' // Transparencia en modo claro
-                : 'rgba(0, 0, 0, 0.8)' // Transparencia en modo oscuro
-            }`, // Establecer el fondo del Drawer como transparente
+            backgroundColor: drawerColor,
           },
         }}
       >
+
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <Box
@@ -391,99 +368,119 @@ const DashboardLayout: React.FC = () => {
               padding: 1, // Espacio alrededor del botón
             }}
           >
-            <IconButton
-              onClick={handleDrawerToggle}
-              sx={{
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                borderRadius: '50%',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.5)',
-                },
-              }}
-            >
-              <ChevronLeftIcon />
-            </IconButton>
-          </Box>
 
-          <List>
-            {/* Menu items */}
-            {menuItems
-              .filter(
-                (item) => isLoggedUser(user) && item.roles.includes(user.role)
-              ) // Filtrar los elementos según el rol del usuario
-              .map((item) => (
-                <ListItemButton
-                  key={item.id}
-                  component={Link}
-                  to={item.path}
-                  style={{
-                    textDecoration: 'none',
-                    color: 'inherit',
-                    background:
-                      location.pathname === item.path
-                        ? 'rgba(255, 255, 255, 0.2)'
-                        : 'transparent', // Resaltar la pestaña seleccionada
-                  }}
-                >
-                  <ListItemIcon
-                    sx={{
-                      color:
+          </Box>
+          <Box sx={{ overflow: 'auto', marginTop: '50px' }}>
+            <List>
+              {/* Menu items */}
+              {menuItems
+                .filter((item) => isLoggedUser(user) && item.roles.includes(user.role))
+                .map((item) => (
+                  <ListItemButton
+                    key={item.id}
+                    component={Link}
+                    to={item.path}
+                    style={{
+                      textDecoration: 'none',
+                      color: 'inherit',
+                      background:
                         location.pathname === item.path
-                          ? 'primary.main'
-                          : 'inherit',
-                    }} // Cambiar el color del icono si está seleccionado
+                          ? 'rgba(255, 255, 255, 0.2)'
+                          : 'transparent',
+                    }}
                   >
-                    {item.icon}
-                  </ListItemIcon>
-                  <ListItemText primary={item.label} sx={{ color: 'white' }} />
-                </ListItemButton>
-              ))}
-            {/* Submenu */}
-            <Accordion sx={{ background: 'transparent', color: 'white' }}>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
-              >
-                <ListItemIcon sx={{ color: 'white' }}>
-                  <SettingsIcon />
-                </ListItemIcon>
-                <ListItemText
-                  primary="Configuraciones"
-                  sx={{ color: 'white' }}
-                />
-              </AccordionSummary>
-              <AccordionDetails sx={{ background: 'rgba(0, 0, 0, 0.2)' }}>
-                <List>
-                  {[
-                    'Sexo',
-                    'Atencion',
-                    'Ciudad',
-                    'Contacto',
-                    'Estado',
-                    'Mensaje',
-                    'Presupuesto',
-                    'Solicitario',
-                    'Direccion',
-                  ].map((text) => (
-                    <ListItem
-                      button
-                      key={text}
-                      component={Link}
-                      to={`/${text.toLowerCase()}`}
-                      sx={{ pl: 4, color: 'white' }}
-                      style={{
-                        background:
-                          location.pathname === `/${text.toLowerCase()}`
-                            ? 'rgba(255, 255, 255, 0.2)'
-                            : 'transparent', // Resaltar la pestaña seleccionada
+                    <ListItemIcon
+                      sx={{
+                        color:
+                          location.pathname === item.path ? 'primary.main' : 'inherit',
                       }}
                     >
-                      <ListItemText primary={text} />
-                    </ListItem>
-                  ))}
-                </List>
-              </AccordionDetails>
-            </Accordion>
-          </List>
+                      {item.icon}
+                    </ListItemIcon>
+                    <ListItemText primary={item.label} sx={{ color: 'white' }} />
+                  </ListItemButton>
+                ))}
+              {/* Submenu */}
+              <AccordionDetails sx={{ background: 'rgba(0, 0, 0, 0.2)' }}>
+  {/* Icono para seleccionar colores del Topbar */}
+  <Typography variant="subtitle1" sx={{ color: 'white', display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+    Colores del Topbar
+    <IconButton
+      onClick={handleOpenTopbarMenu}
+      sx={{ color: 'white' }}
+      aria-label="Seleccionar color del Topbar"
+    >
+      <PaletteIcon />
+    </IconButton>
+  </Typography>
+  <Menu
+    anchorEl={anchorElTopbar}
+    open={openTopbarMenu}
+    onClose={handleCloseTopbarMenu}
+  >
+    {colorPalette.map((color) => (
+      <MenuItem
+        key={color}
+        onClick={() => {
+          handleColorChange('topbar', color);
+          handleCloseTopbarMenu();
+        }}
+      >
+        <Box
+          sx={{
+            width: 24,
+            height: 24,
+            backgroundColor: color,
+            borderRadius: '50%',
+            marginRight: 1,
+          }}
+        />
+        {color}
+      </MenuItem>
+    ))}
+  </Menu>
+
+  {/* Icono para seleccionar colores del Drawer */}
+  <Typography variant="subtitle1" sx={{ color: 'white', display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
+    Colores del Drawer
+    <IconButton
+      onClick={handleOpenDrawerMenu}
+      sx={{ color: 'white' }}
+      aria-label="Seleccionar color del Drawer"
+    >
+      <PaletteIcon />
+    </IconButton>
+  </Typography>
+  <Menu
+    anchorEl={anchorElDrawer}
+    open={openDrawerMenu}
+    onClose={handleCloseDrawerMenu}
+  >
+    {colorPalette.map((color) => (
+      <MenuItem
+        key={color}
+        onClick={() => {
+          handleColorChange('drawer', color);
+          handleCloseDrawerMenu();
+        }}
+      >
+        <Box
+          sx={{
+            width: 24,
+            height: 24,
+            backgroundColor: color,
+            borderRadius: '50%',
+            marginRight: 1,
+          }}
+        />
+        {color}
+      </MenuItem>
+    ))}
+  </Menu>
+</AccordionDetails>
+
+            </List>
+          </Box>
           <Divider />
         </Box>
       </Drawer>
