@@ -168,10 +168,10 @@ const dientesImages: Record<DienteKeys, string> = {
 
 const items = [
   { title: 'Resetear parte', id: 0, color: '#FFFFFF' },
-  { title: 'Aparato Ortodontico Fijo', id: 1, color: '#FF4500' },
-  { title: 'Aparato Ortodontico Removible', id: 2, color: '#FF6347' },
+  { title: 'Aparato Ortodontico Fijo', id: 1, color: '#AB9ECD' },
+  { title: 'Aparato Ortodontico Removible', id: 2, color: '#FF5241' },
   { title: 'Caries', id: 3, color: '#FF0000' },
-  { title: 'Corona Definitiva', id: 4, color: '#FFD700' },
+  { title: 'Corona Definitiva', id: 4, color: 'rgb(255, 207, 54)' },
   { title: 'Corona Temporal', id: 5, color: '#FFA500' },
   { title: 'Desgaste Oclusal/Incisal', id: 6, color: '#808080' },
   { title: 'Diastema', id: 7, color: '#00CED1' },
@@ -863,7 +863,7 @@ if (getTreatment.title === 'Resetear parte') {
   console.log(treatments);
   const treatmentColorMap: Record<string, string> = {
     Caries: '#FF0000',
-    'Corona Definitiva': '#FFD700',
+    'Corona Definitiva': 'rgb(255, 207, 54)',
     'Corona Temporal': '#FFA500',
     Restauración: '#32CD32',
     Fractura: '#A52A2A',
@@ -871,8 +871,8 @@ if (getTreatment.title === 'Resetear parte') {
     'Protesis Fija': '#B8860B',
     'Protesis Removible': '#F4A460',
     'Protesis Total': '#FFDEAD',
-    'Aparato Ortodontico Fijo': '#FF4500',
-    'Aparato Ortodontico Removible': '#FF6347',
+    'Aparato Ortodontico Fijo': '#AB9ECD',
+    'Aparato Ortodontico Removible': '#FF5241',
     'Tratamiento Pulpar': '#FF6347',
     'Diente Ausente': '#000000',
     'Diente Discromico': '#8B4513',
