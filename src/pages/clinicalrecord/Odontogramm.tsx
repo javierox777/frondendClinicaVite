@@ -249,44 +249,44 @@ const Odontogramm = ({ odontogram }: Props) => {
 
     setTeeth(updatedTeeth);
 
-    const getTreatment = items.find((i) => i.id === treatment.selected);
+ const getTreatment = items.find((i) => i.id === treatment.selected);
 
-    if (getTreatment.title === 'Resetear parte') {
-      // Eliminar el tratamiento correspondiente a esta pieza y parte
-      const newTreatments = treatments.filter(
-        (t) => !(t.pieza.diente === tooth.pieza && t.pieza.parte === part)
-      );
-      setTreatments(newTreatments);
-    } else {
-      // Aquí mantienes la lógica existente de agregar un nuevo tratamiento
-      // Si no existe un tratamiento igual en el día de hoy
-      const today = new Date().toDateString();
-      const treatmentExists = treatments.some(
-        (t) =>
-          t.pieza.diente === tooth.pieza &&
-          t.pieza.parte === part &&
-          t.detalle === getTreatment.title &&
-          new Date(t.fecha).toDateString() === today
-      );
-    
-      if (!treatmentExists) {
-        setTreatments([
-          ...treatments,
-          {
-            detalle: getTreatment.title,
-            fecha: new Date(),
-            profesional: (user as User).profesionalId,
-            pieza: {
-              diente: tooth.pieza!,
-              parte: part,
-            },
-            _id: (Math.random() * 1000).toString(),
-            observacion: 'sin novedad',
-          },
-        ]);
-      }
-    }
-    
+if (getTreatment.title === 'Resetear parte') {
+  // Eliminar el tratamiento correspondiente a esta pieza y parte
+  const newTreatments = treatments.filter(
+    (t) => !(t.pieza.diente === tooth.pieza && t.pieza.parte === part)
+  );
+  setTreatments(newTreatments);
+} else {
+  // Aquí mantienes la lógica existente de agregar un nuevo tratamiento
+  // Si no existe un tratamiento igual en el día de hoy
+  const today = new Date().toDateString();
+  const treatmentExists = treatments.some(
+    (t) =>
+      t.pieza.diente === tooth.pieza &&
+      t.pieza.parte === part &&
+      t.detalle === getTreatment.title &&
+      new Date(t.fecha).toDateString() === today
+  );
+
+  if (!treatmentExists) {
+    setTreatments([
+      ...treatments,
+      {
+        detalle: getTreatment.title,
+        fecha: new Date(),
+        profesional: (user as User).profesionalId,
+        pieza: {
+          diente: tooth.pieza!,
+          parte: part,
+        },
+        _id: (Math.random() * 1000).toString(),
+        observacion: 'sin novedad',
+      },
+    ]);
+  }
+}
+
   };
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -1389,23 +1389,13 @@ const Odontogramm = ({ odontogram }: Props) => {
                 {treatmentsWithColor
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((t: ITreatment) => {
-                    const allTreatmentsForThisTooth = treatmentsWithColor.filter(tr => tr.pieza.diente === t.pieza.diente);
+                    const bucalColor = t.pieza.parte === 'bucal' ? t.pieza.bucal.color : '#FFFFFF';
+                    const distalColor = t.pieza.parte === 'distal' ? t.pieza.distal.color : '#FFFFFF';
+                    const oclusalColor = t.pieza.parte === 'oclusal' ? t.pieza.oclusal.color : '#FFFFFF';
+                    const mesialColor = t.pieza.parte === 'mesial' ? t.pieza.mesial.color : '#FFFFFF';
+                    const lingualColor = t.pieza.parte === 'lingualpalatino' ? t.pieza.lingualpalatino.color : '#FFFFFF';
+                
 
-
-                    const bucalTreatment = allTreatmentsForThisTooth.find(x => x.pieza.parte === 'bucal');
-                    const bucalColor = bucalTreatment ? bucalTreatment.pieza.bucal.color : '#FFFFFF';
-
-                    const distalTreatment = allTreatmentsForThisTooth.find(x => x.pieza.parte === 'distal');
-                    const distalColor = distalTreatment ? distalTreatment.pieza.distal.color : '#FFFFFF';
-
-                    const oclusalTreatment = allTreatmentsForThisTooth.find(x => x.pieza.parte === 'oclusal');
-                    const oclusalColor = oclusalTreatment ? oclusalTreatment.pieza.oclusal.color : '#FFFFFF';
-
-                    const mesialTreatment = allTreatmentsForThisTooth.find(x => x.pieza.parte === 'mesial');
-                    const mesialColor = mesialTreatment ? mesialTreatment.pieza.mesial.color : '#FFFFFF';
-
-                    const lingualTreatment = allTreatmentsForThisTooth.find(x => x.pieza.parte === 'lingualpalatino');
-                    const lingualColor = lingualTreatment ? lingualTreatment.pieza.lingualpalatino.color : '#FFFFFF';
 
 
                     return (
