@@ -172,13 +172,12 @@ const items = [
   { title: 'Aparato Ortodontico Removible', id: 2, color: '#FF5241' },
   { title: 'Caries', id: 3, color: '#FF0000' },
   { title: 'Corona Definitiva', id: 4, color: 'rgb(255, 207, 54)' },
-  { title: 'Corona Temporal', id: 5, color: '#FFA500' },
+  { title: 'Corona Provisoria', id: 5, color: 'rgb(255	151	41)' },
   { title: 'Desgaste Oclusal/Incisal', id: 6, color: '#808080' },
   { title: 'Diastema', id: 7, color: '#00CED1' },
   { title: 'Diente Ausente', id: 8, color: '#000000' },
   { title: 'Diente Discromico', id: 9, color: '#8B4513' },
   { title: 'Diente Ectopico', id: 10, color: '#4682B4' },
-  { title: 'Diente en Clavija', id: 11, color: '#9370DB' },
   { title: 'Diente Extruido', id: 12, color: '#FF69B4' },
   { title: 'Diente Intruido', id: 13, color: '#DB7093' },
   { title: 'Endentulo Total', id: 14, color: '#D3D3D3' },
@@ -190,10 +189,10 @@ const items = [
   { title: 'Microdoncia', id: 20, color: '#87CEEB' },
   { title: 'Migración', id: 21, color: '#6A5ACD' },
   { title: 'Movilidad', id: 22, color: '#FFB6C1' },
-  { title: 'Protesis Fija', id: 23, color: '#B8860B' },
-  { title: 'Protesis Removible', id: 24, color: '#F4A460' },
-  { title: 'Protesis Total', id: 25, color: '#FFDEAD' },
-  { title: 'Remanente Radicular', id: 26, color: '#2F4F4F' },
+  { title: 'Protesis Fija Plural', id: 23, color: '#B8860B' },
+  { title: 'Protesis Removible Parcial', id: 24, color: '#F4A460' },
+  { title: 'Protesis Removible Total', id: 25, color: '#FFDEAD' },
+  { title: 'Resto Radicular', id: 26, color: '#2F4F4F' },
   { title: 'Restauración', id: 27, color: '#32CD32' },
   { title: 'Restauración Temporal', id: 28, color: '#9ACD32' },
   { title: 'Semi Impactación', id: 29, color: '#B22222' },
@@ -201,6 +200,7 @@ const items = [
   { title: 'Tratamiento Pulpar', id: 31, color: '#FF6347' },
   { title: 'Giroversión', id: 32, color: '#B0E0E6' },
   { title: 'Transposición', id: 33, color: '#20B2AA' },
+  { title: 'Diente incluido', id: 34, color: 'rgb(177 ,	23,	32)' },
 ];
 
 interface Props {
@@ -864,10 +864,10 @@ if (getTreatment.title === 'Resetear parte') {
   const treatmentColorMap: Record<string, string> = {
     Caries: '#FF0000',
     'Corona Definitiva': 'rgb(255, 207, 54)',
-    'Corona Temporal': '#FFA500',
-    Restauración: '#32CD32',
-    Fractura: '#A52A2A',
-    Endodoncia: '#00CED1',
+    'Corona Provisoria': 'rgb(255	151	41)',
+    'Restauración': '#32CD32',
+    'Fractura': '#A52A2A',
+    'Endodoncia': '#00CED1',
     'Protesis Fija': '#B8860B',
     'Protesis Removible': '#F4A460',
     'Protesis Total': '#FFDEAD',
@@ -876,20 +876,28 @@ if (getTreatment.title === 'Resetear parte') {
     'Tratamiento Pulpar': '#FF6347',
     'Diente Ausente': '#000000',
     'Diente Discromico': '#8B4513',
-    Giroversión: '#B0E0E6',
-    Implante: '#2E8B57',
-    Migración: '#6A5ACD',
-    Movilidad: '#FFB6C1',
-    Microdoncia: '#87CEEB',
-    Macrodoncia: '#8FBC8F',
+    'Giroversión': '#B0E0E6',
+    'Implante': '#2E8B57',
+    'Migración': '#6A5ACD',
+    'Movilidad': '#FFB6C1',
+    'Microdoncia': '#87CEEB',
+    'Macrodoncia': '#8FBC8F',
     'Semi Impactación': '#B22222',
-    Supernumerario: '#FF8C00',
+    'Supernumerario': '#FF8C00',
     'Restauración Temporal': '#9ACD32',
     'Desgaste Oclusal/Incisal': '#808080',
-    Diastema: '#00CED1',
+    'Diastema': '#00CED1',
     'Geminación/Fusión': '#BA55D3',
-    Impactación: '#8B0000',
-    'Remanente Radicular': '#2F4F4F',
+    'Impactación': '#8B0000',
+    'Resto Radicular': '#2F4F4F',
+    'Diente incluido':'rgb(177,	23,	32)',
+    'Diente Extruido':'#FF69B4',
+    'Diente Intruido':'#DB7093',
+    'Endentulo Total':'#D3D3D3',
+    'Protesis Fija Plural':'#B8860B',
+    'Protesis Removible Parcial':'#F4A460',
+    'Protesis Removible Total':'#FFDEAD',
+    'Transposición':'#20B2AA' 
   };
 
   const treatmentsWithColor = treatments.map((t: ITreatment) => {
@@ -1040,7 +1048,7 @@ if (getTreatment.title === 'Resetear parte') {
                 >
                   <div
                     style={{ backgroundColor: item.color }}
-                    className="rounded-full w-2 h-2"
+                    className="rounded-full w-6 h-6 mr-2"
                   ></div>
                   <Typography
                     style={{ borderBottom: '1px solid #e1e3e3' }}
@@ -1440,12 +1448,12 @@ if (getTreatment.title === 'Resetear parte') {
                             <div
                               style={{
                                 display: 'grid',
-                                gridTemplateColumns: 'repeat(3, 10px)',
-                                gridTemplateRows: 'repeat(3, 10px)',
+                                gridTemplateColumns: 'repeat(3, 15px)',
+                                gridTemplateRows: 'repeat(3, 15px)',
                                 gap: '1px',
                                 width: '32px',
                                 height: '32px',
-                                border: '1px solid #ddd',
+                               
                               }}
                             >
                               {/* Bucal (arriba) */}
@@ -1454,7 +1462,7 @@ if (getTreatment.title === 'Resetear parte') {
                                   gridColumn: '2',
                                   gridRow: '1',
                                   backgroundColor: bucalColor,
-                                  border: '1px solid #ccc',
+                                  border: '2px solid #ccc',
                                 }}
                               ></div>
 
@@ -1464,7 +1472,7 @@ if (getTreatment.title === 'Resetear parte') {
                                   gridColumn: '1',
                                   gridRow: '2',
                                   backgroundColor: distalColor,
-                                  border: '1px solid #ccc',
+                                  border: '2px solid #ccc',
                                 }}
                               ></div>
 
@@ -1474,7 +1482,7 @@ if (getTreatment.title === 'Resetear parte') {
                                   gridColumn: '2',
                                   gridRow: '2',
                                   backgroundColor: oclusalColor,
-                                  border: '1px solid #ccc',
+                                  border: '2px solid #ccc',
                                 }}
                               ></div>
 
@@ -1484,7 +1492,7 @@ if (getTreatment.title === 'Resetear parte') {
                                   gridColumn: '3',
                                   gridRow: '2',
                                   backgroundColor: mesialColor,
-                                  border: '1px solid #ccc',
+                                  border: '2px solid #ccc',
                                 }}
                               ></div>
 
@@ -1494,7 +1502,7 @@ if (getTreatment.title === 'Resetear parte') {
                                   gridColumn: '2',
                                   gridRow: '3',
                                   backgroundColor: lingualColor,
-                                  border: '1px solid #ccc',
+                                  border: '2px solid #ccc',
                                 }}
                               ></div>
                             </div>
