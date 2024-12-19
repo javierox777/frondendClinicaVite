@@ -231,10 +231,10 @@ const Odontogramm = ({ odontogram }: Props) => {
   const [teeth, setTeeth] = useState<Diente[]>();
 
   useEffect(() => {
-    if (odontogram) {
-      setLoading(false);
+    if (odontogram && odontogram.dientes) {
       setTeeth(odontogram.dientes);
       setTreatments(odontogram.tratamientos);
+      setLoading(false);
     }
   }, [odontogram]);
 
