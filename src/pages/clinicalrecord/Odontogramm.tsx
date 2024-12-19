@@ -249,36 +249,44 @@ const Odontogramm = ({ odontogram }: Props) => {
 
     setTeeth(updatedTeeth);
 
-    const getTreatment = items.filter((i: any) => {
-      return i.id === treatment.selected;
-    })[0];
+    const getTreatment = items.find((i) => i.id === treatment.selected);
 
-    // Check if the treatment for this part of the tooth already exists on the same date
-    const today = new Date().toDateString();
-    const treatmentExists = treatments.some(
-      (t) =>
-        t.pieza.diente === tooth.pieza &&
-        t.pieza.parte === part &&
-        t.detalle === getTreatment.title &&
-        new Date(t.fecha).toDateString() === today // Comparing only the date, not the time
-    );
-
-    if (!treatmentExists && getTreatment.title !== 'Resetear parte') {
-      setTreatments([
-        ...treatments,
-        {
-          detalle: getTreatment.title,
-          fecha: new Date(),
-          profesional: (user as User).profesionalId,
-          pieza: {
-            diente: tooth.pieza!,
-            parte: part,
+    if (getTreatment.title === 'Resetear parte') {
+      // Eliminar el tratamiento correspondiente a esta pieza y parte
+      const newTreatments = treatments.filter(
+        (t) => !(t.pieza.diente === tooth.pieza && t.pieza.parte === part)
+      );
+      setTreatments(newTreatments);
+    } else {
+      // Aquí mantienes la lógica existente de agregar un nuevo tratamiento
+      // Si no existe un tratamiento igual en el día de hoy
+      const today = new Date().toDateString();
+      const treatmentExists = treatments.some(
+        (t) =>
+          t.pieza.diente === tooth.pieza &&
+          t.pieza.parte === part &&
+          t.detalle === getTreatment.title &&
+          new Date(t.fecha).toDateString() === today
+      );
+    
+      if (!treatmentExists) {
+        setTreatments([
+          ...treatments,
+          {
+            detalle: getTreatment.title,
+            fecha: new Date(),
+            profesional: (user as User).profesionalId,
+            pieza: {
+              diente: tooth.pieza!,
+              parte: part,
+            },
+            _id: (Math.random() * 1000).toString(),
+            observacion: 'sin novedad',
           },
-          _id: (Math.random() * 1000).toString(),
-          observacion: 'sin novedad',
-        },
-      ]);
+        ]);
+      }
     }
+    
   };
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -822,8 +830,8 @@ const Odontogramm = ({ odontogram }: Props) => {
           doc.text(
             value,
             startX +
-              columnWidths.slice(0, index).reduce((a, b) => a + b, 0) +
-              2,
+            columnWidths.slice(0, index).reduce((a, b) => a + b, 0) +
+            2,
             currentY + 7
           );
         });
@@ -853,6 +861,66 @@ const Odontogramm = ({ odontogram }: Props) => {
   };
 
   console.log(treatments);
+  const treatmentColorMap: Record<string, string> = {
+    Caries: '#FF0000',
+    'Corona Definitiva': '#FFD700',
+    'Corona Temporal': '#FFA500',
+    Restauración: '#32CD32',
+    Fractura: '#A52A2A',
+    Endodoncia: '#00CED1',
+    'Protesis Fija': '#B8860B',
+    'Protesis Removible': '#F4A460',
+    'Protesis Total': '#FFDEAD',
+    'Aparato Ortodontico Fijo': '#FF4500',
+    'Aparato Ortodontico Removible': '#FF6347',
+    'Tratamiento Pulpar': '#FF6347',
+    'Diente Ausente': '#000000',
+    'Diente Discromico': '#8B4513',
+    Giroversión: '#B0E0E6',
+    Implante: '#2E8B57',
+    Migración: '#6A5ACD',
+    Movilidad: '#FFB6C1',
+    Microdoncia: '#87CEEB',
+    Macrodoncia: '#8FBC8F',
+    'Semi Impactación': '#B22222',
+    Supernumerario: '#FF8C00',
+    'Restauración Temporal': '#9ACD32',
+    'Desgaste Oclusal/Incisal': '#808080',
+    Diastema: '#00CED1',
+    'Geminación/Fusión': '#BA55D3',
+    Impactación: '#8B0000',
+    'Remanente Radicular': '#2F4F4F',
+  };
+
+  const treatmentsWithColor = treatments.map((t: ITreatment) => {
+    const treatmentColor = treatmentColorMap[t.detalle] || '#FFFFFF';
+    return {
+      ...t,
+      pieza: {
+        ...t.pieza,
+        bucal:
+          t.pieza.parte === 'bucal'
+            ? { color: treatmentColor }
+            : { color: '#FFFFFF' },
+        distal:
+          t.pieza.parte === 'distal'
+            ? { color: treatmentColor }
+            : { color: '#FFFFFF' },
+        oclusal:
+          t.pieza.parte === 'oclusal'
+            ? { color: treatmentColor }
+            : { color: '#FFFFFF' },
+        mesial:
+          t.pieza.parte === 'mesial'
+            ? { color: treatmentColor }
+            : { color: '#FFFFFF' },
+        lingualpalatino:
+          t.pieza.parte === 'lingualpalatino'
+            ? { color: treatmentColor }
+            : { color: '#FFFFFF' },
+      },
+    };
+  });
 
   return (
     <>
@@ -1293,6 +1361,21 @@ const Odontogramm = ({ odontogram }: Props) => {
                   >
                     Atención
                   </TableCell>
+
+
+
+
+
+
+                  <TableCell
+                    style={{
+                      fontWeight: 'bold',
+                      color:
+                        mode === 'light' ? colors.lightModeTableText : 'white',
+                    }}
+                  >
+                    Detalle Tratamiento
+                  </TableCell>
                   <TableCell
                     style={{
                       fontWeight: 'bold',
@@ -1303,104 +1386,196 @@ const Odontogramm = ({ odontogram }: Props) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {treatments &&
-                  treatments
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((t: ITreatment) => {
-                      return (
-                        <TableRow key={t._id}>
-                          <TableCell>{t.detalle}</TableCell>
-                          <TableCell>
-                            {t.pieza.diente} {t.pieza.parte}
-                          </TableCell>
-                          <TableCell>
-                            {new Date(t.fecha).toLocaleDateString()}
-                          </TableCell>
-                          <TableCell>
-                            <Tooltip
-                              title={
-                                t.observacion ? t.observacion : 'sin novedad'
-                              }
-                            >
-                              <Typography>
-                                {t.observacion
-                                  ? t.observacion.length > 20
-                                    ? `${t.observacion.slice(0, 20)}...`
-                                    : t.observacion
-                                  : 'sin novedad'}
-                              </Typography>
-                            </Tooltip>
-                          </TableCell>
-                          <TableCell>
-                            {(t.profesional as Professional).nombre1}{' '}
-                            {(t.profesional as Professional).apellPat}
-                          </TableCell>
-                          <TableCell>
-                            <IconButton
-                              onClick={() => {
-                                const newTreatments = treatments.filter(
-                                  (tr: ITreatment) => t._id !== tr._id
-                                );
-                                setTreatments(newTreatments);
+                {treatmentsWithColor
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((t: ITreatment) => {
+                    const allTreatmentsForThisTooth = treatmentsWithColor.filter(tr => tr.pieza.diente === t.pieza.diente);
 
-                                const updatedTeeth = [...teeth!];
 
-                                const toothIndex = teeth!.findIndex(
-                                  (d: Diente) => d.pieza === t.pieza.diente
-                                );
+                    const bucalTreatment = allTreatmentsForThisTooth.find(x => x.pieza.parte === 'bucal');
+                    const bucalColor = bucalTreatment ? bucalTreatment.pieza.bucal.color : '#FFFFFF';
 
-                                updatedTeeth[toothIndex][
-                                  t.pieza.parte as
-                                    | 'bucal'
-                                    | 'distal'
-                                    | 'oclusal'
-                                    | 'mesial'
-                                    | 'lingualpalatino'
-                                ].color = '#FFFFFF';
-                                updatedTeeth[toothIndex][
-                                  t.pieza.parte as
-                                    | 'bucal'
-                                    | 'distal'
-                                    | 'oclusal'
-                                    | 'mesial'
-                                    | 'lingualpalatino'
-                                ].detalle = '';
-                                updatedTeeth[toothIndex][
-                                  t.pieza.parte as
-                                    | 'bucal'
-                                    | 'distal'
-                                    | 'oclusal'
-                                    | 'mesial'
-                                    | 'lingualpalatino'
-                                ].diagnostico = '';
-                                updatedTeeth[toothIndex][
-                                  t.pieza.parte as
-                                    | 'bucal'
-                                    | 'distal'
-                                    | 'oclusal'
-                                    | 'mesial'
-                                    | 'lingualpalatino'
-                                ].estado = '';
+                    const distalTreatment = allTreatmentsForThisTooth.find(x => x.pieza.parte === 'distal');
+                    const distalColor = distalTreatment ? distalTreatment.pieza.distal.color : '#FFFFFF';
 
-                                setTeeth(updatedTeeth);
+                    const oclusalTreatment = allTreatmentsForThisTooth.find(x => x.pieza.parte === 'oclusal');
+                    const oclusalColor = oclusalTreatment ? oclusalTreatment.pieza.oclusal.color : '#FFFFFF';
+
+                    const mesialTreatment = allTreatmentsForThisTooth.find(x => x.pieza.parte === 'mesial');
+                    const mesialColor = mesialTreatment ? mesialTreatment.pieza.mesial.color : '#FFFFFF';
+
+                    const lingualTreatment = allTreatmentsForThisTooth.find(x => x.pieza.parte === 'lingualpalatino');
+                    const lingualColor = lingualTreatment ? lingualTreatment.pieza.lingualpalatino.color : '#FFFFFF';
+
+
+                    return (
+                      <TableRow key={t._id}>
+                        <TableCell>{t.detalle}</TableCell>
+                        <TableCell>
+                          {t.pieza.diente} {t.pieza.parte}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(t.fecha).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <Tooltip
+                            title={
+                              t.observacion ? t.observacion : 'sin novedad'
+                            }
+                          >
+                            <Typography>
+                              {t.observacion
+                                ? t.observacion.length > 20
+                                  ? `${t.observacion.slice(0, 20)}...`
+                                  : t.observacion
+                                : 'sin novedad'}
+                            </Typography>
+                          </Tooltip>
+                        </TableCell>
+                        <TableCell>
+                          {(t.profesional as Professional).nombre1}{' '}
+                          {(t.profesional as Professional).apellPat}
+                        </TableCell>
+                        {/* pintar cruz */}
+                        <TableCell>
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            {/* Imagen del diente */}
+                            <img
+                              src={dientesImages[`diente${t.pieza.diente}` as DienteKeys]}
+                              alt={`Diente ${t.pieza.diente}`}
+                              style={{ height: '50px', marginRight: '10px' }}
+                            />
+
+                            {/* Cruz pintada */}
+                            <div
+                              style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(3, 10px)',
+                                gridTemplateRows: 'repeat(3, 10px)',
+                                gap: '1px',
+                                width: '32px',
+                                height: '32px',
+                                border: '1px solid #ddd',
                               }}
                             >
-                              <Delete />
-                            </IconButton>
-                            <MuiButton
-                              color="primary"
-                              variant="contained"
-                              onClick={() => {
-                                setTreatmentForm(true);
-                                setEditTreatment(t);
-                              }}
-                            >
-                              Añadir observación
-                            </MuiButton>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
+                              {/* Bucal (arriba) */}
+                              <div
+                                style={{
+                                  gridColumn: '2',
+                                  gridRow: '1',
+                                  backgroundColor: bucalColor,
+                                  border: '1px solid #ccc',
+                                }}
+                              ></div>
+
+                              {/* Distal (izquierda) */}
+                              <div
+                                style={{
+                                  gridColumn: '1',
+                                  gridRow: '2',
+                                  backgroundColor: distalColor,
+                                  border: '1px solid #ccc',
+                                }}
+                              ></div>
+
+                              {/* Oclusal (centro) */}
+                              <div
+                                style={{
+                                  gridColumn: '2',
+                                  gridRow: '2',
+                                  backgroundColor: oclusalColor,
+                                  border: '1px solid #ccc',
+                                }}
+                              ></div>
+
+                              {/* Mesial (derecha) */}
+                              <div
+                                style={{
+                                  gridColumn: '3',
+                                  gridRow: '2',
+                                  backgroundColor: mesialColor,
+                                  border: '1px solid #ccc',
+                                }}
+                              ></div>
+
+                              {/* Lingual/Palatino (abajo) */}
+                              <div
+                                style={{
+                                  gridColumn: '2',
+                                  gridRow: '3',
+                                  backgroundColor: lingualColor,
+                                  border: '1px solid #ccc',
+                                }}
+                              ></div>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <IconButton
+                            onClick={() => {
+                              const newTreatments = treatments.filter(
+                                (tr: ITreatment) => t._id !== tr._id
+                              );
+                              setTreatments(newTreatments);
+
+                              const updatedTeeth = [...teeth!];
+
+                              const toothIndex = teeth!.findIndex(
+                                (d: Diente) => d.pieza === t.pieza.diente
+                              );
+
+                              updatedTeeth[toothIndex][
+                                t.pieza.parte as
+                                | 'bucal'
+                                | 'distal'
+                                | 'oclusal'
+                                | 'mesial'
+                                | 'lingualpalatino'
+                              ].color = '#FFFFFF';
+                              updatedTeeth[toothIndex][
+                                t.pieza.parte as
+                                | 'bucal'
+                                | 'distal'
+                                | 'oclusal'
+                                | 'mesial'
+                                | 'lingualpalatino'
+                              ].detalle = '';
+                              updatedTeeth[toothIndex][
+                                t.pieza.parte as
+                                | 'bucal'
+                                | 'distal'
+                                | 'oclusal'
+                                | 'mesial'
+                                | 'lingualpalatino'
+                              ].diagnostico = '';
+                              updatedTeeth[toothIndex][
+                                t.pieza.parte as
+                                | 'bucal'
+                                | 'distal'
+                                | 'oclusal'
+                                | 'mesial'
+                                | 'lingualpalatino'
+                              ].estado = '';
+
+                              setTeeth(updatedTeeth);
+                            }}
+                          >
+                            <Delete />
+                          </IconButton>
+                          <MuiButton
+                            color="primary"
+                            variant="contained"
+                            onClick={() => {
+                              setTreatmentForm(true);
+                              setEditTreatment(t);
+                            }}
+                          >
+                            Añadir observación
+                          </MuiButton>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
               </TableBody>
             </Table>
             <TablePagination
