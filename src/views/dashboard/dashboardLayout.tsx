@@ -118,8 +118,13 @@ const DashboardLayout: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [particlesEnabled, setParticlesEnabled] = useState(true); // Estado para controlar las partículas
-  const [topbarColor, setTopbarColor] = useState('#1976D2'); // Color por defecto del Topbar
-  const [drawerColor, setDrawerColor] = useState('#424242'); // Color por defecto del Drawer
+  // Estados iniciales con gradientes
+// Cambia los estados iniciales:
+const [topbarColor, setTopbarColor] = useState('linear-gradient(to right, #9C27B0, #E91E63)');
+const [drawerColor, setDrawerColor] = useState('linear-gradient(to bottom, #E91E63, #9C27B0)');
+
+
+
   const colorPalette = ['#1976D2', '#FF5722', '#4CAF50', '#9C27B0', '#FFC107', '#607D8B']; // Paleta de colores
 
   const open = Boolean(anchorEl);
@@ -235,12 +240,12 @@ const DashboardLayout: React.FC = () => {
       {/* Renderiza las partículas solo si están habilitadas */}
       <CssBaseline />
       <AppBar
-        position="fixed"
-        sx={{
-          backgroundColor: topbarColor,
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-        }}
-      >
+  position="fixed"
+  sx={{
+    background: topbarColor,
+    zIndex: (theme) => theme.zIndex.drawer + 1,
+  }}
+>
         <Toolbar>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1, mr: 1 }}>
             <IconButton
@@ -349,15 +354,15 @@ const DashboardLayout: React.FC = () => {
         </Toolbar>
       </AppBar>
       <Drawer
-        variant="persistent"
-        open={drawerOpen}
-        sx={{
-          '& .MuiDrawer-paper': {
-            width: drawerWidth,
-            backgroundColor: drawerColor,
-          },
-        }}
-      >
+  variant="persistent"
+  open={drawerOpen}
+  sx={{
+    '& .MuiDrawer-paper': {
+      width: drawerWidth,
+      background: drawerColor,
+    },
+  }}
+>
 
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
