@@ -232,11 +232,17 @@ const Odontogramm = ({ odontogram }: Props) => {
 
   useEffect(() => {
     if (odontogram && odontogram.dientes) {
-      setTeeth(odontogram.dientes);
-      setTreatments(odontogram.tratamientos);
-      setLoading(false);
+      // Forzar un ligero retraso
+      setLoading(true);
+      setTimeout(() => {
+        setTeeth(odontogram.dientes);
+        setTreatments(odontogram.tratamientos);
+        setLoading(false);
+      }, 100);
     }
   }, [odontogram]);
+  
+  
 
   const handleUpdate = (tooth: Diente, part: string) => {
     const updatedTeeth = [...teeth!];

@@ -120,8 +120,16 @@ const DashboardLayout: React.FC = () => {
   const [particlesEnabled, setParticlesEnabled] = useState(true); // Estado para controlar las partículas
   // Estados iniciales con gradientes
 // Cambia los estados iniciales:
-const [topbarColor, setTopbarColor] = useState('linear-gradient(to right, #9C27B0, #E91E63)');
-const [drawerColor, setDrawerColor] = useState('linear-gradient(to bottom, #E91E63, #9C27B0)');
+// const [topbarColor, setTopbarColor] = useState('linear-gradient(to right, #9C27B0, #E91E63)');
+// const [drawerColor, setDrawerColor] = useState('linear-gradient(to bottom, #E91E63, #9C27B0)');
+
+const [topbarColor, setTopbarColor] = useState(
+  'linear-gradient(to right, rgba(225,190,231,0.7), rgba(244,143,177,0.7))'
+);
+const [drawerColor, setDrawerColor] = useState(
+  'linear-gradient(to bottom, rgba(244,143,177,0.7), rgba(225,190,231,0.7))'
+);
+
 
 
 
