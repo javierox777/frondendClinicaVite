@@ -2,7 +2,6 @@ import {
   Box,
   Grid,
   IconButton,
-  Popper,
   Table,
   TableBody,
   TableCell,
@@ -22,7 +21,7 @@ import { ITreatment, OdontogramInterface } from '../../interfaces/Odontogram';
 import { Diente } from '../../interfaces/Diente';
 
 import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
+
 
 import diente11 from '../../assets/dientes/diente_11.png';
 import diente12 from '../../assets/dientes/diente_12.png';
@@ -89,6 +88,8 @@ import toast, { Toaster } from 'react-hot-toast';
 import axios from 'axios';
 import { generalConfig } from '../../config';
 import TreatmentForm from './TreatmentForm';
+
+
 
 interface Person {
   _id: string;
@@ -257,7 +258,12 @@ const Odontogramm = ({ odontogram }: Props) => {
 
  const getTreatment = items.find((i) => i.id === treatment.selected);
 
-if (getTreatment.title === 'Resetear parte') {
+ if (!getTreatment) {
+  // Manejar el caso en que NO se encuentre el tratamiento, por ejemplo:
+  return; // o mostrar un error, etc.
+}
+
+if (getTreatment?.title === 'Resetear parte') {
   // Eliminar el tratamiento correspondiente a esta pieza y parte
   const newTreatments = treatments.filter(
     (t) => !(t.pieza.diente === tooth.pieza && t.pieza.parte === part)
@@ -366,18 +372,26 @@ if (getTreatment.title === 'Resetear parte') {
 
       const rutCompleto = `${persona.rut}-${persona.dv}`;
       const fechaNacimiento = new Date(persona.fechaNac).toLocaleDateString();
-      const institucion = persona.institucion?.nombre || 'No especificado';
       const edad = calculateAge(persona.fechaNac);
 
       // Título del documento
       const pageWidth = doc.internal.pageSize.getWidth();
       doc.setFontSize(18);
-      doc.setTextColor(0);
+      doc.setTextColor(255, 105, 180);
       doc.setFont('helvetica', 'bold');
-      doc.text('Clínica Dental AMANIA', pageWidth / 2, 20, { align: 'center' });
+      doc.text('Clínica Dental', pageWidth / 2 - 20, 20, { align: 'center' });
+
+      // Título "AMANIA" (color azul)
+      doc.setTextColor(0, 102, 204); // Azul (RGB: 0, 102, 204)
+      doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
+
+       // Subtítulo "ODONTOGRAMA" (azul también)
+       doc.setFontSize(16);
+       doc.setTextColor(0, 102, 204); // Azul (igual que "AMANIA")
+       doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' });
 
       // Logo
-      const logoUrl = '/public/logo.png'; // Reemplaza con tu logo en Base64
+      const logoUrl = '/logo.png'; 
       doc.addImage(logoUrl, 'PNG', 10, 10, 30, 30);
 
       // Crear tabla principal con celdas y bordes
@@ -388,26 +402,26 @@ if (getTreatment.title === 'Resetear parte') {
       let currentY = 50;
 
       // Sección Forma de ingreso y convenio
-      doc.rect(startX, currentY, 190, cellHeight * 3);
-      doc.line(startX + 95, currentY, startX + 95, currentY + cellHeight);
-      doc.text('FORMA DE INGRESO A LA CONSULTA:', startX + 2, currentY + 5);
+      // doc.rect(startX, currentY, 190, cellHeight * 3);
+      // doc.line(startX + 95, currentY, startX + 95, currentY + cellHeight);
+      // doc.text('FORMA DE INGRESO A LA CONSULTA:', startX + 2, currentY + 5);
 
       // Primera columna: 1 y 2
-      doc.rect(startX, currentY, 190, cellHeight);
-      doc.text('1.- Volante', startX + 2, currentY + 14);
-      doc.rect(startX, currentY + 8, 45, cellHeight);
-      doc.rect(startX + 45, currentY + 8, 50, cellHeight); // Rectángulo para Volante
-      doc.text('2.- Radio', startX + 2, currentY + 22);
-      doc.rect(startX + 45, currentY + 16, 50, cellHeight); // Rectángulo para Radio
+      // doc.rect(startX, currentY, 190, cellHeight);
+      // doc.text('1.- Volante', startX + 2, currentY + 14);
+      // doc.rect(startX, currentY + 8, 45, cellHeight);
+      // doc.rect(startX + 45, currentY + 8, 50, cellHeight); // Rectángulo para Volante
+      // doc.text('2.- Radio', startX + 2, currentY + 22);
+      // doc.rect(startX + 45, currentY + 16, 50, cellHeight); // Rectángulo para Radio
 
       // Segunda columna: CONVENIO y 3 y 4
 
-      doc.text('CONVENIO:', startX + 97, currentY + 5);
-      doc.rect(startX + 95, currentY + 16, 95, cellHeight);
-      doc.text('3.- Recomendación', startX + 97, currentY + 14);
-      doc.rect(startX + 140, currentY + 8, 50, cellHeight); // Rectángulo para Recomendación
-      doc.text('4.- Casualidad/Otro', startX + 97, currentY + 22);
-      doc.rect(startX + 140, currentY + 16, 50, cellHeight); // R
+      doc.text(`CONVENIO : ${persona.institucion.nombre}`, startX + 2 , currentY + 6);
+      doc.rect(startX , currentY + 1, 190, cellHeight);
+;
+      // doc.rect(startX + 140, currentY + 8, 50, cellHeight); // Rectángulo para Recomendación
+      // doc.text('4.- Casualidad/Otro', startX + 97, currentY + 22);
+      // doc.rect(startX + 140, currentY + 16, 50, cellHeight); // R
 
       // Salto de línea
       currentY += cellHeight;
@@ -672,6 +686,7 @@ if (getTreatment.title === 'Resetear parte') {
       // Título "AMANIA" (color azul)
       doc.setTextColor(0, 102, 204); // Azul (RGB: 0, 102, 204)
       doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
+      
 
       // Subtítulo "ODONTOGRAMA" (azul también)
       doc.setFontSize(16);
@@ -740,15 +755,18 @@ if (getTreatment.title === 'Resetear parte') {
           }
 
           // Obtener tratamiento dinámico del backend
-          const toothParts = treatmentsData[tooth.pieza] || {};
-          drawToothShape(toothX + 1, toothY + toothHeight + 3, toothParts);
+          const toothParts = tooth.pieza
+          ? treatmentsData[tooth.pieza]
+          : {}; // fallback to an empty object
+        
+        drawToothShape(toothX + 1, toothY + toothHeight + 3, toothParts);
 
           toothX += toothWidth + gap;
         });
       };
 
       // Datos dinámicos de tratamientos desde el backend
-      const treatmentsData = {};
+      const treatmentsData: any = {};
       teeth?.forEach((tooth) => {
         treatmentsData[tooth.pieza!] = {
           bucal: { color: tooth.bucal.color },
@@ -1403,11 +1421,11 @@ if (getTreatment.title === 'Resetear parte') {
                 {treatmentsWithColor
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((t: ITreatment) => {
-                    const bucalColor = t.pieza.parte === 'bucal' ? t.pieza.bucal.color : '#FFFFFF';
-                    const distalColor = t.pieza.parte === 'distal' ? t.pieza.distal.color : '#FFFFFF';
-                    const oclusalColor = t.pieza.parte === 'oclusal' ? t.pieza.oclusal.color : '#FFFFFF';
-                    const mesialColor = t.pieza.parte === 'mesial' ? t.pieza.mesial.color : '#FFFFFF';
-                    const lingualColor = t.pieza.parte === 'lingualpalatino' ? t.pieza.lingualpalatino.color : '#FFFFFF';
+                    const bucalColor = t.pieza.parte === 'bucal' ? t.pieza.bucal?.color : '#FFFFFF';
+                    const distalColor = t.pieza.parte === 'distal' ? t.pieza.distal?.color : '#FFFFFF';
+                    const oclusalColor = t.pieza.parte === 'oclusal' ? t.pieza.oclusal?.color : '#FFFFFF';
+                    const mesialColor = t.pieza.parte === 'mesial' ? t.pieza.mesial?.color : '#FFFFFF';
+                    const lingualColor = t.pieza.parte === 'lingualpalatino' ? t.pieza.lingualpalatino?.color : '#FFFFFF';
                 
 
 

@@ -58,14 +58,14 @@ const Receta: React.FC = () => {
 
   const [dataUpdated, setUpdated] = useState(false);
 
-  const { data: fetchData } = useQuery({
-    queryKey: ['fetchData', dataUpdated],
-    queryFn: async () => {
-      const response = await axios.get(`${generalConfig.baseUrl}/receipt`);
-      setFormData(response.data.body);
-      return response.data.body;
-    },
-  });
+  // const { data: fetchData } = useQuery({
+  //   queryKey: ['fetchData', dataUpdated],
+  //   queryFn: async () => {
+  //     const response = await axios.get(`${generalConfig.baseUrl}/receipt`);
+  //     setFormData(response.data.body);
+  //     return response.data.body;
+  //   },
+  // });
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);

@@ -2,8 +2,6 @@ import { AppBar, Button, Grid, Toolbar, Typography } from '@mui/material';
 import { useState } from 'react';
 import PatientForm from './PatientForm';
 import PatientsTable from './PatientsTable';
-import TotalPatients from './TotalPatients';
-import { Badge, Calendar } from 'rsuite';
 import colors from '../../styles/colors';
 import { useThemeContext } from '../../componemts/themeContext';
 

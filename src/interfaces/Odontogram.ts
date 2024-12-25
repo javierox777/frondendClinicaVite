@@ -2,6 +2,9 @@ import { Diente } from "./Diente";
 import { Person } from "./Person";
 import { Professional } from "./Professional";
 
+interface IParteConColor {
+    color: string;
+  }
 
 export interface ITreatment {
     _id?:string
@@ -11,6 +14,11 @@ export interface ITreatment {
     pieza:{
         diente:string;
         parte:string;
+        bucal?: IParteConColor;           // Usar ? si no siempre existe
+        distal?: IParteConColor;
+        oclusal?: IParteConColor;
+        mesial?: IParteConColor;
+        lingualpalatino?: IParteConColor;
     }
     observacion:string
 }
@@ -23,4 +31,5 @@ export interface OdontogramInterface {
     profesionalModifica: Professional | string
     dientes: Diente[]
     tratamientos: ITreatment[]
+    
 }

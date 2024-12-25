@@ -24,7 +24,7 @@ const ModalContent = styled(Box)(({ theme }) => ({
   transform: 'translate(-50%, -50%)',
 }));
 
-const CenteredContainer = styled(Box)(({ theme }) => ({
+const CenteredContainer = styled(Box)(() => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',

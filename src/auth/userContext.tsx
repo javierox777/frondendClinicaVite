@@ -1,4 +1,4 @@
-import React, {
+import  {
   createContext,
   PropsWithChildren,
   useContext,
@@ -12,16 +12,16 @@ import { decodeJwt } from './decodeJwt'; // Importa la función que decodifica e
 export interface LoggedUser {
   _id: string;
   login: string;
-  vigencia: boolean;
-  fechaRegistro: string;
-  nombre: string;
+  vigencia: boolean | string;
+  fechaRegistro: string | Date;
+  nombre?: string;
   profesionalId: string;
-  role?: string; 
+  role?: string | undefined; 
 }
 
 
 interface UserContextType {
-  user: LoggedUser | null;
+  user: LoggedUser | null ;
   setUser: Dispatch<SetStateAction<LoggedUser | null>>;
   loading: boolean;
 }

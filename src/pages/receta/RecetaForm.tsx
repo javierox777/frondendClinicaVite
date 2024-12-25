@@ -155,7 +155,7 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
     },
   });
 
-  const { data: statuses, isLoading: statusesLoading } = useQuery({
+  const { data: statuses, isLoading} = useQuery({
     queryKey: ['statuses'],
     queryFn: async () => {
       const response = await axios.get(`${generalConfig.baseUrl}/statuses`);

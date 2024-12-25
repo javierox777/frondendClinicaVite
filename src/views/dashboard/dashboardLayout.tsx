@@ -272,7 +272,7 @@ const [drawerColor, setDrawerColor] = useState(
               marginLeft: 'auto', // Empuja el contenido hacia la derecha
             }}
           >
-            {`${user.nombre}  ${roleLabels[user.role] || 'Sin rol definido'}`}
+            {`${user.nombre}  ${roleLabels[user.role!] || 'Sin rol definido'}`}
           </Typography>
           <IconButton
             size="large"
@@ -374,7 +374,7 @@ const [drawerColor, setDrawerColor] = useState(
             <List>
               {/* Menu items */}
               {menuItems
-                .filter((item) => isLoggedUser(user) && item.roles.includes(user.role))
+                .filter((item) => isLoggedUser(user) && item.roles.includes(user.role!))
                 .map((item) => (
                   <ListItemButton
                     key={item.id}

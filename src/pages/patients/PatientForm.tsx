@@ -1,22 +1,16 @@
 import {
-  Add,
   AddCircleOutline,
-  CheckCircle,
   Close,
   Delete,
-  PlusOne,
 } from '@mui/icons-material';
 import {
   AppBar,
   Box,
   Button,
   Card,
-  Checkbox,
   Container,
   Dialog,
-  Fab,
   FormControl,
-  FormControlLabel,
   Grid,
   IconButton,
   InputLabel,
@@ -26,8 +20,6 @@ import {
   SelectChangeEvent,
   Slide,
   Switch,
-  Tab,
-  Tabs,
   TextField,
   Toolbar,
   Typography,
@@ -41,10 +33,9 @@ import toast, { Toaster } from 'react-hot-toast';
 import { Person } from '../../interfaces/Person';
 import colors from '../../styles/colors';
 import { useThemeContext } from '../../componemts/themeContext';
-import { Address } from '../../interfaces/Address';
-import { Contact } from '../../interfaces/Contact';
 
-import { format, compareAsc } from 'date-fns';
+
+import { format } from 'date-fns';
 import Subform from './subForms/Subform';
 import { ShortModel } from '../../interfaces/ShortModel';
 import { Institution } from '../../interfaces/Institution';
@@ -77,7 +68,7 @@ const badHabits = [
   { descripcion: 'Deflución atípico', id: 5 },
 ];
 
-const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
+const PatientForm = ({ open, onClose, patient }: Props) => {
 
   const { mode } = useThemeContext();
   const [value, setValue] = useState(0);

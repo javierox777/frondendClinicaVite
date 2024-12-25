@@ -10,7 +10,6 @@ import {
   Divider,
   FormControl,
   FormControlLabel,
-  FormGroup,
   Grid,
   IconButton,
   MenuItem,
@@ -23,7 +22,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { format } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
