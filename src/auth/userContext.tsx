@@ -12,11 +12,11 @@ import { decodeJwt } from './decodeJwt'; // Importa la función que decodifica e
 export interface LoggedUser {
   _id: string;
   login: string;
-  vigencia: string;
+  vigencia: boolean;
   fechaRegistro: string;
   nombre: string;
   profesionalId: string;
-  role: 'admin' | 'user'; 
+  role?: string; 
 }
 
 

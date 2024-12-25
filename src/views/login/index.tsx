@@ -1,11 +1,11 @@
-import React, { useState, FormEvent, useEffect, useContext } from 'react';
+import React, { useState, FormEvent, useEffect } from 'react';
 import { Button, Grid, TextField, Paper } from '@mui/material';
 import logo from '/logo.png'; // Asegúrate de que la ruta es correcta
 import Axios from 'axios';
 import { generalConfig } from '../../config';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
-import {  useUser } from '../../auth/userContext';
+import { useUser } from '../../auth/userContext';
 import authStorage from '../../auth/storage';
 
 const baseUrl = generalConfig.baseUrl;
@@ -51,11 +51,14 @@ const Login: React.FC = () => {
       const message = data.message;
 
       if (message === 'Bienvenido') {
-        setUser(data.data);
+        const userResponse = data.data;
+        setUser({
+          ...userResponse,
+          vigencia: userResponse.vigencia === "true",
+          role: 'user' // asignas un rol por defecto sin leerlo de userResponse
+        });
 
         const token = data.token;
-        // const id = data._id;
-        // const name = data.name;
         if (token) authStorage.storeToken(token);
 
         navigate('/inicio');
@@ -76,7 +79,7 @@ const Login: React.FC = () => {
           timer: 1500,
         });
 
-    
+
       }
     } catch (error) {
       Swal.fire({

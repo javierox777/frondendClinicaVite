@@ -11,9 +11,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Tabs,
-  Toolbar,
-  Typography,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
@@ -24,7 +21,6 @@ import { Contact } from '../../interfaces/Contact';
 import { Person } from '../../interfaces/Person';
 import colors from '../../styles/colors';
 import { useState } from 'react';
-import { IAntecedent } from '../../interfaces/Antecedents';
 import HeaderBar from '../../componemts/HeaderBar';
 
 interface Props {
@@ -33,7 +29,7 @@ interface Props {
 
 const Personalnfo = ({ patient }: Props) => {
   const { mode } = useThemeContext();
-  const [tab, setTab] = useState(0);
+
 
   const { data: contacts } = useQuery({
     queryKey: ['contacts'],

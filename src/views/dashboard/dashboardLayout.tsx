@@ -8,15 +8,14 @@ import {
   List,
   Typography,
   Divider,
-  ListItem,
+
   ListItemIcon,
   ListItemText,
   Switch,
   IconButton,
   Menu,
   MenuItem,
-  Accordion,
-  AccordionSummary,
+
   AccordionDetails,
   FormControlLabel,
   ListItemButton,
@@ -36,29 +35,18 @@ import {
 } from '@mui/icons-material';
 
 
-import MenuIcon from '@mui/icons-material/Menu';
-import HomeIcon from '@mui/icons-material/Home';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import PeopleIcon from '@mui/icons-material/People';
+
+
 import SettingsIcon from '@mui/icons-material/Settings';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // Icono de expansión
+
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import Inicio from '../../pages/home';
 import { useThemeContext } from '../../componemts/themeContext';
 import { ParticlesContainer } from './ParticlesFire'; // Asegúrate de importar correctamente
-import {
-  AssignmentInd,
-  AssignmentLate,
-  AssignmentReturn,
-  CalendarMonth,
-  ContactEmergency,
-  EditCalendar,
-  Receipt,
-  RequestQuote,
-} from '@mui/icons-material';
+
 import PaletteIcon from '@mui/icons-material/Palette';
 
-import DescriptionIcon from '@mui/icons-material/Description';
+
 
 import PatientsPage from '../../pages/patients/PatientsPage';
 import InstitutionForm from '../../pages/institucion/InstitutionForm';
@@ -79,7 +67,7 @@ import BudgetsPage from '../../pages/budgets/BudgetsPage';
 import BudgetDetailsPage from '../../pages/budgets/BudgetDetailsPage';
 import EditBudgetPage from '../../pages/budgets/EditBudgetPage';
 import authStorage from '../../auth/storage';
-import { LoggedUser, UserContext, useUser } from '../../auth/userContext';
+import { LoggedUser, useUser } from '../../auth/userContext';
 import Receta from '../../pages/receta/RecetaTable';
 import BudgetPDF from '../../pages/budgets/BudgetPDF';
 import AppointmentsPage from '../../pages/appointments/AppointmentsPage';
@@ -90,11 +78,10 @@ import AttentionPage from '../../pages/attention/AttentionPage';
 import CurrentPatient from '../../pages/attention/CurrentPatient';
 import ClinicalRecordPage from '../../pages/clinicalrecord/ClinicalRecordPage';
 import PatientRecord from '../../pages/clinicalrecord/PatientRecord';
-import ConsentForm from '../../pages/consent/ConsentPage';
-import Administracion from '../../pages/admin/Admin';
-import colors from '../../styles/colors';
 
-import { Button } from '@mui/material';
+import Administracion from '../../pages/admin/Admin';
+
+
 
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import ParticlesIcon from '@mui/icons-material/Cloud';
@@ -105,7 +92,7 @@ import { useNavigate } from 'react-router-dom';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import logo from '/logo.png';
-import { Grid } from 'rsuite';
+
 import { JwtPayload } from 'jwt-decode';
 import { decodeJwt } from '../../auth/decodeJwt';
 import ConsentMain from '../../pages/consent/ConsentMain';
@@ -176,9 +163,9 @@ const [drawerColor, setDrawerColor] = useState(
     }
   };
   const handleLogout = async () => {
-    await authStorage.removeToken(); // Eliminar el token
-    setUser(null); // Restablecer el usuario a null en el contexto
-    navigate('/login'); // Redirigir al usuario a la página de inicio de sesión
+    await authStorage.removeToken(); 
+    setUser(null); 
+    navigate('/login'); 
   };
 
   useEffect(() => {

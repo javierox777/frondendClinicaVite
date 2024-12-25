@@ -15,17 +15,14 @@ import {
   DialogActions,
   IconButton,
   TextField,
-  Switch,
   AppBar,
   Toolbar,
   Typography,
 } from '@mui/material';
 import { useSpring, animated } from '@react-spring/web';
 import RecetaForm from './RecetaForm';
-import EditRecetaForm from './EditRecetaForm';
 import RecetaTemplate from './RecetaPdf';
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import axios from 'axios';
 import jsPDF from 'jspdf';
@@ -35,38 +32,13 @@ import { Receipt } from '../../interfaces/Receipt';
 import { Person } from '../../interfaces/Person';
 import { Professional } from '../../interfaces/Professional';
 import { Company } from '../../interfaces/Company';
-import { Address } from '../../interfaces/Address';
-import { ShortModel } from '../../interfaces/ShortModel';
-import { useTheme } from '@emotion/react';
 import { useThemeContext } from '../../componemts/themeContext';
 import colors from '../../styles/colors';
 import { useQuery } from '@tanstack/react-query';
 import { generalConfig } from '../../config';
 import { Toaster } from 'react-hot-toast';
 
-interface IPersona {
-  _id: string;
-  apellMat: string;
-  apellPat: string;
-  dv: string;
-  fechaNac: Date;
-  institucion: string;
-  nacionalidad: string;
-  nombre1: string;
-  nombre2: string;
-  rut: string;
-  sexo: string;
-  vigente: string;
-  direccion: string;
-  Solicitario: string;
-  atencion: string;
-  consentimiento: string;
-  fichaClinica: string;
-  libretaContacto: string;
-  libretaDireccion: string;
-  presupuesto: string;
-  receta: string;
-}
+
 
 const AnimatedDialog = animated(Dialog);
 const AnimatedDialogContent = animated(DialogContent);
