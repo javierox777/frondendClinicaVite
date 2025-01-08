@@ -1,6 +1,5 @@
 import { AttachMoney, Close } from '@mui/icons-material';
 import {
-  AppBar,
   Autocomplete,
   Box,
   Button,
@@ -26,26 +25,24 @@ import {
 import { TransitionProps } from '@mui/material/transitions';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { useThemeContext } from '../../componemts/themeContext';
-import { generalConfig } from '../../config';
-import { Company } from '../../interfaces/Company';
-import { Person } from '../../interfaces/Person';
-import { Professional } from '../../interfaces/Professional';
-import { ShortModel } from '../../interfaces/ShortModel';
-import colors from '../../styles/colors';
-import Subform from '../patients/subForms/Subform';
-import DetailsForm from './DetailsForm';
-import { ServiceInterface } from '../../interfaces/ServiceInterface';
-import { Budget } from '../../interfaces/Budget';
-import { BudgetDetail } from '../../interfaces/BudgetDetail';
-import BudgetFormSkeleton from './BudgetFormSkeleton';
 import { format } from 'date-fns';
+import React, { useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { LoggedUser, useUser } from '../../auth/userContext';
 import HeaderBar from '../../componemts/HeaderBar';
-import { ServiceType } from '../../interfaces/ServiceType';
+import { useThemeContext } from '../../componemts/themeContext';
+import { generalConfig } from '../../config';
 import { Agreement } from '../../interfaces/Agreement';
+import { Budget } from '../../interfaces/Budget';
+import { Company } from '../../interfaces/Company';
+import { Person } from '../../interfaces/Person';
+import { ServiceInterface } from '../../interfaces/ServiceInterface';
+import { ServiceType } from '../../interfaces/ServiceType';
+import { ShortModel } from '../../interfaces/ShortModel';
+import colors from '../../styles/colors';
+import Subform from '../patients/subForms/Subform';
+import BudgetFormSkeleton from './BudgetFormSkeleton';
+import DetailsForm from './DetailsForm';
 
 interface Props {
   open: boolean;
@@ -88,7 +85,6 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
   const [clinicId, setClinicId] = useState('');
   const [statusId, setStatusId] = useState('');
   const [registerDate, setRegisterDate] = useState('');
-  const [validDate, setValidDate] = useState('');
   const [isSubmitting, setSubmitting] = useState(false);
   const [agreement, setAgreement] = useState('');
 

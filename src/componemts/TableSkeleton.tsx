@@ -8,7 +8,6 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
-import React from 'react';
 
 const TableSkeleton = () => {
   return (

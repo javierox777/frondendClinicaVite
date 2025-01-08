@@ -1,9 +1,8 @@
-import React from 'react';
-import AppointmentsCalendar from './AppointmentsCalendar';
-import { AppBar, Container, Grid, Toolbar, Typography } from '@mui/material';
-import TodaysSchedule from './TodaysSchedule';
+import { AppBar, Grid, Toolbar, Typography } from '@mui/material';
 import { useThemeContext } from '../../componemts/themeContext';
 import colors from '../../styles/colors';
+import AppointmentsCalendar from './AppointmentsCalendar';
+import TodaysSchedule from './TodaysSchedule';
 
 const AppointmentsPage = () => {
   const { mode } = useThemeContext();

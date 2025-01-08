@@ -1,6 +1,5 @@
 import {
   AppBar,
-  Card,
   Grid,
   LinearProgress,
   Paper,
@@ -17,12 +16,12 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import React, { useState } from 'react';
-import { generalConfig } from '../../config';
-import { Appointment } from '../../interfaces/Appointment';
+import { useNavigate } from 'react-router-dom';
 import StatusBadge from '../../componemts/StatusBadge';
 import { useThemeContext } from '../../componemts/themeContext';
+import { generalConfig } from '../../config';
+import { Appointment } from '../../interfaces/Appointment';
 import colors from '../../styles/colors';
-import { useNavigate } from 'react-router-dom';
 
 const tableHeadings = [
   { id: 1, label: 'Paciente' },

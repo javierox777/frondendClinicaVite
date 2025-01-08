@@ -1,6 +1,3 @@
-import { Typography } from '@mui/material';
-import React, { PropsWithChildren, ReactNode } from 'react';
-
 interface Props {
   title: string;
   status: 'in-progress' | 'finished' | 'cancelled';

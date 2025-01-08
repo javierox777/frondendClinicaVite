@@ -1,22 +1,19 @@
 import {
-  Box,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Divider,
   Grid,
   Paper,
   PaperProps,
   Typography,
 } from '@mui/material';
-import React from 'react';
 import Draggable from 'react-draggable';
 import HeaderBar from '../../componemts/HeaderBar';
+import { useThemeContext } from '../../componemts/themeContext';
 import { TimeSlot } from '../../interfaces/TimeSlot';
 import colors from '../../styles/colors';
-import { useThemeContext } from '../../componemts/themeContext';
 
 const weekDays: Record<number, string> = {
   0: 'Domingo',

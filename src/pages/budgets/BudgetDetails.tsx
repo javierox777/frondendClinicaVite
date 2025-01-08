@@ -1,14 +1,11 @@
+import { Check } from '@mui/icons-material';
 import {
   AppBar,
   Box,
   Button,
-  Card,
   Container,
-  Divider,
   Grid,
   LinearProgress,
-  Paper,
-  Skeleton,
   Table,
   TableBody,
   TableCell,
@@ -21,23 +18,21 @@ import {
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { LoggedUser, useUser } from '../../auth/userContext';
+import HeaderBar from '../../componemts/HeaderBar';
 import StatusBadge from '../../componemts/StatusBadge';
+import TableSkeleton from '../../componemts/TableSkeleton';
+import { useThemeContext } from '../../componemts/themeContext';
 import { generalConfig } from '../../config';
 import { Address } from '../../interfaces/Address';
+import { Agreement } from '../../interfaces/Agreement';
 import { Budget } from '../../interfaces/Budget';
 import { BudgetDetail } from '../../interfaces/BudgetDetail';
 import { Contact } from '../../interfaces/Contact';
-import colors from '../../styles/colors';
-import { useThemeContext } from '../../componemts/themeContext';
-import TableSkeleton from '../../componemts/TableSkeleton';
-import { useNavigate } from 'react-router-dom';
-import { Check } from '@mui/icons-material';
-import { LoggedUser, useUser } from '../../auth/userContext';
-import { useState } from 'react';
-import jsPDF from 'jspdf';
-import HeaderBar from '../../componemts/HeaderBar';
-import { Agreement } from '../../interfaces/Agreement';
 import { ServiceType } from '../../interfaces/ServiceType';
+import colors from '../../styles/colors';
+import { useEffect, useState } from 'react';
 
 interface Props {
   budget: Budget;
@@ -70,6 +65,8 @@ const BudgetDetails = ({ budget }: Props) => {
   const { mode } = useThemeContext();
   const navigate = useNavigate();
   const { user } = useUser();
+
+  const [showEdit, setEdit] = useState(false);
 
   const {
     empresa,
@@ -118,6 +115,20 @@ const BudgetDetails = ({ budget }: Props) => {
 
   const validAddresses = addresses?.filter((a: any) => a.vigente === '1');
 
+  const checkEdit = (user: LoggedUser, budgetProfessionalId: string) => {
+    if (user.role === 'admin') {
+      return true;
+    }
+    if (user.role !== 'admin' && user.profesionalId === budgetProfessionalId) {
+      return true;
+    }
+    return false;
+  };
+
+  useEffect(() => {
+    checkEdit(user as LoggedUser, budget.profesional._id);
+  }, []);
+
   return (
     <div id="pdf">
       <Container>
@@ -150,6 +161,7 @@ const BudgetDetails = ({ budget }: Props) => {
                     >
                       Editar
                     </Button>
+
                     <Button
                       onClick={() =>
                         navigate('/presupuestopdf', {
@@ -225,29 +237,30 @@ const BudgetDetails = ({ budget }: Props) => {
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
-                {!budget.profesionalValida && (
-                  <Button
-                    onClick={async () => {
-                      if (user) {
-                        const response = await axios.patch(
-                          `${generalConfig.baseUrl}/budgets/validatebudget/${budget._id}`,
-                          {
-                            profesionalValida: (user as LoggedUser)
-                              .profesionalId,
-                          }
-                        );
+                {!budget.profesionalValida &&
+                  (user as LoggedUser).role === 'admin' && (
+                    <Button
+                      onClick={async () => {
+                        if (user) {
+                          const response = await axios.patch(
+                            `${generalConfig.baseUrl}/budgets/validatebudget/${budget._id}`,
+                            {
+                              profesionalValida: (user as LoggedUser)
+                                .profesionalId,
+                            }
+                          );
 
-                        if (response.data.message === 'success') {
-                          navigate('/presupuestos');
+                          if (response.data.message === 'success') {
+                            navigate('/presupuestos');
+                          }
                         }
-                      }
-                    }}
-                    color="info"
-                    variant="outlined"
-                  >
-                    Validar
-                  </Button>
-                )}
+                      }}
+                      color="info"
+                      variant="outlined"
+                    >
+                      Validar
+                    </Button>
+                  )}
                 {budget.profesionalValida && (
                   <>
                     <Typography sx={{ fontWeight: 'bold' }}>

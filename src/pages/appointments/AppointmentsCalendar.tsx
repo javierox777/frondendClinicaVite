@@ -1,6 +1,5 @@
 import {
   Autocomplete,
-  Card,
   CircularProgress,
   FormControl,
   TextField,
@@ -8,6 +7,7 @@ import {
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { format } from 'date-fns';
 import { useEffect, useState } from 'react';
 import { Badge, Calendar, Popover, Whisper } from 'rsuite';
 import esAr from 'rsuite/locales/es_AR';
@@ -19,7 +19,6 @@ import { ProfessionalSchedule } from '../../interfaces/ProfessionalSchedule';
 import { TimeSlot } from '../../interfaces/TimeSlot';
 import colors from '../../styles/colors';
 import DateDetails from './DateDetails';
-import { format } from 'date-fns';
 import DateHistory from './DateHistory';
 
 interface Props {

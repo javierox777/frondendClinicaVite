@@ -1,8 +1,4 @@
-import {
-  AddCircleOutline,
-  Close,
-  Delete,
-} from '@mui/icons-material';
+import { AddCircleOutline, Close, Delete } from '@mui/icons-material';
 import {
   AppBar,
   Box,
@@ -33,7 +29,6 @@ import toast, { Toaster } from 'react-hot-toast';
 import { Person } from '../../interfaces/Person';
 import colors from '../../styles/colors';
 import { useThemeContext } from '../../componemts/themeContext';
-
 
 import { format } from 'date-fns';
 import Subform from './subForms/Subform';
@@ -69,7 +64,6 @@ const badHabits = [
 ];
 
 const PatientForm = ({ open, onClose, patient }: Props) => {
-
   const { mode } = useThemeContext();
   const [value, setValue] = useState(0);
 
@@ -322,11 +316,10 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
   ) => {
     const updatedContacts = [...contacts];
 
-    
     updatedContacts[rowIndex][field] = (e.target as HTMLInputElement).value;
     setContacts(updatedContacts);
   };
- 
+
   const { data: formData } = useQuery({
     queryKey: ['formData', subFormSubmitted],
     queryFn: async () => {
@@ -370,10 +363,10 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
       setSubmitting(true);
 
       if (patient) {
-        console.log("updatedContacts", patient?._id)
+        console.log('updatedContacts', patient?._id);
         const response = await axios.patch(
           `${generalConfig.baseUrl}/persons/${patient._id}`,
-          
+
           newPerson
         );
 
@@ -598,6 +591,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                     Nacionalidad
                   </InputLabel>
                   <Select
+                    required
                     label="nationalities"
                     id="nationality-select"
                     labelId="nationality-select-label"
@@ -628,6 +622,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                 <FormControl fullWidth>
                   <InputLabel id="gender-select-label">Sexo</InputLabel>
                   <Select
+                    required
                     label="Sexo"
                     id="gender-select"
                     labelId="gender-select-label"
@@ -650,6 +645,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                 <FormControl fullWidth>
                   <InputLabel id="prevision-select-label">Previsión</InputLabel>
                   <Select
+                    required
                     label="prevision"
                     id="prevision-select"
                     labelId="prevision-select-label"
@@ -674,6 +670,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                     Institución
                   </InputLabel>
                   <Select
+                    required
                     label="institution"
                     id="institution-select"
                     labelId="institution-select-label"

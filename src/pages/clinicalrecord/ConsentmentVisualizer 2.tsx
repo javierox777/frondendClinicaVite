@@ -1,35 +1,23 @@
-import React from 'react';
-import { Consentment } from '../../interfaces/Consentment';
-import { ConsentmentDetail } from '../../interfaces/ConsentmentDetails';
-import { Delete } from '@mui/icons-material';
 import {
-  FormControl,
-  InputLabel,
-  Select,
-  SelectChangeEvent,
-  MenuItem,
-  Typography,
-  TextField,
-  TableContainer,
+  AppBar,
+  Container,
+  Grid,
   Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
   TableHead,
   TableRow,
-  TableCell,
-  TableBody,
-  Grid,
-  Table,
-  Button,
-  Container,
-  AppBar,
   Toolbar,
+  Typography,
 } from '@mui/material';
+import { ConsentmentDetail } from '../../interfaces/ConsentmentDetails';
 
-import { Company } from '../../interfaces/Company';
+import { useThemeContext } from '../../componemts/themeContext';
 import { Person } from '../../interfaces/Person';
 import { Professional } from '../../interfaces/Professional';
-import { ShortModel } from '../../interfaces/ShortModel';
 import colors from '../../styles/colors';
-import { useThemeContext } from '../../componemts/themeContext';
 import { ConsentmentResponse } from './ConsentmentsTab';
 
 interface Props {

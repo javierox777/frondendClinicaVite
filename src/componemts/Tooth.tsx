@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useThemeContext } from './themeContext';
 import colors from '../styles/colors';
 
@@ -13,9 +13,9 @@ interface Props {
 const Tooth = ({ tooth, onUpdate, treatment }: Props) => {
   const { mode } = useThemeContext();
 
-  const [selectedPart, setPart] = useState('');
+  const [selectedPart] = useState('');
 
-  const [activePart, setActive] = useState({
+  const [activePart] = useState({
     bucal: false,
     oclusal: false,
     mesial: false,

@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Divider,
   FormControl,
   Grid,
   InputLabel,
@@ -30,7 +29,6 @@ import { Person } from '../../interfaces/Person';
 import { Professional } from '../../interfaces/Professional';
 import { TimeSlot } from '../../interfaces/TimeSlot';
 import colors from '../../styles/colors';
-import { Toys } from '@mui/icons-material';
 import HeaderBar from '../../componemts/HeaderBar';
 
 interface Props {

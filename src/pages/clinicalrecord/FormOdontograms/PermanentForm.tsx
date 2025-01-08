@@ -1,6 +1,6 @@
-import React from 'react';
 import { Diente } from '../../../interfaces/Diente';
 
+import { Checkbox } from '@mui/material';
 import diente11 from '../../../assets/dientes/diente11.png';
 import diente12 from '../../../assets/dientes/diente12.png';
 import diente13 from '../../../assets/dientes/diente13.png';
@@ -33,10 +33,7 @@ import diente45 from '../../../assets/dientes/diente45.png';
 import diente46 from '../../../assets/dientes/diente46.png';
 import diente47 from '../../../assets/dientes/diente47.png';
 import diente48 from '../../../assets/dientes/diente48.png';
-import Tooth from '../../../componemts/Tooth';
 import { useThemeContext } from '../../../componemts/themeContext';
-import colors from '../../../styles/colors';
-import { Checkbox, FormControlLabel } from '@mui/material';
 
 type DienteKeys =
   `diente${11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48}`;
@@ -82,14 +79,12 @@ interface Props {
 }
 
 const PermanentForm = ({ teeth, onCheck }: Props) => {
-  const { mode } = useThemeContext();
-
   return (
     <>
       <div className="flex justify-center items-center ">
         {teeth
           .filter((t: Diente) => parseInt(t.pieza!) < 31)
-          .map((t: Diente, index) => {
+          .map((t: Diente) => {
             const dienteKey = `diente${t.pieza}` as DienteKeys;
             return (
               <div
@@ -117,7 +112,7 @@ const PermanentForm = ({ teeth, onCheck }: Props) => {
       <div className="flex justify-center items-center  ">
         {teeth
           .filter((t: Diente) => parseInt(t.pieza!) >= 31)
-          .map((t: Diente, index) => {
+          .map((t: Diente) => {
             const dienteKey = `diente${t.pieza}` as DienteKeys;
             return (
               <div

@@ -1,6 +1,3 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Appointment } from '../../interfaces/Appointment';
 import {
   Button,
   ButtonGroup,
@@ -13,17 +10,17 @@ import {
   DialogTitle,
   Divider,
   Grid,
-  Modal,
   Typography,
 } from '@mui/material';
-import RecetaForm from '../receta/RecetaForm';
 import axios from 'axios';
-import { generalConfig } from '../../config';
+import { useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
-import StatusBadge from '../../componemts/StatusBadge';
-import RecetaDetailsPage from '../receta/RecetaDetailsPage';
-import PatientRecord from '../clinicalrecord/PatientRecord';
+import { useLocation, useNavigate } from 'react-router-dom';
 import HeaderBar from '../../componemts/HeaderBar';
+import StatusBadge from '../../componemts/StatusBadge';
+import { generalConfig } from '../../config';
+import { Appointment } from '../../interfaces/Appointment';
+import RecetaForm from '../receta/RecetaForm';
 
 const CurrentPatient = () => {
   const [completed, setCompleted] = useState(false);

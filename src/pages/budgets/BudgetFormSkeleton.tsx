@@ -1,34 +1,4 @@
-import { Close, AttachMoney } from '@mui/icons-material';
-import {
-  Dialog,
-  Toolbar,
-  Paper,
-  IconButton,
-  Container,
-  Grid,
-  Card,
-  Typography,
-  Box,
-  FormControl,
-  InputLabel,
-  Select,
-  SelectChangeEvent,
-  MenuItem,
-  Autocomplete,
-  TextField,
-  colors,
-  Divider,
-  Button,
-  Skeleton,
-} from '@mui/material';
-import React from 'react';
-import { generalConfig } from '../../config';
-import { Company } from '../../interfaces/Company';
-import { Person } from '../../interfaces/Person';
-import { Professional } from '../../interfaces/Professional';
-import { ShortModel } from '../../interfaces/ShortModel';
-import Subform from '../patients/subForms/Subform';
-import DetailsForm from './DetailsForm';
+import { Card, Container, Divider, Grid, Skeleton } from '@mui/material';
 
 const BudgetFormSkeleton = () => {
   return (

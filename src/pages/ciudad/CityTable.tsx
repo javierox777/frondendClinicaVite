@@ -1,6 +1,13 @@
-import React, { useState } from 'react';
-import { Table, TableHead, TableRow, TableCell, TableBody, Button, IconButton } from '@mui/material';
-import { Edit, Delete } from '@mui/icons-material'; // Importa los iconos de Material-UI
+import { Delete, Edit } from '@mui/icons-material'; // Importa los iconos de Material-UI
+import {
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from '@mui/material';
+import { useState } from 'react';
 import City from './Ciudad';
 
 const CiudadTable = () => {
@@ -35,9 +42,8 @@ const CiudadTable = () => {
   return (
     <>
       {showForm && <City />}
-      <div style={{ overflowX: 'auto' }}> 
-       
-        <Table style={{ minWidth: 600, marginTop:"5%" }}> 
+      <div style={{ overflowX: 'auto' }}>
+        <Table style={{ minWidth: 600, marginTop: '5%' }}>
           <TableHead>
             <TableRow>
               <TableCell>ID</TableCell>
@@ -53,10 +59,14 @@ const CiudadTable = () => {
                 <TableCell>{ciudad.nombre}</TableCell>
                 <TableCell>{ciudad.vigente}</TableCell>
                 <TableCell>
-                  <IconButton onClick={handleOpenForm}> {/* Agrega un botón de edición */}
+                  <IconButton onClick={handleOpenForm}>
+                    {' '}
+                    {/* Agrega un botón de edición */}
                     <Edit />
                   </IconButton>
-                  <IconButton> {/* Agrega un botón de eliminación */}
+                  <IconButton>
+                    {' '}
+                    {/* Agrega un botón de eliminación */}
                     <Delete />
                   </IconButton>
                 </TableCell>

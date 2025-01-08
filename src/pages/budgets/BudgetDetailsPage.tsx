@@ -1,6 +1,5 @@
-import React from 'react';
-import BudgetDetails from './BudgetDetails';
 import { useLocation } from 'react-router-dom';
+import BudgetDetails from './BudgetDetails';
 
 const BudgetDetailsPage = () => {
   const params = useLocation();

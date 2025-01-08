@@ -1,37 +1,37 @@
-import { Visibility, PictureAsPdf } from "@mui/icons-material";
+import { PictureAsPdf, Visibility } from '@mui/icons-material';
 import {
-  LinearProgress,
-  TableContainer,
-  Paper,
-  Grid,
-  Table,
-  IconButton,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  TablePagination,
   AppBar,
+  Button,
+  Grid,
+  IconButton,
+  LinearProgress,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
   Toolbar,
   Typography,
-  Button,
-} from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import React, { useRef, useState } from "react";
-import { useThemeContext } from "../../componemts/themeContext";
-import { generalConfig } from "../../config";
-import colors from "../../styles/colors";
-import { Person } from "../../interfaces/Person";
-import { Consentment } from "../../interfaces/Consentment";
-import { Company } from "../../interfaces/Company";
-import { ConsentmentDetail } from "../../interfaces/ConsentmentDetails";
-import ConsentmentVisualizer from "./ConsentmentVisualizer";
-import ConsentForm from "../consent/ConsentPage";
+} from '@mui/material';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import { useRef, useState } from 'react';
+import { useThemeContext } from '../../componemts/themeContext';
+import { generalConfig } from '../../config';
+import { Company } from '../../interfaces/Company';
+import { Consentment } from '../../interfaces/Consentment';
+import { ConsentmentDetail } from '../../interfaces/ConsentmentDetails';
+import { Person } from '../../interfaces/Person';
+import colors from '../../styles/colors';
+import ConsentForm from '../consent/ConsentPage';
+import ConsentmentVisualizer from './ConsentmentVisualizer';
 
 const tableHeadings = [
-  { id: 1, label: "Fecha" },
-  { id: 2, label: "Clínica" },
+  { id: 1, label: 'Fecha' },
+  { id: 2, label: 'Clínica' },
 ];
 
 interface Props {
@@ -55,7 +55,7 @@ const ConsentmentsTab = ({ patient }: Props) => {
   const visualizerRef = useRef<any>(null);
 
   const { data: consentments, isLoading } = useQuery({
-    queryKey: ["consentments", dataUpdated],
+    queryKey: ['consentments', dataUpdated],
     queryFn: async () => {
       const response = await axios.get(
         `${generalConfig.baseUrl}/consentments/getconsentments/${patient._id}`
@@ -89,10 +89,10 @@ const ConsentmentsTab = ({ patient }: Props) => {
                 <Toolbar
                   style={{
                     backgroundColor:
-                      mode === "light"
+                      mode === 'light'
                         ? colors.lightModeHeaderColor
                         : colors.darkModeHeaderColor,
-                    justifyContent: "space-between",
+                    justifyContent: 'space-between',
                   }}
                 >
                   <Typography variant="h6">Consentimientos</Typography>
@@ -106,14 +106,14 @@ const ConsentmentsTab = ({ patient }: Props) => {
                   <TableHead
                     style={{
                       backgroundColor:
-                        mode === "light"
+                        mode === 'light'
                           ? colors.lightModeTableHead
                           : colors.darkModeTableHead,
                     }}
                   >
                     <TableRow>
                       {tableHeadings.map((h) => (
-                        <TableCell key={h.id} style={{ fontWeight: "bold" }}>
+                        <TableCell key={h.id} style={{ fontWeight: 'bold' }}>
                           {h.label}
                         </TableCell>
                       ))}
@@ -122,14 +122,14 @@ const ConsentmentsTab = ({ patient }: Props) => {
                   </TableHead>
                   <TableBody>
                     {consentments?.map((c: ConsentmentResponse) => (
-                      <TableRow key={c.consentimiento._id}>
+                      <TableRow key={c.consentimiento?._id}>
                         <TableCell>
                           {new Date(
-                            c.consentimiento.fechaRegistro
+                            c.consentimiento?.fechaRegistro
                           ).toLocaleDateString()}
                         </TableCell>
                         <TableCell>
-                          {(c.consentimiento.empresa as Company).razonSocial}
+                          {(c.consentimiento?.empresa as Company)?.razonSocial}
                         </TableCell>
                         <TableCell>
                           <IconButton onClick={() => setConsentment(c)}>
@@ -156,7 +156,11 @@ const ConsentmentsTab = ({ patient }: Props) => {
               </TableContainer>
             </Grid>
 
-            <Grid item xs={6} className="border border-zinc-200 rounded-lg p-3 pl-20 pr-20 ml-5 pt-0">
+            <Grid
+              item
+              xs={6}
+              className="border border-zinc-200 rounded-lg p-3 pl-20 pr-20 ml-5 pt-0"
+            >
               <ConsentmentVisualizer
                 ref={visualizerRef}
                 consentment={showConsentment}

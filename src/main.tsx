@@ -8,7 +8,6 @@ import { CustomThemeProvider } from './componemts/themeContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { UserProvider } from './auth/userContext';
 import 'rsuite/dist/rsuite.min.css';
-import { CustomProvider } from 'rsuite';
 import CalendarThemeProvider from './componemts/CalendarThemeProvider';
 import ProtectedRoute from './componemts/ProtectedRoute'; // Asegúrate de ajustar la ruta
 

@@ -1,5 +1,17 @@
+import {
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Modal,
+  Select,
+  SelectChangeEvent,
+  TextField,
+  Typography,
+  styled,
+} from '@mui/material';
 import React, { useState } from 'react';
-import { TextField, Button, FormControl, InputLabel, Select, MenuItem, Modal, Box, Typography, styled, SelectChangeEvent } from '@mui/material';
 
 // Estilos personalizados
 const StyledFormControl = styled(FormControl)(({ theme }) => ({
@@ -9,7 +21,6 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
 
 const StyledButton = styled(Button)(({ theme }) => ({
   margin: theme.spacing(1),
- 
 }));
 
 const ModalContent = styled(Box)(({ theme }) => ({
@@ -39,7 +50,9 @@ const Ciudad = () => {
     nombre: '',
   });
 
-  const handleChange = (event: React.ChangeEvent<{ name?: string; value: unknown }>) => {
+  const handleChange = (
+    event: React.ChangeEvent<{ name?: string; value: unknown }>
+  ) => {
     const { name, value } = event.target;
     setFormData({
       ...formData,
@@ -79,7 +92,12 @@ const Ciudad = () => {
         aria-describedby="modal-description"
       >
         <ModalContent>
-          <Typography id="modal-title" variant="h6" component="h2" align="center">
+          <Typography
+            id="modal-title"
+            variant="h6"
+            component="h2"
+            align="center"
+          >
             Formulario
           </Typography>
           <form onSubmit={handleSubmit}>
@@ -129,7 +147,10 @@ const Ciudad = () => {
       </Modal>
 
       <CenteredContainer>
-        <StyledButton  style={{position: 'absolute', left: 0 }} onClick={handleOpen}>
+        <StyledButton
+          style={{ position: 'absolute', left: 0 }}
+          onClick={handleOpen}
+        >
           Abrir Formulario
         </StyledButton>
       </CenteredContainer>

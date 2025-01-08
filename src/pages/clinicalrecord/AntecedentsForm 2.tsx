@@ -1,3 +1,4 @@
+import { Delete } from '@mui/icons-material';
 import {
   AppBar,
   Box,
@@ -13,15 +14,14 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import React, { ChangeEvent, useEffect, useState } from 'react';
-import colors from '../../styles/colors';
-import { useThemeContext } from '../../componemts/themeContext';
-import { IAntecedent } from '../../interfaces/Antecedents';
-import { Delete } from '@mui/icons-material';
-import toast from 'react-hot-toast';
-import { Person } from '../../interfaces/Person';
 import axios from 'axios';
+import React, { ChangeEvent, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useThemeContext } from '../../componemts/themeContext';
 import { generalConfig } from '../../config';
+import { IAntecedent } from '../../interfaces/Antecedents';
+import { Person } from '../../interfaces/Person';
+import colors from '../../styles/colors';
 
 interface Props {
   open: boolean;

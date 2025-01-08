@@ -35,9 +35,9 @@ const ConsentmentTable = ({ consentments }: Props) => {
   const [searchText, setSearchText] = useState('');
 
   const filteredConsentments = consentments?.filter((c: Consentment) => {
-    const rut = (c.persona as Person).rut.toLowerCase();
+    const rut = (c.persona as Person)?.rut.toLowerCase();
     const name =
-      `${(c.persona as Person).nombre1} ${(c.persona as Person).apellPat}`.toLowerCase();
+      `${(c.persona as Person)?.nombre1} ${(c.persona as Person)?.apellPat}`.toLowerCase();
     const date = format(new Date(c.fechaRegistro), 'yyyy/MM/dd');
     return (
       rut.includes(searchText.toLowerCase()) ||
@@ -91,41 +91,42 @@ const ConsentmentTable = ({ consentments }: Props) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredConsentments
-              ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((c: Consentment) => {
-                return (
-                  <TableRow key={c._id}>
-                    <TableCell>
-                      {(c.persona as Person).nombre1}{' '}
-                      {(c.persona as Person).apellPat}{' '}
-                    </TableCell>
-                    <TableCell>
-                      {formatRut((c.persona as Person).rut)}-
-                      {(c.persona as Person).dv}
-                    </TableCell>
-                    <TableCell>
-                      {format(new Date(c.fechaRegistro), 'yyyy/MM/dd')}
-                    </TableCell>
-                    <TableCell>
-                      <IconButton>
-                        <PictureAsPdf color="primary" />
-                      </IconButton>
-                      <IconButton
-                        onClick={() => {
-                          navigation('/editarconsentimiento', {
-                            state: {
-                              consentment: c,
-                            },
-                          });
-                        }}
-                      >
-                        <Edit color="success" />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+            {filteredConsentments &&
+              filteredConsentments
+                ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((c: Consentment) => {
+                  return (
+                    <TableRow key={c._id}>
+                      <TableCell>
+                        {(c.persona as Person).nombre1}{' '}
+                        {(c.persona as Person).apellPat}{' '}
+                      </TableCell>
+                      <TableCell>
+                        {formatRut((c.persona as Person).rut)}-
+                        {(c.persona as Person).dv}
+                      </TableCell>
+                      <TableCell>
+                        {format(new Date(c.fechaRegistro), 'yyyy/MM/dd')}
+                      </TableCell>
+                      <TableCell>
+                        <IconButton>
+                          <PictureAsPdf color="primary" />
+                        </IconButton>
+                        <IconButton
+                          onClick={() => {
+                            navigation('/editarconsentimiento', {
+                              state: {
+                                consentment: c,
+                              },
+                            });
+                          }}
+                        >
+                          <Edit color="success" />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
           </TableBody>
         </Table>
       </TableContainer>

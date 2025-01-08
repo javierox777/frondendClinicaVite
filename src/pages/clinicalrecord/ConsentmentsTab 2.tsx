@@ -1,36 +1,33 @@
 import { Visibility } from '@mui/icons-material';
 import {
-  LinearProgress,
-  TableContainer,
-  Paper,
-  Grid,
-  Table,
-  IconButton,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  TablePagination,
   AppBar,
+  Button,
+  Grid,
+  IconButton,
+  LinearProgress,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
   Toolbar,
   Typography,
-  Button,
-  Dialog,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useThemeContext } from '../../componemts/themeContext';
 import { generalConfig } from '../../config';
-import { Receipt } from '../receta/types';
-import ReceiptVisualizer from './ReceiptVisualizer';
-import colors from '../../styles/colors';
-import { Person } from '../../interfaces/Person';
-import { Consentment } from '../../interfaces/Consentment';
 import { Company } from '../../interfaces/Company';
-import ConsentmentVisualizer from './ConsentmentVisualizer';
-import ConsentForm from '../consent/ConsentPage';
+import { Consentment } from '../../interfaces/Consentment';
 import { ConsentmentDetail } from '../../interfaces/ConsentmentDetails';
+import { Person } from '../../interfaces/Person';
+import colors from '../../styles/colors';
+import ConsentForm from '../consent/ConsentPage';
+import ConsentmentVisualizer from './ConsentmentVisualizer';
 
 const tableHeadings = [
   { id: 1, label: 'Fecha' },
@@ -176,9 +173,12 @@ const ConsentmentsTab = ({ patient }: Props) => {
           </Grid>
         )}
       </Grid>
-      <Dialog open={formOpen} onClose={() => setFormOpen(false)}>
-        <ConsentForm afterSubmit={() => setUpdated(!dataUpdated)} />
-      </Dialog>
+
+      <ConsentForm
+        afterSubmit={() => setUpdated(!dataUpdated)}
+        open={formOpen}
+        onClose={() => setFormOpen(false)}
+      />
     </>
   );
 };

@@ -1,21 +1,12 @@
-import {
-  AppBar,
-  Button,
-  Container,
-  Grid,
-  Toolbar,
-  Typography,
-} from '@mui/material';
-import React, { useState } from 'react';
-import BudgetSearcher from './BudgetSearcher';
-import { Add } from '@mui/icons-material';
-import BudgetForm from './BudgetForm';
-import BudgetVisualizer from './BudgetVisualizer';
+import { AppBar, Button, Grid, Toolbar, Typography } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { useState } from 'react';
+import { useThemeContext } from '../../componemts/themeContext';
 import { generalConfig } from '../../config';
 import colors from '../../styles/colors';
-import { useThemeContext } from '../../componemts/themeContext';
+import BudgetForm from './BudgetForm';
+import BudgetVisualizer from './BudgetVisualizer';
 
 const BudgetsPage = () => {
   const { mode } = useThemeContext();
