@@ -211,16 +211,18 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
                           >
                             <PictureAsPdf />
                           </IconButton>
-                          <IconButton
-                            color="success"
-                            onClick={() =>
-                              navigation('/editarpresupuesto', {
-                                state: { budget: b },
-                              })
-                            }
-                          >
-                            <Edit />
-                          </IconButton>
+                          {!b.profesionalValida && (
+                            <IconButton
+                              color="success"
+                              onClick={() =>
+                                navigation('/editarpresupuesto', {
+                                  state: { budget: b },
+                                })
+                              }
+                            >
+                              <Edit />
+                            </IconButton>
+                          )}
                         </TableCell>
                       </TableRow>
                     );

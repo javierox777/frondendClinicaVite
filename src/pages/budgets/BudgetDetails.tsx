@@ -136,7 +136,7 @@ const BudgetDetails = ({ budget }: Props) => {
           {/* Datos del presupuesto */}
           <Grid item className="rounded p-5">
             <Grid container spacing={3}>
-              <AppBar position="static" className="mb-5">
+              <AppBar position="static" className="mb-5 mt-5">
                 <Toolbar
                   style={{
                     backgroundColor:
@@ -149,18 +149,20 @@ const BudgetDetails = ({ budget }: Props) => {
                   <Typography variant="h6" className="capitalize">
                     Datos de presupuesto
                   </Typography>
-                  <Box>
-                    <Button
-                      onClick={() =>
-                        navigate('/editarpresupuesto', {
-                          state: { budget: budget },
-                        })
-                      }
-                      color="success"
-                      variant="contained"
-                    >
-                      Editar
-                    </Button>
+                  <Box className="flex space-x-3">
+                    {!budget.profesionalValida && (
+                      <Button
+                        onClick={() =>
+                          navigate('/editarpresupuesto', {
+                            state: { budget: budget },
+                          })
+                        }
+                        color="success"
+                        variant="contained"
+                      >
+                        Editar
+                      </Button>
+                    )}
 
                     <Button
                       onClick={() =>

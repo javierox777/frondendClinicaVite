@@ -484,7 +484,6 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
             </Typography>
           </Container>
           <Container className="p-5">
-            <HeaderMenu />
             <AppBar position="static" className="mb-5">
               <Toolbar
                 style={{
@@ -713,16 +712,6 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                     </Toolbar>
                   </AppBar>
                 </Box>
-                <Box display="flex" alignItems="center" mb={2}>
-                  <Typography
-                    style={{ fontWeight: 'bold', marginRight: '10px' }}
-                  >
-                    Agregar convenio
-                  </Typography>
-                  <IconButton onClick={handleAddAgreement}>
-                    <AddCircleOutline />
-                  </IconButton>
-                </Box>
                 <Box style={{ width: '100%' }}>
                   <DataGrid
                     rows={agreements.map((a, index) => ({
@@ -804,6 +793,11 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                     // disableRowSelectionOnClick
                   />
                 </Box>
+                <Box display="flex" alignItems="center" mb={2}>
+                  <Button onClick={handleAddAgreement} variant="contained">
+                    Agregar convenio
+                  </Button>
+                </Box>
               </Grid>
 
               <Grid item xs={12}>
@@ -821,23 +815,11 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                             : colors.darkModeHeaderColor,
                       }}
                     >
-                      <Typography variant="h6">Direcciones</Typography>
+                      <Typography variant="h6">Contactos</Typography>
                     </Toolbar>
                   </AppBar>
                 </Box>
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  style={{ marginBottom: 10 }}
-                >
-                  <Typography style={{ fontWeight: 'bold' }}>
-                    Libreta de contactos
-                  </Typography>
 
-                  <IconButton onClick={handleAddContact}>
-                    <AddCircleOutline />
-                  </IconButton>
-                </Box>
                 {contacts.length === 0 && (
                   <Box>
                     <Typography>
@@ -945,6 +927,15 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                     </Card>
                   );
                 })}
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  style={{ marginBottom: 10 }}
+                >
+                  <Button onClick={handleAddContact} variant="contained">
+                    Agregar contacto
+                  </Button>
+                </Box>
               </Grid>
 
               <Grid item xs={12}>
@@ -957,21 +948,10 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                           : colors.darkModeHeaderColor,
                     }}
                   >
-                    <Typography variant="h6">Contactos</Typography>
+                    <Typography variant="h6">Libreta de dirección</Typography>
                   </Toolbar>
                 </AppBar>
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  style={{ marginBottom: 10 }}
-                >
-                  <Typography style={{ fontWeight: 'bold' }}>
-                    Libreta de dirección
-                  </Typography>
-                  <IconButton onClick={handleAddAddress}>
-                    <AddCircleOutline />
-                  </IconButton>
-                </Box>
+
                 {addresses.length === 0 && (
                   <Box>
                     <Typography>
@@ -1109,6 +1089,15 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                     </Card>
                   );
                 })}
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  style={{ marginBottom: 10 }}
+                >
+                  <Button onClick={handleAddAddress} variant="contained">
+                    Agregar dirección
+                  </Button>
+                </Box>
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth>

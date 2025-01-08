@@ -14,12 +14,19 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { ChangeEvent, Dispatch, SetStateAction } from 'react';
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
 import { useThemeContext } from '../../componemts/themeContext';
 import { BudgetDetail } from '../../interfaces/BudgetDetail';
 import { ServiceInterface } from '../../interfaces/ServiceInterface';
 import { ShortModel } from '../../interfaces/ShortModel';
 import colors from '../../styles/colors';
+import { LoggedUser, useUser } from '../../auth/userContext';
 
 interface Props {
   budgetDetails: any[];
@@ -35,6 +42,8 @@ const DetailsForm = ({
   services,
 }: Props) => {
   const { mode } = useThemeContext();
+  const { user } = useUser();
+  const [editPrice, setEdit] = useState(false);
 
   const handleAddRow = () => {
     setDetails([
@@ -107,14 +116,16 @@ const DetailsForm = ({
     setDetails(updatedDetails);
   };
 
+  console.log(user);
+
+  useEffect(() => {
+    if ((user as LoggedUser).role === 'admin') {
+      setEdit(true);
+    }
+  }, []);
   return (
     <Card elevation={3} sx={{ padding: 3 }}>
       <Grid container spacing={1}>
-        <Grid item xs={12}>
-          <Button variant="contained" color="primary" onClick={handleAddRow}>
-            Agregar detalle
-          </Button>
-        </Grid>
         {budgetDetails.length === 0 && (
           <Grid item xs={12}>
             <Typography sx={{ color: colors.ligthModeSoftText }}>
@@ -235,6 +246,7 @@ const DetailsForm = ({
                               </InputAdornment>
                             ),
                           }}
+                          disabled={!editPrice}
                         />
                       );
                     }
@@ -281,6 +293,7 @@ const DetailsForm = ({
                           !budgetDetails[index].pagado;
                         setDetails(updatedDetails);
                       }}
+                      disabled={!editPrice}
                     />
                   </Box>
                   <Box>
@@ -300,6 +313,11 @@ const DetailsForm = ({
             </Grid>
           );
         })}
+        <Grid item xs={12}>
+          <Button variant="contained" color="primary" onClick={handleAddRow}>
+            Agregar detalle
+          </Button>
+        </Grid>
       </Grid>
     </Card>
   );

@@ -38,11 +38,36 @@ interface Antecedent {
 }
 
 const badHabits = [
-  { descripcion: 'Succión digital', _id: 1 },
-  { descripcion: 'Respirador bucal', _id: 2 },
-  { descripcion: 'Onicofagia', _id: 3 },
-  { descripcion: 'Succión chupete-mamadera', _id: 4 },
-  { descripcion: 'Deflución atípico', _id: 5 },
+  { descripcion: 'Tabaco', _id: 1 },
+  { descripcion: 'Bruxismo', _id: 2 },
+  { descripcion: 'Interposición lingual', _id: 3 },
+  { descripcion: 'Onicofagia', _id: 4 },
+  { descripcion: 'Succión Digital', _id: 5 },
+  { descripcion: 'Higiene bucal', _id: 6 },
+  { descripcion: 'Consumo sustancias', _id: 7 },
+];
+
+const moribidAntecedents = [
+  { descripcion: 'Diabetes', _id: 1 },
+  { descripcion: 'Hipertensión', _id: 2 },
+  { descripcion: 'Trastorno Coagulación', _id: 3 },
+  { descripcion: 'Enfermedad inmunitaria', _id: 4 },
+  { descripcion: 'Enfermedad Cardiorespiratoria', _id: 5 },
+  { descripcion: 'Enfermedad Reumatologicas', _id: 6 },
+  { descripcion: 'Paciente Oncológico', _id: 7 },
+  { descripcion: 'Trastorno Psiquiátricos', _id: 8 },
+  { descripcion: 'Trastorno Neurodegenerativos', _id: 9 },
+  { descripcion: 'Trastorno Neurodivergentes', _id: 10 },
+  { descripcion: 'Trastorno Neurológicos', _id: 11 },
+  { descripcion: 'Trastornos Neurocognitivos', _id: 12 },
+  { descripcion: 'Discapacidad física', _id: 13 },
+  { descripcion: 'Discapacidad Auditiva', _id: 14 },
+  { descripcion: 'Discapacidad visual', _id: 15 },
+  { descripcion: 'Enfermedades Endocrinas', _id: 16 },
+  { descripcion: 'Enfermedades Infecciosas', _id: 17 },
+  { descripcion: 'Embarazo', _id: 18 },
+  { descripcion: 'Cirugía', _id: 19 },
+  { descripcion: 'Otro', _id: 20 },
 ];
 
 const AntecedentsForm = ({
@@ -277,7 +302,7 @@ const AntecedentsForm = ({
                 </Box>
               );
             })}
-          {type === 'morbid' &&
+          {/* {type === 'morbid' &&
             morbidos.map((a: Antecedent, index) => {
               return (
                 <Box className="mt-2" key={a._id}>
@@ -295,6 +320,33 @@ const AntecedentsForm = ({
                     <Delete />
                   </IconButton>
                 </Box>
+              );
+            })} */}
+          {type === 'morbid' &&
+            moribidAntecedents.map((bh: any) => {
+              return (
+                <FormControl fullWidth key={bh.id}>
+                  <FormControlLabel
+                    label={bh.descripcion}
+                    control={
+                      <Checkbox
+                        checked={morbidos.some(
+                          (h) => h.descripcion === bh.descripcion
+                        )}
+                        onChange={(e, checked) => {
+                          if (checked) {
+                            setMorbidos([...morbidos, bh]);
+                          } else {
+                            const updatedHabits = morbidos.filter(
+                              (h) => h.descripcion !== bh.descripcion
+                            );
+                            setMorbidos(updatedHabits);
+                          }
+                        }}
+                      />
+                    }
+                  />
+                </FormControl>
               );
             })}
           {type === 'allergy' &&

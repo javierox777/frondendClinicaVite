@@ -45,6 +45,29 @@ const badHabits = [
   { descripcion: 'Deflución atípico', id: 5 },
 ];
 
+const moribidAntecedents = [
+  { descripcion: 'Diabetes', _id: 1 },
+  { descripcion: 'Hipertensión', _id: 2 },
+  { descripcion: 'Trastorno Coagulación', _id: 3 },
+  { descripcion: 'Enfermedad inmunitaria', _id: 4 },
+  { descripcion: 'Enfermedad Cardiorespiratoria', _id: 5 },
+  { descripcion: 'Enfermedad Reumatologicas', _id: 6 },
+  { descripcion: 'Paciente Oncológico', _id: 7 },
+  { descripcion: 'Trastorno Psiquiátricos', _id: 8 },
+  { descripcion: 'Trastorno Neurodegenerativos', _id: 9 },
+  { descripcion: 'Trastorno Neurodivergentes', _id: 10 },
+  { descripcion: 'Trastorno Neurológicos', _id: 11 },
+  { descripcion: 'Trastornos Neurocognitivos', _id: 12 },
+  { descripcion: 'Discapacidad física', _id: 13 },
+  { descripcion: 'Discapacidad Auditiva', _id: 14 },
+  { descripcion: 'Discapacidad visual', _id: 15 },
+  { descripcion: 'Enfermedades Endocrinas', _id: 16 },
+  { descripcion: 'Enfermedades Infecciosas', _id: 17 },
+  { descripcion: 'Embarazo', _id: 18 },
+  { descripcion: 'Cirugía', _id: 19 },
+  { descripcion: 'Otro', _id: 20 },
+];
+
 const PatientAntecedents = ({ patient }: Props) => {
   const { mode } = useThemeContext();
   const [value, setValue] = useState(0);
