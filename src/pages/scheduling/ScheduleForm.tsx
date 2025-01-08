@@ -93,7 +93,7 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
     setDayOffToAdd('');
     toast.success('Día libre se ha agregado');
   };
-
+  const fixedDate = new Date(`${startDate}T12:00:00`);
   const handleSubmit = async (e: React.FormEvent) => {
     const data = {
       diasHabilitados: weekDays,
@@ -101,7 +101,7 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
       intervalo: interval,
       profesional: professionalId,
       horaInicio: `${startHour}:${startMinutes}`,
-      fechaInicio: format(new Date(startDate), 'MM/dd/yyyy'),
+      fechaInicio : format(fixedDate, 'MM/dd/yyyy'),
       fechaTermino: format(new Date(endDate), 'MM/dd/yyyy'),
       diasLibres: daysOff,
     };
@@ -164,7 +164,19 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
           error.response.data.message === 'schedule exists'
         ) {
           toast.error(
-            `Ya existe agenda para las fechas:\n${error.response.data.overlappingDates.map((date: string) => `${weekDaysOptions[new Date(date).getDay()].label} ${date}`).join('\n')}`
+            <div>
+              <p>Ya existe agenda para las fechas:</p>
+              <ul>
+                {error.response.data.overlappingDates.map((date: string) => {
+                  const dayLabel = weekDaysOptions[new Date(date).getDay()].label;
+                  return (
+                    <li key={date}>
+                      {dayLabel} {date}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
           );
         }
       } else {
