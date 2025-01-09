@@ -8,14 +8,12 @@ import {
   List,
   Typography,
   Divider,
-
   ListItemIcon,
   ListItemText,
   Switch,
   IconButton,
   Menu,
   MenuItem,
-
   AccordionDetails,
   FormControlLabel,
   ListItemButton,
@@ -34,9 +32,6 @@ import {
   FactCheck,
 } from '@mui/icons-material';
 
-
-
-
 import SettingsIcon from '@mui/icons-material/Settings';
 
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
@@ -45,8 +40,6 @@ import { useThemeContext } from '../../componemts/themeContext';
 import { ParticlesContainer } from './ParticlesFire'; // Asegúrate de importar correctamente
 
 import PaletteIcon from '@mui/icons-material/Palette';
-
-
 
 import PatientsPage from '../../pages/patients/PatientsPage';
 import InstitutionForm from '../../pages/institucion/InstitutionForm';
@@ -81,8 +74,6 @@ import PatientRecord from '../../pages/clinicalrecord/PatientRecord';
 
 import Administracion from '../../pages/admin/Admin';
 
-
-
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import ParticlesIcon from '@mui/icons-material/Cloud';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -97,6 +88,7 @@ import { JwtPayload } from 'jwt-decode';
 import { decodeJwt } from '../../auth/decodeJwt';
 import ConsentMain from '../../pages/consent/ConsentMain';
 import EditConsentPage from '../../pages/consent/EditConsentPage';
+import DentistSchedule from '../../pages/dentistSchedule/DentistSchedule';
 
 const drawerWidth = 240;
 
@@ -106,21 +98,25 @@ const DashboardLayout: React.FC = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [particlesEnabled, setParticlesEnabled] = useState(true); // Estado para controlar las partículas
   // Estados iniciales con gradientes
-// Cambia los estados iniciales:
-// const [topbarColor, setTopbarColor] = useState('linear-gradient(to right, #9C27B0, #E91E63)');
-// const [drawerColor, setDrawerColor] = useState('linear-gradient(to bottom, #E91E63, #9C27B0)');
+  // Cambia los estados iniciales:
+  // const [topbarColor, setTopbarColor] = useState('linear-gradient(to right, #9C27B0, #E91E63)');
+  // const [drawerColor, setDrawerColor] = useState('linear-gradient(to bottom, #E91E63, #9C27B0)');
 
-const [topbarColor, setTopbarColor] = useState(
-  'linear-gradient(to right, rgba(225,190,231,0.7), rgba(244,143,177,0.7))'
-);
-const [drawerColor, setDrawerColor] = useState(
-  'linear-gradient(to bottom, rgba(244,143,177,0.7), rgba(225,190,231,0.7))'
-);
+  const [topbarColor, setTopbarColor] = useState(
+    'linear-gradient(to right, rgba(225,190,231,0.7), rgba(244,143,177,0.7))'
+  );
+  const [drawerColor, setDrawerColor] = useState(
+    'linear-gradient(to bottom, rgba(244,143,177,0.7), rgba(225,190,231,0.7))'
+  );
 
-
-
-
-  const colorPalette = ['#1976D2', '#FF5722', '#4CAF50', '#9C27B0', '#FFC107', '#607D8B']; // Paleta de colores
+  const colorPalette = [
+    '#1976D2',
+    '#FF5722',
+    '#4CAF50',
+    '#9C27B0',
+    '#FFC107',
+    '#607D8B',
+  ]; // Paleta de colores
 
   const open = Boolean(anchorEl);
   const { user, setUser, loading } = useUser();
@@ -163,9 +159,9 @@ const [drawerColor, setDrawerColor] = useState(
     }
   };
   const handleLogout = async () => {
-    await authStorage.removeToken(); 
-    setUser(null); 
-    navigate('/login'); 
+    await authStorage.removeToken();
+    setUser(null);
+    navigate('/login');
   };
 
   useEffect(() => {
@@ -173,22 +169,99 @@ const [drawerColor, setDrawerColor] = useState(
   }, []);
 
   const menuItems = [
-    { id: 1, label: 'Inicio', icon: <Dashboard />, path: '/inicio', roles: ['admin', 'user'] },
-    { id: 2, label: 'Administración', icon: <AdminPanelSettings />, path: '/administracion', roles: ['admin'] },
-    { id: 3, label: 'Pacientes', icon: <Group />, path: '/pacientes', roles: ['admin', 'user'] },
-    { id: 4, label: 'Profesionales', icon: <Engineering />, path: '/profesionales', roles: ['admin'] },
-    { id: 5, label: 'Presupuestos', icon: <AttachMoney />, path: '/presupuestos', roles: ['admin', 'user'] },
-    { id: 6, label: 'Agenda', icon: <Event />, path: '/agenda', roles: ['admin', 'user'] },
-    { id: 7, label: 'Programación', icon: <Schedule />, path: '/programacion', roles: ['admin'] },
-    { id: 8, label: 'Receta', icon: <MedicalServices />, path: '/receta', roles: ['admin', 'user'] },
-    { id: 9, label: 'Módulo dental', icon: <HealthAndSafety />, path: '/modulodental', roles: ['admin', 'user'] },
-    { id: 10, label: 'Consentimiento', icon: <AssignmentTurnedIn />, path: '/consentimiento', roles: ['admin', 'user'] },
-    { id: 11, label: 'Atención', icon: <FactCheck />, path: '/atencionhoy', roles: ['admin', 'user'] },
+    {
+      id: 1,
+      label: 'Inicio',
+      icon: <Dashboard />,
+      path: '/inicio',
+      roles: ['admin', 'user'],
+    },
+    {
+      id: 2,
+      label: 'Administración',
+      icon: <AdminPanelSettings />,
+      path: '/administracion',
+      roles: ['admin'],
+    },
+    {
+      id: 3,
+      label: 'Pacientes',
+      icon: <Group />,
+      path: '/pacientes',
+      roles: ['admin', 'user'],
+    },
+    {
+      id: 4,
+      label: 'Profesionales',
+      icon: <Engineering />,
+      path: '/profesionales',
+      roles: ['admin'],
+    },
+    {
+      id: 5,
+      label: 'Presupuestos',
+      icon: <AttachMoney />,
+      path: '/presupuestos',
+      roles: ['admin', 'user'],
+    },
+    {
+      id: 6,
+      label: 'Agenda',
+      icon: <Event />,
+      path: '/agenda',
+      roles: ['admin'],
+    },
+    {
+      id: 12,
+      label: 'Agenda',
+      icon: <Event />,
+      path: '/agendadentista',
+      roles: ['user'],
+    },
+    {
+      id: 7,
+      label: 'Programación',
+      icon: <Schedule />,
+      path: '/programacion',
+      roles: ['admin'],
+    },
+    {
+      id: 8,
+      label: 'Receta',
+      icon: <MedicalServices />,
+      path: '/receta',
+      roles: ['admin', 'user'],
+    },
+    {
+      id: 9,
+      label: 'Módulo dental',
+      icon: <HealthAndSafety />,
+      path: '/modulodental',
+      roles: ['admin', 'user'],
+    },
+    {
+      id: 10,
+      label: 'Consentimiento',
+      icon: <AssignmentTurnedIn />,
+      path: '/consentimiento',
+      roles: ['admin', 'user'],
+    },
+    {
+      id: 11,
+      label: 'Atención',
+      icon: <FactCheck />,
+      path: '/atencionhoy',
+      roles: ['admin', 'user'],
+    },
   ];
 
   // Mantén el estado para el anclaje del menú
-  const [anchorElTopbar, setAnchorElTopbar] = useState<null | HTMLElement>(null);
-  const [anchorElDrawer, setAnchorElDrawer] = useState<null | HTMLElement>(null);
+  const [anchorElTopbar, setAnchorElTopbar] = useState<null | HTMLElement>(
+    null
+  );
+  const [anchorElDrawer, setAnchorElDrawer] = useState<null | HTMLElement>(
+    null
+  );
 
   // Manejar apertura y cierre del menú
   const openTopbarMenu = Boolean(anchorElTopbar);
@@ -235,14 +308,16 @@ const [drawerColor, setDrawerColor] = useState(
       {/* Renderiza las partículas solo si están habilitadas */}
       <CssBaseline />
       <AppBar
-  position="fixed"
-  sx={{
-    background: topbarColor,
-    zIndex: (theme) => theme.zIndex.drawer + 1,
-  }}
->
+        position="fixed"
+        sx={{
+          background: topbarColor,
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+        }}
+      >
         <Toolbar>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1, mr: 1 }}>
+          <Box
+            sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1, mr: 1 }}
+          >
             <IconButton
               onClick={handleDrawerToggle}
               sx={{
@@ -349,16 +424,15 @@ const [drawerColor, setDrawerColor] = useState(
         </Toolbar>
       </AppBar>
       <Drawer
-  variant="persistent"
-  open={drawerOpen}
-  sx={{
-    '& .MuiDrawer-paper': {
-      width: drawerWidth,
-      background: drawerColor,
-    },
-  }}
->
-
+        variant="persistent"
+        open={drawerOpen}
+        sx={{
+          '& .MuiDrawer-paper': {
+            width: drawerWidth,
+            background: drawerColor,
+          },
+        }}
+      >
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <Box
@@ -367,14 +441,15 @@ const [drawerColor, setDrawerColor] = useState(
               justifyContent: 'flex-end', // Alinea el contenido al final (derecha)
               padding: 1, // Espacio alrededor del botón
             }}
-          >
-
-          </Box>
+          ></Box>
           <Box sx={{ overflow: 'auto', marginTop: '50px' }}>
             <List>
               {/* Menu items */}
               {menuItems
-                .filter((item) => isLoggedUser(user) && item.roles.includes(user.role!))
+                .filter(
+                  (item) =>
+                    isLoggedUser(user) && item.roles.includes(user.role!)
+                )
                 .map((item) => (
                   <ListItemButton
                     key={item.id}
@@ -392,93 +467,115 @@ const [drawerColor, setDrawerColor] = useState(
                     <ListItemIcon
                       sx={{
                         color:
-                          location.pathname === item.path ? 'primary.main' : 'inherit',
+                          location.pathname === item.path
+                            ? 'primary.main'
+                            : 'inherit',
                       }}
                     >
                       {item.icon}
                     </ListItemIcon>
-                    <ListItemText primary={item.label} sx={{ color: 'white' }} />
+                    <ListItemText
+                      primary={item.label}
+                      sx={{ color: 'white' }}
+                    />
                   </ListItemButton>
                 ))}
               {/* Submenu */}
               <AccordionDetails sx={{ background: 'rgba(0, 0, 0, 0.2)' }}>
-  {/* Icono para seleccionar colores del Topbar */}
-  <Typography variant="subtitle1" sx={{ color: 'white', display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-    Colores del Topbar
-    <IconButton
-      onClick={handleOpenTopbarMenu}
-      sx={{ color: 'white' }}
-      aria-label="Seleccionar color del Topbar"
-    >
-      <PaletteIcon />
-    </IconButton>
-  </Typography>
-  <Menu
-    anchorEl={anchorElTopbar}
-    open={openTopbarMenu}
-    onClose={handleCloseTopbarMenu}
-  >
-    {colorPalette.map((color) => (
-      <MenuItem
-        key={color}
-        onClick={() => {
-          handleColorChange('topbar', color);
-          handleCloseTopbarMenu();
-        }}
-      >
-        <Box
-          sx={{
-            width: 24,
-            height: 24,
-            backgroundColor: color,
-            borderRadius: '50%',
-            marginRight: 1,
-          }}
-        />
-        {color}
-      </MenuItem>
-    ))}
-  </Menu>
+                {/* Icono para seleccionar colores del Topbar */}
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    mb: 2,
+                  }}
+                >
+                  Colores del Topbar
+                  <IconButton
+                    onClick={handleOpenTopbarMenu}
+                    sx={{ color: 'white' }}
+                    aria-label="Seleccionar color del Topbar"
+                  >
+                    <PaletteIcon />
+                  </IconButton>
+                </Typography>
+                <Menu
+                  anchorEl={anchorElTopbar}
+                  open={openTopbarMenu}
+                  onClose={handleCloseTopbarMenu}
+                >
+                  {colorPalette.map((color) => (
+                    <MenuItem
+                      key={color}
+                      onClick={() => {
+                        handleColorChange('topbar', color);
+                        handleCloseTopbarMenu();
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 24,
+                          height: 24,
+                          backgroundColor: color,
+                          borderRadius: '50%',
+                          marginRight: 1,
+                        }}
+                      />
+                      {color}
+                    </MenuItem>
+                  ))}
+                </Menu>
 
-  {/* Icono para seleccionar colores del Drawer */}
-  <Typography variant="subtitle1" sx={{ color: 'white', display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
-    Colores del Drawer
-    <IconButton
-      onClick={handleOpenDrawerMenu}
-      sx={{ color: 'white' }}
-      aria-label="Seleccionar color del Drawer"
-    >
-      <PaletteIcon />
-    </IconButton>
-  </Typography>
-  <Menu
-    anchorEl={anchorElDrawer}
-    open={openDrawerMenu}
-    onClose={handleCloseDrawerMenu}
-  >
-    {colorPalette.map((color) => (
-      <MenuItem
-        key={color}
-        onClick={() => {
-          handleColorChange('drawer', color);
-          handleCloseDrawerMenu();
-        }}
-      >
-        <Box
-          sx={{
-            width: 24,
-            height: 24,
-            backgroundColor: color,
-            borderRadius: '50%',
-            marginRight: 1,
-          }}
-        />
-        {color}
-      </MenuItem>
-    ))}
-  </Menu>
-</AccordionDetails>
-
+                {/* Icono para seleccionar colores del Drawer */}
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    mt: 2,
+                  }}
+                >
+                  Colores del Drawer
+                  <IconButton
+                    onClick={handleOpenDrawerMenu}
+                    sx={{ color: 'white' }}
+                    aria-label="Seleccionar color del Drawer"
+                  >
+                    <PaletteIcon />
+                  </IconButton>
+                </Typography>
+                <Menu
+                  anchorEl={anchorElDrawer}
+                  open={openDrawerMenu}
+                  onClose={handleCloseDrawerMenu}
+                >
+                  {colorPalette.map((color) => (
+                    <MenuItem
+                      key={color}
+                      onClick={() => {
+                        handleColorChange('drawer', color);
+                        handleCloseDrawerMenu();
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 24,
+                          height: 24,
+                          backgroundColor: color,
+                          borderRadius: '50%',
+                          marginRight: 1,
+                        }}
+                      />
+                      {color}
+                    </MenuItem>
+                  ))}
+                </Menu>
+              </AccordionDetails>
             </List>
           </Box>
           <Divider />
@@ -536,6 +633,7 @@ const [drawerColor, setDrawerColor] = useState(
             <Route path="/modulodental" element={<ClinicalRecordPage />} />
             <Route path="/fichaclinica" element={<PatientRecord />} />
             <Route path="/atencionpaciente" element={<CurrentPatient />} />
+            <Route path="/agendadentista" element={<DentistSchedule />} />
             <Route
               path="/editarprofesional"
               element={<EditProfessionalPage />}

@@ -98,7 +98,8 @@ const OdontogramTab = ({ odontograms, afterSubmit, persona }: Props) => {
           {odontograms && odontograms.length === 0 && (
             <Grid item>
               <Typography>
-                No se ha registrado odontograma para este paciente.
+                Se registrará odontograma para paciente, con fecha de registro{' '}
+                {new Date().toLocaleDateString()}
               </Typography>
             </Grid>
           )}
