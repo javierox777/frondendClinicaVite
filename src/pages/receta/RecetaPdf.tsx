@@ -208,6 +208,7 @@ const RecetaTemplate = ({ receta }: Props) => {
             <thead>
               <tr className="border-blue-700 border">
                 <th className="border-blue-700 border">Medicamento</th>
+                <th className="border-blue-700 border">Cada</th>
                 <th className="border-blue-700 border">Fracción</th>
                 <th className="border-blue-700 border">Días</th>
               </tr>
@@ -218,6 +219,7 @@ const RecetaTemplate = ({ receta }: Props) => {
                   <tr key={d._id}>
                     <td className="text-center">{d.objeto}</td>
                     <td className="text-center">{d.intervalo}</td>
+                    <td className="text-center">{d.fraccion}</td>
                     <td className="text-center">{d.dias}</td>
                   </tr>
                 ))}

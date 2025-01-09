@@ -108,6 +108,7 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
       objeto: '',
       dias: 0,
       intervalo: '',
+      fraccion: '',
       _id: (Math.random() * 1000).toString(),
     },
   ]);
@@ -155,7 +156,7 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
     },
   });
 
-  const { data: statuses, isLoading} = useQuery({
+  const { data: statuses, isLoading } = useQuery({
     queryKey: ['statuses'],
     queryFn: async () => {
       const response = await axios.get(`${generalConfig.baseUrl}/statuses`);
@@ -177,7 +178,7 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
 
   const handleDetailChange = (
     e: ChangeEvent<HTMLInputElement> | SelectChangeEvent<string>,
-    field: 'objeto' | 'dias' | 'intervalo',
+    field: 'objeto' | 'dias' | 'intervalo' | 'fraccion',
     index: number
   ) => {
     const updatedDetails = [...details];
@@ -253,6 +254,7 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
               objeto: '',
               dias: 0,
               intervalo: '',
+              fraccion: '',
               _id: (Math.random() * 1000).toString(),
             },
           ]);
@@ -527,6 +529,7 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
                         objeto: '',
                         dias: 0,
                         intervalo: '',
+                        fraccion: '',
                         _id: (Math.random() * 1000).toString(),
                       },
                     ]);
@@ -578,6 +581,19 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
                               : 'white',
                         }}
                       >
+                        Cada/Horas
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography
+                        style={{
+                          fontWeight: 'bold',
+                          color:
+                            mode === 'light'
+                              ? colors.lightModeTableText
+                              : 'white',
+                        }}
+                      >
                         Fracción
                       </Typography>
                     </TableCell>
@@ -616,7 +632,7 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
                         <TableCell>
                           <FormControl fullWidth>
                             <InputLabel id="fraction-select-label">
-                              Fracción
+                              Cada cuantas horas
                             </InputLabel>
                             <Select
                               required
@@ -636,6 +652,17 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
                                 );
                               })}
                             </Select>
+                          </FormControl>
+                        </TableCell>
+                        <TableCell>
+                          <FormControl fullWidth>
+                            <TextField
+                              required
+                              value={d.fraccion}
+                              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                handleDetailChange(e, 'fraccion', index);
+                              }}
+                            />
                           </FormControl>
                         </TableCell>
                         <TableCell>

@@ -6,5 +6,6 @@ export interface ReceiptDetail {
     objeto: string;
     receta?: string | Receipt;
     dias:number,
-    intervalo:string
+    intervalo:string,
+    fraccion:string
 }
