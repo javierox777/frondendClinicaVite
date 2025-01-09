@@ -22,7 +22,6 @@ import { Diente } from '../../interfaces/Diente';
 
 import { jsPDF } from 'jspdf';
 
-
 import diente11 from '../../assets/dientes/diente_11.png';
 import diente12 from '../../assets/dientes/diente_12.png';
 import diente13 from '../../assets/dientes/diente_13.png';
@@ -88,8 +87,6 @@ import toast, { Toaster } from 'react-hot-toast';
 import axios from 'axios';
 import { generalConfig } from '../../config';
 import TreatmentForm from './TreatmentForm';
-
-
 
 interface Person {
   _id: string;
@@ -242,8 +239,6 @@ const Odontogramm = ({ odontogram }: Props) => {
       }, 100);
     }
   }, [odontogram]);
-  
-  
 
   const handleUpdate = (tooth: Diente, part: string) => {
     const updatedTeeth = [...teeth!];
@@ -256,49 +251,48 @@ const Odontogramm = ({ odontogram }: Props) => {
 
     setTeeth(updatedTeeth);
 
- const getTreatment = items.find((i) => i.id === treatment.selected);
+    const getTreatment = items.find((i) => i.id === treatment.selected);
 
- if (!getTreatment) {
-  // Manejar el caso en que NO se encuentre el tratamiento, por ejemplo:
-  return; // o mostrar un error, etc.
-}
+    if (!getTreatment) {
+      // Manejar el caso en que NO se encuentre el tratamiento, por ejemplo:
+      return; // o mostrar un error, etc.
+    }
 
-if (getTreatment?.title === 'Resetear parte') {
-  // Eliminar el tratamiento correspondiente a esta pieza y parte
-  const newTreatments = treatments.filter(
-    (t) => !(t.pieza.diente === tooth.pieza && t.pieza.parte === part)
-  );
-  setTreatments(newTreatments);
-} else {
-  // Aquí mantienes la lógica existente de agregar un nuevo tratamiento
-  // Si no existe un tratamiento igual en el día de hoy
-  const today = new Date().toDateString();
-  const treatmentExists = treatments.some(
-    (t) =>
-      t.pieza.diente === tooth.pieza &&
-      t.pieza.parte === part &&
-      t.detalle === getTreatment.title &&
-      new Date(t.fecha).toDateString() === today
-  );
+    if (getTreatment?.title === 'Resetear parte') {
+      // Eliminar el tratamiento correspondiente a esta pieza y parte
+      const newTreatments = treatments.filter(
+        (t) => !(t.pieza.diente === tooth.pieza && t.pieza.parte === part)
+      );
+      setTreatments(newTreatments);
+    } else {
+      // Aquí mantienes la lógica existente de agregar un nuevo tratamiento
+      // Si no existe un tratamiento igual en el día de hoy
+      const today = new Date().toDateString();
+      const treatmentExists = treatments.some(
+        (t) =>
+          t.pieza.diente === tooth.pieza &&
+          t.pieza.parte === part &&
+          t.detalle === getTreatment.title &&
+          new Date(t.fecha).toDateString() === today
+      );
 
-  if (!treatmentExists) {
-    setTreatments([
-      ...treatments,
-      {
-        detalle: getTreatment.title,
-        fecha: new Date(),
-        profesional: (user as User).profesionalId,
-        pieza: {
-          diente: tooth.pieza!,
-          parte: part,
-        },
-        _id: (Math.random() * 1000).toString(),
-        observacion: 'sin novedad',
-      },
-    ]);
-  }
-}
-
+      if (!treatmentExists) {
+        setTreatments([
+          ...treatments,
+          {
+            detalle: getTreatment.title,
+            fecha: new Date(),
+            profesional: (user as User).profesionalId,
+            pieza: {
+              diente: tooth.pieza!,
+              parte: part,
+            },
+            _id: (Math.random() * 1000).toString(),
+            observacion: 'sin novedad',
+          },
+        ]);
+      }
+    }
   };
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -385,13 +379,13 @@ if (getTreatment?.title === 'Resetear parte') {
       doc.setTextColor(0, 102, 204); // Azul (RGB: 0, 102, 204)
       doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
 
-       // Subtítulo "ODONTOGRAMA" (azul también)
-       doc.setFontSize(16);
-       doc.setTextColor(0, 102, 204); // Azul (igual que "AMANIA")
-       doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' });
+      // Subtítulo "ODONTOGRAMA" (azul también)
+      doc.setFontSize(16);
+      doc.setTextColor(0, 102, 204); // Azul (igual que "AMANIA")
+      doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' });
 
       // Logo
-      const logoUrl = '/logo.png'; 
+      const logoUrl = '/logo.png';
       doc.addImage(logoUrl, 'PNG', 10, 10, 30, 30);
 
       // Crear tabla principal con celdas y bordes
@@ -416,9 +410,12 @@ if (getTreatment?.title === 'Resetear parte') {
 
       // Segunda columna: CONVENIO y 3 y 4
 
-      doc.text(`CONVENIO : ${persona.institucion.nombre}`, startX + 2 , currentY + 6);
-      doc.rect(startX , currentY + 1, 190, cellHeight);
-;
+      doc.text(
+        `CONVENIO : ${persona.institucion.nombre}`,
+        startX + 2,
+        currentY + 6
+      );
+      doc.rect(startX, currentY + 1, 190, cellHeight);
       // doc.rect(startX + 140, currentY + 8, 50, cellHeight); // Rectángulo para Recomendación
       // doc.text('4.- Casualidad/Otro', startX + 97, currentY + 22);
       // doc.rect(startX + 140, currentY + 16, 50, cellHeight); // R
@@ -686,7 +683,6 @@ if (getTreatment?.title === 'Resetear parte') {
       // Título "AMANIA" (color azul)
       doc.setTextColor(0, 102, 204); // Azul (RGB: 0, 102, 204)
       doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
-      
 
       // Subtítulo "ODONTOGRAMA" (azul también)
       doc.setFontSize(16);
@@ -755,11 +751,9 @@ if (getTreatment?.title === 'Resetear parte') {
           }
 
           // Obtener tratamiento dinámico del backend
-          const toothParts = tooth.pieza
-          ? treatmentsData[tooth.pieza]
-          : {}; // fallback to an empty object
-        
-        drawToothShape(toothX + 1, toothY + toothHeight + 3, toothParts);
+          const toothParts = tooth.pieza ? treatmentsData[tooth.pieza] : {}; // fallback to an empty object
+
+          drawToothShape(toothX + 1, toothY + toothHeight + 3, toothParts);
 
           toothX += toothWidth + gap;
         });
@@ -854,8 +848,8 @@ if (getTreatment?.title === 'Resetear parte') {
           doc.text(
             value,
             startX +
-            columnWidths.slice(0, index).reduce((a, b) => a + b, 0) +
-            2,
+              columnWidths.slice(0, index).reduce((a, b) => a + b, 0) +
+              2,
             currentY + 7
           );
         });
@@ -889,9 +883,9 @@ if (getTreatment?.title === 'Resetear parte') {
     Caries: '#FF0000',
     'Corona Definitiva': 'rgb(255, 207, 54)',
     'Corona Provisoria': 'rgb(255	151	41)',
-    'Restauración': '#32CD32',
-    'Fractura': '#A52A2A',
-    'Endodoncia': '#00CED1',
+    Restauración: '#32CD32',
+    Fractura: '#A52A2A',
+    Endodoncia: '#00CED1',
     'Protesis Fija': '#B8860B',
     'Protesis Removible': '#F4A460',
     'Protesis Total': '#FFDEAD',
@@ -900,28 +894,28 @@ if (getTreatment?.title === 'Resetear parte') {
     'Tratamiento Pulpar': '#FF6347',
     'Diente Ausente': '#000000',
     'Diente Discromico': '#8B4513',
-    'Giroversión': '#B0E0E6',
-    'Implante': '#2E8B57',
-    'Migración': '#6A5ACD',
-    'Movilidad': '#FFB6C1',
-    'Microdoncia': '#87CEEB',
-    'Macrodoncia': '#8FBC8F',
+    Giroversión: '#B0E0E6',
+    Implante: '#2E8B57',
+    Migración: '#6A5ACD',
+    Movilidad: '#FFB6C1',
+    Microdoncia: '#87CEEB',
+    Macrodoncia: '#8FBC8F',
     'Semi Impactación': '#B22222',
-    'Supernumerario': '#FF8C00',
+    Supernumerario: '#FF8C00',
     'Restauración Temporal': '#9ACD32',
     'Desgaste Oclusal/Incisal': '#808080',
-    'Diastema': '#00CED1',
+    Diastema: '#00CED1',
     'Geminación/Fusión': '#BA55D3',
-    'Impactación': '#8B0000',
+    Impactación: '#8B0000',
     'Resto Radicular': '#2F4F4F',
-    'Diente incluido':'rgb(177,	23,	32)',
-    'Diente Extruido':'#FF69B4',
-    'Diente Intruido':'#DB7093',
-    'Endentulo Total':'#D3D3D3',
-    'Protesis Fija Plural':'#B8860B',
-    'Protesis Removible Parcial':'#F4A460',
-    'Protesis Removible Total':'#FFDEAD',
-    'Transposición':'#20B2AA' 
+    'Diente incluido': 'rgb(177,	23,	32)',
+    'Diente Extruido': '#FF69B4',
+    'Diente Intruido': '#DB7093',
+    'Endentulo Total': '#D3D3D3',
+    'Protesis Fija Plural': '#B8860B',
+    'Protesis Removible Parcial': '#F4A460',
+    'Protesis Removible Total': '#FFDEAD',
+    Transposición: '#20B2AA',
   };
 
   const treatmentsWithColor = treatments.map((t: ITreatment) => {
@@ -953,6 +947,8 @@ if (getTreatment?.title === 'Resetear parte') {
       },
     };
   });
+
+  if (!odontogram) return <LinearProgress />;
 
   return (
     <>
@@ -1394,11 +1390,6 @@ if (getTreatment?.title === 'Resetear parte') {
                     Atención
                   </TableCell>
 
-
-
-
-
-
                   <TableCell
                     style={{
                       fontWeight: 'bold',
@@ -1421,14 +1412,26 @@ if (getTreatment?.title === 'Resetear parte') {
                 {treatmentsWithColor
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((t: ITreatment) => {
-                    const bucalColor = t.pieza.parte === 'bucal' ? t.pieza.bucal?.color : '#FFFFFF';
-                    const distalColor = t.pieza.parte === 'distal' ? t.pieza.distal?.color : '#FFFFFF';
-                    const oclusalColor = t.pieza.parte === 'oclusal' ? t.pieza.oclusal?.color : '#FFFFFF';
-                    const mesialColor = t.pieza.parte === 'mesial' ? t.pieza.mesial?.color : '#FFFFFF';
-                    const lingualColor = t.pieza.parte === 'lingualpalatino' ? t.pieza.lingualpalatino?.color : '#FFFFFF';
-                
-
-
+                    const bucalColor =
+                      t.pieza.parte === 'bucal'
+                        ? t.pieza.bucal?.color
+                        : '#FFFFFF';
+                    const distalColor =
+                      t.pieza.parte === 'distal'
+                        ? t.pieza.distal?.color
+                        : '#FFFFFF';
+                    const oclusalColor =
+                      t.pieza.parte === 'oclusal'
+                        ? t.pieza.oclusal?.color
+                        : '#FFFFFF';
+                    const mesialColor =
+                      t.pieza.parte === 'mesial'
+                        ? t.pieza.mesial?.color
+                        : '#FFFFFF';
+                    const lingualColor =
+                      t.pieza.parte === 'lingualpalatino'
+                        ? t.pieza.lingualpalatino?.color
+                        : '#FFFFFF';
 
                     return (
                       <TableRow key={t._id}>
@@ -1460,10 +1463,16 @@ if (getTreatment?.title === 'Resetear parte') {
                         </TableCell>
                         {/* pintar cruz */}
                         <TableCell>
-                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <div
+                            style={{ display: 'flex', alignItems: 'center' }}
+                          >
                             {/* Imagen del diente */}
                             <img
-                              src={dientesImages[`diente${t.pieza.diente}` as DienteKeys]}
+                              src={
+                                dientesImages[
+                                  `diente${t.pieza.diente}` as DienteKeys
+                                ]
+                              }
                               alt={`Diente ${t.pieza.diente}`}
                               style={{ height: '50px', marginRight: '10px' }}
                             />
@@ -1477,7 +1486,6 @@ if (getTreatment?.title === 'Resetear parte') {
                                 gap: '1px',
                                 width: '32px',
                                 height: '32px',
-                               
                               }}
                             >
                               {/* Bucal (arriba) */}
@@ -1548,35 +1556,35 @@ if (getTreatment?.title === 'Resetear parte') {
 
                               updatedTeeth[toothIndex][
                                 t.pieza.parte as
-                                | 'bucal'
-                                | 'distal'
-                                | 'oclusal'
-                                | 'mesial'
-                                | 'lingualpalatino'
+                                  | 'bucal'
+                                  | 'distal'
+                                  | 'oclusal'
+                                  | 'mesial'
+                                  | 'lingualpalatino'
                               ].color = '#FFFFFF';
                               updatedTeeth[toothIndex][
                                 t.pieza.parte as
-                                | 'bucal'
-                                | 'distal'
-                                | 'oclusal'
-                                | 'mesial'
-                                | 'lingualpalatino'
+                                  | 'bucal'
+                                  | 'distal'
+                                  | 'oclusal'
+                                  | 'mesial'
+                                  | 'lingualpalatino'
                               ].detalle = '';
                               updatedTeeth[toothIndex][
                                 t.pieza.parte as
-                                | 'bucal'
-                                | 'distal'
-                                | 'oclusal'
-                                | 'mesial'
-                                | 'lingualpalatino'
+                                  | 'bucal'
+                                  | 'distal'
+                                  | 'oclusal'
+                                  | 'mesial'
+                                  | 'lingualpalatino'
                               ].diagnostico = '';
                               updatedTeeth[toothIndex][
                                 t.pieza.parte as
-                                | 'bucal'
-                                | 'distal'
-                                | 'oclusal'
-                                | 'mesial'
-                                | 'lingualpalatino'
+                                  | 'bucal'
+                                  | 'distal'
+                                  | 'oclusal'
+                                  | 'mesial'
+                                  | 'lingualpalatino'
                               ].estado = '';
 
                               setTeeth(updatedTeeth);

@@ -63,13 +63,16 @@ const OdontogramTab = ({ odontograms, afterSubmit, persona }: Props) => {
   const createOdontogram = async () => {
     try {
       setCreating(true);
+      const formattedDate = format(new Date(), 'yyyy/MM/dd');
+      console.log(formattedDate);
+      const payload = {
+        profesionalModifica: (user as User).profesionalId,
+        persona: persona._id,
+        fecha: formattedDate,
+      };
       const response = await axios.post(
         `${generalConfig.baseUrl}/odontogramas`,
-        {
-          profesionalModifica: (user as User).profesionalId,
-          persona: persona._id,
-          fecha: format(new Date(), 'yyyy/mm/dd'),
-        }
+        payload
       );
 
       if (response.data.message === 'success') {
@@ -120,7 +123,7 @@ const OdontogramTab = ({ odontograms, afterSubmit, persona }: Props) => {
 
   return (
     <>
-      <Odontogramm odontogram={selectedOdontogram} />
+      {selectedOdontogram && <Odontogramm odontogram={selectedOdontogram} />}
       <Toaster />
       <Dialog
         fullScreen

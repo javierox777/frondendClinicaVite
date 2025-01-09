@@ -63,12 +63,14 @@ const OdontogramTab = ({ odontograms, afterSubmit, persona }: Props) => {
   const createOdontogram = async () => {
     try {
       setCreating(true);
+      const formattedDate = format(new Date(), 'yyyy/MM/dd');
+      console.log(formattedDate);
       const response = await axios.post(
         `${generalConfig.baseUrl}/odontogramas`,
         {
           profesionalModifica: (user as User).profesionalId,
           persona: persona._id,
-          fecha: format(new Date(), 'yyyy/mm/dd'),
+          fecha: formattedDate,
         }
       );
 
@@ -87,7 +89,7 @@ const OdontogramTab = ({ odontograms, afterSubmit, persona }: Props) => {
 
   useEffect(() => {
     if (odontograms) setOdontogram(odontograms[0]);
-  }, []);
+  }, [odontograms]);
 
   if (odontograms && odontograms.length === 0)
     return (
