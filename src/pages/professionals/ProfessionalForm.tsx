@@ -104,6 +104,12 @@ const ProfessionalForm = ({
       login: username,
       password: password,
     };
+    const isValid = validarRutSinDigitoVerificador(rut);
+
+    if (!isValid) {
+      toast.error('Rut no valido.');
+      setSubmitting(false);
+    }
 
     if (professional) {
       try {
