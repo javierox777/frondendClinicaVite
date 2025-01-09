@@ -29,6 +29,7 @@ import { Person } from '../../interfaces/Person';
 import colors from '../../styles/colors';
 import { Link } from 'react-router-dom';
 import AppLink from '../../componemts/AppLink';
+import { formatRut } from '../../helpers/formatRut';
 
 interface Props {
   refetch?: boolean;
@@ -186,7 +187,11 @@ const PatientsTableRecord = ({ refetch }: Props) => {
                       >
                         {p.nombre1} {p.apellPat}
                       </TableCell>
-                      <TableCell>{p.rut}</TableCell>
+                      <TableCell>
+                        {formatRut(p.rut)}
+                        {'-'}
+                        {p.dv}
+                      </TableCell>
                       <TableCell>{p.institucion.nombre}</TableCell>
                     </TableRow>
                   );

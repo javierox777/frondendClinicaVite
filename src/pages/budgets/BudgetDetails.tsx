@@ -33,6 +33,7 @@ import { Contact } from '../../interfaces/Contact';
 import { ServiceType } from '../../interfaces/ServiceType';
 import colors from '../../styles/colors';
 import { useEffect, useState } from 'react';
+import { formatRut } from '../../helpers/formatRut';
 
 interface Props {
   budget: Budget;
@@ -293,7 +294,7 @@ const BudgetDetails = ({ budget }: Props) => {
               <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                 <Typography sx={{ fontWeight: 'bold' }}>RUT</Typography>
                 <Typography>
-                  {persona.rut} - {persona.dv}
+                  {formatRut(persona.rut)} - {persona.dv.toUpperCase()}
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>

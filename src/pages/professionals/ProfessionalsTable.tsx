@@ -22,6 +22,7 @@ import TableSkeleton from '../../componemts/TableSkeleton';
 import { Professional } from '../../interfaces/Professional';
 import { Edit, Search } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { formatRut } from '../../helpers/formatRut';
 
 interface Props {
   refetch?: boolean;
@@ -162,7 +163,11 @@ const ProfessionalsTable = ({ refetch }: Props) => {
                       >
                         {p.nombre1} {p.apellPat}
                       </TableCell>
-                      <TableCell>{p.rut}</TableCell>
+                      <TableCell>
+                        {formatRut(p.rut)}
+                        {'-'}
+                        {p.dv}
+                      </TableCell>
                       <TableCell>{p.email}</TableCell>
                       <TableCell>{p.celular}</TableCell>
                       <TableCell>

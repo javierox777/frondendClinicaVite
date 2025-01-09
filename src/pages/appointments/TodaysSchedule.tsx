@@ -22,6 +22,7 @@ import { useThemeContext } from '../../componemts/themeContext';
 import { generalConfig } from '../../config';
 import { Appointment } from '../../interfaces/Appointment';
 import colors from '../../styles/colors';
+import { formatRut } from '../../helpers/formatRut';
 
 const tableHeadings = [
   { id: 1, label: 'Paciente' },
@@ -144,7 +145,7 @@ const TodaysSchedule = () => {
                           {a.persona.apellMat.toLowerCase()}
                         </TableCell>
                         <TableCell>
-                          {a.persona.rut}-{a.persona.dv}
+                          {formatRut(a.persona.rut)}-{a.persona.dv}
                         </TableCell>
                         <TableCell>
                           {a.profesional.nombre1} {a.profesional.apellPat}

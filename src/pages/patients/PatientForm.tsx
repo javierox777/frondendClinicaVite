@@ -38,6 +38,7 @@ import HeaderMenu from './Menu';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { ServiceType } from '../../interfaces/ServiceType';
 import { Agreement } from '../../interfaces/Agreement';
+import { validarRutSinDigitoVerificador } from '../../helpers/validateRut';
 
 interface Props {
   open: boolean;
@@ -79,6 +80,8 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
   const [institution, setInstitution] = useState('');
   const [verificationDigit, setVerificationDigit] = useState('');
   const [isSubmitting, setSubmitting] = useState(false);
+
+  const [validRut, setValidRut] = useState(true);
 
   const [correspondingInstitutions, setCorrespondingInst] = useState([]);
   const [subFormSubmitted, setSubFormSubmitted] = useState(true);
@@ -343,6 +346,13 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
       ({ _id, persona, ...rest }) => rest
     );
 
+    const isValid = validarRutSinDigitoVerificador(rut);
+
+    if (!isValid) {
+      toast.error('Rut no valido.');
+      setSubmitting(false);
+    }
+
     const newPerson = {
       nombre1: firstName,
       nombre2: secondName,
@@ -458,6 +468,16 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
         ?.nombre || '',
   }));
 
+  const validateRut = () => {
+    const isValid = validarRutSinDigitoVerificador(rut);
+    setValidRut(isValid);
+  };
+
+  useEffect(() => {
+    console.log('efecto');
+    validateRut();
+  }, [rut]);
+
   console.log(agreements);
 
   return (
@@ -549,6 +569,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
                       onChange={(e) => setRut(e.target.value)}
                       value={rut}
                       required
+                      error={!validRut}
                     />
                   </FormControl>
                   <Typography style={{ marginInline: 4 }}> - </Typography>

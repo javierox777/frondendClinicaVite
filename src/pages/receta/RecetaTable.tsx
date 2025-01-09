@@ -37,8 +37,7 @@ import colors from '../../styles/colors';
 import { useQuery } from '@tanstack/react-query';
 import { generalConfig } from '../../config';
 import { Toaster } from 'react-hot-toast';
-
-
+import { formatRut } from '../../helpers/formatRut';
 
 const AnimatedDialog = animated(Dialog);
 const AnimatedDialogContent = animated(DialogContent);
@@ -58,14 +57,14 @@ const Receta: React.FC = () => {
 
   const [dataUpdated, setUpdated] = useState(false);
 
-  // const { data: fetchData } = useQuery({
-  //   queryKey: ['fetchData', dataUpdated],
-  //   queryFn: async () => {
-  //     const response = await axios.get(`${generalConfig.baseUrl}/receipt`);
-  //     setFormData(response.data.body);
-  //     return response.data.body;
-  //   },
-  // });
+  const { data: fetchData } = useQuery({
+    queryKey: ['fetchData', dataUpdated],
+    queryFn: async () => {
+      const response = await axios.get(`${generalConfig.baseUrl}/receipt`);
+      setFormData(response.data.body);
+      return response.data.body;
+    },
+  });
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
@@ -286,7 +285,11 @@ const Receta: React.FC = () => {
             {filteredData.map((row, index) => (
               <TableRow key={row._id} onClick={() => handleRowClickOpen(row)}>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell>{(row.persona as Person).rut}</TableCell>
+                <TableCell>
+                  {formatRut((row.persona as Person).rut)}
+                  {'-'}
+                  {(row.persona as Person).dv}
+                </TableCell>
                 <TableCell
                   style={{ textTransform: 'capitalize' }}
                 >{`${(row.persona as Person).nombre1} ${(row.persona as Person).nombre2} ${(row.persona as Person).apellPat} ${(row.persona as Person).apellMat}`}</TableCell>

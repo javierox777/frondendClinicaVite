@@ -24,6 +24,8 @@ import axios from 'axios';
 import { generalConfig } from '../../config';
 import colors from '../../styles/colors';
 import { useThemeContext } from '../../componemts/themeContext';
+import { validarRutSinDigitoVerificador } from '../../helpers/validateRut';
+import { useUser } from '../../auth/userContext';
 
 interface Props {
   open: boolean;
@@ -67,6 +69,8 @@ const ProfessionalForm = ({
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('');
 
+  const [validRut, setValidRut] = useState(false);
+
   const [isSubmitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -99,7 +103,6 @@ const ProfessionalForm = ({
       email: email,
       login: username,
       password: password,
-      role: role
     };
 
     if (professional) {
@@ -116,7 +119,6 @@ const ProfessionalForm = ({
             celular: phone,
             direccion: address,
             email: email,
-          
           }
         );
         if (response.data.message === 'success') {
@@ -164,6 +166,14 @@ const ProfessionalForm = ({
       }
     }
   };
+  const validateRut = () => {
+    const isValid = validarRutSinDigitoVerificador(rut);
+    setValidRut(isValid);
+  };
+
+  useEffect(() => {
+    validateRut();
+  }, [rut]);
 
   return (
     <>
@@ -249,6 +259,7 @@ const ProfessionalForm = ({
                       onChange={(e) => setRut(e.target.value)}
                       value={rut}
                       required
+                      error={!validRut}
                     />
                   </FormControl>
                   <Typography style={{ marginInline: 4 }}> - </Typography>
@@ -359,24 +370,24 @@ const ProfessionalForm = ({
                       />
                     </FormControl>
                   </Grid>
-                        {/* Campo de selección de Rol */}
-              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-                <FormControl fullWidth>
-                  <Typography variant="subtitle1">Rol</Typography>
-                  <Select
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
-                    displayEmpty
-                    required
-                  >
-                    <MenuItem value="" disabled>
-                      Seleccionar rol
-                    </MenuItem>
-                    <MenuItem value="admin">Admin</MenuItem>
-                    <MenuItem value="user">User</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
+                  {/* Campo de selección de Rol */}
+                  <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                    <FormControl fullWidth>
+                      <Typography variant="subtitle1">Rol</Typography>
+                      <Select
+                        value={role}
+                        onChange={(e) => setRole(e.target.value)}
+                        displayEmpty
+                        required
+                      >
+                        <MenuItem value="" disabled>
+                          Seleccionar rol
+                        </MenuItem>
+                        <MenuItem value="admin">Admin</MenuItem>
+                        <MenuItem value="user">User</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
                 </>
               )}
               <Grid item xs={12}>

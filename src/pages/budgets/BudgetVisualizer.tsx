@@ -27,6 +27,7 @@ import { useNavigate } from 'react-router-dom';
 import { useThemeContext } from '../../componemts/themeContext';
 import { Budget } from '../../interfaces/Budget';
 import colors from '../../styles/colors';
+import { formatRut } from '../../helpers/formatRut';
 
 interface Props {
   budgets: Budget[];
@@ -189,7 +190,11 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
                         >
                           {b.persona.nombre1} {b.persona.apellPat}
                         </TableCell>
-                        <TableCell>{b.persona.rut}</TableCell>
+                        <TableCell>
+                          {formatRut(b.persona.rut)}
+                          {'-'}
+                          {b.persona.dv}
+                        </TableCell>
                         <TableCell>
                           {new Date(b.fechaRegistro).toLocaleDateString()}
                         </TableCell>

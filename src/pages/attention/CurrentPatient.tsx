@@ -21,6 +21,7 @@ import StatusBadge from '../../componemts/StatusBadge';
 import { generalConfig } from '../../config';
 import { Appointment } from '../../interfaces/Appointment';
 import RecetaForm from '../receta/RecetaForm';
+import { formatRut } from '../../helpers/formatRut';
 
 const CurrentPatient = () => {
   const [completed, setCompleted] = useState(false);
@@ -109,7 +110,7 @@ const CurrentPatient = () => {
               <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
                 <Typography style={{ fontWeight: 'bold' }}>RUT</Typography>
                 <Typography>
-                  {appointment.persona.rut}-{appointment.persona.dv}
+                  {formatRut(appointment.persona.rut)}-{appointment.persona.dv}
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
