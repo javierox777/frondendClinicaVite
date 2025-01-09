@@ -35,6 +35,7 @@ interface Props {
 interface Antecedent {
   _id: string;
   descripcion: string;
+  detail?: string;
 }
 
 const badHabits = [
@@ -206,7 +207,8 @@ const PatientAntecedents = ({ patient }: Props) => {
                   }
                   return (
                     <List.Item key={a._id} className="capitalize">
-                      {a.descripcion.toLowerCase()}
+                      <Typography>{a.descripcion.toLowerCase()}</Typography>
+                      <Typography>{a.detail?.toLowerCase()}</Typography>
                     </List.Item>
                   );
                 })}

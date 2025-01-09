@@ -35,6 +35,7 @@ interface Props {
 interface Antecedent {
   _id: string;
   descripcion: string;
+  detail?: string;
 }
 
 const badHabits = [
@@ -86,7 +87,7 @@ const AntecedentsForm = ({
     { _id: (Math.random() * 1000).toString(), descripcion: '' },
   ]);
   const [morbidos, setMorbidos] = useState<Antecedent[]>([
-    { _id: (Math.random() * 1000).toString(), descripcion: '' },
+    { _id: (Math.random() * 1000).toString(), descripcion: '', detail: '' },
   ]);
   const [familiares, setFamiliares] = useState<Antecedent[]>([
     { _id: (Math.random() * 1000).toString(), descripcion: '' },
@@ -323,30 +324,59 @@ const AntecedentsForm = ({
               );
             })} */}
           {type === 'morbid' &&
-            moribidAntecedents.map((bh: any) => {
+            moribidAntecedents.map((antecedent: any) => {
+              const isChecked = morbidos.some(
+                (m) => m.descripcion === antecedent.descripcion
+              );
+              const currentMorbid = morbidos.find(
+                (m) => m.descripcion === antecedent.descripcion
+              );
+
               return (
-                <FormControl fullWidth key={bh.id}>
-                  <FormControlLabel
-                    label={bh.descripcion}
-                    control={
-                      <Checkbox
-                        checked={morbidos.some(
-                          (h) => h.descripcion === bh.descripcion
-                        )}
-                        onChange={(e, checked) => {
-                          if (checked) {
-                            setMorbidos([...morbidos, bh]);
-                          } else {
-                            const updatedHabits = morbidos.filter(
-                              (h) => h.descripcion !== bh.descripcion
-                            );
-                            setMorbidos(updatedHabits);
-                          }
+                <Box key={antecedent._id} className="mt-2">
+                  <FormControl fullWidth>
+                    <FormControlLabel
+                      label={antecedent.descripcion}
+                      control={
+                        <Checkbox
+                          checked={isChecked}
+                          onChange={(e, checked) => {
+                            if (checked) {
+                              setMorbidos([
+                                ...morbidos,
+                                { ...antecedent, detail: '' },
+                              ]);
+                            } else {
+                              setMorbidos(
+                                morbidos.filter(
+                                  (m) =>
+                                    m.descripcion !== antecedent.descripcion
+                                )
+                              );
+                            }
+                          }}
+                        />
+                      }
+                    />
+                  </FormControl>
+                  {isChecked && (
+                    <FormControl fullWidth>
+                      <TextField
+                        label="Detalle"
+                        multiline
+                        value={currentMorbid?.detail || ''}
+                        onChange={(e) => {
+                          const updatedMorbid = morbidos.map((m) =>
+                            m.descripcion === antecedent.descripcion
+                              ? { ...m, detail: e.target.value }
+                              : m
+                          );
+                          setMorbidos(updatedMorbid);
                         }}
                       />
-                    }
-                  />
-                </FormControl>
+                    </FormControl>
+                  )}
+                </Box>
               );
             })}
           {type === 'allergy' &&
