@@ -7,11 +7,18 @@ import {
 } from '@mui/icons-material';
 import {
   Avatar,
+  Box,
   Button,
   CircularProgress,
   Collapse,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControl,
+  Grid,
   IconButton,
   MenuItem,
   Paper,
@@ -48,30 +55,22 @@ interface Professional {
 }
 
 const RolesDashboard: React.FC = () => {
-  const [professionals, setProfessionals] = useState<Professional[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedRole, setSelectedRole] = useState<Record<string, string>>({});
   const [selectedPermissions, setSelectedPermissions] = useState<
     Record<string, string[]>
   >({});
-  // const { user: currentUser } = useUser();
 
-  useEffect(() => {
-    const fetchProfessionals = async () => {
-      try {
-        const response = await axios.get(
-          `${generalConfig.baseUrl}/professionals`
-        );
-        setProfessionals(response.data.body);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching professionals:', error);
-        setLoading(false);
-      }
-    };
+  const [dataUpdated, setDataUpdated] = useState(false);
 
-    fetchProfessionals();
-  }, []);
+  const { data: professionals, isLoading } = useQuery({
+    queryKey: ['professionals', dataUpdated],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${generalConfig.baseUrl}/professionals`
+      );
+      return response.data.body;
+    },
+  });
 
   const handleRoleChange = async (id: string) => {
     console.log(id);
@@ -84,13 +83,6 @@ const RolesDashboard: React.FC = () => {
       );
 
       toast.success('Rol ha sido actualizado correctamente');
-
-      // Actualiza el estado de los profesionales en el frontend
-      setProfessionals((prevProfessionals) =>
-        prevProfessionals.map((prof) =>
-          prof._id === id ? { ...prof, role: selectedRole[id] } : prof
-        )
-      );
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error('Error updating role:', error.response?.data);
@@ -117,7 +109,7 @@ const RolesDashboard: React.FC = () => {
     }
   };
 
-  if (loading) return <CircularProgress />;
+  if (isLoading) return <CircularProgress />;
 
   return (
     <>
@@ -144,13 +136,14 @@ const RolesDashboard: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {professionals.map((professional) => (
+                {professionals.map((professional: Professional) => (
                   <ProfessionalRow
                     key={professional._id}
                     professional={professional}
                     selectedRole={selectedRole}
                     setSelectedRole={setSelectedRole}
                     handleRoleChange={handleRoleChange}
+                    afterSubmit={() => setDataUpdated(!dataUpdated)}
                   />
                 ))}
               </TableBody>
@@ -168,13 +161,16 @@ const ProfessionalRow = ({
   selectedRole,
   setSelectedRole,
   handleRoleChange,
+  afterSubmit,
 }: {
   professional: Professional;
   selectedRole: Record<string, string>;
   setSelectedRole: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   handleRoleChange: (id: string) => void;
+  afterSubmit: CallableFunction;
 }) => {
   const [open, setOpen] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
 
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -196,7 +192,7 @@ const ProfessionalRow = ({
         `${generalConfig.baseUrl}/users/${login._id}`,
         { clave1: password }
       );
-      console.log(response);
+
       if (response.data.message === 'success') {
         toast.success('Contraseña actualizada correctamente');
         setIsSubmitting(false);
@@ -213,6 +209,33 @@ const ProfessionalRow = ({
       }
     }
   };
+
+  const handleDisableAccount = async () => {
+    setIsSubmitting(true);
+    try {
+      const response = await axios.patch(
+        `${generalConfig.baseUrl}/users/${login._id}/disable`
+      );
+
+      if (response.data.message === 'success') {
+        toast.success('Cuenta deshabilitada correctamente');
+        setIsSubmitting(false);
+        setOpenDialog(false);
+        afterSubmit();
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error('Error disabling account:', error.response?.data);
+        toast.error('Error al deshabilitar la cuenta');
+        setIsSubmitting(false);
+      } else {
+        console.error('Unexpected error:', error);
+        toast.error('Error inesperado');
+        setIsSubmitting(false);
+      }
+    }
+  };
+
   return (
     <>
       <TableRow>
@@ -285,6 +308,19 @@ const ProfessionalRow = ({
       <TableRow>
         <TableCell colSpan={5}>
           <Collapse in={open} timeout="auto" unmountOnExit>
+            <Grid container>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                <Typography variant="h6" gutterBottom>
+                  {' '}
+                  Login : {login?.login}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                <Typography variant="h6" gutterBottom>
+                  Vigente : {login?.vigencia === '1' ? 'Sí' : 'No'}
+                </Typography>
+              </Grid>
+            </Grid>
             <Typography variant="h6" gutterBottom>
               Cambiar Contraseña
             </Typography>
@@ -301,20 +337,74 @@ const ProfessionalRow = ({
                     const newPassword = e.target.value;
                     setPassword(newPassword);
                   }}
+                  error={password.length <= 7}
+                  helperText={
+                    password.length <= 7
+                      ? 'La contraseña debe tener al menos 8 caracteres'
+                      : ''
+                  }
                 />
               </FormControl>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={onChangePassword}
-                disabled={isSubmitting}
-              >
-                Cambiar Contraseña
-              </Button>
+              <Box className="flex-col space-y-2">
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={onChangePassword}
+                  disabled={isSubmitting}
+                >
+                  Cambiar Contraseña
+                </Button>
+                {login?.vigencia === '1' && (
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    color="error"
+                    onClick={() => setOpenDialog(true)}
+                  >
+                    Deshabilitar cuenta
+                  </Button>
+                )}
+              </Box>
             </form>
           </Collapse>
         </TableCell>
       </TableRow>
+
+      <Dialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {'Confirmar deshabilitación de cuenta'}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            ¿Estás seguro de que deseas deshabilitar esta cuenta? Esta acción no
+            se puede deshacer.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setOpenDialog(false)}
+            color="inherit"
+            variant="contained"
+            disabled={isSubmitting}
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleDisableAccount}
+            color="error"
+            autoFocus
+            variant="contained"
+            disabled={isSubmitting}
+          >
+            Deshabilitar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
