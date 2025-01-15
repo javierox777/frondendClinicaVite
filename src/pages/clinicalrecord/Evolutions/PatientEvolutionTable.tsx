@@ -26,6 +26,7 @@ import { format } from 'date-fns';
 import { Professional } from '../../../interfaces/Professional';
 import { Visibility } from '@mui/icons-material';
 import EvolutionVisualizer from './EvolutionVisualizer';
+import EvolutionForm from './EvolutionForm';
 
 interface Props {
   patient: Person;
@@ -41,6 +42,7 @@ const PatientEvolutionTable = ({ patient }: Props) => {
   const { mode } = useThemeContext();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [openForm, setOpenForm] = useState(false);
 
   const [showEvolution, setShowEvolution] = useState<Evolution>();
 
@@ -64,7 +66,7 @@ const PatientEvolutionTable = ({ patient }: Props) => {
             title="Evoluciones"
             buttonTitle="Evolucionar"
             button
-            buttonFn={() => console.log('hola')}
+            buttonFn={() => setOpenForm(true)}
           />
           {isLoading && <LinearProgress />}
           {evolutions && (
@@ -134,6 +136,11 @@ const PatientEvolutionTable = ({ patient }: Props) => {
           <EvolutionVisualizer evolution={showEvolution} />
         </Grid>
       </Grid>
+      <EvolutionForm
+        open={openForm}
+        onClose={() => setOpenForm(false)}
+        patient={patient}
+      />
     </>
   );
 };
