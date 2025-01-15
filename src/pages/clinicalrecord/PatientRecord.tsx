@@ -37,6 +37,7 @@ import ConsentmentsTab from './ConsentmentsTab';
 import { formatRut } from '../../helpers/formatRut';
 import PatientAntecedents from './PatientAntecedents';
 import { Toaster } from 'react-hot-toast';
+import PatientEvolutionTable from './Evolutions/PatientEvolutionTable';
 
 const tableHeadings = [
   { id: 1, label: 'Fecha' },
@@ -271,10 +272,11 @@ const PatientRecord = () => {
               >
                 <Tab label="Contactos y Direcciones" {...a11yProps(0)} />
                 <Tab label="Odontograma" {...a11yProps(1)} />
-                <Tab label="Historial de citas" {...a11yProps(2)} />
-                <Tab label="Medicamentos" {...a11yProps(3)} />
-                <Tab label="Consentimientos" {...a11yProps(4)} />
-                <Tab label="Antecedentes" {...a11yProps(5)} />
+                <Tab label="Evolución" {...a11yProps(2)} />
+                <Tab label="Historial de citas" {...a11yProps(3)} />
+                <Tab label="Medicamentos" {...a11yProps(4)} />
+                <Tab label="Consentimientos" {...a11yProps(5)} />
+                <Tab label="Antecedentes" {...a11yProps(6)} />
               </Tabs>
             </Box>
           </Grid>
@@ -282,7 +284,7 @@ const PatientRecord = () => {
         {/* INFORMACION DE PACIENTE  */}
 
         <Grid item xs={12}>
-          <CustomTabPanel value={value} index={2}>
+          <CustomTabPanel value={value} index={3}>
             {appointmentsFetching && (
               <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                 <LinearProgress />
@@ -367,16 +369,19 @@ const PatientRecord = () => {
               persona={patient}
             />
           </CustomTabPanel>
+          <CustomTabPanel value={value} index={2}>
+            <PatientEvolutionTable patient={patient} />
+          </CustomTabPanel>
           <CustomTabPanel value={value} index={0}>
             <Personalnfo patient={patient} />
           </CustomTabPanel>
-          <CustomTabPanel value={value} index={3}>
+          <CustomTabPanel value={value} index={4}>
             <PatientReceipts patient={patient} />
           </CustomTabPanel>
-          <CustomTabPanel value={value} index={4}>
+          <CustomTabPanel value={value} index={5}>
             <ConsentmentsTab patient={patient} />
           </CustomTabPanel>
-          <CustomTabPanel value={value} index={5}>
+          <CustomTabPanel value={value} index={6}>
             <PatientAntecedents patient={patient} />
           </CustomTabPanel>
         </Grid>
