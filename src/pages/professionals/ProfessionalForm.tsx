@@ -109,6 +109,7 @@ const ProfessionalForm = ({
     if (!isValid) {
       toast.error('Rut no valido.');
       setSubmitting(false);
+      return;
     }
 
     if (professional) {
