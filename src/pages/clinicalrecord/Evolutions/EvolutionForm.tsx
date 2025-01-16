@@ -11,6 +11,7 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  Slide,
   TextField,
   Typography,
 } from '@mui/material';
@@ -30,12 +31,22 @@ import { Professional } from '../../../interfaces/Professional';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { Evolution } from '../../../interfaces/Evolution';
+import { TransitionProps } from '@mui/material/transitions';
+
+const Transition = React.forwardRef(function Transition(
+  props: TransitionProps & {
+    children: React.ReactElement;
+  },
+  ref: React.Ref<unknown>
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 interface Props {
   open: boolean;
   onClose: CallableFunction;
   patient: Person;
-  evolution?: Evolution;
+  evolution?: Evolution | null;
   afterSubmit?: CallableFunction;
 }
 
@@ -104,6 +115,8 @@ const EvolutionForm = ({
           setIsSubmitting(false);
           afterSubmit && afterSubmit();
           onClose();
+          setClinicId('');
+          setDescription('');
         }
       }
     } catch (error) {
@@ -121,7 +134,16 @@ const EvolutionForm = ({
   }, [evolution]);
 
   return (
-    <Dialog open={open} onClose={() => onClose()} fullWidth maxWidth="xl">
+    <Dialog
+      open={open}
+      onClose={() => {
+        onClose();
+      }}
+      fullWidth
+      maxWidth="xl"
+      TransitionComponent={Transition}
+      transitionDuration={500}
+    >
       <form onSubmit={onSubmit}>
         <DialogTitle>
           <HeaderBar title="Evolucionar paciente" />
@@ -239,7 +261,13 @@ const EvolutionForm = ({
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" color="inherit" onClick={() => onClose()}>
+          <Button
+            variant="contained"
+            color="inherit"
+            onClick={() => {
+              onClose();
+            }}
+          >
             Cerrar
           </Button>
           <Button

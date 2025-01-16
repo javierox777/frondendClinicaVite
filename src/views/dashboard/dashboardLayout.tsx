@@ -89,6 +89,7 @@ import { decodeJwt } from '../../auth/decodeJwt';
 import ConsentMain from '../../pages/consent/ConsentMain';
 import EditConsentPage from '../../pages/consent/EditConsentPage';
 import DentistSchedule from '../../pages/dentistSchedule/DentistSchedule';
+import EvolutionFormPage from '../../pages/clinicalrecord/Evolutions/EvolutionFormPage';
 
 const drawerWidth = 240;
 
@@ -634,6 +635,10 @@ const DashboardLayout: React.FC = () => {
             <Route path="/fichaclinica" element={<PatientRecord />} />
             <Route path="/atencionpaciente" element={<CurrentPatient />} />
             <Route path="/agendadentista" element={<DentistSchedule />} />
+            <Route
+              path="/evolucionarpaciente"
+              element={<EvolutionFormPage />}
+            />
             <Route
               path="/editarprofesional"
               element={<EditProfessionalPage />}

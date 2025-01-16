@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Person } from '../../../interfaces/Person';
 import {
   Grid,
@@ -27,6 +27,7 @@ import { Professional } from '../../../interfaces/Professional';
 import { Edit, Visibility } from '@mui/icons-material';
 import EvolutionVisualizer from './EvolutionVisualizer';
 import EvolutionForm from './EvolutionForm';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   patient: Person;
@@ -40,11 +41,17 @@ const tableHeadings = [
 
 const PatientEvolutionTable = ({ patient }: Props) => {
   const { mode } = useThemeContext();
+  const navigate = useNavigate();
+
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [openForm, setOpenForm] = useState(false);
 
-  const [showEvolution, setShowEvolution] = useState<Evolution>();
+  const [newEvolutionForm, setNewEvolutionForm] = useState(false);
+
+  const [showEvolution, setShowEvolution] = useState<Evolution | undefined>();
+
+  const [editEvolution, setEditEvolution] = useState<Evolution>();
 
   const [dataUpdated, setDataUpdated] = useState(false);
 
@@ -58,6 +65,17 @@ const PatientEvolutionTable = ({ patient }: Props) => {
     },
   });
 
+  useEffect(() => {
+    if (showEvolution && evolutions) {
+      const updatedEvolution = evolutions.find(
+        (e: Evolution) => e._id === showEvolution._id
+      );
+      console.log('evolucion actualizada', updatedEvolution);
+
+      setShowEvolution(updatedEvolution);
+    }
+  }, [dataUpdated, evolutions]);
+
   return (
     <>
       <Grid container spacing={2} gap={2}>
@@ -66,7 +84,9 @@ const PatientEvolutionTable = ({ patient }: Props) => {
             title="Evoluciones"
             buttonTitle="Evolucionar"
             button
-            buttonFn={() => setOpenForm(true)}
+            buttonFn={() => {
+              setNewEvolutionForm(true);
+            }}
           />
           {isLoading && <LinearProgress />}
           {evolutions && (
@@ -111,7 +131,7 @@ const PatientEvolutionTable = ({ patient }: Props) => {
                           </IconButton>
                           <IconButton
                             onClick={() => {
-                              setShowEvolution(evolution);
+                              setEditEvolution(evolution);
                               setOpenForm(true);
                             }}
                           >
@@ -146,9 +166,17 @@ const PatientEvolutionTable = ({ patient }: Props) => {
       </Grid>
       <EvolutionForm
         open={openForm}
-        onClose={() => setOpenForm(false)}
+        onClose={() => {
+          setOpenForm(false);
+        }}
         patient={patient}
-        evolution={showEvolution}
+        evolution={editEvolution}
+        afterSubmit={() => setDataUpdated(!dataUpdated)}
+      />
+      <EvolutionForm
+        open={newEvolutionForm}
+        onClose={() => setNewEvolutionForm(false)}
+        patient={patient}
         afterSubmit={() => setDataUpdated(!dataUpdated)}
       />
     </>

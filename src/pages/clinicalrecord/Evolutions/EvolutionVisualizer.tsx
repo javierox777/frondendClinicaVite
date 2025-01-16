@@ -11,6 +11,7 @@ interface Props {
 }
 
 const EvolutionVisualizer = ({ evolution }: Props) => {
+  console.log(evolution);
   const { mode } = useThemeContext();
   if (!evolution)
     return (
