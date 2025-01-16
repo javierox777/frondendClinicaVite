@@ -33,12 +33,7 @@ import { useNavigate } from 'react-router-dom';
 import HistorialCitasModal from './HistorialCitasModal';
 import { generalConfig } from '../config';
 
-
-import {
-  RadialBarChart,
-  RadialBar,
- 
-} from 'recharts';
+import { RadialBarChart, RadialBar } from 'recharts';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF69B4'];
 
@@ -167,31 +162,33 @@ const Inicio: React.FC = () => {
         setTratamientosDataMensual(dataTratamientosMensual);
 
         // Tratamientos por profesional
-       // Filtrar tratamientos por el profesional logueado
-const tratamientosFiltrados = tratamientosAnuales.filter(
-  (tratamiento) => tratamiento.profesional._id === loggedUser?.profesionalId
-);
+        // Filtrar tratamientos por el profesional logueado
+        const tratamientosFiltrados = tratamientosAnuales.filter(
+          (tratamiento) =>
+            tratamiento.profesional._id === loggedUser?.profesionalId
+        );
 
-// Contar los tratamientos solo del profesional logueado
-const tratamientosPorProfesionalCount = tratamientosFiltrados.reduce(
-  (acc: any, tratamiento: Tratamiento) => {
-    const profesional = `${tratamiento.profesional.nombre1} ${tratamiento.profesional.apellPat}`;
-    acc[profesional] = (acc[profesional] || 0) + 1;
-    return acc;
-  },
-  {}
-);
+        // Contar los tratamientos solo del profesional logueado
+        const tratamientosPorProfesionalCount = tratamientosFiltrados.reduce(
+          (acc: any, tratamiento: Tratamiento) => {
+            const profesional = `${tratamiento.profesional.nombre1} ${tratamiento.profesional.apellPat}`;
+            acc[profesional] = (acc[profesional] || 0) + 1;
+            return acc;
+          },
+          {}
+        );
 
-// Mapear los datos al formato requerido por recharts
-const dataTratamientosPorProfesional = Object.keys(tratamientosPorProfesionalCount).map((key) => ({
-  name: key,
-  value: tratamientosPorProfesionalCount[key],
-  description: `Tratamientos realizados por ${key}: ${tratamientosPorProfesionalCount[key]}`
-}));
+        // Mapear los datos al formato requerido por recharts
+        const dataTratamientosPorProfesional = Object.keys(
+          tratamientosPorProfesionalCount
+        ).map((key) => ({
+          name: key,
+          value: tratamientosPorProfesionalCount[key],
+          description: `Tratamientos realizados por ${key}: ${tratamientosPorProfesionalCount[key]}`,
+        }));
 
-// Actualizar el estado con los datos filtrados
-setTratamientosPorProfesional(dataTratamientosPorProfesional);
-
+        // Actualizar el estado con los datos filtrados
+        setTratamientosPorProfesional(dataTratamientosPorProfesional);
 
         setLoading(false);
       } catch (error) {
@@ -220,48 +217,48 @@ setTratamientosPorProfesional(dataTratamientosPorProfesional);
       <Grid container spacing={3} mt={2}>
         {/* Gráfico de tratamientos por año */}
         <Grid item xs={12} md={4}>
-  <Paper
-    sx={{
-      p: 2,
-      boxShadow: 3,
-      borderRadius: '8px',
-      transition: 'transform 0.3s ease-in-out',
-      '&:hover': { transform: 'scale(1.05)' },
-    }}
-  >
-    <Typography
-      variant="h6"
-      gutterBottom
-      sx={{ fontWeight: 'medium', fontSize: '1rem', color: '#555' }}
-    >
-      Tratamientos por Año (Usuario)
-    </Typography>
-    {loading ? (
-      <CircularProgress />
-    ) : (
-      <ResponsiveContainer width="100%" height={250}>
-        <BarChart
-          data={tratamientosDataAnual}
-          layout="vertical"
-          margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <YAxis
-            type="category"
-            dataKey="name"
-            tick={{ fontSize: 12 }}
-            width={100}
-          />
-          <XAxis type="number" />
-          <Tooltip formatter={(value) => `${value} tratamientos`} />
-          <Bar dataKey="value" fill="#8884d8" barSize={20}>
-            <LabelList dataKey="value" position="insideRight" />
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
-    )}
-  </Paper>
-</Grid>
+          <Paper
+            sx={{
+              p: 2,
+              boxShadow: 3,
+              borderRadius: '8px',
+              transition: 'transform 0.3s ease-in-out',
+              '&:hover': { transform: 'scale(1.05)' },
+            }}
+          >
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{ fontWeight: 'medium', fontSize: '1rem', color: '#555' }}
+            >
+              Tratamientos por Año (Usuario)
+            </Typography>
+            {loading ? (
+              <CircularProgress />
+            ) : (
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart
+                  data={tratamientosDataAnual}
+                  layout="vertical"
+                  margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <YAxis
+                    type="category"
+                    dataKey="name"
+                    tick={{ fontSize: 12 }}
+                    width={100}
+                  />
+                  <XAxis type="number" />
+                  <Tooltip formatter={(value) => `${value} tratamientos`} />
+                  <Bar dataKey="value" fill="#8884d8" barSize={20}>
+                    <LabelList dataKey="value" position="insideRight" />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </Paper>
+        </Grid>
 
         {/* Gráfico de tratamientos por mes */}
         <Grid item xs={12} md={4}>
@@ -330,45 +327,43 @@ setTratamientosPorProfesional(dataTratamientosPorProfesional);
               <CircularProgress />
             ) : (
               <ResponsiveContainer width="100%" height={250}>
-              <BarChart
-                data={tratamientosPorProfesional}
-                layout="vertical"
-                margin={{
-                  top: 20,
-                  right: 30,
-                  left: 20,
-                  bottom: 10,
-                }}
-              >
-                {/* Grid para líneas de referencia */}
-                <CartesianGrid strokeDasharray="3 3" />
-                
-                {/* Eje Y: Muestra los nombres */}
-                <YAxis
-                  type="category"
-                  dataKey="name"
-                  width={150}
-                  tick={{ fontSize: 12 }}
-                />
-                
-                {/* Eje X: Muestra valores */}
-                <XAxis type="number" />
-        
-                {/* Tooltip: Info dinámica al pasar el mouse */}
-                <Tooltip formatter={(value) => `${value} tratamientos`} />
-        
-                {/* Leyenda debajo del gráfico */}
-                <Legend verticalAlign="top" />
-        
-                {/* Barras con colores personalizados */}
-                <Bar dataKey="value" fill="#00C49F" barSize={20}>
-                  {/* Etiquetas dentro de las barras */}
-                  <LabelList dataKey="value" position="insideRight" />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-            
-            
+                <BarChart
+                  data={tratamientosPorProfesional}
+                  layout="vertical"
+                  margin={{
+                    top: 20,
+                    right: 30,
+                    left: 20,
+                    bottom: 10,
+                  }}
+                >
+                  {/* Grid para líneas de referencia */}
+                  <CartesianGrid strokeDasharray="3 3" />
+
+                  {/* Eje Y: Muestra los nombres */}
+                  <YAxis
+                    type="category"
+                    dataKey="name"
+                    width={150}
+                    tick={{ fontSize: 12 }}
+                  />
+
+                  {/* Eje X: Muestra valores */}
+                  <XAxis type="number" />
+
+                  {/* Tooltip: Info dinámica al pasar el mouse */}
+                  <Tooltip formatter={(value) => `${value} tratamientos`} />
+
+                  {/* Leyenda debajo del gráfico */}
+                  <Legend verticalAlign="top" />
+
+                  {/* Barras con colores personalizados */}
+                  <Bar dataKey="value" fill="#00C49F" barSize={20}>
+                    {/* Etiquetas dentro de las barras */}
+                    <LabelList dataKey="value" position="insideRight" />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
             )}
           </Paper>
         </Grid>
@@ -518,26 +513,24 @@ setTratamientosPorProfesional(dataTratamientosPorProfesional);
                 <CircularProgress />
               ) : (
                 <ResponsiveContainer width="100%" height={300}>
-                <RadialBarChart 
-                  cx="50%" 
-                  cy="50%" 
-                  innerRadius="10%" 
-                  outerRadius="80%" 
-                  barSize={10} 
-                  data={tratamientosDataAnual}
-                >
-                  <RadialBar 
-                     
-                    background 
-                    
-                    dataKey="value" 
-                    fill="#FF8042" 
-                  />
-                  <Tooltip />
-                  <Legend />
-                </RadialBarChart>
-              </ResponsiveContainer>
-              
+                  <RadialBarChart
+                    cx="50%"
+                    cy="50%"
+                    innerRadius="10%"
+                    outerRadius="80%"
+                    barSize={10}
+                    data={tratamientosDataAnual}
+                  >
+                    <RadialBar background dataKey="value" fill="#FF8042" />
+                    <Tooltip
+                      formatter={(value, name, props) => [
+                        value,
+                        props.payload.name,
+                      ]}
+                    />
+                    <Legend />
+                  </RadialBarChart>
+                </ResponsiveContainer>
               )}
             </Paper>
           </Grid>
