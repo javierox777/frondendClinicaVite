@@ -24,7 +24,7 @@ import { Evolution } from '../../../interfaces/Evolution';
 import { Company } from '../../../interfaces/Company';
 import { format } from 'date-fns';
 import { Professional } from '../../../interfaces/Professional';
-import { Visibility } from '@mui/icons-material';
+import { Edit, Visibility } from '@mui/icons-material';
 import EvolutionVisualizer from './EvolutionVisualizer';
 import EvolutionForm from './EvolutionForm';
 
@@ -109,6 +109,14 @@ const PatientEvolutionTable = ({ patient }: Props) => {
                           >
                             <Visibility />
                           </IconButton>
+                          <IconButton
+                            onClick={() => {
+                              setShowEvolution(evolution);
+                              setOpenForm(true);
+                            }}
+                          >
+                            <Edit color="success" />
+                          </IconButton>
                         </TableCell>
                       </TableRow>
                     );
@@ -131,7 +139,7 @@ const PatientEvolutionTable = ({ patient }: Props) => {
         <Grid
           item
           xs={6}
-          className="border border-zinc-200 rounded-lg p-3 pl-20 pr-20 ml-5 pt-0"
+          className="border border-zinc-200 rounded-lg p-3 pl-20 pr-20 ml-5 pt-0 prose"
         >
           <EvolutionVisualizer evolution={showEvolution} />
         </Grid>
@@ -140,6 +148,8 @@ const PatientEvolutionTable = ({ patient }: Props) => {
         open={openForm}
         onClose={() => setOpenForm(false)}
         patient={patient}
+        evolution={showEvolution}
+        afterSubmit={() => setDataUpdated(!dataUpdated)}
       />
     </>
   );

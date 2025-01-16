@@ -4,6 +4,7 @@ import { Container, Grid, Typography } from '@mui/material';
 import { useThemeContext } from '../../../componemts/themeContext';
 import colors from '../../../styles/colors';
 import { Visibility } from '@mui/icons-material';
+import ReactMarkdown from 'react-markdown';
 
 interface Props {
   evolution: Evolution | undefined;
@@ -29,7 +30,7 @@ const EvolutionVisualizer = ({ evolution }: Props) => {
       </Container>
     );
 
-  return <div>EvolutionVisualizer</div>;
+  return <ReactMarkdown>{evolution.descripcion}</ReactMarkdown>;
 };
 
 export default EvolutionVisualizer;

@@ -7,10 +7,14 @@ import {
   DialogTitle,
   FormControl,
   Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
   TextField,
   Typography,
 } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import HeaderBar from '../../../componemts/HeaderBar';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
@@ -21,18 +25,35 @@ import colors from '../../../styles/colors';
 import { Company } from '../../../interfaces/Company';
 import SimpleMDE from 'react-simplemde-editor';
 import 'easymde/dist/easymde.min.css';
+import { useUser } from '../../../auth/userContext';
+import { Professional } from '../../../interfaces/Professional';
+import toast from 'react-hot-toast';
+import { format } from 'date-fns';
+import { Evolution } from '../../../interfaces/Evolution';
 
 interface Props {
   open: boolean;
   onClose: CallableFunction;
   patient: Person;
+  evolution?: Evolution;
+  afterSubmit?: CallableFunction;
 }
 
-const EvolutionForm = ({ open, onClose, patient }: Props) => {
+const EvolutionForm = ({
+  open,
+  onClose,
+  patient,
+  evolution,
+  afterSubmit,
+}: Props) => {
   const { mode } = useThemeContext();
+  const { user } = useUser();
 
   const [clinicId, setClinicId] = useState<string>('');
   const [description, setDescription] = useState<string>('');
+  const [professional, setProfessional] = useState<string>('');
+
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const { data: formData, isLoading } = useQuery({
     queryKey: ['evolutionForm'],
@@ -44,11 +65,64 @@ const EvolutionForm = ({ open, onClose, patient }: Props) => {
     },
   });
 
-  console.log(formData);
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      if (!evolution) {
+        const response = await axios.post(
+          `${generalConfig.baseUrl}/evoluciones`,
+          {
+            persona: patient._id,
+            profesional: user?.profesionalId,
+            empresa: clinicId,
+            descripcion: description,
+            fecha: format(new Date(), 'yyyy-MM-dd'),
+          }
+        );
+
+        if (response.data.message === 'success') {
+          toast.success('Evolución registrada correctamente');
+          setIsSubmitting(false);
+          setDescription('');
+          setClinicId('');
+          afterSubmit && afterSubmit();
+        }
+      } else {
+        const response = await axios.patch(
+          `${generalConfig.baseUrl}/evoluciones/${evolution._id}`,
+          {
+            persona: patient._id,
+            empresa: clinicId,
+            descripcion: description,
+            profesional: user?.profesionalId,
+          }
+        );
+
+        if (response.data.message === 'success') {
+          toast.success('Evolución actualizada correctamente');
+          setIsSubmitting(false);
+          afterSubmit && afterSubmit();
+          onClose();
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      setIsSubmitting(false);
+      toast.error('Error al registrar evolución');
+    }
+  };
+
+  useEffect(() => {
+    if (evolution) {
+      setClinicId((evolution.empresa as Company)._id);
+      setDescription(evolution.descripcion);
+    }
+  }, [evolution]);
 
   return (
     <Dialog open={open} onClose={() => onClose()} fullWidth maxWidth="xl">
-      <form>
+      <form onSubmit={onSubmit}>
         <DialogTitle>
           <HeaderBar title="Evolucionar paciente" />
         </DialogTitle>
@@ -97,11 +171,38 @@ const EvolutionForm = ({ open, onClose, patient }: Props) => {
               )}
             </Grid>
             <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+              <FormControl fullWidth>
+                <InputLabel id="attention-type-label">Atención</InputLabel>
+                <Select
+                  required
+                  label="attention-types"
+                  id="attention-type-select"
+                  labelId="attention-type-label"
+                  onChange={(e: SelectChangeEvent<string>) => {
+                    setProfessional(e.target.value);
+                  }}
+                  value={user?.profesionalId}
+                  disabled
+                >
+                  {professional === '' && (
+                    <MenuItem disabled>Seleccione paciente</MenuItem>
+                  )}
+                  {formData?.professionals?.map((p: Professional) => {
+                    return (
+                      <MenuItem key={p._id} value={p._id}>
+                        {p.nombre1} {p.apellPat}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
               {formData && (
                 <FormControl fullWidth>
                   <Autocomplete
                     disablePortal
-                    //   defaultValue={budget?.empresa}
+                    defaultValue={evolution?.empresa as Company}
                     options={formData?.clinics}
                     renderInput={(params) => (
                       <TextField {...params} label="Clínica" />
@@ -141,8 +242,14 @@ const EvolutionForm = ({ open, onClose, patient }: Props) => {
           <Button variant="contained" color="inherit" onClick={() => onClose()}>
             Cerrar
           </Button>
-          <Button variant="contained" color="primary">
-            Registrar evolución
+          <Button
+            variant="contained"
+            color={evolution ? 'success' : 'primary'}
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {!evolution && 'Registrar evolución'}
+            {evolution && 'Actualizar evolución'}
           </Button>
         </DialogActions>
       </form>
