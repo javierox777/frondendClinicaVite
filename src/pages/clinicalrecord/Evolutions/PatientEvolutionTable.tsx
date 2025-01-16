@@ -77,7 +77,7 @@ const PatientEvolutionTable = ({ patient }: Props) => {
 
   return (
     <>
-      <Grid container spacing={2} gap={2}>
+      <Grid container spacing={2} gap={6}>
         <Grid xs={5}>
           <HeaderBar
             title="Evoluciones"
@@ -163,7 +163,7 @@ const PatientEvolutionTable = ({ patient }: Props) => {
         <Grid
           item
           xs={6}
-          className="border border-zinc-200 rounded-lg p-3 pl-20 pr-20 ml-5 pt-0 prose"
+          className="border border-zinc-200 rounded-lg p-3 pl-20 pr-20 pt-0 prose"
         >
           <EvolutionVisualizer evolution={showEvolution} />
         </Grid>

@@ -23,6 +23,7 @@ import { generalConfig } from '../../config';
 import { Appointment } from '../../interfaces/Appointment';
 import colors from '../../styles/colors';
 import { formatRut } from '../../helpers/formatRut';
+import TableSkeleton from '../../componemts/TableSkeleton';
 
 const tableHeadings = [
   { id: 1, label: 'Paciente' },
@@ -63,6 +64,10 @@ const TodaysSchedule = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  if (isLoading) {
+    return <TableSkeleton />;
+  }
 
   return (
     <Grid container>
