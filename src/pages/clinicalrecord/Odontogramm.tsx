@@ -169,7 +169,7 @@ const items = [
   { title: 'Aparato Ortodontico Fijo', id: 1, color: '#AB9ECD' },
   { title: 'Aparato Ortodontico Removible', id: 2, color: '#FF5241' },
   { title: 'Caries', id: 3, color: '#FF0000' },
-  { title: 'Corona Definitiva', id: 4, color: 'rgb(255, 207, 54)' },
+  { title: 'Corona Definitiva', id: 4, color: '#FFCF36' },
   { title: 'Corona Provisoria', id: 5, color: '#FF9729' },
   { title: 'Desgaste Oclusal/Incisal', id: 6, color: '#808080' },
   { title: 'Diastema', id: 7, color: '#00CED1' },
@@ -198,7 +198,8 @@ const items = [
   { title: 'Tratamiento Pulpar', id: 31, color: '#FF6347' },
   { title: 'Giroversión', id: 32, color: '#B0E0E6' },
   { title: 'Transposición', id: 33, color: '#20B2AA' },
-  { title: 'Diente incluido', id: 34, color: 'rgb(177,23 ,32)' },
+  { title: 'Diente incluido', id: 34, color: '#B11720' },
+
 ];
 
 interface Props {
@@ -709,10 +710,15 @@ const Odontogramm = ({ odontogram }: Props) => {
         ];
 
         parts.forEach((part) => {
-          const color = toothParts?.[part.key]?.color || '#FFFFFF';
+          let color = toothParts?.[part.key]?.color || '#FFFFFF';
+        
+          if (color.includes('255\t151\t41')) {
+            color = '#FF9729';
+          }
           doc.setFillColor(color);
-          doc.rect(part.x, part.y, part.w, part.h, 'FD'); // Pintar sección
+          doc.rect(part.x, part.y, part.w, part.h, 'FD');
         });
+        
       };
 
       // Función para dibujar una fila de dientes
@@ -881,7 +887,7 @@ const Odontogramm = ({ odontogram }: Props) => {
   console.log(treatments);
   const treatmentColorMap: Record<string, string> = {
     'Caries': '#FF0000',
-    'Corona Definitiva': 'rgb(255, 207, 54)',
+    'Corona Definitiva': '#FFCF36',
     'Corona Provisoria': '#FF9729',
     'Restauración': '#32CD32',
     'Fractura': '#A52A2A',
@@ -908,7 +914,7 @@ const Odontogramm = ({ odontogram }: Props) => {
     'Geminación/Fusión': '#BA55D3',
     'Impactación': '#8B0000',
     'Resto Radicular': '#2F4F4F',
-    'Diente incluido': 'rgb(177,	23,	32)',
+    'Diente incluido': '#B11720',
     'Diente Extruido': '#FF69B4',
     'Diente Intruido': '#DB7093',
     'Endentulo Total': '#D3D3D3',
