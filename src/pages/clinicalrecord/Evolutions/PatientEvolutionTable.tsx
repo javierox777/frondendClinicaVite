@@ -70,7 +70,6 @@ const PatientEvolutionTable = ({ patient }: Props) => {
       const updatedEvolution = evolutions.find(
         (e: Evolution) => e._id === showEvolution._id
       );
-      console.log('evolucion actualizada', updatedEvolution);
 
       setShowEvolution(updatedEvolution);
     }
@@ -110,37 +109,42 @@ const PatientEvolutionTable = ({ patient }: Props) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {evolutions?.map((evolution: Evolution) => {
-                    return (
-                      <TableRow key={evolution._id}>
-                        <TableCell>
-                          {format(new Date(evolution.fecha), 'yyyy/MM/dd')}
-                        </TableCell>
-                        <TableCell>
-                          {(evolution.profesional as Professional).nombre1}{' '}
-                          {(evolution.profesional as Professional).apellPat}
-                        </TableCell>
-                        <TableCell>
-                          {(evolution.empresa as Company).razonSocial}
-                        </TableCell>
-                        <TableCell>
-                          <IconButton
-                            onClick={() => setShowEvolution(evolution)}
-                          >
-                            <Visibility />
-                          </IconButton>
-                          <IconButton
-                            onClick={() => {
-                              setEditEvolution(evolution);
-                              setOpenForm(true);
-                            }}
-                          >
-                            <Edit color="success" />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
+                  {evolutions
+                    ?.slice(
+                      page * rowsPerPage,
+                      page * rowsPerPage + rowsPerPage
+                    )
+                    .map((evolution: Evolution) => {
+                      return (
+                        <TableRow key={evolution._id}>
+                          <TableCell>
+                            {format(new Date(evolution.fecha), 'yyyy/MM/dd')}
+                          </TableCell>
+                          <TableCell>
+                            {(evolution.profesional as Professional).nombre1}{' '}
+                            {(evolution.profesional as Professional).apellPat}
+                          </TableCell>
+                          <TableCell>
+                            {(evolution.empresa as Company).razonSocial}
+                          </TableCell>
+                          <TableCell>
+                            <IconButton
+                              onClick={() => setShowEvolution(evolution)}
+                            >
+                              <Visibility />
+                            </IconButton>
+                            <IconButton
+                              onClick={() => {
+                                setEditEvolution(evolution);
+                                setOpenForm(true);
+                              }}
+                            >
+                              <Edit color="success" />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                 </TableBody>
               </Table>
               <TablePagination
