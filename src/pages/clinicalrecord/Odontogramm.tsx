@@ -170,7 +170,7 @@ const items = [
   { title: 'Aparato Ortodontico Removible', id: 2, color: '#FF5241' },
   { title: 'Caries', id: 3, color: '#FF0000' },
   { title: 'Corona Definitiva', id: 4, color: 'rgb(255, 207, 54)' },
-  { title: 'Corona Provisoria', id: 5, color: 'rgb(255	151	41)' },
+  { title: 'Corona Provisoria', id: 5, color: '#FF9729' },
   { title: 'Desgaste Oclusal/Incisal', id: 6, color: '#808080' },
   { title: 'Diastema', id: 7, color: '#00CED1' },
   { title: 'Diente Ausente', id: 8, color: '#000000' },
@@ -198,7 +198,7 @@ const items = [
   { title: 'Tratamiento Pulpar', id: 31, color: '#FF6347' },
   { title: 'Giroversión', id: 32, color: '#B0E0E6' },
   { title: 'Transposición', id: 33, color: '#20B2AA' },
-  { title: 'Diente incluido', id: 34, color: 'rgb(177 ,	23,	32)' },
+  { title: 'Diente incluido', id: 34, color: 'rgb(177,23 ,32)' },
 ];
 
 interface Props {
@@ -880,12 +880,12 @@ const Odontogramm = ({ odontogram }: Props) => {
 
   console.log(treatments);
   const treatmentColorMap: Record<string, string> = {
-    Caries: '#FF0000',
+    'Caries': '#FF0000',
     'Corona Definitiva': 'rgb(255, 207, 54)',
-    'Corona Provisoria': 'rgb(255	151	41)',
-    Restauración: '#32CD32',
-    Fractura: '#A52A2A',
-    Endodoncia: '#00CED1',
+    'Corona Provisoria': '#FF9729',
+    'Restauración': '#32CD32',
+    'Fractura': '#A52A2A',
+    'Endodoncia': '#00CED1',
     'Protesis Fija': '#B8860B',
     'Protesis Removible': '#F4A460',
     'Protesis Total': '#FFDEAD',
@@ -894,19 +894,19 @@ const Odontogramm = ({ odontogram }: Props) => {
     'Tratamiento Pulpar': '#FF6347',
     'Diente Ausente': '#000000',
     'Diente Discromico': '#8B4513',
-    Giroversión: '#B0E0E6',
-    Implante: '#2E8B57',
-    Migración: '#6A5ACD',
-    Movilidad: '#FFB6C1',
-    Microdoncia: '#87CEEB',
-    Macrodoncia: '#8FBC8F',
+    'Giroversión': '#B0E0E6',
+    'Implante': '#2E8B57',
+    'Migración': '#6A5ACD',
+    'Movilidad': '#FFB6C1',
+    'Microdoncia': '#87CEEB',
+    'Macrodoncia': '#8FBC8F',
     'Semi Impactación': '#B22222',
-    Supernumerario: '#FF8C00',
+    'Supernumerario': '#FF8C00',
     'Restauración Temporal': '#9ACD32',
     'Desgaste Oclusal/Incisal': '#808080',
-    Diastema: '#00CED1',
+    'Diastema': '#00CED1',
     'Geminación/Fusión': '#BA55D3',
-    Impactación: '#8B0000',
+    'Impactación': '#8B0000',
     'Resto Radicular': '#2F4F4F',
     'Diente incluido': 'rgb(177,	23,	32)',
     'Diente Extruido': '#FF69B4',
@@ -915,7 +915,7 @@ const Odontogramm = ({ odontogram }: Props) => {
     'Protesis Fija Plural': '#B8860B',
     'Protesis Removible Parcial': '#F4A460',
     'Protesis Removible Total': '#FFDEAD',
-    Transposición: '#20B2AA',
+    'Transposición': '#20B2AA',
   };
 
   const treatmentsWithColor = treatments.map((t: ITreatment) => {
