@@ -63,10 +63,10 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
   const { mode } = useThemeContext();
 
   const [professionalId, setProfessionalId] = useState<string>('');
-  const [quota, setQuota] = useState<number>(0);
+  const [quota, setQuota] = useState<number>(1);
   const [startHour, setStartHour] = useState<string>('08');
   const [startMinutes, setStartMinutes] = useState<string>('00');
-  const [interval, setInterval] = useState<number>(0);
+  const [interval, setInterval] = useState<number>(30);
   const [weekDays, setWeekdays] = useState<number[]>([]);
   const [daysOff, setDaysOff] = useState<string[]>([]);
   const [dayOffToAdd, setDayOffToAdd] = useState<string>('');
@@ -88,11 +88,23 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
   });
 
   const handleAddDayOff = () => {
-    const dateToAdd = format(new Date(dayOffToAdd), 'MM/dd/yyy');
+    // 1. Convertimos `dayOffToAdd` a objeto Date
+    const originalDate = new Date(dayOffToAdd);
+  
+    // 2. Sumamos 1 día
+    originalDate.setDate(originalDate.getDate() + 1);
+  
+    // 3. Formateamos a "MM/dd/yyyy" (o el formato que quieras)
+    const dateToAdd = format(originalDate, 'MM/dd/yyyy');
+  
+    // 4. Agregamos el día libre
     setDaysOff([...daysOff, dateToAdd]);
+  
+    // 5. Limpiamos el input y mostramos un mensaje
     setDayOffToAdd('');
     toast.success('Día libre se ha agregado');
   };
+  
   const fixedDate = new Date(`${startDate}T12:00:00`);
   const handleSubmit = async (e: React.FormEvent) => {
     const data = {
@@ -101,7 +113,7 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
       intervalo: interval,
       profesional: professionalId,
       horaInicio: `${startHour}:${startMinutes}`,
-      fechaInicio : format(fixedDate, 'MM/dd/yyyy'),
+      fechaInicio: format(fixedDate, 'MM/dd/yyyy'),
       fechaTermino: format(new Date(endDate), 'MM/dd/yyyy'),
       diasLibres: daysOff,
     };
@@ -130,6 +142,7 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
           setSubmitting(false);
           if (refetch) {
             refetch();
+            onClose();
           }
         }
       } else {
@@ -146,9 +159,9 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
             diasLibres: daysOff,
             vigente: valid,
           }
-          
+
         );
-      ;
+        ;
 
 
         if (response.data.message === 'success') {
@@ -156,6 +169,7 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
           setSubmitting(false);
           if (refetch) {
             refetch();
+            onClose();
           }
         }
       }
@@ -207,7 +221,7 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
       console.log('Debug FRONT => fechaTermino:', schedule.fechaTermino);
       console.log('Debug FRONT => diasHabilitados:', schedule.diasHabilitados)
     }
-  
+
   }, [schedule]);
 
   return (
@@ -312,11 +326,15 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
                     type="date"
                     label="Fecha Inicio"
                     InputLabelProps={{ shrink: true }}
+                    inputProps={{
+                      min: new Date().toISOString().split('T')[0], // Restringe a la fecha actual
+                    }}
                     onChange={(e) => {
                       setStartDate(e.target.value);
                     }}
                     value={startDate}
                   />
+
                 </FormControl>
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
@@ -326,11 +344,15 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
                     type="date"
                     label="Fecha Término"
                     InputLabelProps={{ shrink: true }}
+                    inputProps={{
+                      min: new Date().toISOString().split('T')[0],
+                    }}
                     onChange={(e) => {
                       setEndDate(e.target.value);
                     }}
                     value={endDate}
                   />
+
                 </FormControl>
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
@@ -344,7 +366,7 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
 
                       const newValue =
                         inputValue === '0' ||
-                        (!isNaN(Number(inputValue)) && inputValue !== '')
+                          (!isNaN(Number(inputValue)) && inputValue !== '')
                           ? String(Number(inputValue))
                           : '0';
 
@@ -365,7 +387,7 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
 
                       const newValue =
                         inputValue === '0' ||
-                        (!isNaN(Number(inputValue)) && inputValue !== '')
+                          (!isNaN(Number(inputValue)) && inputValue !== '')
                           ? String(Number(inputValue))
                           : '0';
 
