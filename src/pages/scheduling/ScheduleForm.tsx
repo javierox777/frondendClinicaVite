@@ -64,7 +64,7 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
 
   const [professionalId, setProfessionalId] = useState<string>('');
   const [quota, setQuota] = useState<number>(0);
-  const [startHour, setStartHour] = useState<string>('01');
+  const [startHour, setStartHour] = useState<string>('08');
   const [startMinutes, setStartMinutes] = useState<string>('00');
   const [interval, setInterval] = useState<number>(0);
   const [weekDays, setWeekdays] = useState<number[]>([]);
@@ -146,7 +146,10 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
             diasLibres: daysOff,
             vigente: valid,
           }
+          
         );
+      ;
+
 
         if (response.data.message === 'success') {
           toast.success('Agenda actualizada');
@@ -200,7 +203,11 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
       setStartDate(format(new Date(schedule.fechaInicio), 'yyyy-MM-dd'));
       setEndDate(format(new Date(schedule.fechaTermino), 'yyyy-MM-dd'));
       setValid(schedule.vigente);
+      console.log('Debug FRONT => fechaInicio:', schedule.fechaInicio);
+      console.log('Debug FRONT => fechaTermino:', schedule.fechaTermino);
+      console.log('Debug FRONT => diasHabilitados:', schedule.diasHabilitados)
     }
+  
   }, [schedule]);
 
   return (
@@ -394,13 +401,13 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
                         value={startHour}
                         onChange={(e) => setStartHour(e.target.value)}
                       >
-                        <MenuItem value="01">01</MenuItem>
+                        {/* <MenuItem value="01">01</MenuItem>
                         <MenuItem value="02">02</MenuItem>
                         <MenuItem value="03">03</MenuItem>
                         <MenuItem value="04">04</MenuItem>
                         <MenuItem value="05">05</MenuItem>
                         <MenuItem value="06">06</MenuItem>
-                        <MenuItem value="07">07</MenuItem>
+                        <MenuItem value="07">07</MenuItem> */}
                         <MenuItem value="08">08</MenuItem>
                         <MenuItem value="09">09</MenuItem>
                         <MenuItem value="10">10</MenuItem>
@@ -412,12 +419,12 @@ const ScheduleForm = ({ onClose, open, schedule, refetch }: Props) => {
                         <MenuItem value="16">16</MenuItem>
                         <MenuItem value="17">17</MenuItem>
                         <MenuItem value="18">18</MenuItem>
-                        <MenuItem value="19">19</MenuItem>
+                        {/* <MenuItem value="19">19</MenuItem>
                         <MenuItem value="20">20</MenuItem>
                         <MenuItem value="21">21</MenuItem>
                         <MenuItem value="22">22</MenuItem>
                         <MenuItem value="23">23</MenuItem>
-                        <MenuItem value="24">24</MenuItem>
+                        <MenuItem value="24">24</MenuItem> */}
                       </Select>
                     </FormControl>
                   </Grid>
