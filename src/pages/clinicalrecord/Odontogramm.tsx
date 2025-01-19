@@ -87,7 +87,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import axios from 'axios';
 import { generalConfig } from '../../config';
 import TreatmentForm from './TreatmentForm';
-import {Person} from '../../interfaces/Person'
+import { Person } from '../../interfaces/Person'
 
 
 
@@ -227,7 +227,35 @@ const Odontogramm = ({ odontogram }: Props) => {
 
   const [teeth, setTeeth] = useState<Diente[]>();
   const [addresses, setAddresses] = useState<Address[]>([]);
-  
+  const [convenios, setConvenios] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchConvenios = async () => {
+      try {
+        // Verificar si existe persona y su _id
+        if (odontogram && isPerson(odontogram.persona)) {
+          const personId = odontogram.persona._id;
+          // Llamar a tu endpoint NestJS: GET /api/persons/convenios/:id
+          const res = await axios.get(
+            `${generalConfig.baseUrl}/persons/convenios/${personId}`
+          );
+          // Respuesta esperada: { message: 'success', body: {..., convenios: [...] } }
+          const data = res.data;
+          if (data && data.body && Array.isArray(data.body.convenios)) {
+            setConvenios(data.body.convenios);
+          } else {
+            setConvenios([]); // en caso de que no vengan convenios
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching convenios:', error);
+        setConvenios([]);
+      }
+    };
+
+    fetchConvenios();
+  }, [odontogram]);
+
   useEffect(() => {
     const fetchAddresses = async () => {
       if (odontogram && isPerson(odontogram.persona)) {
@@ -235,10 +263,10 @@ const Odontogramm = ({ odontogram }: Props) => {
           const response = await axios.get(
             `${generalConfig.baseUrl}/address-book/getaddresses/${odontogram.persona._id}`
           );
-  
+
           // Imprime directamente los datos de la respuesta
           console.log("addresses from response", response.data.body);
-  
+
           // Actualiza el estado con los datos obtenidos
           setAddresses(response.data.body || []);
         } catch (error) {
@@ -246,10 +274,10 @@ const Odontogramm = ({ odontogram }: Props) => {
         }
       }
     };
-  
+
     fetchAddresses();
   }, [odontogram]);
- 
+
 
   useEffect(() => {
     if (odontogram && odontogram.dientes) {
@@ -388,43 +416,41 @@ const Odontogramm = ({ odontogram }: Props) => {
     try {
       const doc = new jsPDF('portrait', 'mm', 'a4');
       const persona = odontogram?.persona;
-  
+
       if (!isPerson(persona)) {
         console.error('La persona no es del tipo esperado.');
         return;
       }
-  
+
       const rutCompleto = `${persona.rut}-${persona.dv}`;
       const fechaNacimiento = new Date(persona.fechaNac).toLocaleDateString();
       const edad = calculateAge(persona.fechaNac instanceof Date ? persona.fechaNac.toISOString() : persona.fechaNac);
-  
+
       const pageWidth = doc.internal.pageSize.getWidth();
       doc.setFontSize(18);
       doc.setTextColor(255, 105, 180);
       doc.setFont('helvetica', 'bold');
       doc.text('Clínica Dental', pageWidth / 2 - 20, 20, { align: 'center' });
-  
+
       doc.setTextColor(0, 102, 204);
       doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
-  
+
       doc.setFontSize(16);
       doc.setTextColor(0, 102, 204);
       doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' });
-       
+
       const logoUrl = '/logo.png';
       doc.addImage(logoUrl, 'PNG', 10, 10, 30, 30);
-  
+
       const cellHeight = 8;
       const startX = 10;
       let currentY = 50;
-  
+
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-  
-      doc.text(`CONVENIO: ${persona.institucion.nombre}`, startX + 2, currentY + 6);
-      doc.rect(startX, currentY + 1, 190, cellHeight);
-      currentY += cellHeight * 2;
-  
+
+
+
       // Fila: Apellido paterno, materno y nombres
       doc.rect(startX, currentY, 190, cellHeight);
       doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight);
@@ -433,7 +459,7 @@ const Odontogramm = ({ odontogram }: Props) => {
       doc.text('APELLIDO MATERNO', startX + 65, currentY + 5);
       doc.text('NOMBRES', startX + 130, currentY + 5);
       currentY += cellHeight;
-  
+
       doc.rect(startX, currentY, 190, cellHeight);
       doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight);
       doc.line(startX + 126.66, currentY, startX + 126.66, currentY + cellHeight);
@@ -441,7 +467,7 @@ const Odontogramm = ({ odontogram }: Props) => {
       doc.text(`${persona.apellMat}`, startX + 65, currentY + 5);
       doc.text(`${persona.nombre1} ${persona.nombre2}`, startX + 130, currentY + 5);
       currentY += cellHeight;
-  
+
       // Fila: Rut, Edad, Sexo, Fecha de Nacimiento
       doc.rect(startX, currentY, 190, cellHeight);
       doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight);
@@ -452,7 +478,7 @@ const Odontogramm = ({ odontogram }: Props) => {
       doc.text('SEXO', startX + 96, currentY + 5);
       doc.text('FECHA DE NACIMIENTO', startX + 130, currentY + 5);
       currentY += cellHeight;
-  
+
       doc.rect(startX, currentY, 190, cellHeight);
       doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight);
       doc.line(startX + 94.995, currentY, startX + 94.995, currentY + cellHeight);
@@ -462,37 +488,81 @@ const Odontogramm = ({ odontogram }: Props) => {
       doc.text(`${persona.sexo.nombre}`, startX + 96, currentY + 5);
       doc.text(`${fechaNacimiento}`, startX + 130, currentY + 5);
       currentY += cellHeight;
-  
+
+      currentY += cellHeight; // Agregar espacio vacío antes del título
+
+      // Celda del título "CONVENIOS:"
+      doc.rect(startX, currentY, 190, cellHeight); // Dibujar borde de la celda
+      doc.text(`PREVISIÓN:`, startX + 2, currentY + 7); // Texto del título
+      currentY += cellHeight;
+
+      // Filas dinámicas para los valores de convenios
+      const prevision = persona.institucion?.nombre ? [persona.institucion.nombre] : ['Sin Presión']; // Asegura que haya al menos un valor
+      prevision.forEach((convenio) => {
+        doc.rect(startX, currentY, 190, cellHeight); // Dibujar borde de cada fila
+        doc.text(convenio, startX + 2, currentY + 5); // Texto del convenio
+        currentY += cellHeight; // Avanza a la siguiente fila
+      });
+      currentY += cellHeight; // Agregar espacio vacío antes del título
+
+      // Celda del título "CONVENIOS:"
+      const conveniosList = convenios.length
+      ? convenios.map((c) => c.prestacionTipo?.nombre || 'Sin convenio')
+      : ['Sin convenios disponibles'];
+
+    // 2. Generamos sección "CONVENIOS"
+    doc.rect(startX, currentY, 190, cellHeight);
+    doc.text('CONVENIOS:', startX + 2, currentY + 7);
+    currentY += cellHeight;
+
+    conveniosList.forEach((convenio) => {
+      doc.rect(startX, currentY, 190, cellHeight);
+      doc.text(convenio, startX + 2, currentY + 5);
+      currentY += cellHeight;
+    });
+
+
+
       // Filas dinámicas de direcciones
-      
+      currentY += cellHeight;
+      doc.rect(startX, currentY, 190, cellHeight); // Borde de la celda del título
+      doc.text(`DIRECCIÓN:`, startX + 2, currentY + 5); // Texto del título
+      currentY += cellHeight; // Avanza a la siguiente fila
+
+      // Filas dinámicas de direcciones
       addresses.forEach((address) => {
         const ciudadNombre = address.ciudad?.nombre || 'Sin ciudad';
         const direccionNombre = address.nombre || 'Sin dirección';
-        doc.rect(startX, currentY, 190, cellHeight);
-        doc.text( `DIRECCIÓN: ${ciudadNombre}, ${direccionNombre}`, startX + 2, currentY + 5);
-        currentY += cellHeight;
+
+        // Celda de cada dirección
+        doc.rect(startX, currentY, 190, cellHeight); // Borde de la celda
+        doc.text(`${ciudadNombre}, ${direccionNombre}`, startX + 2, currentY + 5); // Texto de la celda
+        currentY += cellHeight; // Avanza a la siguiente fila
       });
+
+      currentY += cellHeight;
+
 
       // doc.text('Direcciones:', 10, 50);
       // addresses.forEach((address, index) => {
       //   doc.text(`- ${address}`, 10, 60 + index * 10);
       // });
-  
+
       // Fila: Teléfono
       doc.rect(startX, currentY, 190, cellHeight);
       doc.text('FONO:', startX + 2, currentY + 7);
       currentY += cellHeight;
-  
+
       // Fila: Dinámica para otros datos
-      doc.rect(startX, currentY, 190, cellHeight);
-      doc.text('OTROS:', startX + 2, currentY + 7);
-      currentY += cellHeight;
-  
+      // doc.rect(startX, currentY, 190, cellHeight);
+      // doc.text('OTROS:', startX + 2, currentY + 7);
+      // currentY += cellHeight;
+
       // Continuación del contenido
       doc.rect(startX, currentY, 190, cellHeight);
       doc.text('MOTIVO DE CONSULTA:', startX + 2, currentY + 7);
       currentY += cellHeight;
-  
+
       doc.rect(startX, currentY, 190, cellHeight);
       doc.text('EVALUACION Y TRATAMIENTO DE ORTODONCIA', startX + 2, currentY + 7);
       currentY += cellHeight * 2;
@@ -672,14 +742,14 @@ const Odontogramm = ({ odontogram }: Props) => {
 
         parts.forEach((part) => {
           let color = toothParts?.[part.key]?.color || '#FFFFFF';
-        
+
           if (color.includes('255\t151\t41')) {
             color = '#FF9729';
           }
           doc.setFillColor(color);
           doc.rect(part.x, part.y, part.w, part.h, 'FD');
         });
-        
+
       };
 
       // Función para dibujar una fila de dientes
@@ -734,7 +804,7 @@ const Odontogramm = ({ odontogram }: Props) => {
           mesial: { color: tooth.mesial.color },
           distal: { color: tooth.distal.color },
           lingualpalatino
-: { color: tooth.lingualpalatino.color },
+            : { color: tooth.lingualpalatino.color },
           oclusal: { color: tooth.oclusal.color },
         };
       });
@@ -816,8 +886,8 @@ const Odontogramm = ({ odontogram }: Props) => {
           doc.text(
             value,
             startX +
-              columnWidths.slice(0, index).reduce((a, b) => a + b, 0) +
-              2,
+            columnWidths.slice(0, index).reduce((a, b) => a + b, 0) +
+            2,
             currentY + 7
           );
         });
@@ -1438,7 +1508,7 @@ const Odontogramm = ({ odontogram }: Props) => {
                             <img
                               src={
                                 dientesImages[
-                                  `diente${t.pieza.diente}` as DienteKeys
+                                `diente${t.pieza.diente}` as DienteKeys
                                 ]
                               }
                               alt={`Diente ${t.pieza.diente}`}
@@ -1524,35 +1594,35 @@ const Odontogramm = ({ odontogram }: Props) => {
 
                               updatedTeeth[toothIndex][
                                 t.pieza.parte as
-                                  | 'bucal'
-                                  | 'distal'
-                                  | 'oclusal'
-                                  | 'mesial'
-                                  | 'lingualpalatino'
+                                | 'bucal'
+                                | 'distal'
+                                | 'oclusal'
+                                | 'mesial'
+                                | 'lingualpalatino'
                               ].color = '#FFFFFF';
                               updatedTeeth[toothIndex][
                                 t.pieza.parte as
-                                  | 'bucal'
-                                  | 'distal'
-                                  | 'oclusal'
-                                  | 'mesial'
-                                  | 'lingualpalatino'
+                                | 'bucal'
+                                | 'distal'
+                                | 'oclusal'
+                                | 'mesial'
+                                | 'lingualpalatino'
                               ].detalle = '';
                               updatedTeeth[toothIndex][
                                 t.pieza.parte as
-                                  | 'bucal'
-                                  | 'distal'
-                                  | 'oclusal'
-                                  | 'mesial'
-                                  | 'lingualpalatino'
+                                | 'bucal'
+                                | 'distal'
+                                | 'oclusal'
+                                | 'mesial'
+                                | 'lingualpalatino'
                               ].diagnostico = '';
                               updatedTeeth[toothIndex][
                                 t.pieza.parte as
-                                  | 'bucal'
-                                  | 'distal'
-                                  | 'oclusal'
-                                  | 'mesial'
-                                  | 'lingualpalatino'
+                                | 'bucal'
+                                | 'distal'
+                                | 'oclusal'
+                                | 'mesial'
+                                | 'lingualpalatino'
                               ].estado = '';
 
                               setTeeth(updatedTeeth);
