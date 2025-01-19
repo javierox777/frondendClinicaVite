@@ -103,6 +103,45 @@ interface Address {
   nombre: string;      // Nombre de la dirección
   _id: string;         // ID único de la dirección
 }
+interface Morbido {
+  descripcion: string;
+  detail: string;
+  _id: string;
+}
+
+interface General {
+  descripcion: string;
+  _id: string;
+}
+
+interface Familiar {
+  descripcion: string;
+  _id: string;
+}
+
+interface Alergia {
+  descripcion: string;
+  _id: string;
+}
+
+interface Habito {
+  descripcion: string;
+  _id: string;
+}
+
+interface Antecedents {
+  _id: string;
+  persona: string;
+  morbidos: Morbido[];
+  familiares: Familiar[];
+  generales: General[];
+  habitos: Habito[];
+  alergias: Alergia[];
+  __v: number;
+}
+
+
+
 
 type DienteKeys =
   `diente${11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 51 | 52 | 53 | 54 | 55 | 61 | 62 | 63 | 64 | 65 | 71 | 72 | 73 | 74 | 75 | 81 | 82 | 83 | 84 | 85}`;
@@ -228,6 +267,32 @@ const Odontogramm = ({ odontogram }: Props) => {
   const [teeth, setTeeth] = useState<Diente[]>();
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [convenios, setConvenios] = useState<any[]>([]);
+  const [antecedents, setAntecedents] = useState<Antecedents | null>(null);
+
+  // useEffect para obtener los antecedentes
+  useEffect(() => {
+    const fetchAntecedents = async () => {
+      try {
+        if (odontogram && isPerson(odontogram.persona)) {
+          const personId = odontogram.persona._id;
+          const res = await axios.get(
+            `${generalConfig.baseUrl}/antecedents/getantecedents/${personId}`
+          );
+          const data = res.data;
+          if (data && data.message === 'success' && Array.isArray(data.body)) {
+            setAntecedents(data.body[0]); // Asumiendo que siempre hay un objeto en el array
+          } else {
+            setAntecedents([]);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching antecedents:', error);
+        setAntecedents([]);
+      }
+    };
+
+    fetchAntecedents();
+  }, [odontogram]);
 
   useEffect(() => {
     const fetchConvenios = async () => {
@@ -412,7 +477,10 @@ const Odontogramm = ({ odontogram }: Props) => {
   };
   console.log("Odontogram!:", odontogram);
   console.log("Persona!:", odontogram?.persona);
+ 
+
   const generateDentistPDF = async () => {
+    
     try {
       const doc = new jsPDF('portrait', 'mm', 'a4');
       const persona = odontogram?.persona;
@@ -427,31 +495,70 @@ const Odontogramm = ({ odontogram }: Props) => {
       const edad = calculateAge(persona.fechaNac instanceof Date ? persona.fechaNac.toISOString() : persona.fechaNac);
 
       const pageWidth = doc.internal.pageSize.getWidth();
-      doc.setFontSize(18);
-      doc.setTextColor(255, 105, 180);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Clínica Dental', pageWidth / 2 - 20, 20, { align: 'center' });
-
-      doc.setTextColor(0, 102, 204);
-      doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
-
-      doc.setFontSize(16);
-      doc.setTextColor(0, 102, 204);
-      doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' });
-
-      const logoUrl = '/logo.png';
-      doc.addImage(logoUrl, 'PNG', 10, 10, 30, 30);
-
-      const cellHeight = 8;
-      const startX = 10;
-      let currentY = 50;
-
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'normal');
-
+       // 1. Definir límites de la página
+       const PAGE_HEIGHT = 297; // Altura total de una hoja A4 en mm
+       const MARGIN = 10; // Márgenes en mm
+       const MAX_Y = PAGE_HEIGHT - MARGIN; // Posición Y máxima antes de añadir una nueva página
+   
+       // 2. Función de utilidad para añadir texto con verificación de salto de página
+       const addTextWithPageCheck = (
+         text: string,
+         x: number,
+         y: number,
+         lineHeight: number = 8
+       ): number => {
+         if (y + lineHeight > MAX_Y) {
+           doc.addPage();
+           y = MARGIN; // Reiniciar posición Y en la nueva página
+   
+           // Repetir encabezados si es necesario
+           doc.setFontSize(18);
+           doc.setTextColor(255, 105, 180);
+           doc.setFont('helvetica', 'bold');
+           doc.text('Clínica Dental', pageWidth / 2 - 20, 20, { align: 'center' });
+   
+           doc.setTextColor(0, 102, 204);
+           doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
+   
+           doc.setFontSize(16);
+           doc.setTextColor(0, 102, 204);
+           doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' });
+   
+           doc.setFontSize(10);
+           doc.setFont('helvetica', 'normal');
+   
+           return y; // Y se ha reiniciado
+         }
+         doc.text(text, x, y);
+         return y + lineHeight;
+       };
+   
+       // 3. Agregar encabezados
+       doc.setFontSize(18);
+       doc.setTextColor(255, 105, 180);
+       doc.setFont('helvetica', 'bold');
+       doc.text('Clínica Dental', pageWidth / 2 - 20, 20, { align: 'center' });
+   
+       doc.setTextColor(0, 102, 204);
+       doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
+   
+       doc.setFontSize(16);
+       doc.setTextColor(0, 102, 204);
+       doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' });
+   
+       const logoUrl = '/logo.png';
+       doc.addImage(logoUrl, 'PNG', 10, 10, 30, 30);
+   
+       const cellHeight = 8;
+       const startX = 10;
+       let currentY = 50;
+   
+       doc.setFontSize(10);
+       doc.setFont('helvetica', 'normal');
 
 
       // Fila: Apellido paterno, materno y nombres
+      doc.setTextColor(0, 0, 0);
       doc.rect(startX, currentY, 190, cellHeight);
       doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight);
       doc.line(startX + 126.66, currentY, startX + 126.66, currentY + cellHeight);
@@ -491,35 +598,39 @@ const Odontogramm = ({ odontogram }: Props) => {
 
       currentY += cellHeight; // Agregar espacio vacío antes del título
 
-      // Celda del título "CONVENIOS:"
+      // Celda del título "PREVISIÓN:"
       doc.rect(startX, currentY, 190, cellHeight); // Dibujar borde de la celda
       doc.text(`PREVISIÓN:`, startX + 2, currentY + 7); // Texto del título
       currentY += cellHeight;
 
-      // Filas dinámicas para los valores de convenios
+      // Filas dinámicas para los valores de prevision
       const prevision = persona.institucion?.nombre ? [persona.institucion.nombre] : ['Sin Presión']; // Asegura que haya al menos un valor
-      prevision.forEach((convenio) => {
+      prevision.forEach((prevision) => {
         doc.rect(startX, currentY, 190, cellHeight); // Dibujar borde de cada fila
-        doc.text(convenio, startX + 2, currentY + 5); // Texto del convenio
+        doc.text(prevision, startX + 2, currentY + 5); // Texto del convenio
         currentY += cellHeight; // Avanza a la siguiente fila
       });
       currentY += cellHeight; // Agregar espacio vacío antes del título
 
       // Celda del título "CONVENIOS:"
       const conveniosList = convenios.length
-      ? convenios.map((c) => c.prestacionTipo?.nombre || 'Sin convenio')
-      : ['Sin convenios disponibles'];
+        ? convenios.map((c) => c.prestacionTipo?.nombre || 'Sin convenio')
+        : ['Sin convenios disponibles'];
 
-    // 2. Generamos sección "CONVENIOS"
-    doc.rect(startX, currentY, 190, cellHeight);
-    doc.text('CONVENIOS:', startX + 2, currentY + 7);
-    currentY += cellHeight;
-
-    conveniosList.forEach((convenio) => {
+      // 2. Generamos sección "CONVENIOS"
       doc.rect(startX, currentY, 190, cellHeight);
-      doc.text(convenio, startX + 2, currentY + 5);
+      doc.setTextColor(0, 0, 0);
+
+      // Luego dibujar el texto
+      doc.text('CONVENIOS:', startX + 2, currentY + 7);
       currentY += cellHeight;
-    });
+
+      conveniosList.forEach((convenio) => {
+
+        doc.rect(startX, currentY, 190, cellHeight);
+        doc.text(convenio, startX + 2, currentY + 5);
+        currentY += cellHeight;
+      });
 
 
 
@@ -552,148 +663,129 @@ const Odontogramm = ({ odontogram }: Props) => {
       doc.rect(startX, currentY, 190, cellHeight);
       doc.text('FONO:', startX + 2, currentY + 7);
       currentY += cellHeight;
+      doc.addPage();
 
-      // Fila: Dinámica para otros datos
-      // doc.rect(startX, currentY, 190, cellHeight);
-      // doc.text('OTROS:', startX + 2, currentY + 7);
-      // currentY += cellHeight;
+// Reiniciar currentY al margen superior
+      // Margen superior en mm
+      doc.setFontSize(18);
+      doc.setTextColor(255, 105, 180);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Clínica Dental', pageWidth / 2 - 20, 20, { align: 'center' });
+  
+      doc.setTextColor(0, 102, 204);
+      doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
+  
+      doc.setFontSize(16);
+      doc.setTextColor(0, 102, 204);
+      doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' });
+  
+     
+      doc.addImage(logoUrl, 'PNG', 10, 10, 30, 30);
+  
+     
+  
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+     currentY = 60;  
 
-      // Continuación del contenido
+    
+
+        // 9. Secciones Dinámicas: GENERALES, FAMILIARES, MÓRBIDOS, ALÉRGIAS, HÁBITOS
+    if (antecedents) {
+      const generalesListt = antecedents.generales?.length
+        ? antecedents.generales.map((g: General) => g.descripcion || 'Sin datos generales')
+        : ['Sin datos generales'];
+
+      const familiaresList = antecedents.familiares?.length
+        ? antecedents.familiares.map((f: Familiar) => f.descripcion || 'Sin datos familiares')
+        : ['Sin datos familiares'];
+
+      const morbidosList = antecedents.morbidos?.length
+        ? antecedents.morbidos.map((m: Morbido) => `${m.descripcion}: ${m.detail || 'Sin detalles'}`)
+        : ['Sin datos mórbidos'];
+
+      const alergiasList = antecedents.alergias?.length
+        ? antecedents.alergias.map((a: Alergia) => a.descripcion || 'Sin datos de alergias')
+        : ['Sin datos de alergias'];
+
+      const habitosList = antecedents.habitos?.length
+        ? antecedents.habitos.map((h: Habito) => h.descripcion || 'Sin datos de hábitos')
+        : ['Sin datos de hábitos'];
+
+      
+     
+
+      // -------------------------------
+      // Secciones Dinámicas: GENERALES, FAMILIARES, MÓRBIDOS, ALÉRGIAS, HÁBITOS
+      // -------------------------------
+     
+      // 1) GENERALES
       doc.rect(startX, currentY, 190, cellHeight);
-      doc.text('MOTIVO DE CONSULTA:', startX + 2, currentY + 7);
+      doc.setTextColor(0, 0, 0);
+      doc.text('GENERALES:', startX + 2, currentY + 5);
       currentY += cellHeight;
 
+      generalesListt.forEach((item) => {
+        doc.rect(startX, currentY, 190, cellHeight);
+        doc.text(item, startX + 2, currentY + 5);
+        currentY += cellHeight;
+      });
+      currentY += cellHeight
+      // 2) FAMILIARES
       doc.rect(startX, currentY, 190, cellHeight);
-      doc.text('EVALUACION Y TRATAMIENTO DE ORTODONCIA', startX + 2, currentY + 7);
-      currentY += cellHeight * 2;
+      doc.setTextColor(0, 0, 0);
+      doc.text('FAMILIARES:', startX + 2, currentY + 5);
+      currentY += cellHeight;
 
-      // Motivo de consulta
+      familiaresList.forEach((item: any) => {
+        doc.rect(startX, currentY, 190, cellHeight);
+        doc.text(item, startX + 2, currentY + 5);
+        currentY += cellHeight;
+      });
+      currentY += cellHeight
+      // 3) MÓRBIDOS
       doc.rect(startX, currentY, 190, cellHeight);
-      doc.text('ANTECEDENTES PERSONALES:', startX + 2, currentY + 7);
+      doc.setTextColor(0, 0, 0);
+      doc.text('MÓRBIDOS:', startX + 2, currentY + 5);
       currentY += cellHeight;
-      doc.rect(startX, currentY, 190, cellHeight);
-      doc.text('ENFERMEDADES ACTUAL Y MEDICAMENTOS', startX + 2, currentY + 7);
 
-      currentY += cellHeight;
+      morbidosList.forEach((item: any) => {
+        doc.rect(startX, currentY, 190, cellHeight);
+        doc.text(item, startX + 2, currentY + 5);
+        currentY += cellHeight;
+      });
+      currentY += cellHeight
+      // 4) ALÉRGIAS
       doc.rect(startX, currentY, 190, cellHeight);
+      doc.setTextColor(0, 0, 0);
+      doc.text('ALÉRGIAS:', startX + 2, currentY + 5);
       currentY += cellHeight;
-      // Salto de línea
 
-      // Antecedentes personales
-      doc.line(
-        startX + 94.995,
-        currentY,
-        startX + 94.995,
-        currentY + cellHeight * 3.3
-      );
-      doc.rect(startX, currentY, 190, cellHeight * 3.3);
-      doc.text(
-        'Alergias:               SI    NO    ',
-        startX + 2,
-        currentY + 8
-      );
-      doc.line(startX, currentY + 10, startX + 190, currentY + 10);
-      doc.text(
-        'FRECUENCUA DE CEPILLADO:    SI    NO   ',
-        startX + 102,
-        currentY + 8
-      );
+      alergiasList.forEach((item: any) => {
+        doc.rect(startX, currentY, 190, cellHeight);
+        doc.text(item, startX + 2, currentY + 5);
+        currentY += cellHeight;
+      });
+      currentY += cellHeight
+
+      // 5) HÁBITOS
+      doc.rect(startX, currentY, 190, cellHeight);
+      doc.setTextColor(0, 0, 0);
+      doc.text('HÁBITOS:', startX + 2, currentY + 5);
       currentY += cellHeight;
-      doc.text('Hemorragias:       SI    NO   ', startX + 2, currentY + 8);
-      doc.line(startX, currentY + 10, startX + 190, currentY + 10);
-      doc.text(
-        'CEDA DENTAL:                               SI    NO   ',
-        startX + 102,
-        currentY + 8
-      );
-      currentY += cellHeight;
-      doc.text(
-        'ENGUAGUE BUCAL:                       SI    NO   ',
-        startX + 102,
-        currentY + 8
-      );
+
+      habitosList.forEach((item: any) => {
+        doc.rect(startX, currentY, 190, cellHeight);
+        doc.text(item, startX + 2, currentY + 5);
+        currentY += cellHeight;
+      });
+
+
+
 
       currentY += cellHeight * 3;
 
-      // Hábitos orales
-
-      doc.rect(startX, currentY, 90, cellHeight * 4);
-      doc.text('HÁBITOS ORALES', startX + 2, currentY + 7);
-      doc.line(startX, currentY + 8, startX + 90, currentY + 9);
-      doc.line(
-        startX + 50,
-        currentY + 9,
-        startX + 50,
-        currentY + cellHeight * 4
-      );
-      doc.line(
-        startX + 70,
-        currentY + 9,
-        startX + 70,
-        currentY + cellHeight * 4
-      );
-      doc.line(
-        startX + 90,
-        currentY + 9,
-        startX + 90,
-        currentY + cellHeight * 4
-      );
-      doc.text('BRUXISMO:', startX + 2, currentY + 14);
-      doc.text('SI', startX + 58, currentY + 14);
-      doc.text('NO', startX + 78, currentY + 14);
-      doc.line(startX, currentY + 16, startX + 90, currentY + 16);
-      doc.text('INTERPOSICIÓN LINGUAL:', startX + 2, currentY + 21);
-      doc.text('SI', startX + 58, currentY + 21);
-      doc.text('NO', startX + 78, currentY + 21);
-      doc.line(startX, currentY + 24, startX + 90, currentY + 24);
-
-      doc.text('ONICOFAGIA:', startX + 2, currentY + 28);
-      doc.text('SI', startX + 58, currentY + 28);
-      doc.text('NO', startX + 78, currentY + 28);
-
-      // Examen físico / Alteraciones
-      doc.rect(startX + 100, currentY, 90, cellHeight * 4); // Contenedor principal
-      doc.text('EXAMEN FÍSICO / ALTERACIONES', startX + 102, currentY + 7);
-
-      // Línea horizontal debajo del título
-      doc.line(startX + 100, currentY + 9, startX + 190, currentY + 9);
-
-      // Líneas verticales para dividir las columnas
-      doc.line(
-        startX + 150,
-        currentY + 9,
-        startX + 150,
-        currentY + cellHeight * 4
-      ); // Primera línea vertical
-      doc.line(
-        startX + 170,
-        currentY + 9,
-        startX + 170,
-        currentY + cellHeight * 4
-      ); // Segunda línea vertical
-      doc.line(
-        startX + 190,
-        currentY + 9,
-        startX + 190,
-        currentY + cellHeight * 4
-      ); // Borde derecho
-
-      // Primera fila de contenido
-      doc.text('ATM:', startX + 102, currentY + 14);
-      doc.text('SI', startX + 158, currentY + 14);
-      doc.text('NO', startX + 178, currentY + 14);
-      doc.line(startX + 100, currentY + 16, startX + 190, currentY + 16); // Línea horizontal
-
-      // Segunda fila de contenido
-      doc.text('LABIO:', startX + 102, currentY + 21);
-      doc.text('SI', startX + 158, currentY + 21);
-      doc.text('NO', startX + 178, currentY + 21);
-      doc.line(startX + 100, currentY + 24, startX + 190, currentY + 24); // Línea horizontal
-
-      // Tercera fila de contenido
-      doc.text('PISO DE BOCA:', startX + 102, currentY + 28);
-      doc.text('SI', startX + 158, currentY + 28);
-      doc.text('NO', startX + 178, currentY + 28);
+     
 
       currentY += cellHeight * 4;
       doc.addPage();
@@ -902,7 +994,7 @@ const Odontogramm = ({ odontogram }: Props) => {
       });
 
       doc.save('ficha_dental.pdf');
-    } catch (error) {
+    }} catch (error) {
       console.error('Error al generar el PDF:', error);
     }
   };
