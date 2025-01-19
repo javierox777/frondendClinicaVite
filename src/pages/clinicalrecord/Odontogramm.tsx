@@ -87,25 +87,23 @@ import toast, { Toaster } from 'react-hot-toast';
 import axios from 'axios';
 import { generalConfig } from '../../config';
 import TreatmentForm from './TreatmentForm';
+import {Person} from '../../interfaces/Person'
 
-interface Person {
-  _id: string;
-  apellMat: string;
-  apellPat: string;
-  dv: string;
-  fechaNac: string;
-  institucion: { nombre: string };
-  libretadireccions: string;
-  nacionalidad: string;
-  nombre1: string;
-  nombre2: string;
-  rut: string;
-  sexo: string;
-}
+
 
 const isPerson = (persona: any): persona is Person => {
   return typeof persona === 'object' && persona !== null && 'rut' in persona;
 };
+interface Address {
+  ciudad: {
+    _id: string;       // ID único de la ciudad
+    nombre: string;    // Nombre de la ciudad
+    vigente: string;   // Estado de vigencia de la ciudad
+  };
+  nombre: string;      // Nombre de la dirección
+  _id: string;         // ID único de la dirección
+}
+
 type DienteKeys =
   `diente${11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 51 | 52 | 53 | 54 | 55 | 61 | 62 | 63 | 64 | 65 | 71 | 72 | 73 | 74 | 75 | 81 | 82 | 83 | 84 | 85}`;
 
@@ -228,6 +226,36 @@ const Odontogramm = ({ odontogram }: Props) => {
   const [type, setType] = useState('permanent');
 
   const [teeth, setTeeth] = useState<Diente[]>();
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      if (odontogram && isPerson(odontogram.persona)) {
+        try {
+          const response = await axios.get(
+            `${generalConfig.baseUrl}/address-book/getaddresses/${odontogram.persona._id}`
+          );
+  
+          // Imprime directamente los datos de la respuesta
+          console.log("addresses from response", response.data.body);
+  
+          // Actualiza el estado con los datos obtenidos
+          setAddresses(response.data.body || []);
+        } catch (error) {
+          console.error('Error fetching addresses:', error);
+        }
+      }
+    };
+  
+    fetchAddresses();
+  }, [odontogram]);
+ 
+
+  useEffect(() => {
+    if (odontogram && odontogram.dientes) {
+      setTeeth(odontogram.dientes);
+    }
+  }, [odontogram]);
 
   useEffect(() => {
     if (odontogram && odontogram.dientes) {
@@ -354,186 +382,119 @@ const Odontogramm = ({ odontogram }: Props) => {
 
     return age;
   };
+  console.log("Odontogram!:", odontogram);
+  console.log("Persona!:", odontogram?.persona);
   const generateDentistPDF = async () => {
     try {
-      // Crear un documento PDF
       const doc = new jsPDF('portrait', 'mm', 'a4');
       const persona = odontogram?.persona;
-
+  
       if (!isPerson(persona)) {
         console.error('La persona no es del tipo esperado.');
         return;
       }
-
+  
       const rutCompleto = `${persona.rut}-${persona.dv}`;
       const fechaNacimiento = new Date(persona.fechaNac).toLocaleDateString();
-      const edad = calculateAge(persona.fechaNac);
-
-      // Título del documento
+      const edad = calculateAge(persona.fechaNac instanceof Date ? persona.fechaNac.toISOString() : persona.fechaNac);
+  
       const pageWidth = doc.internal.pageSize.getWidth();
       doc.setFontSize(18);
       doc.setTextColor(255, 105, 180);
       doc.setFont('helvetica', 'bold');
       doc.text('Clínica Dental', pageWidth / 2 - 20, 20, { align: 'center' });
-
-      // Título "AMANIA" (color azul)
-      doc.setTextColor(0, 102, 204); // Azul (RGB: 0, 102, 204)
+  
+      doc.setTextColor(0, 102, 204);
       doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
-
-      // Subtítulo "ODONTOGRAMA" (azul también)
+  
       doc.setFontSize(16);
-      doc.setTextColor(0, 102, 204); // Azul (igual que "AMANIA")
+      doc.setTextColor(0, 102, 204);
       doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' });
-
-      // Logo
+       
       const logoUrl = '/logo.png';
       doc.addImage(logoUrl, 'PNG', 10, 10, 30, 30);
-
-      // Crear tabla principal con celdas y bordes
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'normal');
+  
       const cellHeight = 8;
       const startX = 10;
       let currentY = 50;
-
-      // Sección Forma de ingreso y convenio
-      // doc.rect(startX, currentY, 190, cellHeight * 3);
-      // doc.line(startX + 95, currentY, startX + 95, currentY + cellHeight);
-      // doc.text('FORMA DE INGRESO A LA CONSULTA:', startX + 2, currentY + 5);
-
-      // Primera columna: 1 y 2
-      // doc.rect(startX, currentY, 190, cellHeight);
-      // doc.text('1.- Volante', startX + 2, currentY + 14);
-      // doc.rect(startX, currentY + 8, 45, cellHeight);
-      // doc.rect(startX + 45, currentY + 8, 50, cellHeight); // Rectángulo para Volante
-      // doc.text('2.- Radio', startX + 2, currentY + 22);
-      // doc.rect(startX + 45, currentY + 16, 50, cellHeight); // Rectángulo para Radio
-
-      // Segunda columna: CONVENIO y 3 y 4
-
-      doc.text(
-        `CONVENIO : ${persona.institucion.nombre}`,
-        startX + 2,
-        currentY + 6
-      );
+  
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+  
+      doc.text(`CONVENIO: ${persona.institucion.nombre}`, startX + 2, currentY + 6);
       doc.rect(startX, currentY + 1, 190, cellHeight);
-      // doc.rect(startX + 140, currentY + 8, 50, cellHeight); // Rectángulo para Recomendación
-      // doc.text('4.- Casualidad/Otro', startX + 97, currentY + 22);
-      // doc.rect(startX + 140, currentY + 16, 50, cellHeight); // R
-
-      // Salto de línea
-      currentY += cellHeight;
-
       currentY += cellHeight * 2;
-
-      // Salto de línea
-      currentY += cellHeight;
-
-      // Fila 1: APELLIDO PATERNO, APELLIDO MATERNO, NOMBRES
-      doc.rect(startX, currentY, 190, cellHeight); // Encabezado
-      doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight); // Línea entre APELLIDO PATERNO y APELLIDO MATERNO
-      doc.line(
-        startX + 126.66,
-        currentY,
-        startX + 126.66,
-        currentY + cellHeight
-      ); // Línea entre APELLIDO MATERNO y NOMBRES
+  
+      // Fila: Apellido paterno, materno y nombres
+      doc.rect(startX, currentY, 190, cellHeight);
+      doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight);
+      doc.line(startX + 126.66, currentY, startX + 126.66, currentY + cellHeight);
       doc.text('APELLIDO PATERNO', startX + 2, currentY + 5);
       doc.text('APELLIDO MATERNO', startX + 65, currentY + 5);
       doc.text('NOMBRES', startX + 130, currentY + 5);
       currentY += cellHeight;
-
-      doc.rect(startX, currentY, 190, cellHeight); // Valores
-      doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight); // Línea entre APELLIDO PATERNO y APELLIDO MATERNO
-      doc.line(
-        startX + 126.66,
-        currentY,
-        startX + 126.66,
-        currentY + cellHeight
-      ); // Línea entre APELLIDO MATERNO y NOMBRES
+  
+      doc.rect(startX, currentY, 190, cellHeight);
+      doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight);
+      doc.line(startX + 126.66, currentY, startX + 126.66, currentY + cellHeight);
       doc.text(`${persona.apellPat}`, startX + 2, currentY + 5);
       doc.text(`${persona.apellMat}`, startX + 65, currentY + 5);
-      doc.text(
-        `${persona.nombre1} ${persona.nombre2}`,
-        startX + 130,
-        currentY + 5
-      );
+      doc.text(`${persona.nombre1} ${persona.nombre2}`, startX + 130, currentY + 5);
       currentY += cellHeight;
-
-      // Fila 2: RUT, EDAD, SEXO, FECHA DE NACIMIENTO
-      doc.rect(startX, currentY, 190, cellHeight); // Encabezado
-      doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight); // Línea entre RUT y EDAD
-      doc.line(
-        startX + 126.66,
-        currentY,
-        startX + 126.66,
-        currentY + cellHeight
-      ); // Línea entre EDAD y SEXO
+  
+      // Fila: Rut, Edad, Sexo, Fecha de Nacimiento
+      doc.rect(startX, currentY, 190, cellHeight);
+      doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight);
+      doc.line(startX + 94.995, currentY, startX + 94.995, currentY + cellHeight);
+      doc.line(startX + 126.66, currentY, startX + 126.66, currentY + cellHeight);
       doc.text('RUT', startX + 2, currentY + 5);
-      doc.line(
-        startX + 94.995,
-        currentY,
-        startX + 94.995,
-        currentY + cellHeight
-      );
       doc.text('EDAD', startX + 65, currentY + 5);
-      doc.line(
-        startX + 198.395,
-        currentY,
-        startX + 198.395,
-        currentY + cellHeight
-      );
       doc.text('SEXO', startX + 96, currentY + 5);
-
       doc.text('FECHA DE NACIMIENTO', startX + 130, currentY + 5);
       currentY += cellHeight;
-
-      doc.rect(startX, currentY, 190, cellHeight); // Valores
-      doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight); // Línea entre RUT y EDAD
-      doc.line(
-        startX + 126.66,
-        currentY,
-        startX + 126.66,
-        currentY + cellHeight
-      ); // Línea entre EDAD y SEXO
+  
+      doc.rect(startX, currentY, 190, cellHeight);
+      doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight);
+      doc.line(startX + 94.995, currentY, startX + 94.995, currentY + cellHeight);
+      doc.line(startX + 126.66, currentY, startX + 126.66, currentY + cellHeight);
       doc.text(`${rutCompleto}`, startX + 2, currentY + 5);
-      doc.line(
-        startX + 94.995,
-        currentY,
-        startX + 94.995,
-        currentY + cellHeight
-      );
       doc.text(`${edad} años`, startX + 65, currentY + 5);
-      doc.text(`${'Hombre'}`, startX + 96, currentY + 5);
+      doc.text(`${persona.sexo.nombre}`, startX + 96, currentY + 5);
       doc.text(`${fechaNacimiento}`, startX + 130, currentY + 5);
       currentY += cellHeight;
+  
+      // Filas dinámicas de direcciones
+      
+      addresses.forEach((address) => {
+        const ciudadNombre = address.ciudad?.nombre || 'Sin ciudad';
+        const direccionNombre = address.nombre || 'Sin dirección';
+        doc.rect(startX, currentY, 190, cellHeight);
+        doc.text( `DIRECCIÓN: ${ciudadNombre}, ${direccionNombre}`, startX + 2, currentY + 5);
+        currentY += cellHeight;
+      });
 
-      // Fila 3: DIRECCIÓN
-      doc.rect(startX, currentY, 190, cellHeight); // Dirección
-      doc.text('DIRECCIÓN:', startX + 2, currentY + 7);
-      doc.text('', startX + 35, currentY + 7);
-      currentY += cellHeight;
-
-      // Fila 4: FONO
-      doc.rect(startX, currentY, 190, cellHeight); // Teléfono
+      // doc.text('Direcciones:', 10, 50);
+      // addresses.forEach((address, index) => {
+      //   doc.text(`- ${address}`, 10, 60 + index * 10);
+      // });
+  
+      // Fila: Teléfono
+      doc.rect(startX, currentY, 190, cellHeight);
       doc.text('FONO:', startX + 2, currentY + 7);
-      doc.text('', startX + 20, currentY + 7);
-
-      currentY += cellHeight * 2;
-
-      // Salto de línea
-
-      // Motivo de consulta
+      currentY += cellHeight;
+  
+      // Fila: Dinámica para otros datos
+      doc.rect(startX, currentY, 190, cellHeight);
+      doc.text('OTROS:', startX + 2, currentY + 7);
+      currentY += cellHeight;
+  
+      // Continuación del contenido
       doc.rect(startX, currentY, 190, cellHeight);
       doc.text('MOTIVO DE CONSULTA:', startX + 2, currentY + 7);
       currentY += cellHeight;
+  
       doc.rect(startX, currentY, 190, cellHeight);
-      doc.text(
-        'EVALUACION Y TRATAMIENTO DE ORTODONCIA',
-        startX + 2,
-        currentY + 7
-      );
-
+      doc.text('EVALUACION Y TRATAMIENTO DE ORTODONCIA', startX + 2, currentY + 7);
       currentY += cellHeight * 2;
 
       // Motivo de consulta
@@ -772,7 +733,8 @@ const Odontogramm = ({ odontogram }: Props) => {
           bucal: { color: tooth.bucal.color },
           mesial: { color: tooth.mesial.color },
           distal: { color: tooth.distal.color },
-          lingualpalatino: { color: tooth.lingualpalatino.color },
+          lingualpalatino
+: { color: tooth.lingualpalatino.color },
           oclusal: { color: tooth.oclusal.color },
         };
       });
