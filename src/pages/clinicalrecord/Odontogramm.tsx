@@ -267,6 +267,7 @@ const Odontogramm = ({ odontogram }: Props) => {
   const [teeth, setTeeth] = useState<Diente[]>();
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [convenios, setConvenios] = useState<any[]>([]);
+  const [contactos, setContactos] = useState<any[]>([]);
   const [antecedents, setAntecedents] = useState<Antecedents | null>(null);
 
   // useEffect para obtener los antecedentes
@@ -308,6 +309,7 @@ const Odontogramm = ({ odontogram }: Props) => {
           const data = res.data;
           if (data && data.body && Array.isArray(data.body.convenios)) {
             setConvenios(data.body.convenios);
+            setContactos(data.body.contactos)
           } else {
             setConvenios([]); // en caso de que no vengan convenios
           }
@@ -635,23 +637,39 @@ const Odontogramm = ({ odontogram }: Props) => {
 
 
       // Filas dinámicas de direcciones
-      currentY += cellHeight;
-      doc.rect(startX, currentY, 190, cellHeight); // Borde de la celda del título
-      doc.text(`DIRECCIÓN:`, startX + 2, currentY + 5); // Texto del título
-      currentY += cellHeight; // Avanza a la siguiente fila
+     // Agregar título de la sección de direcciones
+currentY += cellHeight;
+doc.rect(startX, currentY, 190, cellHeight); // Borde de la celda del título
+doc.text("DIRECCIÓN:", startX + 2, currentY + 7); // Texto del título
+currentY += cellHeight; // Avanza a la siguiente fila
 
-      // Filas dinámicas de direcciones
-      addresses.forEach((address) => {
-        const ciudadNombre = address.ciudad?.nombre || 'Sin ciudad';
-        const direccionNombre = address.nombre || 'Sin dirección';
+// Mapeo dinámico de direcciones por tipo
+const tiposDirecciones: Record<string, string[]> = {};
 
-        // Celda de cada dirección
-        doc.rect(startX, currentY, 190, cellHeight); // Borde de la celda
-        doc.text(`${ciudadNombre}, ${direccionNombre}`, startX + 2, currentY + 5); // Texto de la celda
-        currentY += cellHeight; // Avanza a la siguiente fila
-      });
+// Procesar las direcciones
+addresses.forEach((address) => {
+  const tipoDireccion = address.tipoDireccion?.nombre || "Sin Tipo";
+  const direccionNombre = address.nombre || "Sin Dirección";
 
-      currentY += cellHeight;
+  if (!tiposDirecciones[tipoDireccion]) {
+    tiposDirecciones[tipoDireccion] = [];
+  }
+  tiposDirecciones[tipoDireccion].push(direccionNombre);
+});
+
+// Generar filas dinámicas para cada tipo de dirección
+Object.entries(tiposDirecciones).forEach(([tipo, valores]) => {
+  valores.forEach((valor) => {
+    doc.rect(startX, currentY, 50, cellHeight); // Columna del tipo de dirección
+    doc.text(tipo, startX + 2, currentY + 7);
+
+    doc.rect(startX + 50, currentY, 140, cellHeight); // Columna de la dirección
+    doc.text(valor, startX + 52, currentY + 7);
+
+    currentY += cellHeight; // Avanza a la siguiente fila
+  });
+});
+currentY += cellHeight;
 
 
       // doc.text('Direcciones:', 10, 50);
@@ -659,10 +677,40 @@ const Odontogramm = ({ odontogram }: Props) => {
       //   doc.text(`- ${address}`, 10, 60 + index * 10);
       // });
 
-      // Fila: Teléfono
-      doc.rect(startX, currentY, 190, cellHeight);
-      doc.text('FONO:', startX + 2, currentY + 7);
-      currentY += cellHeight;
+      // Fila: CONTACTOS
+     // Dibujar título de la tabla
+     
+     doc.rect(startX, currentY, 190, cellHeight);
+     doc.text("CONTACTOS:", startX + 2, currentY + 7);
+     currentY += cellHeight;
+     
+     // Mapear contactos por tipo
+     const tiposContactos: Record<string, string[]> = {};
+     
+     // Procesar contactos
+     contactos.forEach((contacto) => {
+       const tipo = contacto.contacto.nombre.toUpperCase(); // Usar el campo 'nombre' del contacto
+       if (!tiposContactos[tipo]) {
+         tiposContactos[tipo] = []; // Crear un arreglo si no existe para este tipo
+       }
+       tiposContactos[tipo].push(contacto.descripcion);
+     });
+     
+     // Generar filas dinámicas
+     Object.entries(tiposContactos).forEach(([tipo, valores]) => {
+       if (valores.length > 0) {
+         doc.rect(startX, currentY, 50, cellHeight * valores.length); // Columna Tipo
+         doc.text(tipo, startX + 2, currentY + 7);
+     
+         doc.rect(startX + 50, currentY, 140, cellHeight * valores.length); // Columna Descripción
+         valores.forEach((valor, index) => {
+           doc.text(valor, startX + 52, currentY + 7 + index * cellHeight);
+         });
+     
+         currentY += cellHeight * valores.length;
+       }
+     });
+     
       doc.addPage();
 
 // Reiniciar currentY al margen superior
