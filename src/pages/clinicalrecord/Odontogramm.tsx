@@ -987,59 +987,63 @@ currentY += cellHeight;
 
       currentY += cellHeight1 * 2;
 
-      // Dibujar tabla de EVOLUCIÓN
-      const headers = ['FECHA', 'DIENTE', 'EVOLUCIÓN'];
-      const columnWidths = [40, 30, 120];
+// Dibujar tabla de EVOLUCIÓN
+const headers = ['FECHA', 'DIENTE', 'EVOLUCIÓN', 'OBSERVACIÓN'];
+const columnWidths = [40, 30, 60, 60]; // Ajustar tamaños de columna
 
-      // Agregar encabezado
-      doc.setFont('helvetica', 'bold');
-      headers.forEach((header, index) => {
-        doc.rect(
-          startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0),
-          currentY,
-          columnWidths[index],
-          10
-        );
-        doc.text(
-          header,
-          startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0) + 2,
-          currentY + 7
-        );
-      });
-      currentY += 10;
+// Agregar encabezado
+doc.setFont('helvetica', 'bold');
+headers.forEach((header, index) => {
+  const xPos = startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0);
+  doc.rect(xPos, currentY, columnWidths[index], 10);
+  doc.text(header, xPos + 2, currentY + 7);
+});
+currentY += 10;
 
-      // Agregar filas dinámicas desde el estado `treatments`
-      treatments.forEach((treatment) => {
-        const values = [
-          new Date(treatment.fecha).toLocaleDateString(), // FECHA
-          `${treatment.pieza.diente} ${treatment.pieza.parte}`, // DIENTE
-          treatment.detalle, // EVOLUCIÓN
-        ];
+// Agregar filas dinámicas desde el estado `treatments`
+treatments.forEach((treatment) => {
+  const values = [
+    new Date(treatment.fecha).toLocaleDateString() || 'Sin fecha', // FECHA
+    treatment.pieza?.diente ? `${treatment.pieza.diente} ${treatment.pieza.parte || ''}` : 'Sin diente', // DIENTE
+    treatment.detalle || 'Sin evolución', // EVOLUCIÓN
+    treatment.observacion || 'Sin observación' // OBSERVACIÓN
+  ];
 
-        values.forEach((value, index) => {
-          doc.rect(
-            startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0),
-            currentY,
-            columnWidths[index],
-            10
-          );
-          doc.text(
-            value,
-            startX +
-            columnWidths.slice(0, index).reduce((a, b) => a + b, 0) +
-            2,
-            currentY + 7
-          );
-        });
+  // Calcular alturas de las celdas
+  const rowHeights = values.map((value, index) => {
+    if (index === 3) {
+      // Observación - Calcular altura basada en líneas
+      const textLines = doc.splitTextToSize(value.toString(), columnWidths[index] - 2);
+      return textLines.length * 10; // Altura según número de líneas
+    }
+    return 10; // Altura estándar para las otras columnas
+  });
+  const maxRowHeight = Math.max(...rowHeights); // Altura máxima para la fila
 
-        currentY += 10;
+  // Dibujar celdas para cada columna
+  values.forEach((value, index) => {
+    const xPos = startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0);
+    doc.rect(xPos, currentY, columnWidths[index], maxRowHeight); // Dibujar celda
 
-        // Agregar una nueva página si la tabla excede el límite de la página actual
-        if (currentY > 280) {
-          doc.addPage();
-          currentY = 20; // Reiniciar posición Y
-        }
-      });
+    if (index === 3) {
+      // Campo OBSERVACIÓN - Dibujar en múltiples líneas
+      const textLines = doc.splitTextToSize(value.toString(), columnWidths[index] - 2);
+      doc.text(textLines, xPos + 2, currentY + 7); // Texto multilínea
+    } else {
+      // Otros campos - Texto simple
+      doc.text(value.toString(), xPos + 2, currentY + 7);
+    }
+  });
+
+  currentY += maxRowHeight; // Mover a la siguiente fila
+
+  // Agregar una nueva página si la tabla excede el límite de la página actual
+  if (currentY > 280) {
+    doc.addPage();
+    currentY = 20; // Reiniciar posición Y
+  }
+});
+
 
       doc.save('ficha_dental.pdf');
     }} catch (error) {
