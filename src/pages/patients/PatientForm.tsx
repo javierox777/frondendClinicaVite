@@ -39,6 +39,7 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { ServiceType } from '../../interfaces/ServiceType';
 import { Agreement } from '../../interfaces/Agreement';
 import { validarRutSinDigitoVerificador } from '../../helpers/validateRut';
+import { after } from 'node:test';
 
 interface Props {
   open: boolean;
@@ -64,7 +65,7 @@ const badHabits = [
   { descripcion: 'Deflución atípico', id: 5 },
 ];
 
-const PatientForm = ({ open, onClose, patient }: Props) => {
+const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
   const { mode } = useThemeContext();
   const [value, setValue] = useState(0);
 
@@ -383,6 +384,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
         if (response.data.message === 'success') {
           toast.success('Paciente actualizado');
           setSubmitting(false);
+          afterSubmit && afterSubmit();
         }
       } else {
         const response = await axios.post(
@@ -393,6 +395,7 @@ const PatientForm = ({ open, onClose, patient }: Props) => {
         if (response.data.message === 'success') {
           toast.success('Paciente registrado');
           setSubmitting(false);
+          afterSubmit && afterSubmit();
         }
       }
     } catch (error) {
