@@ -4,9 +4,11 @@ import PatientForm from './PatientForm';
 import PatientsTable from './PatientsTable';
 import colors from '../../styles/colors';
 import { useThemeContext } from '../../componemts/themeContext';
+import { useUser } from '../../auth/userContext';
 
 const PatientsPage = () => {
   const { mode } = useThemeContext();
+  const { user } = useUser();
 
   const [modalOpen, setModal] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -26,14 +28,16 @@ const PatientsPage = () => {
               }}
             >
               <Typography variant="h6">Pacientes</Typography>
-              <Button
-                variant="contained"
-                onClick={() => {
-                  setModal(true);
-                }}
-              >
-                Registrar nuevo paciente
-              </Button>
+              {user?.role === 'admin' && (
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    setModal(true);
+                  }}
+                >
+                  Registrar nuevo paciente
+                </Button>
+              )}
             </Toolbar>
           </AppBar>
         </Grid>
