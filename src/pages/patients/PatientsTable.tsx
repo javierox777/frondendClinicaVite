@@ -24,8 +24,10 @@ import { generalConfig } from '../../config';
 import { Person } from '../../interfaces/Person';
 import colors from '../../styles/colors';
 import { formatRut } from '../../helpers/formatRut';
+import { useUser } from '../../auth/userContext';
 
 const PatientsTable = ({ refetch }: { refetch?: boolean }) => {
+  const { user } = useUser();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchText, setSearchText] = useState('');
@@ -225,16 +227,18 @@ const PatientsTable = ({ refetch }: { refetch?: boolean }) => {
                       </TableCell>
                       <TableCell>{p.institucion.nombre}</TableCell>
                       <TableCell>
-                        <IconButton
-                          color="success"
-                          onClick={() =>
-                            navigation('/editarpaciente', {
-                              state: { patient: p },
-                            })
-                          }
-                        >
-                          <Edit />
-                        </IconButton>
+                        {user?.role === 'admin' && (
+                          <IconButton
+                            color="success"
+                            onClick={() =>
+                              navigation('/editarpaciente', {
+                                state: { patient: p },
+                              })
+                            }
+                          >
+                            <Edit />
+                          </IconButton>
+                        )}
                         <IconButton
                           color="primary"
                           onClick={() => handleDownloadPdf(p)}

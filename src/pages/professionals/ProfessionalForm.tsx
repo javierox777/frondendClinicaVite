@@ -103,6 +103,7 @@ const ProfessionalForm = ({
       email: email,
       login: username,
       password: password,
+      role: role,
     };
     const isValid = validarRutSinDigitoVerificador(rut);
 
@@ -390,8 +391,8 @@ const ProfessionalForm = ({
                         <MenuItem value="" disabled>
                           Seleccionar rol
                         </MenuItem>
-                        <MenuItem value="admin">Admin</MenuItem>
-                        <MenuItem value="user">User</MenuItem>
+                        <MenuItem value="admin">Administración</MenuItem>
+                        <MenuItem value="user">Dentista</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
