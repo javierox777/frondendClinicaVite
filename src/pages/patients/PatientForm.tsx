@@ -38,7 +38,7 @@ import HeaderMenu from './Menu';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { ServiceType } from '../../interfaces/ServiceType';
 import { Agreement } from '../../interfaces/Agreement';
-import { validarRutSinDigitoVerificador } from '../../helpers/validateRut';
+import { validarRutConDigitoVerificador, validarRutSinDigitoVerificador } from '../../helpers/validateRut';
 import { after } from 'node:test';
 
 interface Props {
@@ -337,73 +337,77 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // const morbidWithoutId = morbid.map(({ _id, ...rest }) => rest);
-    // const familiarWithoutId = familiar.map(({ _id, ...rest }) => rest);
-    // const generalWithoutId = general.map(({ _id, ...rest }) => rest);
-    // const allergiesWithoutId = allergies.map(({ _id, ...rest }) => rest);
-    // const habitsWithoutId = habits.map(({ id, ...rest }) => rest);
-    const agreementsWithoutId = agreements.map(
-      ({ _id, persona, ...rest }) => rest
-    );
-
-    const isValid = validarRutSinDigitoVerificador(rut);
-
-    if (!isValid) {
-      toast.error('Rut no valido.');
-      setSubmitting(false);
+  
+    // 🔹 Limpiar RUT y separar el DV
+    const rutLimpio = rut.replace(/\./g, ''); // Eliminar puntos
+    const dvLimpio = verificationDigit.toLowerCase(); // Forzar minúsculas en DV
+    const rutCompleto = `${rutLimpio}-${dvLimpio}`; // Unir con guion
+  
+    // 🔥 Validar el RUT completo con su dígito verificador
+    if (!validarRutConDigitoVerificador(rutCompleto)) {
+      toast.error('❌ RUT no válido.');
+      return;
     }
-
-    const newPerson = {
-      nombre1: firstName,
-      nombre2: secondName,
-      apellPat: firstSurname,
-      apellMat: secondSurname,
-      rut: rut,
-      dv: verificationDigit,
-      fechaNac: new Date(birthday).toISOString(),
-      institucion: institution,
-      nacionalidad: nationality,
-      sexo: gender,
-      contactos: contacts,
-      direcciones: addresses,
-      convenios: agreementsWithoutId,
-    };
-
+  
     try {
       setSubmitting(true);
-
-      if (patient) {
-        console.log('updatedContacts', patient?._id);
-        const response = await axios.patch(
-          `${generalConfig.baseUrl}/persons/${patient._id}`,
-
-          newPerson
-        );
-
-        if (response.data.message === 'success') {
-          toast.success('Paciente actualizado');
-          setSubmitting(false);
-          afterSubmit && afterSubmit();
-        }
-      } else {
-        const response = await axios.post(
-          `${generalConfig.baseUrl}/persons`,
-          newPerson
-        );
-
-        if (response.data.message === 'success') {
-          toast.success('Paciente registrado');
-          setSubmitting(false);
-          afterSubmit && afterSubmit();
-        }
+  
+      // 🔹 Verificar si el RUT ya existe
+      const { data: existingPatient } = await axios.get(
+        `${generalConfig.baseUrl}/persons?rut=${rutLimpio}`
+      );
+  
+      if (existingPatient.length > 0) {
+        toast.error('⚠️ El RUT ya está registrado.');
+        setSubmitting(false);
+        return;
       }
-    } catch (error) {
-      toast.error('Los datos no pudieron ser registrados.');
+  
+      // 🔹 Crear el objeto `newPerson`
+      const newPerson = {
+        nombre1: firstName.trim(),
+        nombre2: secondName.trim(),
+        apellPat: firstSurname.trim(),
+        apellMat: secondSurname.trim(),
+        rut: rutLimpio,
+        dv: dvLimpio,
+        fechaNac: new Date(birthday).toISOString(),
+        institucion: institution,
+        nacionalidad: nationality,
+        sexo: gender,
+        contactos: contacts,
+        direcciones: addresses,
+        convenios: agreements.map(({ _id, persona, ...rest }) => rest),
+      };
+  
+      // 🔹 Enviar la solicitud al backend
+      let response;
+      if (patient) {
+        response = await axios.patch(
+          `${generalConfig.baseUrl}/persons/${patient._id}`,
+          newPerson
+        );
+        toast.success('✅ Paciente actualizado.');
+      } else {
+        response = await axios.post(`${generalConfig.baseUrl}/persons`, newPerson);
+        toast.success('✅ Paciente registrado.');
+      }
+  
       setSubmitting(false);
+      afterSubmit && afterSubmit();
+    } catch (error) {
+      setSubmitting(false);
+  
+      // 🔹 Manejo detallado de errores del backend
+      if (axios.isAxiosError(error) && error.response) {
+        toast.error(`❌ ${error.response.data.message || 'Error desconocido.'}`);
+      } else {
+        toast.error('❌ Error en la conexión con el servidor.');
+      }
     }
   };
-
+  
+  
   const getPatientAddresses = async (patientId: string) => {
     const response = await axios.get(
       `${generalConfig.baseUrl}/address-book/getaddresses/${patientId}`
@@ -569,7 +573,11 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                   <FormControl style={{ width: '60%' }}>
                     <TextField
                       label="RUT"
-                      onChange={(e) => setRut(e.target.value)}
+                      onChange={(e) => {
+                        
+                        const cleanedValue = e.target.value.replace(/[^0-9]/g, '');
+                        setRut(cleanedValue);
+                      }}
                       value={rut}
                       required
                       error={!validRut}
@@ -579,8 +587,12 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                   <FormControl style={{ width: '30%' }}>
                     <TextField
                       label="Dígito verificador"
-                      onChange={(e) => setVerificationDigit(e.target.value)}
-                      inputProps={{ maxLength: 1 }}
+                      onChange={(e) => {
+                        
+                        const cleanedValue = e.target.value.replace(/[^0-9kK]/g, '');
+                        setVerificationDigit(cleanedValue.toUpperCase()); 
+                      }}
+                      inputProps={{ maxLength: 1 }} 
                       value={verificationDigit}
                       required
                     />
