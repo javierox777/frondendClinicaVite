@@ -80,17 +80,21 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-
   const filteredBudgets = budgets?.filter((b: Budget) => {
+    if (!b.persona || !b.presupuestoTipo) return false;
+
     const rut = b.persona.rut.toLowerCase();
     const institution = b.presupuestoTipo.nombre.toLowerCase();
     const name = `${b.persona.nombre1} ${b.persona.apellPat}`.toLowerCase();
+
     return (
       rut.includes(searchText.toLowerCase()) ||
       institution.includes(searchText.toLowerCase()) ||
       name.includes(searchText.toLowerCase())
     );
   });
+
+
   if (isLoading) {
     return (
       <Container>
