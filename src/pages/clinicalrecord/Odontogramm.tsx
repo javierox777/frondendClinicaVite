@@ -950,7 +950,7 @@ const drawCrossInCell = (
 };
 
 // 2. Generar la tabla de evolución con las columnas modificadas:
-const headers = ['FECHA', 'DIENTE', 'EVOLUCIÓN', 'OBSERVACIÓN'];
+const headers = ['FECHA', 'DIENTE', 'CONDICIONES/ TRATAMIENTO DENTAL', 'OBSERVACIÓN'];
 // Se achica la columna FECHA y se agranda la columna DIENTE:
 const columnWidths = [20, 50, 60, 60]; 
 doc.setFont('helvetica', 'bold');
