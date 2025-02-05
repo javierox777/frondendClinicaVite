@@ -13,5 +13,5 @@ export interface BudgetDetail {
     prestacion: ShortModel;
     cantidad: number,
     pagado: boolean
-
+    new?:boolean
 }

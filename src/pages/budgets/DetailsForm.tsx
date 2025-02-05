@@ -1,16 +1,27 @@
-import { AttachMoney, Close } from '@mui/icons-material';
+import { AttachMoney, Close, Delete, Remove } from '@mui/icons-material';
 import {
   Box,
   Button,
   Card,
   Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
   Grid,
   IconButton,
   InputAdornment,
   MenuItem,
+  Paper,
   Select,
   SelectChangeEvent,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   TextField,
   Typography,
 } from '@mui/material';
@@ -27,6 +38,9 @@ import { ServiceInterface } from '../../interfaces/ServiceInterface';
 import { ShortModel } from '../../interfaces/ShortModel';
 import colors from '../../styles/colors';
 import { LoggedUser, useUser } from '../../auth/userContext';
+import toast, { Toaster } from 'react-hot-toast';
+import { generalConfig } from '../../config';
+import axios from 'axios';
 
 interface Props {
   budgetDetails: any[];
@@ -45,6 +59,11 @@ const DetailsForm = ({
   const { user } = useUser();
   const [editPrice, setEdit] = useState(false);
 
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [detailToDelete, setDetailToDelete] = useState('');
+
+  const [submitting, setSubmitting] = useState(false);
+
   const handleAddRow = () => {
     setDetails([
       ...budgetDetails,
@@ -60,6 +79,7 @@ const DetailsForm = ({
         prestacion: '',
         cantidad: 1,
         pagado: false,
+        new: true,
       },
     ]);
   };
@@ -116,210 +136,215 @@ const DetailsForm = ({
     setDetails(updatedDetails);
   };
 
-  console.log(user);
-
   useEffect(() => {
     if ((user as LoggedUser).role === 'admin') {
       setEdit(true);
     }
   }, []);
+
+  const handleDeleteDetail = async (id: string) => {
+    setSubmitting(true);
+    try {
+      const response = await axios.delete(
+        `${generalConfig.baseUrl}/budget-details/${id}`
+      );
+
+      if (response.data.message === 'success') {
+        setSubmitting(false);
+        toast.success('Detalle eliminado');
+        setOpenDeleteDialog(false);
+        const filtered = budgetDetails.filter(
+          (d: BudgetDetail) => d._id !== id
+        );
+        setDetails(filtered);
+      }
+    } catch (error) {
+      setSubmitting(false);
+      toast.error('Error al eliminar detalle');
+    }
+  };
   return (
-    <Card elevation={3} sx={{ padding: 3 }}>
-      <Grid container spacing={1}>
-        {budgetDetails.length === 0 && (
+    <>
+      <Card elevation={3} sx={{ padding: 3 }}>
+        <Grid container spacing={1}>
+          {budgetDetails.length === 0 && (
+            <Grid item xs={12}>
+              <Typography sx={{ color: colors.ligthModeSoftText }}>
+                Haz click en el icono para agregar detalle
+              </Typography>
+            </Grid>
+          )}
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead
+                style={{
+                  backgroundColor:
+                    mode === 'light'
+                      ? colors.lightModeTableHead
+                      : colors.darkModeTableHead,
+                }}
+              >
+                <TableRow>
+                  <TableCell align="center"></TableCell>
+                  <TableCell align="center">Descripción</TableCell>
+                  <TableCell align="center">Prestación</TableCell>
+                  <TableCell align="center">Valor</TableCell>
+                  <TableCell align="center">Pagado</TableCell>
+                  <TableCell align="center">Acciones</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {budgetDetails?.map((b: BudgetDetail, index: number) => (
+                  <TableRow key={b._id}>
+                    <TableCell align="center">
+                      <IconButton
+                        style={{
+                          backgroundColor:
+                            mode === 'light'
+                              ? colors.lightModeTableHead
+                              : colors.darkModeTableHead,
+                        }}
+                        onClick={() => {
+                          const filtered = budgetDetails.filter(
+                            (d: BudgetDetail) => d._id !== b._id
+                          );
+                          setDetails(filtered);
+                        }}
+                      >
+                        <Remove />
+                      </IconButton>
+                    </TableCell>
+                    <TableCell align="center">
+                      <FormControl fullWidth>
+                        <Select
+                          value={b.objeto?._id}
+                          required
+                          onChange={(e: SelectChangeEvent<string>) =>
+                            handleStringValuechange(e, index, 'objeto')
+                          }
+                        >
+                          {objects?.map((o: ShortModel) => (
+                            <MenuItem key={o._id} value={o._id}>
+                              {o.nombre}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </TableCell>
+                    <TableCell align="center">
+                      <FormControl fullWidth>
+                        <Select
+                          value={b.prestacion._id}
+                          required
+                          onChange={(e: SelectChangeEvent<string>) =>
+                            handleStringValuechange(e, index, 'prestacion')
+                          }
+                        >
+                          {services?.map((s: ServiceInterface) => (
+                            <MenuItem key={s._id} value={s._id}>
+                              {s.nombre}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </TableCell>
+                    <TableCell align="center">
+                      {services?.map((s: ServiceInterface) => {
+                        if (
+                          (typeof b.prestacion !== 'string' &&
+                            s._id === b.prestacion._id) ||
+                          (typeof b.prestacion === 'string' &&
+                            s._id === b.prestacion)
+                        ) {
+                          return (
+                            <TextField
+                              fullWidth
+                              key={s._id}
+                              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                handlePriceChange(e, index, 'valor');
+                              }}
+                              value={b.valor}
+                              InputLabelProps={{ shrink: true }}
+                              InputProps={{
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    <AttachMoney />
+                                  </InputAdornment>
+                                ),
+                              }}
+                              disabled={!editPrice}
+                            />
+                          );
+                        }
+                      })}
+                    </TableCell>
+                    <TableCell align="center">
+                      <Checkbox
+                        color="success"
+                        checked={b.pagado}
+                        onClick={() => {
+                          const updatedDetails = [...budgetDetails];
+                          budgetDetails[index].pagado =
+                            !budgetDetails[index].pagado;
+                          setDetails(updatedDetails);
+                        }}
+                        disabled={!editPrice}
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      {!b.new && (
+                        <IconButton
+                          onClick={() => {
+                            setOpenDeleteDialog(true);
+                            setDetailToDelete(b._id);
+                          }}
+                        >
+                          <Delete />
+                        </IconButton>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
           <Grid item xs={12}>
-            <Typography sx={{ color: colors.ligthModeSoftText }}>
-              Haz click en el icono para agregar detalle
-            </Typography>
+            <Button variant="contained" color="primary" onClick={handleAddRow}>
+              Agregar detalle
+            </Button>
           </Grid>
-        )}
-        <Grid item xs={12}>
-          <Grid
-            container
-            sx={{
-              backgroundColor:
-                mode === 'light'
-                  ? colors.lightModeTableHead
-                  : colors.darkModeTableHead,
+        </Grid>
+      </Card>
+      <Dialog open={openDeleteDialog}>
+        <DialogTitle>¿Eliminar Detalle?</DialogTitle>
+        <DialogContent>
+          Detalle de presupuesto será eliminado y no se podrá recuperar ¿Desea
+          continuar?
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            color="error"
+            disabled={submitting}
+            onClick={() => {
+              handleDeleteDetail(detailToDelete);
             }}
           >
-            <Grid item xs={3}>
-              <Typography sx={{ fontWeight: 'bold', textAlign: 'center' }}>
-                Descripción
-              </Typography>
-            </Grid>
-            <Grid item xs={3}>
-              <Typography sx={{ fontWeight: 'bold', textAlign: 'center' }}>
-                Prestación
-              </Typography>
-            </Grid>
-            {/* <Grid item xs={2}>
-              <Typography sx={{ fontWeight: 'bold' }}>
-                Valor unitario NETO
-              </Typography>
-            </Grid> */}
-            <Grid item xs={3}>
-              <Typography sx={{ fontWeight: 'bold', textAlign: 'center' }}>
-                Valor
-              </Typography>
-            </Grid>
-            <Grid item xs={3}>
-              <Typography sx={{ fontWeight: 'bold', textAlign: 'center' }}>
-                Pagado
-              </Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-        {budgetDetails?.map((b: BudgetDetail, index: number) => {
-          return (
-            <Grid item xs={12} key={b._id}>
-              <Grid container spacing={1} alignItems="center">
-                <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
-                  <FormControl fullWidth>
-                    {/* <InputLabel id="budget-type-label">Descripción</InputLabel> */}
-                    <Select
-                      value={b.objeto?._id}
-                      required
-                      // label="budget-types"
-                      id="budget-type-select"
-                      labelId="budget-type-label"
-                      onChange={(e: SelectChangeEvent<string>) =>
-                        handleStringValuechange(e, index, 'objeto')
-                      }
-                      // value={}
-                    >
-                      {objects?.map((o: ShortModel) => {
-                        return (
-                          <MenuItem key={o._id} value={o._id}>
-                            {o.nombre}
-                          </MenuItem>
-                        );
-                      })}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
-                  <FormControl fullWidth>
-                    {/* <InputLabel id="service-type-label">Prestación</InputLabel> */}
-                    <Select
-                      value={b.prestacion._id}
-                      required
-                      // label="service-types"
-                      id="service-type-select"
-                      labelId="service-type-label"
-                      onChange={(e: SelectChangeEvent<string>) =>
-                        handleStringValuechange(e, index, 'prestacion')
-                      }
-                    >
-                      {services?.map((s: ServiceInterface) => {
-                        return (
-                          <MenuItem key={s._id} value={s._id}>
-                            {s.nombre}
-                          </MenuItem>
-                        );
-                      })}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
-                  {services?.map((s: ServiceInterface) => {
-                    if (
-                      (typeof b.prestacion !== 'string' &&
-                        s._id === b.prestacion._id) ||
-                      (typeof b.prestacion === 'string' &&
-                        s._id === b.prestacion)
-                    ) {
-                      return (
-                        <TextField
-                          fullWidth
-                          // label="valor unitario NETO"
-                          key={s._id}
-                          onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                            handlePriceChange(e, index, 'valor');
-                          }}
-                          value={b.valor}
-                          InputLabelProps={{ shrink: true }}
-                          InputProps={{
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                <AttachMoney />
-                              </InputAdornment>
-                            ),
-                          }}
-                          disabled={!editPrice}
-                        />
-                      );
-                    }
-                  })}
-                </Grid>
-                {/* <Grid item xs={12} sm={12} md={12} lg={2} xl={2}>
-                  {services?.map((s: ServiceInterface) => {
-                    if (
-                      (typeof b.prestacion !== 'string' &&
-                        s._id === b.prestacion._id) ||
-                      (typeof b.prestacion === 'string' &&
-                        s._id === b.prestacion)
-                    ) {
-                      return (
-                        <TextField
-                          // label="valor unitario IVA"
-                          fullWidth
-                          onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                            handlePriceChange(e, index, 'valorUniIva');
-                          }}
-                          key={s._id}
-                          value={b.valorUniIva}
-                          InputLabelProps={{ shrink: true }}
-                          InputProps={{
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                <AttachMoney />
-                              </InputAdornment>
-                            ),
-                          }}
-                        />
-                      );
-                    }
-                  })}
-                </Grid> */}
-                <Grid item xs={2} display="flex" justifyContent="end">
-                  <Box>
-                    <Checkbox
-                      color="success"
-                      checked={b.pagado}
-                      onClick={() => {
-                        const updatedDetails = [...budgetDetails];
-                        budgetDetails[index].pagado =
-                          !budgetDetails[index].pagado;
-                        setDetails(updatedDetails);
-                      }}
-                      disabled={!editPrice}
-                    />
-                  </Box>
-                  <Box>
-                    <IconButton
-                      onClick={() => {
-                        const filtered = budgetDetails.filter(
-                          (d: BudgetDetail) => d._id !== b._id
-                        );
-                        setDetails(filtered);
-                      }}
-                    >
-                      <Close />
-                    </IconButton>
-                  </Box>
-                </Grid>
-              </Grid>
-            </Grid>
-          );
-        })}
-        <Grid item xs={12}>
-          <Button variant="contained" color="primary" onClick={handleAddRow}>
-            Agregar detalle
+            Eliminar
           </Button>
-        </Grid>
-      </Grid>
-    </Card>
+          <Button
+            variant="contained"
+            color="inherit"
+            onClick={() => {
+              setOpenDeleteDialog(false);
+            }}
+          >
+            Cancelar
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Toaster />
+    </>
   );
 };
 
