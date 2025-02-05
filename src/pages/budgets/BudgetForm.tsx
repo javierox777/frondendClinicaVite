@@ -360,7 +360,7 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
                       </>
                     )}
                   </Grid>
-                  <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+                  {/* <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                     {data && (
                       <>
                         <Box sx={{ marginBottom: 2 }}>
@@ -396,7 +396,7 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
                         </FormControl>
                       </>
                     )}
-                  </Grid>
+                  </Grid> */}
                   <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                     {data && (
                       <FormControl fullWidth>

@@ -35,6 +35,7 @@ const ConsentmentTable = ({ consentments }: Props) => {
   const [searchText, setSearchText] = useState('');
 
   const filteredConsentments = consentments?.filter((c: Consentment) => {
+    if (!c.persona) return false;
     const rut = (c.persona as Person)?.rut.toLowerCase();
     const name =
       `${(c.persona as Person)?.nombre1} ${(c.persona as Person)?.apellPat}`.toLowerCase();

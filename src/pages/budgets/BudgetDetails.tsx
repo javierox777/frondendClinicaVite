@@ -187,11 +187,7 @@ const BudgetDetails = ({ budget }: Props) => {
                 </Typography>
                 <StatusBadge
                   status={budget.profesionalValida ? 'finished' : 'in-progress'}
-                  title={
-                    budget.profesionalValida
-                      ? 'VALIDADO'
-                      : 'VALIDACIÓN PENDIENTE'
-                  }
+                  title={budget.estado.nombre}
                 />
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
