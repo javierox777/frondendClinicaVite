@@ -658,7 +658,7 @@ const Odontogramm = ({ odontogram }: Props) => {
   doc.setFont('helvetica', 'normal');
   doc.rect(startX, currentY, 190, cellHeight);
   doc.setTextColor(0, 0, 0);
-  doc.text('GENERALESSSS:', startX + 2, currentY + 5);
+  doc.text('ANTECEDENTES GENERALES:', startX + 2, currentY + 5);
   currentY += cellHeight;
 
   generalesListt.forEach((item) => {
@@ -670,7 +670,7 @@ const Odontogramm = ({ odontogram }: Props) => {
   // 2) FAMILIARES
   doc.rect(startX, currentY, 190, cellHeight);
   doc.setTextColor(0, 0, 0);
-  doc.text('FAMILIARES:', startX + 2, currentY + 5);
+  doc.text('ANTECEDENTES FAMILIARES:', startX + 2, currentY + 5);
   currentY += cellHeight;
 
   familiaresList.forEach((item: any) => {
@@ -682,7 +682,7 @@ const Odontogramm = ({ odontogram }: Props) => {
   // 3) MÓRBIDOS
   doc.rect(startX, currentY, 190, cellHeight);
   doc.setTextColor(0, 0, 0);
-  doc.text('MÓRBIDOS:', startX + 2, currentY + 5);
+  doc.text('ANTECEDENTES MÓRBIDOS:', startX + 2, currentY + 5);
   currentY += cellHeight;
 
   morbidosList.forEach((item: any) => {
