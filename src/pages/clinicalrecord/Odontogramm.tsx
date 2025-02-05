@@ -87,22 +87,22 @@ import toast, { Toaster } from 'react-hot-toast';
 import axios from 'axios';
 import { generalConfig } from '../../config';
 import TreatmentForm from './TreatmentForm';
-import { Person } from '../../interfaces/Person'
-
-
+import { Person } from '../../interfaces/Person';
 
 const isPerson = (persona: any): persona is Person => {
   return typeof persona === 'object' && persona !== null && 'rut' in persona;
 };
+
 interface Address {
   ciudad: {
-    _id: string;       // ID único de la ciudad
-    nombre: string;    // Nombre de la ciudad
-    vigente: string;   // Estado de vigencia de la ciudad
+    _id: string;
+    nombre: string;
+    vigente: string;
   };
-  nombre: string;      // Nombre de la dirección
-  _id: string;         // ID único de la dirección
+  nombre: string;
+  _id: string;
 }
+
 interface Morbido {
   descripcion: string;
   detail: string;
@@ -140,12 +140,11 @@ interface Antecedents {
   __v: number;
 }
 
-
-
-
+// Nota: Se envuelve la unión entre paréntesis
 type DienteKeys =
-  `diente${11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 51 | 52 | 53 | 54 | 55 | 61 | 62 | 63 | 64 | 65 | 71 | 72 | 73 | 74 | 75 | 81 | 82 | 83 | 84 | 85}`;
+  `diente${(11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 51 | 52 | 53 | 54 | 55 | 61 | 62 | 63 | 64 | 65 | 71 | 72 | 73 | 74 | 75 | 81 | 82 | 83 | 84 | 85)}`;
 
+// Mapeo de imágenes de dientes
 const dientesImages: Record<DienteKeys, string> = {
   diente11: diente11,
   diente12: diente12,
@@ -236,7 +235,6 @@ const items = [
   { title: 'Giroversión', id: 32, color: '#B0E0E6' },
   { title: 'Transposición', id: 33, color: '#20B2AA' },
   { title: 'Diente incluido', id: 34, color: '#B11720' },
-
 ];
 
 interface Props {
@@ -249,28 +247,22 @@ const Odontogramm = ({ odontogram }: Props) => {
   const { mode } = useThemeContext();
 
   const [odontogramLoading, setLoading] = useState(true);
-
   const [treatmentForm, setTreatmentForm] = useState(false);
   const [treatmentToEdit, setEditTreatment] = useState<ITreatment>();
-
   const [isSubmitting, setSubmitting] = useState(false);
-
   const [treatment, setTreatment] = useState({
     selected: 0,
     color: '',
   });
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-
   const [type, setType] = useState('permanent');
-
   const [teeth, setTeeth] = useState<Diente[]>();
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [convenios, setConvenios] = useState<any[]>([]);
   const [contactos, setContactos] = useState<any[]>([]);
   const [antecedents, setAntecedents] = useState<Antecedents | null>(null);
 
-  // useEffect para obtener los antecedentes
   useEffect(() => {
     const fetchAntecedents = async () => {
       try {
@@ -281,7 +273,7 @@ const Odontogramm = ({ odontogram }: Props) => {
           );
           const data = res.data;
           if (data && data.message === 'success' && Array.isArray(data.body)) {
-            setAntecedents(data.body[0]); // Asumiendo que siempre hay un objeto en el array
+            setAntecedents(data.body[0]);
           } else {
             setAntecedents([]);
           }
@@ -291,27 +283,23 @@ const Odontogramm = ({ odontogram }: Props) => {
         setAntecedents([]);
       }
     };
-
     fetchAntecedents();
   }, [odontogram]);
 
   useEffect(() => {
     const fetchConvenios = async () => {
       try {
-        // Verificar si existe persona y su _id
         if (odontogram && isPerson(odontogram.persona)) {
           const personId = odontogram.persona._id;
-          // Llamar a tu endpoint NestJS: GET /api/persons/convenios/:id
           const res = await axios.get(
             `${generalConfig.baseUrl}/persons/convenios/${personId}`
           );
-          // Respuesta esperada: { message: 'success', body: {..., convenios: [...] } }
           const data = res.data;
           if (data && data.body && Array.isArray(data.body.convenios)) {
             setConvenios(data.body.convenios);
-            setContactos(data.body.contactos)
+            setContactos(data.body.contactos);
           } else {
-            setConvenios([]); // en caso de que no vengan convenios
+            setConvenios([]);
           }
         }
       } catch (error) {
@@ -319,7 +307,6 @@ const Odontogramm = ({ odontogram }: Props) => {
         setConvenios([]);
       }
     };
-
     fetchConvenios();
   }, [odontogram]);
 
@@ -330,21 +317,15 @@ const Odontogramm = ({ odontogram }: Props) => {
           const response = await axios.get(
             `${generalConfig.baseUrl}/address-book/getaddresses/${odontogram.persona._id}`
           );
-
-          // Imprime directamente los datos de la respuesta
           console.log("addresses from response", response.data.body);
-
-          // Actualiza el estado con los datos obtenidos
           setAddresses(response.data.body || []);
         } catch (error) {
           console.error('Error fetching addresses:', error);
         }
       }
     };
-
     fetchAddresses();
   }, [odontogram]);
-
 
   useEffect(() => {
     if (odontogram && odontogram.dientes) {
@@ -354,7 +335,6 @@ const Odontogramm = ({ odontogram }: Props) => {
 
   useEffect(() => {
     if (odontogram && odontogram.dientes) {
-      // Forzar un ligero retraso
       setLoading(true);
       setTimeout(() => {
         setTeeth(odontogram.dientes);
@@ -366,31 +346,19 @@ const Odontogramm = ({ odontogram }: Props) => {
 
   const handleUpdate = (tooth: Diente, part: string) => {
     const updatedTeeth = [...teeth!];
-
-    const indexOfOldTooth = teeth!.findIndex(
-      (d: Diente) => d._id === tooth._id
-    );
-
+    const indexOfOldTooth = teeth!.findIndex((d: Diente) => d._id === tooth._id);
     updatedTeeth[indexOfOldTooth] = tooth;
-
     setTeeth(updatedTeeth);
 
     const getTreatment = items.find((i) => i.id === treatment.selected);
-
-    if (!getTreatment) {
-      // Manejar el caso en que NO se encuentre el tratamiento, por ejemplo:
-      return; // o mostrar un error, etc.
-    }
+    if (!getTreatment) return;
 
     if (getTreatment?.title === 'Resetear parte') {
-      // Eliminar el tratamiento correspondiente a esta pieza y parte
       const newTreatments = treatments.filter(
         (t) => !(t.pieza.diente === tooth.pieza && t.pieza.parte === part)
       );
       setTreatments(newTreatments);
     } else {
-      // Aquí mantienes la lógica existente de agregar un nuevo tratamiento
-      // Si no existe un tratamiento igual en el día de hoy
       const today = new Date().toDateString();
       const treatmentExists = treatments.some(
         (t) =>
@@ -399,7 +367,6 @@ const Odontogramm = ({ odontogram }: Props) => {
           t.detalle === getTreatment.title &&
           new Date(t.fecha).toDateString() === today
       );
-
       if (!treatmentExists) {
         setTreatments([
           ...treatments,
@@ -407,10 +374,7 @@ const Odontogramm = ({ odontogram }: Props) => {
             detalle: getTreatment.title,
             fecha: new Date(),
             profesional: (user as User).profesionalId,
-            pieza: {
-              diente: tooth.pieza!,
-              parte: part,
-            },
+            pieza: { diente: tooth.pieza!, parte: part },
             _id: (Math.random() * 1000).toString(),
             observacion: 'sin novedad',
           },
@@ -418,6 +382,7 @@ const Odontogramm = ({ odontogram }: Props) => {
       }
     }
   };
+
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
@@ -435,12 +400,9 @@ const Odontogramm = ({ odontogram }: Props) => {
   const handleSubmit = async () => {
     try {
       setSubmitting(true);
-
       const treatmentsWithoutId = treatments.map(({ _id, ...rest }) => rest);
-
       const response = await axios.patch(
         `${generalConfig.baseUrl}/odontogramas/${odontogram?._id}`,
-
         {
           profesionalModifica: (user as User).profesionalId,
           tratamientos: treatmentsWithoutId,
@@ -448,7 +410,6 @@ const Odontogramm = ({ odontogram }: Props) => {
         }
       );
       console.log('id de odontograma', odontogram?.persona);
-
       if (response.data.message === 'success') {
         toast.success('Cambios guardados.');
       }
@@ -456,17 +417,14 @@ const Odontogramm = ({ odontogram }: Props) => {
     } catch (error) {
       setSubmitting(false);
       toast.error('No se pudo guardar el odontograma, inténtelo nuevamente.');
-      console.log(error);
+      console.error(error);
     }
   };
 
   const calculateAge = (fechaNac: string): number => {
     const today = new Date();
     const birthDate = new Date(fechaNac);
-
     let age = today.getFullYear() - birthDate.getFullYear();
-
-    // Verificar si el cumpleaños ya ocurrió este año
     const monthDiff = today.getMonth() - birthDate.getMonth();
     if (
       monthDiff < 0 ||
@@ -474,92 +432,73 @@ const Odontogramm = ({ odontogram }: Props) => {
     ) {
       age--;
     }
-
     return age;
   };
-  console.log("Odontogram!:", odontogram);
-  console.log("Persona!:", odontogram?.persona);
- 
 
   const generateDentistPDF = async () => {
-    
     try {
       const doc = new jsPDF('portrait', 'mm', 'a4');
       const persona = odontogram?.persona;
-
       if (!isPerson(persona)) {
         console.error('La persona no es del tipo esperado.');
         return;
       }
-
       const rutCompleto = `${persona.rut}-${persona.dv}`;
       const fechaNacimiento = new Date(persona.fechaNac).toLocaleDateString();
-      const edad = calculateAge(persona.fechaNac instanceof Date ? persona.fechaNac.toISOString() : persona.fechaNac);
-
+      const edad = calculateAge(
+        persona.fechaNac instanceof Date
+          ? persona.fechaNac.toISOString()
+          : persona.fechaNac
+      );
       const pageWidth = doc.internal.pageSize.getWidth();
-       // 1. Definir límites de la página
-       const PAGE_HEIGHT = 297; // Altura total de una hoja A4 en mm
-       const MARGIN = 10; // Márgenes en mm
-       const MAX_Y = PAGE_HEIGHT - MARGIN; // Posición Y máxima antes de añadir una nueva página
-   
-       // 2. Función de utilidad para añadir texto con verificación de salto de página
-       const addTextWithPageCheck = (
-         text: string,
-         x: number,
-         y: number,
-         lineHeight: number = 8
-       ): number => {
-         if (y + lineHeight > MAX_Y) {
-           doc.addPage();
-           y = MARGIN; // Reiniciar posición Y en la nueva página
-   
-           // Repetir encabezados si es necesario
-           doc.setFontSize(18);
-           doc.setTextColor(255, 105, 180);
-           doc.setFont('helvetica', 'bold');
-           doc.text('Clínica Dental', pageWidth / 2 - 20, 20, { align: 'center' });
-   
-           doc.setTextColor(0, 102, 204);
-           doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
-   
-           doc.setFontSize(16);
-           doc.setTextColor(0, 102, 204);
-           doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' });
-   
-           doc.setFontSize(10);
-           doc.setFont('helvetica', 'normal');
-   
-           return y; // Y se ha reiniciado
-         }
-         doc.text(text, x, y);
-         return y + lineHeight;
-       };
-   
-       // 3. Agregar encabezados
-       doc.setFontSize(18);
-       doc.setTextColor(255, 105, 180);
-       doc.setFont('helvetica', 'bold');
-       doc.text('Clínica Dental', pageWidth / 2 - 20, 20, { align: 'center' });
-   
-       doc.setTextColor(0, 102, 204);
-       doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
-   
-       doc.setFontSize(16);
-       doc.setTextColor(0, 102, 204);
-       doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' });
-   
-       const logoUrl = '/logo.png';
-       doc.addImage(logoUrl, 'PNG', 10, 10, 30, 30);
-   
-       const cellHeight = 8;
-       const startX = 10;
-       let currentY = 50;
-   
-       doc.setFontSize(10);
-       doc.setFont('helvetica', 'normal');
+      const PAGE_HEIGHT = 297;
+      const MARGIN = 10;
+      const MAX_Y = PAGE_HEIGHT - MARGIN;
+      const addTextWithPageCheck = (
+        text: string,
+        x: number,
+        y: number,
+        lineHeight: number = 8
+      ): number => {
+        if (y + lineHeight > MAX_Y) {
+          doc.addPage();
+          y = MARGIN;
+          doc.setFontSize(18);
+          doc.setTextColor(255, 105, 180);
+          doc.setFont('helvetica', 'bold');
+          doc.text('Clínica Dental', pageWidth / 2 - 20, 20, { align: 'center' });
+          doc.setTextColor(0, 102, 204);
+          doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
+          doc.setFontSize(16);
+          doc.setTextColor(0, 102, 204);
+          doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' });
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'normal');
+          return y;
+        }
+        doc.text(text, x, y);
+        return y + lineHeight;
+      };
 
+      // Encabezado de la primera página
+      doc.setFontSize(18);
+      doc.setTextColor(255, 105, 180);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Clínica Dental', pageWidth / 2 - 20, 20, { align: 'center' });
+      doc.setTextColor(0, 102, 204);
+      doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
+      doc.setFontSize(16);
+      doc.setTextColor(0, 102, 204);
+      doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' });
+      const logoUrl = '/logo.png';
+      doc.addImage(logoUrl, 'PNG', 10, 10, 30, 30);
+      const cellHeight = 8;
+      const startX = 10;
+      let currentY = 50;
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
 
-      // Fila: Apellido paterno, materno y nombres
+      // Datos de la persona
       doc.setTextColor(0, 0, 0);
       doc.rect(startX, currentY, 190, cellHeight);
       doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight);
@@ -568,7 +507,6 @@ const Odontogramm = ({ odontogram }: Props) => {
       doc.text('APELLIDO MATERNO', startX + 65, currentY + 5);
       doc.text('NOMBRES', startX + 130, currentY + 5);
       currentY += cellHeight;
-
       doc.rect(startX, currentY, 190, cellHeight);
       doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight);
       doc.line(startX + 126.66, currentY, startX + 126.66, currentY + cellHeight);
@@ -576,8 +514,6 @@ const Odontogramm = ({ odontogram }: Props) => {
       doc.text(`${persona.apellMat}`, startX + 65, currentY + 5);
       doc.text(`${persona.nombre1} ${persona.nombre2}`, startX + 130, currentY + 5);
       currentY += cellHeight;
-
-      // Fila: Rut, Edad, Sexo, Fecha de Nacimiento
       doc.rect(startX, currentY, 190, cellHeight);
       doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight);
       doc.line(startX + 94.995, currentY, startX + 94.995, currentY + cellHeight);
@@ -587,7 +523,6 @@ const Odontogramm = ({ odontogram }: Props) => {
       doc.text('SEXO', startX + 96, currentY + 5);
       doc.text('FECHA DE NACIMIENTO', startX + 130, currentY + 5);
       currentY += cellHeight;
-
       doc.rect(startX, currentY, 190, cellHeight);
       doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight);
       doc.line(startX + 94.995, currentY, startX + 94.995, currentY + cellHeight);
@@ -597,401 +532,295 @@ const Odontogramm = ({ odontogram }: Props) => {
       doc.text(`${persona.sexo.nombre}`, startX + 96, currentY + 5);
       doc.text(`${fechaNacimiento}`, startX + 130, currentY + 5);
       currentY += cellHeight;
-
-      currentY += cellHeight; // Agregar espacio vacío antes del título
-
-      // Celda del título "PREVISIÓN:"
-      doc.rect(startX, currentY, 190, cellHeight); // Dibujar borde de la celda
-      doc.text(`PREVISIÓN:`, startX + 2, currentY + 7); // Texto del título
       currentY += cellHeight;
-
-      // Filas dinámicas para los valores de prevision
-      const prevision = persona.institucion?.nombre ? [persona.institucion.nombre] : ['Sin Presión']; // Asegura que haya al menos un valor
+      doc.rect(startX, currentY, 190, cellHeight);
+      doc.text(`PREVISIÓN:`, startX + 2, currentY + 7);
+      currentY += cellHeight;
+      const prevision = persona.institucion?.nombre ? [persona.institucion.nombre] : ['Sin Presión'];
       prevision.forEach((prevision) => {
-        doc.rect(startX, currentY, 190, cellHeight); // Dibujar borde de cada fila
-        doc.text(prevision, startX + 2, currentY + 5); // Texto del convenio
-        currentY += cellHeight; // Avanza a la siguiente fila
+        doc.rect(startX, currentY, 190, cellHeight);
+        doc.text(prevision, startX + 2, currentY + 5);
+        currentY += cellHeight;
       });
-      currentY += cellHeight; // Agregar espacio vacío antes del título
-
-      // Celda del título "CONVENIOS:"
+      currentY += cellHeight;
       const conveniosList = convenios.length
         ? convenios.map((c) => c.prestacionTipo?.nombre || 'Sin convenio')
         : ['Sin convenios disponibles'];
-
-      // 2. Generamos sección "CONVENIOS"
       doc.rect(startX, currentY, 190, cellHeight);
       doc.setTextColor(0, 0, 0);
-
-      // Luego dibujar el texto
       doc.text('CONVENIOS:', startX + 2, currentY + 7);
       currentY += cellHeight;
-
       conveniosList.forEach((convenio) => {
-
         doc.rect(startX, currentY, 190, cellHeight);
         doc.text(convenio, startX + 2, currentY + 5);
         currentY += cellHeight;
       });
-
-
-
-      // Filas dinámicas de direcciones
-     // Agregar título de la sección de direcciones
-currentY += cellHeight;
-doc.rect(startX, currentY, 190, cellHeight); // Borde de la celda del título
-doc.text("DIRECCIÓN:", startX + 2, currentY + 7); // Texto del título
-currentY += cellHeight; // Avanza a la siguiente fila
-
-// Mapeo dinámico de direcciones por tipo
-const tiposDirecciones: Record<string, string[]> = {};
-
-// Procesar las direcciones
-addresses.forEach((address) => {
-  const tipoDireccion = address.tipoDireccion?.nombre || "Sin Tipo";
-  const direccionNombre = address.nombre || "Sin Dirección";
-
-  if (!tiposDirecciones[tipoDireccion]) {
-    tiposDirecciones[tipoDireccion] = [];
-  }
-  tiposDirecciones[tipoDireccion].push(direccionNombre);
-});
-
-// Generar filas dinámicas para cada tipo de dirección
-Object.entries(tiposDirecciones).forEach(([tipo, valores]) => {
-  valores.forEach((valor) => {
-    doc.rect(startX, currentY, 50, cellHeight); // Columna del tipo de dirección
-    doc.text(tipo, startX + 2, currentY + 7);
-
-    doc.rect(startX + 50, currentY, 140, cellHeight); // Columna de la dirección
-    doc.text(valor, startX + 52, currentY + 7);
-
-    currentY += cellHeight; // Avanza a la siguiente fila
-  });
-});
-currentY += cellHeight;
-
-
-      // doc.text('Direcciones:', 10, 50);
-      // addresses.forEach((address, index) => {
-      //   doc.text(`- ${address}`, 10, 60 + index * 10);
-      // });
-
-      // Fila: CONTACTOS
-     // Dibujar título de la tabla
-     
-     doc.rect(startX, currentY, 190, cellHeight);
-     doc.text("CONTACTOS:", startX + 2, currentY + 7);
-     currentY += cellHeight;
-     
-     // Mapear contactos por tipo
-     const tiposContactos: Record<string, string[]> = {};
-     
-     // Procesar contactos
-     contactos.forEach((contacto) => {
-       const tipo = contacto.contacto.nombre.toUpperCase(); // Usar el campo 'nombre' del contacto
-       if (!tiposContactos[tipo]) {
-         tiposContactos[tipo] = []; // Crear un arreglo si no existe para este tipo
-       }
-       tiposContactos[tipo].push(contacto.descripcion);
-     });
-     
-     // Generar filas dinámicas
-     Object.entries(tiposContactos).forEach(([tipo, valores]) => {
-       if (valores.length > 0) {
-         doc.rect(startX, currentY, 50, cellHeight * valores.length); // Columna Tipo
-         doc.text(tipo, startX + 2, currentY + 7);
-     
-         doc.rect(startX + 50, currentY, 140, cellHeight * valores.length); // Columna Descripción
-         valores.forEach((valor, index) => {
-           doc.text(valor, startX + 52, currentY + 7 + index * cellHeight);
-         });
-     
-         currentY += cellHeight * valores.length;
-       }
-     });
-     
+      currentY += cellHeight;
+      doc.rect(startX, currentY, 190, cellHeight);
+      doc.text("DIRECCIÓN:", startX + 2, currentY + 7);
+      currentY += cellHeight;
+      const tiposDirecciones: Record<string, string[]> = {};
+      addresses.forEach((address) => {
+        const tipoDireccion = address.tipoDireccion?.nombre || "Sin Tipo";
+        const direccionNombre = address.nombre || "Sin Dirección";
+        if (!tiposDirecciones[tipoDireccion]) {
+          tiposDirecciones[tipoDireccion] = [];
+        }
+        tiposDirecciones[tipoDireccion].push(direccionNombre);
+      });
+      Object.entries(tiposDirecciones).forEach(([tipo, valores]) => {
+        valores.forEach((valor) => {
+          doc.rect(startX, currentY, 50, cellHeight);
+          doc.text(tipo, startX + 2, currentY + 7);
+          doc.rect(startX + 50, currentY, 140, cellHeight);
+          doc.text(valor, startX + 52, currentY + 7);
+          currentY += cellHeight;
+        });
+      });
+      currentY += cellHeight;
+      doc.rect(startX, currentY, 190, cellHeight);
+      doc.text("CONTACTOS:", startX + 2, currentY + 7);
+      currentY += cellHeight;
+      const tiposContactos: Record<string, string[]> = {};
+      contactos.forEach((contacto) => {
+        const tipo = contacto.contacto.nombre.toUpperCase();
+        if (!tiposContactos[tipo]) {
+          tiposContactos[tipo] = [];
+        }
+        tiposContactos[tipo].push(contacto.descripcion);
+      });
+      Object.entries(tiposContactos).forEach(([tipo, valores]) => {
+        if (valores.length > 0) {
+          doc.rect(startX, currentY, 50, cellHeight * valores.length);
+          doc.text(tipo, startX + 2, currentY + 7);
+          doc.rect(startX + 50, currentY, 140, cellHeight * valores.length);
+          valores.forEach((valor, index) => {
+            doc.text(valor, startX + 52, currentY + 7 + index * cellHeight);
+          });
+          currentY += cellHeight * valores.length;
+        }
+      });
       doc.addPage();
-
-// Reiniciar currentY al margen superior
-      // Margen superior en mm
       doc.setFontSize(18);
       doc.setTextColor(255, 105, 180);
       doc.setFont('helvetica', 'bold');
       doc.text('Clínica Dental', pageWidth / 2 - 20, 20, { align: 'center' });
-  
       doc.setTextColor(0, 102, 204);
       doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
-  
       doc.setFontSize(16);
       doc.setTextColor(0, 102, 204);
       doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' });
-  
-     
       doc.addImage(logoUrl, 'PNG', 10, 10, 30, 30);
-  
-     
-  
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-     currentY = 60;  
+      currentY = 60;
 
-    
-
-        // 9. Secciones Dinámicas: GENERALES, FAMILIARES, MÓRBIDOS, ALÉRGIAS, HÁBITOS
-    if (antecedents) {
-      const generalesListt = antecedents.generales?.length
-        ? antecedents.generales.map((g: General) => g.descripcion || 'Sin datos generales')
-        : ['Sin datos generales'];
-
-      const familiaresList = antecedents.familiares?.length
-        ? antecedents.familiares.map((f: Familiar) => f.descripcion || 'Sin datos familiares')
-        : ['Sin datos familiares'];
-
-      const morbidosList = antecedents.morbidos?.length
-        ? antecedents.morbidos.map((m: Morbido) => `${m.descripcion}: ${m.detail || 'Sin detalles'}`)
-        : ['Sin datos mórbidos'];
-
-      const alergiasList = antecedents.alergias?.length
-        ? antecedents.alergias.map((a: Alergia) => a.descripcion || 'Sin datos de alergias')
-        : ['Sin datos de alergias'];
-
-      const habitosList = antecedents.habitos?.length
-        ? antecedents.habitos.map((h: Habito) => h.descripcion || 'Sin datos de hábitos')
-        : ['Sin datos de hábitos'];
-
-      
-     
-
-      // -------------------------------
-      // Secciones Dinámicas: GENERALES, FAMILIARES, MÓRBIDOS, ALÉRGIAS, HÁBITOS
-      // -------------------------------
-     
-      // 1) GENERALES
-      doc.rect(startX, currentY, 190, cellHeight);
-      doc.setTextColor(0, 0, 0);
-      doc.text('GENERALES:', startX + 2, currentY + 5);
-      currentY += cellHeight;
-
-      generalesListt.forEach((item) => {
-        doc.rect(startX, currentY, 190, cellHeight);
-        doc.text(item, startX + 2, currentY + 5);
-        currentY += cellHeight;
-      });
-      currentY += cellHeight
-      // 2) FAMILIARES
-      doc.rect(startX, currentY, 190, cellHeight);
-      doc.setTextColor(0, 0, 0);
-      doc.text('FAMILIARES:', startX + 2, currentY + 5);
-      currentY += cellHeight;
-
-      familiaresList.forEach((item: any) => {
-        doc.rect(startX, currentY, 190, cellHeight);
-        doc.text(item, startX + 2, currentY + 5);
-        currentY += cellHeight;
-      });
-      currentY += cellHeight
-      // 3) MÓRBIDOS
-      doc.rect(startX, currentY, 190, cellHeight);
-      doc.setTextColor(0, 0, 0);
-      doc.text('MÓRBIDOS:', startX + 2, currentY + 5);
-      currentY += cellHeight;
-
-      morbidosList.forEach((item: any) => {
-        doc.rect(startX, currentY, 190, cellHeight);
-        doc.text(item, startX + 2, currentY + 5);
-        currentY += cellHeight;
-      });
-      currentY += cellHeight
-      // 4) ALÉRGIAS
-      doc.rect(startX, currentY, 190, cellHeight);
-      doc.setTextColor(0, 0, 0);
-      doc.text('ALÉRGIAS:', startX + 2, currentY + 5);
-      currentY += cellHeight;
-
-      alergiasList.forEach((item: any) => {
-        doc.rect(startX, currentY, 190, cellHeight);
-        doc.text(item, startX + 2, currentY + 5);
-        currentY += cellHeight;
-      });
-      currentY += cellHeight
-
-      // 5) HÁBITOS
-      doc.rect(startX, currentY, 190, cellHeight);
-      doc.setTextColor(0, 0, 0);
-      doc.text('HÁBITOS:', startX + 2, currentY + 5);
-      currentY += cellHeight;
-
-      habitosList.forEach((item: any) => {
-        doc.rect(startX, currentY, 190, cellHeight);
-        doc.text(item, startX + 2, currentY + 5);
-        currentY += cellHeight;
-      });
-
-
-
-
-      currentY += cellHeight * 3;
-
-     
-
-      currentY += cellHeight * 4;
-      doc.addPage();
-
-      // Odontograma
-      const toothWidth = 7;
-      const toothHeight = 10;
-      const gap = 5;
-      let toothX = startX;
-      let toothY = 20;
-
-      // Encabezado
-      // Título "Clínica Dental" (color rosa)
-      doc.setFontSize(18);
-      doc.setTextColor(255, 105, 180);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Clínica Dental', pageWidth / 2 - 20, 20, { align: 'center' });
-
-      // Título "AMANIA" (color azul)
-      doc.setTextColor(0, 102, 204); // Azul (RGB: 0, 102, 204)
-      doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
-
-      // Subtítulo "ODONTOGRAMA" (azul también)
-      doc.setFontSize(16);
-      doc.setTextColor(0, 102, 204); // Azul (igual que "AMANIA")
-      doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' });
-
-      doc.addImage(logoUrl, 'PNG', 10, 3, 30, 30);
-
-      // Función para pintar las secciones de la cruz
+      // Función para dibujar la “cruz” (cuadrícula 3x3) en cada diente
       const drawToothShape = (x: number, y: number, toothParts: any) => {
         const size = 2;
         const parts = [
-          { key: 'bucal', x: x + size, y: y, w: size, h: size }, // Arriba
-          { key: 'distal', x: x, y: y + size, w: size, h: size }, // Izquierda
-          { key: 'oclusal', x: x + size, y: y + size, w: size, h: size }, // Centro
-          { key: 'mesial', x: x + 2 * size, y: y + size, w: size, h: size }, // Derecha
-          {
-            key: 'lingualpalatino',
-            x: x + size,
-            y: y + 2 * size,
-            w: size,
-            h: size,
-          }, // Abajo
+          { key: 'bucal', x: x + size, y: y, w: size, h: size },
+          { key: 'distal', x: x, y: y + size, w: size, h: size },
+          { key: 'oclusal', x: x + size, y: y + size, w: size, h: size },
+          { key: 'mesial', x: x + 2 * size, y: y + size, w: size, h: size },
+          { key: 'lingualpalatino', x: x + size, y: y + 2 * size, w: size, h: size },
         ];
-
         parts.forEach((part) => {
           let color = toothParts?.[part.key]?.color || '#FFFFFF';
-
           if (color.includes('255\t151\t41')) {
             color = '#FF9729';
           }
           doc.setFillColor(color);
           doc.rect(part.x, part.y, part.w, part.h, 'FD');
         });
-
       };
 
       // Función para dibujar una fila de dientes
       const drawTeethRow = (
-        teeth: Diente[],
+        teethArray: Diente[],
         treatmentsData: any,
         startY: number,
         startX: number
       ) => {
         let toothX = startX;
-        let toothY = startY + 30;
-
-        teeth.forEach((tooth) => {
-          if (toothX + toothWidth > pageWidth - startX) {
+        let toothY = startY + 10;
+        teethArray.forEach((tooth) => {
+          if (toothX + 7 > pageWidth - startX) {
             toothX = startX;
-            toothY += toothHeight + gap * 8;
+            toothY += 10 + 5 * 8;
           }
-
-          // Dibujar número del diente
-          doc
-            .setFontSize(8)
-            .text(`${tooth.pieza}`, toothX + toothWidth / 3, toothY - 2);
-
-          // Imagen del diente
-          const toothImage =
-            dientesImages[`diente${tooth.pieza}` as DienteKeys];
+          doc.setFontSize(8);
+          doc.text(`${tooth.pieza}`, toothX + 7 / 3, toothY - 2);
+          const toothImage = dientesImages[`diente${tooth.pieza}` as DienteKeys];
           if (toothImage) {
-            doc.addImage(
-              toothImage,
-              'PNG',
-              toothX,
-              toothY,
-              toothWidth,
-              toothHeight
-            );
+            doc.addImage(toothImage, 'PNG', toothX, toothY, 7, 10);
           }
-
-          // Obtener tratamiento dinámico del backend
-          const toothParts = tooth.pieza ? treatmentsData[tooth.pieza] : {}; // fallback to an empty object
-
-          drawToothShape(toothX + 1, toothY + toothHeight + 3, toothParts);
-
-          toothX += toothWidth + gap;
+          const toothParts = tooth.pieza ? treatmentsData[tooth.pieza] : {};
+          drawToothShape(toothX + 1, toothY + 10 + 3, toothParts);
+          toothX += 7 + 5;
         });
       };
 
-      // Datos dinámicos de tratamientos desde el backend
+      // Armar el objeto con los tratamientos para cada diente
       const treatmentsData: any = {};
       teeth?.forEach((tooth) => {
         treatmentsData[tooth.pieza!] = {
           bucal: { color: tooth.bucal.color },
           mesial: { color: tooth.mesial.color },
           distal: { color: tooth.distal.color },
-          lingualpalatino
-            : { color: tooth.lingualpalatino.color },
+          lingualpalatino: { color: tooth.lingualpalatino.color },
           oclusal: { color: tooth.oclusal.color },
         };
       });
 
-      // Definir dientes superiores e inferiores
-      const upperTeeth = teeth!.filter((t: Diente) => parseInt(t.pieza!) < 31);
-      const lowerTeeth = teeth!.filter(
+      // Filtrar dientes en grupos:
+
+      const tempTeeth1 = teeth!.filter(
+        (t: Diente) => parseInt(t.pieza!) > 48 && parseInt(t.pieza!) <= 65
+      );
+      const tempTeeth2 = teeth!.filter(
+        (t: Diente) => parseInt(t.pieza!) >= 71
+      );
+      const permanentUpperTeeth = teeth!.filter(
+        (t: Diente) => parseInt(t.pieza!) < 31
+      );
+      const permanentLowerTeeth = teeth!.filter(
         (t: Diente) => parseInt(t.pieza!) >= 31 && parseInt(t.pieza!) < 51
       );
 
-      // Calcular el área total de los dientes
-      const totalWidth =
-        upperTeeth.length * toothWidth + (upperTeeth.length - 1) * gap;
-      const totalHeight = (toothHeight + gap * 3) * 2; // Dos filas de dientes
+      let currentYChart = 20;
 
-      // Dibujar el rectángulo envolvente
-      doc.setDrawColor(0); // Color del borde (negro)
-      doc.setLineWidth(0.1); // Grosor del borde
-      doc.rect(startX - 5, 60 - 5, totalWidth + 10, totalHeight + 10); // Rectángulo envolvente
+      // Función para centrar una fila de dientes
+      const drawCenteredTeethRow = (
+        teethArray: Diente[],
+        treatmentsData: any,
+        startY: number
+      ) => {
+        const toothWidth = 7; // ancho de la imagen del diente
+        const gap = 5; // espacio entre dientes
+        const rowWidth = teethArray.length * toothWidth + (teethArray.length - 1) * gap;
+        const centeredStartX = (pageWidth - rowWidth) / 2; // cálculo para centrar
+        drawTeethRow(teethArray, treatmentsData, startY, centeredStartX);
+      };
 
-      // Dibujar filas de dientes
-      drawTeethRow(upperTeeth, treatmentsData, 30, startX);
-      drawTeethRow(
-        lowerTeeth,
-        treatmentsData,
-        30 + toothHeight + gap * 4,
-        startX
-      );
+      // Dibuja los dientes temporales centrados
+     // Suponiendo que currentYChart es la variable que controla la posición vertical de la sección
+
+// Sección de dientes temporales
+if (tempTeeth1.length > 0 || tempTeeth2.length > 0) {
+  // Incrementa currentYChart para que el título de dientes temporales se imprima más abajo
+  currentYChart += 30; // Aumenta este valor según sea necesario
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  // Escribe el título centrado para los dientes temporales
+  doc.text("Dientes Temporales", pageWidth / 2, currentYChart, { align: 'center' });
+  currentYChart += 10; // Espacio adicional para separar el título de los dientes
+}
+
+// Dibuja los dientes temporales centrados
+if (tempTeeth1.length > 0) {
+  drawCenteredTeethRow(tempTeeth1, treatmentsData, currentYChart);
+  currentYChart += 10 + 5 * 4;
+}
+if (tempTeeth2.length > 0) {
+  drawCenteredTeethRow(tempTeeth2, treatmentsData, currentYChart);
+  currentYChart += 10 + 5 * 4;
+}
+
+// Sección de dientes definitivos (permanentes)
+if (permanentUpperTeeth.length > 0 || permanentLowerTeeth.length > 0) {
+  // Deja un espacio extra antes del título
+  currentYChart += 25; // Aumenta este valor según sea necesario
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  // Escribe el título centrado para los dientes definitivos
+  doc.text("Dientes Definitivos", pageWidth / 2, currentYChart, { align: 'center' });
+  currentYChart += 10; // Espacio adicional para separar el título de los dientes
+}
+
+// Dibuja los dientes permanentes
+if (permanentUpperTeeth.length > 0) {
+  drawTeethRow(permanentUpperTeeth, treatmentsData, currentYChart, startX);
+  currentYChart += 10 + 5 * 4;
+}
+if (permanentLowerTeeth.length > 0) {
+  drawTeethRow(permanentLowerTeeth, treatmentsData, currentYChart, startX);
+}
+
+
+      doc.addPage();
+      doc.setFontSize(18);
+      doc.setTextColor(255, 105, 180);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Clínica Dental', pageWidth / 2 - 20, 20, { align: 'center' });
+      doc.setTextColor(0, 102, 204);
+      doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
+      doc.setFontSize(16);
+      doc.setTextColor(0, 102, 204);
+      doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' });
+      
+      doc.addImage(logoUrl, 'PNG', 10, 10, 30, 30);
+      
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
 
       const cellHeight1 = 8;
-      const totalRows = 40; // Total de filas para la tabla
-
-      currentY = 100;
-
+      currentY = 20;
       currentY += cellHeight1 * 2;
-      // Título de la página
       doc.setFontSize(8);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(0, 0, 0);
-
       currentY += cellHeight1 * 2;
 
-// Dibujar tabla de EVOLUCIÓN
-const headers = ['FECHA', 'DIENTE', 'EVOLUCIÓN', 'OBSERVACIÓN'];
-const columnWidths = [40, 30, 60, 60]; // Ajustar tamaños de columna
+      // Dibujar tabla de EVOLUCIÓN
+     // Dibujar tabla de EVOLUCIÓN
+// Supongamos que 'doc', 'startX', 'currentY', 'treatments' y 'treatmentColorMap' ya están definidos
 
-// Agregar encabezado
+// 1. Definir la función drawCrossInCell en el mismo archivo o dentro del mismo scope:
+const drawCrossInCell = (
+  cellX: number,
+  cellY: number,
+  cellWidth: number,
+  cellHeight: number,
+  treatment: any,
+  baseSize: number = 2
+) => {
+  // Tamaño total de la cruz
+  const totalWidth = 3 * baseSize;
+  const totalHeight = 3 * baseSize;
+  // Posiciona la cruz en la esquina inferior derecha con un pequeño margen (2 unidades)
+  const offsetX = cellX + cellWidth - totalWidth - 2;
+  const offsetY = cellY + cellHeight - totalHeight - 2;
+  
+  // Obtiene el color del tratamiento a partir del mapeo
+  const treatmentColor = treatmentColorMap[treatment.detalle] || '#FFFFFF';
+  
+  // Define las 5 partes de la cruz (disposición: bucal, distal, oclusal, mesial, lingualpalatino)
+  const parts = [
+    { key: 'bucal', x: offsetX + baseSize, y: offsetY, w: baseSize, h: baseSize },
+    { key: 'distal', x: offsetX, y: offsetY + baseSize, w: baseSize, h: baseSize },
+    { key: 'oclusal', x: offsetX + baseSize, y: offsetY + baseSize, w: baseSize, h: baseSize },
+    { key: 'mesial', x: offsetX + 2 * baseSize, y: offsetY + baseSize, w: baseSize, h: baseSize },
+    { key: 'lingualpalatino', x: offsetX + baseSize, y: offsetY + 2 * baseSize, w: baseSize, h: baseSize },
+  ];
+  
+  parts.forEach((part) => {
+    // Si la parte coincide con la parte afectada, se pinta con el color obtenido, de lo contrario en blanco.
+    let fillColor = '#FFFFFF';
+    if (treatment.pieza && treatment.pieza.parte === part.key) {
+      fillColor = treatmentColor;
+    }
+    doc.setFillColor(fillColor);
+    doc.rect(part.x, part.y, part.w, part.h, 'FD');
+    doc.setLineWidth(0.2);
+    doc.rect(part.x, part.y, part.w, part.h);
+  });
+};
+
+// 2. Generar la tabla de evolución con las columnas modificadas:
+const headers = ['FECHA', 'DIENTE', 'EVOLUCIÓN', 'OBSERVACIÓN'];
+// Se achica la columna FECHA y se agranda la columna DIENTE:
+const columnWidths = [20, 50, 60, 60]; 
 doc.setFont('helvetica', 'bold');
 headers.forEach((header, index) => {
   const xPos = startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0);
@@ -1000,53 +829,49 @@ headers.forEach((header, index) => {
 });
 currentY += 10;
 
-// Agregar filas dinámicas desde el estado `treatments`
 treatments.forEach((treatment) => {
   const values = [
-    new Date(treatment.fecha).toLocaleDateString() || 'Sin fecha', // FECHA
-    treatment.pieza?.diente ? `${treatment.pieza.diente} ${treatment.pieza.parte || ''}` : 'Sin diente', // DIENTE
-    treatment.detalle || 'Sin evolución', // EVOLUCIÓN
-    treatment.observacion || 'Sin observación' // OBSERVACIÓN
+    new Date(treatment.fecha).toLocaleDateString() || 'Sin fecha',
+    treatment.pieza?.diente
+      ? `${treatment.pieza.diente} ${treatment.pieza.parte || ''}`
+      : 'Sin diente',
+    treatment.detalle || 'Sin evolución',
+    treatment.observacion || 'Sin observación'
   ];
-
-  // Calcular alturas de las celdas
   const rowHeights = values.map((value, index) => {
     if (index === 3) {
-      // Observación - Calcular altura basada en líneas
       const textLines = doc.splitTextToSize(value.toString(), columnWidths[index] - 2);
-      return textLines.length * 10; // Altura según número de líneas
+      return textLines.length * 10;
     }
-    return 10; // Altura estándar para las otras columnas
+    return 10;
   });
-  const maxRowHeight = Math.max(...rowHeights); // Altura máxima para la fila
-
-  // Dibujar celdas para cada columna
+  const maxRowHeight = Math.max(...rowHeights);
+  
   values.forEach((value, index) => {
     const xPos = startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0);
-    doc.rect(xPos, currentY, columnWidths[index], maxRowHeight); // Dibujar celda
-
-    if (index === 3) {
-      // Campo OBSERVACIÓN - Dibujar en múltiples líneas
+    doc.rect(xPos, currentY, columnWidths[index], maxRowHeight);
+    if (index === 1) {
+      // Columna DIENTE: imprime el texto y luego dibuja la cruz
+      doc.text(value.toString(), xPos + 2, currentY + 7);
+      drawCrossInCell(xPos, currentY, columnWidths[index], maxRowHeight, treatment, 2);
+    } else if (index === 3) {
       const textLines = doc.splitTextToSize(value.toString(), columnWidths[index] - 2);
-      doc.text(textLines, xPos + 2, currentY + 7); // Texto multilínea
+      doc.text(textLines, xPos + 2, currentY + 7);
     } else {
-      // Otros campos - Texto simple
       doc.text(value.toString(), xPos + 2, currentY + 7);
     }
   });
-
-  currentY += maxRowHeight; // Mover a la siguiente fila
-
-  // Agregar una nueva página si la tabla excede el límite de la página actual
+  
+  currentY += maxRowHeight;
   if (currentY > 280) {
     doc.addPage();
-    currentY = 20; // Reiniciar posición Y
+    currentY = 20;
   }
 });
+doc.save('ficha_dental.pdf');
 
 
-      doc.save('ficha_dental.pdf');
-    }} catch (error) {
+    } catch (error) {
       console.error('Error al generar el PDF:', error);
     }
   };
@@ -1054,13 +879,10 @@ treatments.forEach((treatment) => {
   const onChangeTreatment = (obs: string, id: string) => {
     const updatedTreatments = [...treatments];
     const index = treatments.findIndex((t: ITreatment) => t._id === id);
-
     updatedTreatments[index].observacion = obs;
-
     setTreatments(updatedTreatments);
   };
 
-  console.log(treatments);
   const treatmentColorMap: Record<string, string> = {
     'Caries': '#FF0000',
     'Corona Definitiva': '#FFCF36',
@@ -1091,13 +913,6 @@ treatments.forEach((treatment) => {
     'Impactación': '#8B0000',
     'Resto Radicular': '#2F4F4F',
     'Diente incluido': '#B11720',
-    'Diente Extruido': '#FF69B4',
-    'Diente Intruido': '#DB7093',
-    'Endentulo Total': '#D3D3D3',
-    'Protesis Fija Plural': '#B8860B',
-    'Protesis Removible Parcial': '#F4A460',
-    'Protesis Removible Total': '#FFDEAD',
-    'Transposición': '#20B2AA',
   };
 
   const treatmentsWithColor = treatments.map((t: ITreatment) => {
@@ -1142,18 +957,15 @@ treatments.forEach((treatment) => {
                 <Typography
                   style={{
                     fontWeight: 'bold',
-                    color:
-                      mode === 'light' ? colors.lightModeTableText : 'white',
+                    color: mode === 'light' ? colors.lightModeTableText : 'white',
                     textAlign: 'center',
                   }}
                 >
                   Fecha de registro
                 </Typography>
-
                 <Typography
                   style={{
-                    color:
-                      mode === 'light' ? colors.lightModeTableText : 'white',
+                    color: mode === 'light' ? colors.lightModeTableText : 'white',
                     textAlign: 'center',
                   }}
                 >
@@ -1166,24 +978,20 @@ treatments.forEach((treatment) => {
                 <Typography
                   style={{
                     fontWeight: 'bold',
-                    color:
-                      mode === 'light' ? colors.lightModeTableText : 'white',
+                    color: mode === 'light' ? colors.lightModeTableText : 'white',
                     textAlign: 'center',
                   }}
                 >
                   Última modificación
                 </Typography>
-
                 <Typography
                   style={{
-                    color:
-                      mode === 'light' ? colors.lightModeTableText : 'white',
+                    color: mode === 'light' ? colors.lightModeTableText : 'white',
                     textAlign: 'center',
                   }}
                 >
                   {odontogram &&
-                    (odontogram.profesionalModifica as Professional)
-                      .nombre1}{' '}
+                    (odontogram.profesionalModifica as Professional).nombre1}{' '}
                   {odontogram &&
                     (odontogram.profesionalModifica as Professional).apellPat}
                 </Typography>
@@ -1193,14 +1001,13 @@ treatments.forEach((treatment) => {
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <MuiButton
               variant="contained"
-              color="primary" // Funciona correctamente con Material-UI
+              color="primary"
               onClick={generateDentistPDF}
             >
               Descargar PDF
             </MuiButton>
           </div>
         </Grid>
-
         <Grid item xs={12} style={{ marginBottom: 15 }}>
           <MuiButton
             variant="contained"
@@ -1246,7 +1053,10 @@ treatments.forEach((treatment) => {
               return (
                 <Box
                   key={item.id}
-                  className={`flex items-center ${treatment.selected === item.id ? 'scale-[1.03] transition-all bg-green-500' : ''} pl-3`}
+                  className={`flex items-center ${treatment.selected === item.id
+                      ? 'scale-[1.03] transition-all bg-green-500'
+                      : ''
+                    } pl-3`}
                 >
                   <div
                     style={{ backgroundColor: item.color }}
@@ -1254,7 +1064,8 @@ treatments.forEach((treatment) => {
                   ></div>
                   <Typography
                     style={{ borderBottom: '1px solid #e1e3e3' }}
-                    className={` cursor-pointer p-3 w-full ${treatment.selected === item.id ? 'text-white' : ''}`}
+                    className={`cursor-pointer p-3 w-full ${treatment.selected === item.id ? 'text-white' : ''
+                      }`}
                     onClick={() => {
                       setTreatment((prevState) => ({
                         color: item.color,
@@ -1280,7 +1091,7 @@ treatments.forEach((treatment) => {
         >
           {odontogramLoading && (
             <Grid
-              className="no-scrollbar "
+              className="no-scrollbar"
               container
               direction={'column'}
               justifyContent={'center'}
@@ -1295,7 +1106,7 @@ treatments.forEach((treatment) => {
           )}
           {!odontogramLoading && (
             <Grid
-              className="no-scrollbar "
+              className="no-scrollbar"
               container
               direction={'column'}
               justifyContent={'center'}
@@ -1305,9 +1116,7 @@ treatments.forEach((treatment) => {
             >
               <Grid item>
                 <ButtonGroup>
-                  <Button onClick={() => setType('permanent')}>
-                    Permanente
-                  </Button>
+                  <Button onClick={() => setType('permanent')}>Permanente</Button>
                   <Button onClick={() => setType('temporary')}>Temporal</Button>
                 </ButtonGroup>
               </Grid>
@@ -1323,7 +1132,7 @@ treatments.forEach((treatment) => {
                             return (
                               <div
                                 key={t._id}
-                                className="flex-col items-center justify-center "
+                                className="flex-col items-center justify-center"
                                 style={{ height: '100%' }}
                               >
                                 <div className="text-center font-semibold">
@@ -1365,7 +1174,7 @@ treatments.forEach((treatment) => {
                             return (
                               <div
                                 key={t._id}
-                                className="flex-col items-center justify-center ju"
+                                className="flex-col items-center justify-center"
                                 style={{ height: '100%' }}
                               >
                                 <div
@@ -1392,7 +1201,7 @@ treatments.forEach((treatment) => {
                             );
                           })}
                     </Grid>
-                  </Grid>{' '}
+                  </Grid>
                 </>
               )}
               {type === 'temporary' && (
@@ -1411,7 +1220,7 @@ treatments.forEach((treatment) => {
                             return (
                               <div
                                 key={t._id}
-                                className="flex-col items-center justify-center "
+                                className="flex-col items-center justify-center"
                                 style={{ height: '100%' }}
                               >
                                 <div className="text-center font-semibold">
@@ -1449,7 +1258,7 @@ treatments.forEach((treatment) => {
                             return (
                               <div
                                 key={t._id}
-                                className="flex-col items-center justify-center ju"
+                                className="flex-col items-center justify-center"
                                 style={{ height: '100%' }}
                               >
                                 <div
@@ -1476,7 +1285,7 @@ treatments.forEach((treatment) => {
                             );
                           })}
                     </Grid>
-                  </Grid>{' '}
+                  </Grid>
                 </>
               )}
             </Grid>
@@ -1529,8 +1338,7 @@ treatments.forEach((treatment) => {
                   <TableCell
                     style={{
                       fontWeight: 'bold',
-                      color:
-                        mode === 'light' ? colors.lightModeTableText : 'white',
+                      color: mode === 'light' ? colors.lightModeTableText : 'white',
                     }}
                   >
                     Condiciones/ Tratamientos dentales
@@ -1538,8 +1346,7 @@ treatments.forEach((treatment) => {
                   <TableCell
                     style={{
                       fontWeight: 'bold',
-                      color:
-                        mode === 'light' ? colors.lightModeTableText : 'white',
+                      color: mode === 'light' ? colors.lightModeTableText : 'white',
                     }}
                   >
                     Pieza
@@ -1547,8 +1354,7 @@ treatments.forEach((treatment) => {
                   <TableCell
                     style={{
                       fontWeight: 'bold',
-                      color:
-                        mode === 'light' ? colors.lightModeTableText : 'white',
+                      color: mode === 'light' ? colors.lightModeTableText : 'white',
                     }}
                   >
                     Fecha
@@ -1556,8 +1362,7 @@ treatments.forEach((treatment) => {
                   <TableCell
                     style={{
                       fontWeight: 'bold',
-                      color:
-                        mode === 'light' ? colors.lightModeTableText : 'white',
+                      color: mode === 'light' ? colors.lightModeTableText : 'white',
                     }}
                   >
                     Observación
@@ -1565,18 +1370,15 @@ treatments.forEach((treatment) => {
                   <TableCell
                     style={{
                       fontWeight: 'bold',
-                      color:
-                        mode === 'light' ? colors.lightModeTableText : 'white',
+                      color: mode === 'light' ? colors.lightModeTableText : 'white',
                     }}
                   >
                     Atención
                   </TableCell>
-
                   <TableCell
                     style={{
                       fontWeight: 'bold',
-                      color:
-                        mode === 'light' ? colors.lightModeTableText : 'white',
+                      color: mode === 'light' ? colors.lightModeTableText : 'white',
                     }}
                   >
                     Detalle Tratamiento
@@ -1584,8 +1386,7 @@ treatments.forEach((treatment) => {
                   <TableCell
                     style={{
                       fontWeight: 'bold',
-                      color:
-                        mode === 'light' ? colors.lightModeTableText : 'white',
+                      color: mode === 'light' ? colors.lightModeTableText : 'white',
                     }}
                   ></TableCell>
                 </TableRow>
@@ -1614,7 +1415,6 @@ treatments.forEach((treatment) => {
                       t.pieza.parte === 'lingualpalatino'
                         ? t.pieza.lingualpalatino?.color
                         : '#FFFFFF';
-
                     return (
                       <TableRow key={t._id}>
                         <TableCell>{t.detalle}</TableCell>
@@ -1625,11 +1425,7 @@ treatments.forEach((treatment) => {
                           {new Date(t.fecha).toLocaleDateString()}
                         </TableCell>
                         <TableCell>
-                          <Tooltip
-                            title={
-                              t.observacion ? t.observacion : 'sin novedad'
-                            }
-                          >
+                          <Tooltip title={t.observacion ? t.observacion : 'sin novedad'}>
                             <Typography>
                               {t.observacion
                                 ? t.observacion.length > 20
@@ -1643,12 +1439,8 @@ treatments.forEach((treatment) => {
                           {(t.profesional as Professional).nombre1}{' '}
                           {(t.profesional as Professional).apellPat}
                         </TableCell>
-                        {/* pintar cruz */}
                         <TableCell>
-                          <div
-                            style={{ display: 'flex', alignItems: 'center' }}
-                          >
-                            {/* Imagen del diente */}
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
                             <img
                               src={
                                 dientesImages[
@@ -1658,8 +1450,6 @@ treatments.forEach((treatment) => {
                               alt={`Diente ${t.pieza.diente}`}
                               style={{ height: '50px', marginRight: '10px' }}
                             />
-
-                            {/* Cruz pintada */}
                             <div
                               style={{
                                 display: 'grid',
@@ -1670,7 +1460,6 @@ treatments.forEach((treatment) => {
                                 height: '32px',
                               }}
                             >
-                              {/* Bucal (arriba) */}
                               <div
                                 style={{
                                   gridColumn: '2',
@@ -1679,8 +1468,6 @@ treatments.forEach((treatment) => {
                                   border: '2px solid #ccc',
                                 }}
                               ></div>
-
-                              {/* Distal (izquierda) */}
                               <div
                                 style={{
                                   gridColumn: '1',
@@ -1689,8 +1476,6 @@ treatments.forEach((treatment) => {
                                   border: '2px solid #ccc',
                                 }}
                               ></div>
-
-                              {/* Oclusal (centro) */}
                               <div
                                 style={{
                                   gridColumn: '2',
@@ -1699,8 +1484,6 @@ treatments.forEach((treatment) => {
                                   border: '2px solid #ccc',
                                 }}
                               ></div>
-
-                              {/* Mesial (derecha) */}
                               <div
                                 style={{
                                   gridColumn: '3',
@@ -1709,8 +1492,6 @@ treatments.forEach((treatment) => {
                                   border: '2px solid #ccc',
                                 }}
                               ></div>
-
-                              {/* Lingual/Palatino (abajo) */}
                               <div
                                 style={{
                                   gridColumn: '2',
@@ -1729,13 +1510,10 @@ treatments.forEach((treatment) => {
                                 (tr: ITreatment) => t._id !== tr._id
                               );
                               setTreatments(newTreatments);
-
                               const updatedTeeth = [...teeth!];
-
                               const toothIndex = teeth!.findIndex(
                                 (d: Diente) => d.pieza === t.pieza.diente
                               );
-
                               updatedTeeth[toothIndex][
                                 t.pieza.parte as
                                 | 'bucal'
@@ -1768,7 +1546,6 @@ treatments.forEach((treatment) => {
                                 | 'mesial'
                                 | 'lingualpalatino'
                               ].estado = '';
-
                               setTeeth(updatedTeeth);
                             }}
                           >

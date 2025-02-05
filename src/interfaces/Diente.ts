@@ -3,6 +3,7 @@ import { ToothPart } from "./ToothPart";
 export interface Diente {
     _id?:string;
     pieza?: string;
+    temporal?: boolean; 
     detalle: string;
     diagnostico: string;
     estado: string;
