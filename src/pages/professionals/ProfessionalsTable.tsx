@@ -159,6 +159,7 @@ const ProfessionalsTable = ({ refetch }: Props) => {
                             mode === 'light'
                               ? colors.lightModeTableText
                               : 'white',
+                          textTransform: 'capitalize',
                         }}
                       >
                         {p.nombre1} {p.apellPat}

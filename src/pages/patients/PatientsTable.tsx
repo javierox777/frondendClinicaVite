@@ -216,6 +216,7 @@ const PatientsTable = ({ refetch }: { refetch?: boolean }) => {
                             mode === 'light'
                               ? colors.lightModeTableText
                               : 'white',
+                          textTransform: 'capitalize',
                         }}
                       >
                         {p.nombre1} {p.apellPat}
