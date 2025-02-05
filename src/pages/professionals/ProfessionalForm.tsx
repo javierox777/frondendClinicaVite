@@ -24,7 +24,10 @@ import axios from 'axios';
 import { generalConfig } from '../../config';
 import colors from '../../styles/colors';
 import { useThemeContext } from '../../componemts/themeContext';
-import { validarRutSinDigitoVerificador } from '../../helpers/validateRut';
+import {
+  validarRutConDigitoVerificador,
+  validarRutSinDigitoVerificador,
+} from '../../helpers/validateRut';
 import { useUser } from '../../auth/userContext';
 
 interface Props {
@@ -89,6 +92,8 @@ const ProfessionalForm = ({
   }, [professional]);
 
   const handleSubmit = async (e: React.FormEvent) => {
+    // 🔹 Limpiar RUT y separar el DV
+
     e.preventDefault();
     setSubmitting(true);
     const data = {
@@ -105,11 +110,14 @@ const ProfessionalForm = ({
       password: password,
       role: role,
     };
-    const isValid = validarRutSinDigitoVerificador(rut);
+    const rutLimpio = rut.replace(/\./g, ''); // Eliminar puntos
+    const dvLimpio = verificationDigit.toLowerCase(); // Forzar minúsculas en DV
+    const rutCompleto = `${rutLimpio}-${dvLimpio}`; // Unir con guion
 
-    if (!isValid) {
-      toast.error('Rut no valido.');
+    // 🔥 Validar el RUT completo con su dígito verificador
+    if (!validarRutConDigitoVerificador(rutCompleto)) {
       setSubmitting(false);
+      toast.error('❌ RUT no válido.');
       return;
     }
 
