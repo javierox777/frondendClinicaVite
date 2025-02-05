@@ -38,7 +38,10 @@ import HeaderMenu from './Menu';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { ServiceType } from '../../interfaces/ServiceType';
 import { Agreement } from '../../interfaces/Agreement';
-import { validarRutConDigitoVerificador, validarRutSinDigitoVerificador } from '../../helpers/validateRut';
+import {
+  validarRutConDigitoVerificador,
+  validarRutSinDigitoVerificador,
+} from '../../helpers/validateRut';
 import { after } from 'node:test';
 
 interface Props {
@@ -337,36 +340,36 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     // 🔹 Limpiar RUT y separar el DV
     const rutLimpio = rut.replace(/\./g, ''); // Eliminar puntos
     const dvLimpio = verificationDigit.toLowerCase(); // Forzar minúsculas en DV
     const rutCompleto = `${rutLimpio}-${dvLimpio}`; // Unir con guion
-  
+
     // 🔥 Validar el RUT completo con su dígito verificador
     if (!validarRutConDigitoVerificador(rutCompleto)) {
       toast.error('❌ RUT no válido.');
       return;
     }
-  
+
     try {
       setSubmitting(true);
-  
+
       // 🔹 Verificar si el RUT ya existe
       const { data: existingPatient } = await axios.get(
         `${generalConfig.baseUrl}/persons?rut=${rutLimpio}`
       );
-  
+
       if (existingPatient.length > 0) {
         toast.error('⚠️ El RUT ya está registrado.');
         setSubmitting(false);
         return;
       }
-  
+
       // 🔹 Crear el objeto `newPerson`
       const newPerson = {
         nombre1: firstName.trim(),
-        nombre2: secondName.trim(),
+        nombre2: secondName === '' ? '.' : secondName.trim(),
         apellPat: firstSurname.trim(),
         apellMat: secondSurname.trim(),
         rut: rutLimpio,
@@ -379,7 +382,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
         direcciones: addresses,
         convenios: agreements.map(({ _id, persona, ...rest }) => rest),
       };
-  
+
       // 🔹 Enviar la solicitud al backend
       let response;
       if (patient) {
@@ -389,25 +392,29 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
         );
         toast.success('✅ Paciente actualizado.');
       } else {
-        response = await axios.post(`${generalConfig.baseUrl}/persons`, newPerson);
+        response = await axios.post(
+          `${generalConfig.baseUrl}/persons`,
+          newPerson
+        );
         toast.success('✅ Paciente registrado.');
       }
-  
+
       setSubmitting(false);
       afterSubmit && afterSubmit();
     } catch (error) {
       setSubmitting(false);
-  
+
       // 🔹 Manejo detallado de errores del backend
       if (axios.isAxiosError(error) && error.response) {
-        toast.error(`❌ ${error.response.data.message || 'Error desconocido.'}`);
+        toast.error(
+          `❌ ${error.response.data.message || 'Error desconocido.'}`
+        );
       } else {
         toast.error('❌ Error en la conexión con el servidor.');
       }
     }
   };
-  
-  
+
   const getPatientAddresses = async (patientId: string) => {
     const response = await axios.get(
       `${generalConfig.baseUrl}/address-book/getaddresses/${patientId}`
@@ -542,7 +549,6 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                     fullWidth
                     onChange={(e) => setSecondName(e.target.value)}
                     value={secondName}
-                    required
                   />
                 </FormControl>
               </Grid>
@@ -574,8 +580,10 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                     <TextField
                       label="RUT"
                       onChange={(e) => {
-                        
-                        const cleanedValue = e.target.value.replace(/[^0-9]/g, '');
+                        const cleanedValue = e.target.value.replace(
+                          /[^0-9]/g,
+                          ''
+                        );
                         setRut(cleanedValue);
                       }}
                       value={rut}
@@ -588,11 +596,13 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                     <TextField
                       label="Dígito verificador"
                       onChange={(e) => {
-                        
-                        const cleanedValue = e.target.value.replace(/[^0-9kK]/g, '');
-                        setVerificationDigit(cleanedValue.toUpperCase()); 
+                        const cleanedValue = e.target.value.replace(
+                          /[^0-9kK]/g,
+                          ''
+                        );
+                        setVerificationDigit(cleanedValue.toUpperCase());
                       }}
-                      inputProps={{ maxLength: 1 }} 
+                      inputProps={{ maxLength: 1 }}
                       value={verificationDigit}
                       required
                     />
