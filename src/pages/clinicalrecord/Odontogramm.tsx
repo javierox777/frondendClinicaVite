@@ -600,7 +600,139 @@ const Odontogramm = ({ odontogram }: Props) => {
           currentY += cellHeight * valores.length;
         }
       });
+
+      
       doc.addPage();
+
+       // 9. Secciones Dinámicas: GENERALES, FAMILIARES, MÓRBIDOS, ALÉRGIAS, HÁBITOS
+ if (antecedents) {
+  const generalesListt = antecedents.generales?.length
+    ? antecedents.generales.map((g: General) => g.descripcion || 'Sin datos generales')
+    : ['Sin datos generales'];
+
+  const familiaresList = antecedents.familiares?.length
+    ? antecedents.familiares.map((f: Familiar) => f.descripcion || 'Sin datos familiares')
+    : ['Sin datos familiares'];
+
+  const morbidosList = antecedents.morbidos?.length
+    ? antecedents.morbidos.map((m: Morbido) => `${m.descripcion}: ${m.detail || 'Sin detalles'}`)
+    : ['Sin datos mórbidos'];
+
+  const alergiasList = antecedents.alergias?.length
+    ? antecedents.alergias.map((a: Alergia) => a.descripcion || 'Sin datos de alergias')
+    : ['Sin datos de alergias'];
+
+  const habitosList = antecedents.habitos?.length
+    ? antecedents.habitos.map((h: Habito) => h.descripcion || 'Sin datos de hábitos')
+    : ['Sin datos de hábitos'];
+
+
+
+
+  // -------------------------------
+  // Secciones Dinámicas: GENERALES, FAMILIARES, MÓRBIDOS, ALÉRGIAS, HÁBITOS
+  // -------------------------------
+
+  // 1) GENERALES
+
+  doc.setFontSize(18);
+  doc.setTextColor(255, 105, 180);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Clínica Dental', pageWidth / 2 - 20, 20, { align: 'center' });
+
+  doc.setTextColor(0, 102, 204);
+  doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
+
+  doc.setFontSize(16);
+  doc.setTextColor(0, 102, 204);
+  doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' });
+
+ 
+  doc.addImage(logoUrl, 'PNG', 10, 10, 30, 30);
+
+  const cellHeight = 8;
+  const startX = 10;
+  let currentY = 50;
+
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.rect(startX, currentY, 190, cellHeight);
+  doc.setTextColor(0, 0, 0);
+  doc.text('GENERALESSSS:', startX + 2, currentY + 5);
+  currentY += cellHeight;
+
+  generalesListt.forEach((item) => {
+    doc.rect(startX, currentY, 190, cellHeight);
+    doc.text(item, startX + 2, currentY + 5);
+    currentY += cellHeight;
+  });
+  currentY += cellHeight
+  // 2) FAMILIARES
+  doc.rect(startX, currentY, 190, cellHeight);
+  doc.setTextColor(0, 0, 0);
+  doc.text('FAMILIARES:', startX + 2, currentY + 5);
+  currentY += cellHeight;
+
+  familiaresList.forEach((item: any) => {
+    doc.rect(startX, currentY, 190, cellHeight);
+    doc.text(item, startX + 2, currentY + 5);
+    currentY += cellHeight;
+  });
+  currentY += cellHeight
+  // 3) MÓRBIDOS
+  doc.rect(startX, currentY, 190, cellHeight);
+  doc.setTextColor(0, 0, 0);
+  doc.text('MÓRBIDOS:', startX + 2, currentY + 5);
+  currentY += cellHeight;
+
+  morbidosList.forEach((item: any) => {
+    doc.rect(startX, currentY, 190, cellHeight);
+    doc.text(item, startX + 2, currentY + 5);
+    currentY += cellHeight;
+  });
+  currentY += cellHeight
+  // 4) ALÉRGIAS
+  doc.rect(startX, currentY, 190, cellHeight);
+  doc.setTextColor(0, 0, 0);
+  doc.text('ALÉRGIAS:', startX + 2, currentY + 5);
+  currentY += cellHeight;
+
+  alergiasList.forEach((item: any) => {
+    doc.rect(startX, currentY, 190, cellHeight);
+    doc.text(item, startX + 2, currentY + 5);
+    currentY += cellHeight;
+  });
+  currentY += cellHeight
+
+  // 5) HÁBITOS
+  doc.rect(startX, currentY, 190, cellHeight);
+  doc.setTextColor(0, 0, 0);
+  doc.text('HÁBITOS:', startX + 2, currentY + 5);
+  currentY += cellHeight;
+
+  habitosList.forEach((item: any) => {
+    doc.rect(startX, currentY, 190, cellHeight);
+    doc.text(item, startX + 2, currentY + 5);
+    currentY += cellHeight;
+  });
+
+
+
+
+  currentY += cellHeight * 3;
+
+
+
+  currentY += cellHeight * 4;
+}
+doc.addPage();
+
+
+//////
+doc.setFontSize(10);
+doc.setFont('helvetica', 'normal');
+currentY = 60;
+
       doc.setFontSize(18);
       doc.setTextColor(255, 105, 180);
       doc.setFont('helvetica', 'bold');
@@ -913,6 +1045,9 @@ doc.save('ficha_dental.pdf');
     'Impactación': '#8B0000',
     'Resto Radicular': '#2F4F4F',
     'Diente incluido': '#B11720',
+    'Diente Ectopico': '#4682B4',
+  'Diente Extruido': '#FF69B4',
+  'Diente Intruido': '#DB7093',
   };
 
   const treatmentsWithColor = treatments.map((t: ITreatment) => {
