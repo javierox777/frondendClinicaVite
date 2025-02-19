@@ -1,23 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { generalConfig } from '../../config';
-// import Subform from '../patients/subForms/Subform';
 import { ShortModel } from '../../interfaces/ShortModel';
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
-
 import colors from '../../styles/colors';
 import { useThemeContext } from '../../componemts/themeContext';
-import { LoggedUser, useUser } from '../../auth/userContext';
-import { Budget } from '../../interfaces/Budget';
-
-//Se agregó interfaz estado en el código
-import { Company } from '../../interfaces/Company';
-import { Person } from '../../interfaces/Person';
-import { Professional } from '../../interfaces/Professional';
 import toast, { Toaster } from 'react-hot-toast';
-
 import {
-  Autocomplete,
   AppBar,
   Toolbar,
   Typography,
@@ -38,7 +27,6 @@ import {
   Select,
   SelectChangeEvent,
   Box,
-  LinearProgress,
   IconButton,
   Dialog,
   Slide,
@@ -48,7 +36,6 @@ import { TransitionProps } from '@mui/material/transitions';
 import { Consentment } from '../../interfaces/Consentment';
 import { format } from 'date-fns';
 import BudgetFormSkeleton from '../budgets/BudgetFormSkeleton';
-import { useNavigate } from 'react-router-dom';
 
 interface Props {
   afterSubmit?: CallableFunction;
@@ -58,9 +45,7 @@ interface Props {
 }
 
 const Transition = React.forwardRef(function Transition(
-  props: TransitionProps & {
-    children: React.ReactElement;
-  },
+  props: TransitionProps & { children: React.ReactElement },
   ref: React.Ref<unknown>
 ) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -69,6 +54,7 @@ const Transition = React.forwardRef(function Transition(
 const ConsentForm = ({ afterSubmit, open, onClose, consentment }: Props) => {
   const { mode } = useThemeContext();
 
+  // Estado para la fecha (en formato yyyy-MM-dd)
   const [registerDate, setRegisterDate] = useState('');
 
   const [pacienteId, setPacienteId] = useState('');
@@ -77,6 +63,7 @@ const ConsentForm = ({ afterSubmit, open, onClose, consentment }: Props) => {
   const [profesionalId, setProfesionalId] = useState('');
 
   const [isSubmitting, setSubmitting] = useState(false);
+  // Estado para los detalles dinámicos
   const [detalles, setDetalles] = useState([
     {
       _id: (Math.random() * 1000).toString(),
@@ -86,7 +73,7 @@ const ConsentForm = ({ afterSubmit, open, onClose, consentment }: Props) => {
     },
   ]);
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['data'],
     queryFn: async () => {
       const response = await axios.get(
@@ -96,24 +83,26 @@ const ConsentForm = ({ afterSubmit, open, onClose, consentment }: Props) => {
     },
   });
 
-  const { data: consentmentDetails, isLoading: detailsLoading } = useQuery({
+  const { data: consentmentDetails } = useQuery({
     queryKey: ['details', consentment],
     queryFn: async () => {
       const response = await axios.get(
         `${generalConfig.baseUrl}/consentment-details/getdetails/${consentment?._id}`
       );
-
       return response.data.body;
     },
+    enabled: !!consentment, // Solo ejecuta si existe consentment
   });
+
   // Función para manejar el envío del formulario
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    // const detailsWithoutId = detalles.map(({ id, ...rest }) => rest);
+    // Concatenamos 'T00:00' para interpretar la fecha en hora local
+    const fechaConHoraLocal = new Date(registerDate + 'T00:00');
 
     const consentData = {
-      fechaRegistro: new Date(registerDate),
+      fechaRegistro: fechaConHoraLocal,
       persona: pacienteId,
       estado: statusId,
       empresa: companiesId,
@@ -122,7 +111,7 @@ const ConsentForm = ({ afterSubmit, open, onClose, consentment }: Props) => {
     };
 
     setSubmitting(true);
-    console.log(consentData);
+    console.log('Enviando datos:', consentData);
     try {
       if (consentment) {
         const response = await axios.patch(
@@ -132,41 +121,32 @@ const ConsentForm = ({ afterSubmit, open, onClose, consentment }: Props) => {
 
         if (response.data.message === 'success') {
           toast.success('Consentimiento actualizado exitosamente');
-          console.log(
-            'Consentimiento actualizado exitosamente:',
-            response.data
-          );
+          console.log('Consentimiento actualizado:', response.data);
           setSubmitting(false);
-          if (afterSubmit) {
-            afterSubmit(); // Llamar función después del envío, si está definida
-          }
+          if (afterSubmit) afterSubmit();
+          onClose(); // Cierra el formulario al finalizar
         }
       } else {
         const response = await axios.post(
           `${generalConfig.baseUrl}/consentments`,
-          consentData,
-          {
-            /*headers: {
-            'Authorization': `Bearer ${user?.token}`,  // Asumiendo que el token se almacena en el usuario autenticado
-            },*/
-          }
+          consentData
         );
         if (response.status === 201) {
           toast.success('Consentimiento registrado exitosamente');
-          console.log('Consentimiento registrado exitosamente:', response.data);
+          console.log('Consentimiento registrado:', response.data);
           setSubmitting(false);
-          if (afterSubmit) {
-            afterSubmit(); // Llamar función después del envío, si está definida
-          }
+          if (afterSubmit) afterSubmit();
+          onClose(); // Cierra el formulario al finalizar
         }
       }
     } catch (error) {
       setSubmitting(false);
-      toast.error('Error al registrar el consentimiento, intentelo nuevamente');
+      toast.error('Error al registrar el consentimiento, inténtelo nuevamente');
       console.error('Error al registrar el consentimiento:', error);
     }
   };
 
+  // Función para agregar una nueva fila de detalle
   const handleAgregarDetalles = () => {
     setDetalles([
       ...detalles,
@@ -179,6 +159,7 @@ const ConsentForm = ({ afterSubmit, open, onClose, consentment }: Props) => {
     ]);
   };
 
+  // Función para actualizar un campo de un detalle
   const handleChangeDetalle = (
     index: number,
     field: 'diagnostico' | 'tratamiento' | 'posiblesComplicaciones',
@@ -189,12 +170,15 @@ const ConsentForm = ({ afterSubmit, open, onClose, consentment }: Props) => {
     setDetalles(nuevosDetalles);
   };
 
+  // Al cargar el componente, si hay consentimiento, se asignan los valores correspondientes
   useEffect(() => {
     if (consentment) {
-      setProfesionalId((consentment.profesional as Professional)._id);
-      setCompaniesId((consentment.empresa as Company)._id);
-      setPacienteId((consentment.persona as Person)._id);
-      setRegisterDate(format(new Date(consentment.fechaRegistro), 'yyy-MM-dd'));
+      // Asumimos que las propiedades existen y tienen el formato correcto
+      setProfesionalId((consentment.profesional as any)._id);
+      setCompaniesId((consentment.empresa as any)._id);
+      setPacienteId((consentment.persona as any)._id);
+      // Corrige el formato de la fecha
+      setRegisterDate(format(new Date(consentment.fechaRegistro), 'yyyy-MM-dd'));
       setStatusId(consentment.estado as string);
     }
     if (consentmentDetails) {
@@ -204,17 +188,8 @@ const ConsentForm = ({ afterSubmit, open, onClose, consentment }: Props) => {
 
   if (isLoading) {
     return (
-      <Dialog
-        open={open}
-        TransitionComponent={Transition}
-        onClose={() => onClose()}
-        fullScreen
-      >
-        <Toolbar
-          component={Paper}
-          elevation={3}
-          style={{ backgroundColor: 'teal' }}
-        >
+      <Dialog open={open} TransitionComponent={Transition} onClose={() => onClose()} fullScreen>
+        <Toolbar component={Paper} elevation={3} style={{ backgroundColor: 'teal' }}>
           <IconButton onClick={() => onClose()}>
             <Close />
           </IconButton>
@@ -226,17 +201,8 @@ const ConsentForm = ({ afterSubmit, open, onClose, consentment }: Props) => {
 
   return (
     <>
-      <Dialog
-        open={open}
-        TransitionComponent={Transition}
-        onClose={() => onClose()}
-        fullScreen
-      >
-        <Toolbar
-          component={Paper}
-          elevation={3}
-          style={{ backgroundColor: 'teal' }}
-        >
+      <Dialog open={open} TransitionComponent={Transition} onClose={() => onClose()} fullScreen>
+        <Toolbar component={Paper} elevation={3} style={{ backgroundColor: 'teal' }}>
           <IconButton onClick={() => onClose()}>
             <Close />
           </IconButton>
@@ -252,6 +218,7 @@ const ConsentForm = ({ afterSubmit, open, onClose, consentment }: Props) => {
             <Box mt={3} /> {/* Espacio hacia abajo */}
             <form onSubmit={handleSubmit}>
               <Grid container spacing={2}>
+                {/* Selección de Estado */}
                 <Grid item xs={6}>
                   <FormControl fullWidth>
                     <InputLabel id="status-label">Estado</InputLabel>
@@ -260,9 +227,7 @@ const ConsentForm = ({ afterSubmit, open, onClose, consentment }: Props) => {
                       required
                       id="status-select"
                       labelId="status-label"
-                      onChange={(e: SelectChangeEvent<string>) =>
-                        setStatusId(e.target.value)
-                      }
+                      onChange={(e: SelectChangeEvent<string>) => setStatusId(e.target.value)}
                       value={statusId}
                     >
                       {data?.statuses.map((s: ShortModel) => (
@@ -273,20 +238,19 @@ const ConsentForm = ({ afterSubmit, open, onClose, consentment }: Props) => {
                     </Select>
                   </FormControl>
                 </Grid>
+                {/* Selección de Clínica */}
                 <Grid item xs={6}>
                   <FormControl fullWidth>
-                    <InputLabel id="companies-label">Clinica</InputLabel>
+                    <InputLabel id="companies-label">Clínica</InputLabel>
                     <Select
                       label="companies"
                       required
                       id="companies-select"
                       labelId="companies-label"
-                      onChange={(e: SelectChangeEvent<string>) =>
-                        setCompaniesId(e.target.value)
-                      }
+                      onChange={(e: SelectChangeEvent<string>) => setCompaniesId(e.target.value)}
                       value={companiesId}
                     >
-                      {data?.clinics?.map((s: Company) => (
+                      {data?.clinics?.map((s: any) => (
                         <MenuItem key={s._id} value={s._id}>
                           {s.razonSocial}
                         </MenuItem>
@@ -294,11 +258,7 @@ const ConsentForm = ({ afterSubmit, open, onClose, consentment }: Props) => {
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item xs={12}>
-                  <Typography variant="body1">
-                    Por medio del presente consentimiento, Yo
-                  </Typography>
-                </Grid>
+                {/* Selección de Paciente */}
                 <Grid item xs={12}>
                   <FormControl fullWidth>
                     <InputLabel id="paciente-label">Paciente</InputLabel>
@@ -307,12 +267,10 @@ const ConsentForm = ({ afterSubmit, open, onClose, consentment }: Props) => {
                       required
                       id="paciente-select"
                       labelId="paciente-label"
-                      onChange={(e: SelectChangeEvent<string>) =>
-                        setPacienteId(e.target.value)
-                      }
+                      onChange={(e: SelectChangeEvent<string>) => setPacienteId(e.target.value)}
                       value={pacienteId}
                     >
-                      {data?.persons?.map((s: Person) => (
+                      {data?.persons?.map((s: any) => (
                         <MenuItem key={s._id} value={s._id}>
                           {s.nombre1} {s.nombre2} {s.apellPat} {s.apellMat}
                         </MenuItem>
@@ -320,21 +278,17 @@ const ConsentForm = ({ afterSubmit, open, onClose, consentment }: Props) => {
                     </Select>
                   </FormControl>
                 </Grid>
+                {/* Fecha de atención y Profesional */}
                 <Grid item xs={6}>
-                  <Typography variant="body1">
-                    En atención comenzada el día
-                  </Typography>
+                  <Typography variant="body1">En atención comenzada el día</Typography>
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography variant="body1">
-                    con el/ la profesional
-                  </Typography>
+                  <Typography variant="body1">con el/ la profesional</Typography>
                 </Grid>
                 <Grid item xs={6}>
                   <FormControl fullWidth>
                     <TextField
                       name="fechaAtencion"
-                      label=""
                       type="date"
                       variant="outlined"
                       size="small"
@@ -352,39 +306,32 @@ const ConsentForm = ({ afterSubmit, open, onClose, consentment }: Props) => {
                       required
                       id="profesional-select"
                       labelId="profesional-label"
-                      onChange={(e: SelectChangeEvent<string>) =>
-                        setProfesionalId(e.target.value)
-                      }
+                      onChange={(e: SelectChangeEvent<string>) => setProfesionalId(e.target.value)}
                       value={profesionalId}
                     >
-                      {data?.professionals?.map((s: Professional) => (
+                      {data?.professionals?.map((s: any) => (
                         <MenuItem key={s._id} value={s._id}>
-                          {s.nombre1} {s.nombre2} {s.apellPat} {s.apellMat}
+                        {s.nombre1} {s.nombre2} {s.apellPat} {s.apellMat}
                         </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
                 </Grid>
+                {/* Texto del consentimiento */}
                 <Grid item xs={12}>
                   <Typography variant="body1">
-                    He sido informado a cerca de mi diagnóstico, pronóstico y
-                    plan de tratamiento así como sus posibles complicaciones
-                    mencionadas en este documento. Por lo tanto, de forma
-                    consciente y voluntaria doy mi consentimiento y aprobación
-                    para que se realice el tratamiento teniendo pleno
-                    conocimiento de los posibles riesgos, complicaciones y
-                    beneficios que podría desprenderse de dicho acto.
+                    He sido informado acerca de mi diagnóstico, pronóstico y plan de tratamiento, así como de sus posibles complicaciones
+                    mencionadas en este documento. Por lo tanto, de forma consciente y voluntaria doy mi consentimiento y aprobación para que se
+                    realice el tratamiento, teniendo pleno conocimiento de los posibles riesgos, complicaciones y beneficios.
                   </Typography>
                 </Grid>
+                {/* Botón para agregar filas dinámicas */}
                 <Grid item xs={12}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleAgregarDetalles}
-                  >
+                  <Button variant="contained" color="primary" onClick={handleAgregarDetalles}>
                     Agregar Diagnóstico
                   </Button>
                 </Grid>
+                {/* Tabla de filas dinámicas */}
                 <Grid item xs={12}>
                   <TableContainer component={Paper}>
                     <Table>
@@ -397,19 +344,15 @@ const ConsentForm = ({ afterSubmit, open, onClose, consentment }: Props) => {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {detalles?.map((detalle, index) => (
-                          <TableRow key={index}>
+                        {detalles.map((detalle, index) => (
+                          <TableRow key={detalle._id}>
                             <TableCell>
                               <TextField
                                 fullWidth
                                 margin="normal"
                                 value={detalle.diagnostico}
                                 onChange={(e) =>
-                                  handleChangeDetalle(
-                                    index,
-                                    'diagnostico',
-                                    e.target.value
-                                  )
+                                  handleChangeDetalle(index, 'diagnostico', e.target.value)
                                 }
                               />
                             </TableCell>
@@ -419,11 +362,7 @@ const ConsentForm = ({ afterSubmit, open, onClose, consentment }: Props) => {
                                 margin="normal"
                                 value={detalle.tratamiento}
                                 onChange={(e) =>
-                                  handleChangeDetalle(
-                                    index,
-                                    'tratamiento',
-                                    e.target.value
-                                  )
+                                  handleChangeDetalle(index, 'tratamiento', e.target.value)
                                 }
                               />
                             </TableCell>
@@ -433,11 +372,7 @@ const ConsentForm = ({ afterSubmit, open, onClose, consentment }: Props) => {
                                 margin="normal"
                                 value={detalle.posiblesComplicaciones}
                                 onChange={(e) =>
-                                  handleChangeDetalle(
-                                    index,
-                                    'posiblesComplicaciones',
-                                    e.target.value
-                                  )
+                                  handleChangeDetalle(index, 'posiblesComplicaciones', e.target.value)
                                 }
                               />
                             </TableCell>
@@ -459,19 +394,17 @@ const ConsentForm = ({ afterSubmit, open, onClose, consentment }: Props) => {
                     </Table>
                   </TableContainer>
                 </Grid>
+                {/* Botón para enviar el formulario */}
                 <Grid item xs={12}>
                   <Button
                     type="submit"
                     variant="contained"
                     color={consentment ? 'success' : 'primary'}
                     fullWidth
-                    style={{
-                      marginBottom: 20,
-                    }}
+                    style={{ marginBottom: 20 }}
                     disabled={isSubmitting}
                   >
-                    {consentment && 'Actualizar consentimiento'}
-                    {!consentment && 'Registrar consentimiento'}
+                    {consentment ? 'Actualizar consentimiento' : 'Registrar consentimiento'}
                   </Button>
                 </Grid>
               </Grid>

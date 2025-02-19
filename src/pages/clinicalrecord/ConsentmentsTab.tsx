@@ -49,7 +49,8 @@ const ConsentmentsTab = ({ patient }: Props) => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [formOpen, setFormOpen] = useState(false);
   const [dataUpdated, setUpdated] = useState(false);
-  const [showConsentment, setConsentment] = useState<ConsentmentResponse>();
+  const [showConsentment, setConsentment] = useState<ConsentmentResponse | undefined>(undefined);
+
 
   // Referencia al componente ConsentmentVisualizer
   const visualizerRef = useRef<any>(null);
@@ -65,14 +66,12 @@ const ConsentmentsTab = ({ patient }: Props) => {
   });
 
   const handleDownloadPDF = (consentment: ConsentmentResponse) => {
-    // Establecer el consentimiento actual para visualización
     setConsentment(consentment);
-
-    // Llamar a la función `generatePDF` dentro del componente `ConsentmentVisualizer`
     setTimeout(() => {
       visualizerRef.current?.generatePDF();
-    }, 100); // Esperar a que se actualice el estado de `showConsentment`
+    }, 100);
   };
+  
 
   return (
     <>
@@ -161,10 +160,8 @@ const ConsentmentsTab = ({ patient }: Props) => {
               xs={6}
               className="border border-zinc-200 rounded-lg p-3 pl-20 pr-20 ml-5 pt-0"
             >
-              <ConsentmentVisualizer
-                ref={visualizerRef}
-                consentment={showConsentment}
-              />
+             <ConsentmentVisualizer ref={visualizerRef} consentment={showConsentment} />
+
             </Grid>
           </>
         )}
