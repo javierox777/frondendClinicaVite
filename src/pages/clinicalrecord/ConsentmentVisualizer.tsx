@@ -20,6 +20,10 @@ import { Person } from '../../interfaces/Person';
 import { Professional } from '../../interfaces/Professional';
 import colors from '../../styles/colors';
 import { ConsentmentResponse } from './ConsentmentsTab';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import { generalConfig } from '../../config';
+import { ConsentmentDetail } from '../../interfaces/ConsentmentDetails';
 
 interface Props {
   consentment: ConsentmentResponse | undefined;
@@ -27,6 +31,17 @@ interface Props {
 
 const ConsentmentVisualizer = forwardRef(({ consentment }: Props, ref) => {
   const { mode } = useThemeContext();
+
+  // const { data: details, isLoading } = useQuery({
+  //   queryKey: ['details', consentment],
+  //   queryFn: async () => {
+  //     if (consentment === undefined) return [];
+  //     const response = await axios.get(
+  //       `${generalConfig.baseUrl}/consentment-details/getdetails/${consentment.consentimiento._id}`
+  //     );
+  //     return response.data.body;
+  //   },
+  // });
 
   // Exponer la función generatePDF al componente padre
   useImperativeHandle(ref, () => ({
@@ -75,7 +90,7 @@ const ConsentmentVisualizer = forwardRef(({ consentment }: Props, ref) => {
     ); // Línea horizontal
 
     // Dibujar filas de la tabla
-    detalles.forEach((d) => {
+    detalles.forEach((d: ConsentmentDetail) => {
       const rowHeight = 10;
 
       doc.rect(startX, y, columnWidths[0], rowHeight);

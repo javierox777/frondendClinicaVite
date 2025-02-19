@@ -9,13 +9,15 @@ import { generalConfig } from '../../config';
 import { Consentment } from '../../interfaces/Consentment';
 import { useNavigate } from 'react-router-dom';
 import ConsentmentVisualizer from '../clinicalrecord/ConsentmentVisualizer';
-import { ConsentmentResponse } from '../clinicalrecord/ConsentmentsTab'; 
+import { ConsentmentResponse } from '../clinicalrecord/ConsentmentsTab';
 // O define tu propia interfaz similar: interface ConsentmentResponse { consentimiento: Consentment; detalles: ConsentmentDetail[]; }
 
 const ConsentMain = () => {
   const navigate = useNavigate();
   const [formOpen, setOpen] = useState(false);
-  const [showConsentment, setShowConsentment] = useState<ConsentmentResponse | undefined>(undefined);
+  const [showConsentment, setShowConsentment] = useState<
+    ConsentmentResponse | undefined
+  >(undefined);
   const [dataUpdated, setUpdated] = useState(false);
 
   // Referencia al Visualizador (para llamar generatePDF)
@@ -31,12 +33,16 @@ const ConsentMain = () => {
   });
 
   // Callback para descargar PDF
-  const handleDownloadPDF = (consentment: Consentment) => {
-    // Suponiendo que consentment ya trae 'detalles'. 
+  const handleDownloadPDF = async (consentment: Consentment) => {
+    const details = await axios.get(
+      `${generalConfig.baseUrl}/consentment-details/getdetails/${consentment._id}`
+    );
+
+    // Suponiendo que consentment ya trae 'detalles'.
     // Si no, hay que hacer otra consulta para obtenerlos.
     setShowConsentment({
       consentimiento: consentment,
-      detalles: consentment.detalles || [], // fallback si viniera 'undefined'
+      detalles: details.data.body || [], // fallback si viniera 'undefined'
     });
 
     setTimeout(() => {
@@ -66,14 +72,19 @@ const ConsentMain = () => {
 
       {/* Visualizador oculto (se usa para generar PDF) */}
       <div style={{ display: 'none' }}>
-        <ConsentmentVisualizer ref={visualizerRef} consentment={showConsentment} />
+        <ConsentmentVisualizer
+          ref={visualizerRef}
+          consentment={showConsentment}
+        />
       </div>
 
       {/* Formulario para crear/editar consentimiento */}
       <ConsentForm
         open={formOpen}
         onClose={() => setOpen(false)}
-        consentment={showConsentment ? showConsentment.consentimiento : undefined}
+        consentment={
+          showConsentment ? showConsentment.consentimiento : undefined
+        }
         afterSubmit={() => {
           setUpdated(!dataUpdated);
         }}
