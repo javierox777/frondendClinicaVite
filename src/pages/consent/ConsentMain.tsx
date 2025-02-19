@@ -42,7 +42,9 @@ const ConsentMain = () => {
     // Si no, hay que hacer otra consulta para obtenerlos.
     setShowConsentment({
       consentimiento: consentment,
-      detalles: details.data.body || [], // fallback si viniera 'undefined'
+      detalles: consentment.detalles
+        ? consentment.detalles
+        : details.data.body || [], // fallback si viniera 'undefined'
     });
 
     setTimeout(() => {
