@@ -87,6 +87,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import axios from 'axios';
 import { generalConfig } from '../../config';
 import TreatmentForm from './TreatmentForm';
+import { format } from 'date-fns';
 
 interface Person {
   _id: string;
@@ -223,7 +224,6 @@ const Odontogramm = ({ odontogram }: Props) => {
   });
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(50);
-  
 
   const [type, setType] = useState('permanent');
 
@@ -1412,7 +1412,10 @@ const Odontogramm = ({ odontogram }: Props) => {
               <TableBody>
                 {treatmentsWithColor
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime())
+                  .sort(
+                    (a, b) =>
+                      new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
+                  )
                   .map((t: ITreatment) => {
                     const bucalColor =
                       t.pieza.parte === 'bucal'
@@ -1442,7 +1445,7 @@ const Odontogramm = ({ odontogram }: Props) => {
                           {t.pieza.diente} {t.pieza.parte}
                         </TableCell>
                         <TableCell>
-                          {new Date(t.fecha).toLocaleDateString()}
+                          {format(new Date(t.fecha), 'dd/MM/yyyy')}
                         </TableCell>
                         <TableCell>
                           <Tooltip
