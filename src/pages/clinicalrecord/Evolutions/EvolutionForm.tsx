@@ -13,7 +13,6 @@ import {
   SelectChangeEvent,
   Slide,
   TextField,
-  Typography,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import HeaderBar from '../../../componemts/HeaderBar';
@@ -29,7 +28,7 @@ import 'easymde/dist/easymde.min.css';
 import { useUser } from '../../../auth/userContext';
 import { Professional } from '../../../interfaces/Professional';
 import toast from 'react-hot-toast';
-import { format } from 'date-fns';
+// ¡OJO! Ya NO usaremos 'format(new Date(), 'yyyy-MM-dd')' para la fecha local
 import { Evolution } from '../../../interfaces/Evolution';
 import { TransitionProps } from '@mui/material/transitions';
 
@@ -48,6 +47,14 @@ interface Props {
   patient: Person;
   evolution?: Evolution | null;
   afterSubmit?: CallableFunction;
+}
+
+// Función para obtener la fecha local en formato YYYY-MM-DD
+function getLocalDateString(): string {
+  const now = new Date();
+  return new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+    .toISOString()
+    .split('T')[0];
 }
 
 const EvolutionForm = ({
@@ -79,18 +86,20 @@ const EvolutionForm = ({
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+
     try {
+      // Obtenemos la fecha local "YYYY-MM-DD" (sin desfase)
+      const currentLocalDate = getLocalDateString();
+
       if (!evolution) {
-        const response = await axios.post(
-          `${generalConfig.baseUrl}/evoluciones`,
-          {
-            persona: patient._id,
-            profesional: user?.profesionalId,
-            empresa: clinicId,
-            descripcion: description,
-            fecha: format(new Date(), 'yyyy-MM-dd'),
-          }
-        );
+        // Crear nueva evolución
+        const response = await axios.post(`${generalConfig.baseUrl}/evoluciones`, {
+          persona: patient._id,
+          profesional: user?.profesionalId,
+          empresa: clinicId,
+          descripcion: description,
+          fecha: currentLocalDate,
+        });
 
         if (response.data.message === 'success') {
           toast.success('Evolución registrada correctamente');
@@ -100,6 +109,7 @@ const EvolutionForm = ({
           afterSubmit && afterSubmit();
         }
       } else {
+        // Editar evolución existente
         const response = await axios.patch(
           `${generalConfig.baseUrl}/evoluciones/${evolution._id}`,
           {
@@ -181,11 +191,11 @@ const EvolutionForm = ({
                       </li>
                     )}
                     getOptionLabel={(patient: Person) => {
-                      // Value selected with enter, right from the input
+                      // El valor seleccionado con Enter
                       if (typeof patient === 'string') {
                         return patient;
                       }
-                      // Regular patient
+                      // Valor normal
                       return `${patient.nombre1} ${patient.apellPat} ${patient.rut}-${patient.dv}`;
                     }}
                   />
@@ -237,12 +247,10 @@ const EvolutionForm = ({
                       </li>
                     )}
                     getOptionLabel={(clinic: Company) => {
-                      // Value selected with enter, right from the input
                       if (typeof clinic === 'string') {
                         return clinic;
                       }
-                      // Regular clinic
-                      return `${clinic.razonSocial}`;
+                      return clinic.razonSocial;
                     }}
                     onChange={(event, clinic: Company | null) => {
                       if (clinic) setClinicId(clinic._id);

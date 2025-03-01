@@ -1,5 +1,19 @@
 import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
-import { TextField, Button, Container, Paper, Box, MenuItem, Select, InputLabel, FormControl, FormControlLabel, Switch, SelectChangeEvent, Grid } from '@mui/material';
+import {
+  TextField,
+  Button,
+  Container,
+  Paper,
+  Box,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+  FormControlLabel,
+  Switch,
+  SelectChangeEvent,
+  Grid
+} from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -11,9 +25,13 @@ interface FormData {
   estado_id: boolean;
   profesional_id: string;
   empresa_id: string;
-  fechaRegistro: Date | null;
+  /**
+   * Importante: Guardamos la fecha como string en formato "YYYY-MM-DD"
+   * así evitamos desfases de zona horaria.
+   */
+  fechaRegistro: string | null; 
   persona_id: string;
-  direccion: string; // Añadir dirección aquí
+  direccion: string;
   recetaDetalle: string[];
 }
 
@@ -36,7 +54,7 @@ interface IProfesional {
   receta: string;
 }
 
-interface IEmpresa extends Document {
+interface IEmpresa {
   _id: string;
   vigencia: string;
   dv: string;
@@ -64,7 +82,7 @@ interface IPersona {
   rut: string;
   sexo: string;
   vigente: string;
-  direccion: string; // Añadir dirección aquí
+  direccion: string;
 }
 
 interface EditRecetaFormProps {
@@ -78,6 +96,10 @@ const EditRecetaForm: React.FC<EditRecetaFormProps> = ({ receta, onSuccess }) =>
   const [persons, setPersons] = useState<IPersona[]>([]);
   const [selectedPersona, setSelectedPersona] = useState<IPersona | null>(null);
 
+  /**
+   * Inicializamos el state con la receta que llega por props.
+   * Aquí, fechaRegistro ya debe venir como string | null (si viene de un fetch).
+   */
   const [formData, setFormData] = useState<FormData>(receta);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -96,7 +118,7 @@ const EditRecetaForm: React.FC<EditRecetaFormProps> = ({ receta, onSuccess }) =>
     }));
   };
 
-  const handleSelectChange = (e: SelectChangeEvent<string>) => { // Usa SelectChangeEvent en lugar de ChangeEvent
+  const handleSelectChange = (e: SelectChangeEvent<string>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -104,10 +126,14 @@ const EditRecetaForm: React.FC<EditRecetaFormProps> = ({ receta, onSuccess }) =>
     }));
   };
 
+  /**
+   * Acá convertimos la fecha seleccionada en el DatePicker a un string `YYYY-MM-DD`.
+   * De esa forma ignoramos la hora y no hay desfase de zona horaria.
+   */
   const handleDateChange = (date: Dayjs | null) => {
     setFormData((prevData) => ({
       ...prevData,
-      fechaRegistro: date ? new Date(date.year(), date.month(), date.date()) : null,
+      fechaRegistro: date ? date.format('YYYY-MM-DD') : null,
     }));
   };
 
@@ -129,7 +155,7 @@ const EditRecetaForm: React.FC<EditRecetaFormProps> = ({ receta, onSuccess }) =>
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    console.log(formData);
+    console.log('Enviando formulario con data:', formData);
     try {
       await axios.put(`http://localhost:3000/api/receipt/${formData._id}`, formData);
       onSuccess(); // Llamar la función onSuccess después de un envío exitoso
@@ -139,26 +165,35 @@ const EditRecetaForm: React.FC<EditRecetaFormProps> = ({ receta, onSuccess }) =>
   };
 
   const getProfesionals = async () => {
-    const data = await axios.get('http://localhost:3000/api/professionals');
-    setProfesionals(data.data.body);
-    console.log("aca professionals", profesionals);
+    try {
+      const data = await axios.get('http://localhost:3000/api/professionals');
+      setProfesionals(data.data.body);
+    } catch (err) {
+      console.error('Error al cargar profesionales:', err);
+    }
   };
 
   const getCompanies = async () => {
-    const data = await axios.get('http://localhost:3000/api/companies');
-    setCompanies(data.data.body);
-    console.log("aca companies", companies);
+    try {
+      const data = await axios.get('http://localhost:3000/api/companies');
+      setCompanies(data.data.body);
+    } catch (err) {
+      console.error('Error al cargar empresas:', err);
+    }
   };
 
   const getPersons = async () => {
-    const data = await axios.get('http://localhost:3000/api/persons');
-    setPersons(data.data.body);
-    console.log("aca persons", persons);
+    try {
+      const data = await axios.get('http://localhost:3000/api/persons');
+      setPersons(data.data.body);
+    } catch (err) {
+      console.error('Error al cargar personas:', err);
+    }
   };
 
   const handlePersonaChange = (e: SelectChangeEvent<string>) => {
     const personaId = e.target.value;
-    const selected = persons.find(persona => persona._id === personaId);
+    const selected = persons.find((persona) => persona._id === personaId);
     if (selected) {
       setSelectedPersona(selected);
       setFormData((prevData) => ({
@@ -175,9 +210,13 @@ const EditRecetaForm: React.FC<EditRecetaFormProps> = ({ receta, onSuccess }) =>
     getPersons();
   }, []);
 
+  /**
+   * Si llega una persona_id desde el prop receta, y ya tenemos la lista de persons,
+   * seleccionamos la persona correspondiente.
+   */
   useEffect(() => {
     if (receta.persona_id) {
-      const selected = persons.find(persona => persona._id === receta.persona_id);
+      const selected = persons.find((persona) => persona._id === receta.persona_id);
       if (selected) setSelectedPersona(selected);
     }
   }, [receta, persons]);
@@ -186,7 +225,12 @@ const EditRecetaForm: React.FC<EditRecetaFormProps> = ({ receta, onSuccess }) =>
     <Container maxWidth="sm">
       <Paper elevation={0} sx={{ p: 3, bgcolor: 'rgba(255, 255, 255, 0.8)' }}>
         <form onSubmit={handleSubmit}>
-          <Button style={{ marginBottom: '10px' }} variant="contained" color="primary" type="button">
+          <Button
+            style={{ marginBottom: '10px' }}
+            variant="contained"
+            color="primary"
+            type="button"
+          >
             Ficha Clinica
           </Button>
           <Box mb={2} mt={4} display="flex" justifyContent="space-between" alignItems="center">
@@ -201,14 +245,24 @@ const EditRecetaForm: React.FC<EditRecetaFormProps> = ({ receta, onSuccess }) =>
               }
               label="Estado ID"
             />
+
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 label="Fecha de Registro"
-                value={formData.fechaRegistro ? dayjs(formData.fechaRegistro) : null}
+                /**
+                 * Para mostrar la fecha, creamos un Dayjs a partir de la cadena "YYYY-MM-DD".
+                 * Si formData.fechaRegistro está en ese formato, dayjs lo entenderá sin problema.
+                 */
+                value={
+                  formData.fechaRegistro
+                    ? dayjs(formData.fechaRegistro, 'YYYY-MM-DD')
+                    : null
+                }
                 onChange={handleDateChange}
               />
             </LocalizationProvider>
           </Box>
+
           <Box mb={1}>
             <FormControl fullWidth variant="outlined">
               <InputLabel id="persona-label">Persona</InputLabel>
@@ -227,6 +281,7 @@ const EditRecetaForm: React.FC<EditRecetaFormProps> = ({ receta, onSuccess }) =>
               </Select>
             </FormControl>
           </Box>
+
           {selectedPersona && (
             <Box mb={1}>
               <Grid container spacing={2}>
@@ -294,6 +349,7 @@ const EditRecetaForm: React.FC<EditRecetaFormProps> = ({ receta, onSuccess }) =>
               </Grid>
             </Box>
           )}
+
           <Box mb={2}>
             <FormControl fullWidth variant="outlined">
               <InputLabel id="profesional-label">Profesional</InputLabel>
@@ -312,6 +368,7 @@ const EditRecetaForm: React.FC<EditRecetaFormProps> = ({ receta, onSuccess }) =>
               </Select>
             </FormControl>
           </Box>
+
           <Box mb={2}>
             <FormControl fullWidth variant="outlined">
               <InputLabel id="empresa">Empresa</InputLabel>
@@ -324,12 +381,13 @@ const EditRecetaForm: React.FC<EditRecetaFormProps> = ({ receta, onSuccess }) =>
               >
                 {companies.map((compa) => (
                   <MenuItem key={compa._id} value={compa._id}>
-                    {`${compa.razonSocial}`}
+                    {compa.razonSocial}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
           </Box>
+
           <Box mb={2}>
             <label>Receta Detalle:</label>
             {formData.recetaDetalle.map((detalle, index) => (
@@ -346,6 +404,7 @@ const EditRecetaForm: React.FC<EditRecetaFormProps> = ({ receta, onSuccess }) =>
               Añadir Detalle
             </Button>
           </Box>
+
           <Button variant="contained" onClick={handleSubmit} color="primary" type="submit">
             Enviar
           </Button>

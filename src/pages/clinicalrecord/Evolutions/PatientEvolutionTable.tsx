@@ -12,7 +12,6 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  Typography,
 } from '@mui/material';
 import HeaderBar from '../../../componemts/HeaderBar';
 import axios from 'axios';
@@ -39,6 +38,23 @@ const tableHeadings = [
   { id: 3, label: 'Clínica' },
 ];
 
+// Función para parsear "YYYY-MM-DD" o "YYYY-MM-DDTHH:mm:ssZ" como fecha local
+function parseDateAsLocal(dateString?: string): Date | null {
+  if (!dateString) return null; // si es undefined o null
+  
+  // Si viene algo tipo "2025-03-01T00:00:00.000Z", cortamos en la 'T'
+  const [datePart] = dateString.split('T'); // "2025-03-01"
+  if (!datePart) return null;
+
+  // Dividimos por '-' => [2025, 03, 01]
+  const [yyyy, mm, dd] = datePart.split('-').map(Number);
+  // Validamos que sean 3 números válidos
+  if (!yyyy || !mm || !dd) return null;
+
+  // Creamos la fecha en hora local
+  return new Date(yyyy, mm - 1, dd);
+}
+
 const PatientEvolutionTable = ({ patient }: Props) => {
   const { mode } = useThemeContext();
   const navigate = useNavigate();
@@ -46,13 +62,9 @@ const PatientEvolutionTable = ({ patient }: Props) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [openForm, setOpenForm] = useState(false);
-
   const [newEvolutionForm, setNewEvolutionForm] = useState(false);
-
   const [showEvolution, setShowEvolution] = useState<Evolution | undefined>();
-
   const [editEvolution, setEditEvolution] = useState<Evolution>();
-
   const [dataUpdated, setDataUpdated] = useState(false);
 
   const { data: evolutions, isLoading } = useQuery({
@@ -70,10 +82,9 @@ const PatientEvolutionTable = ({ patient }: Props) => {
       const updatedEvolution = evolutions.find(
         (e: Evolution) => e._id === showEvolution._id
       );
-
       setShowEvolution(updatedEvolution);
     }
-  }, [dataUpdated, evolutions]);
+  }, [dataUpdated, evolutions, showEvolution]);
 
   return (
     <>
@@ -105,21 +116,22 @@ const PatientEvolutionTable = ({ patient }: Props) => {
                         {h.label}
                       </TableCell>
                     ))}
-                    <TableCell></TableCell>
+                    <TableCell />
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {evolutions
-                    ?.slice(
-                      page * rowsPerPage,
-                      page * rowsPerPage + rowsPerPage
-                    )
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((evolution: Evolution) => {
+                      // Usamos parseDateAsLocal para evitar el RangeError
+                      const localDate = parseDateAsLocal(evolution.fecha);
+                      const displayDate = localDate
+                        ? format(localDate, 'dd/MM/yyyy')
+                        : '—'; // en caso de fecha inválida o sin fecha
+                      
                       return (
                         <TableRow key={evolution._id}>
-                          <TableCell>
-                            {format(new Date(evolution.fecha), 'yyyy/MM/dd')}
-                          </TableCell>
+                          <TableCell>{displayDate}</TableCell>
                           <TableCell>
                             {(evolution.profesional as Professional).nombre1}{' '}
                             {(evolution.profesional as Professional).apellPat}
@@ -160,6 +172,7 @@ const PatientEvolutionTable = ({ patient }: Props) => {
             </TableContainer>
           )}
         </Grid>
+
         <Grid
           item
           xs={6}
@@ -168,6 +181,8 @@ const PatientEvolutionTable = ({ patient }: Props) => {
           <EvolutionVisualizer evolution={showEvolution} />
         </Grid>
       </Grid>
+
+      {/* Form para Editar Evolución */}
       <EvolutionForm
         open={openForm}
         onClose={() => {
@@ -177,6 +192,8 @@ const PatientEvolutionTable = ({ patient }: Props) => {
         evolution={editEvolution}
         afterSubmit={() => setDataUpdated(!dataUpdated)}
       />
+
+      {/* Form para Nueva Evolución */}
       <EvolutionForm
         open={newEvolutionForm}
         onClose={() => setNewEvolutionForm(false)}

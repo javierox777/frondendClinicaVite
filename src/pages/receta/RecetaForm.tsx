@@ -36,7 +36,8 @@ import { ShortModel } from '../../interfaces/ShortModel';
 import { User } from '../../interfaces/User';
 import colors from '../../styles/colors';
 import { Receipt } from '../../interfaces/Receipt';
-import { format } from 'date-fns';
+// <-- AQUI
+import { format, parse } from 'date-fns'; // Importar parse de date-fns
 
 interface FormData {
   estado: string;
@@ -113,21 +114,19 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
     },
   ]);
 
+  // Queries
   const { data: persons, isLoading: personsLoading } = useQuery({
     queryKey: ['persons'],
     queryFn: async () => {
       const response = await axios.get(`${generalConfig.baseUrl}/persons`);
-
       return response.data.body;
     },
   });
+
   const { data: professionals, isLoading: professionalsLoading } = useQuery({
     queryKey: ['professionals'],
     queryFn: async () => {
-      const response = await axios.get(
-        `${generalConfig.baseUrl}/professionals`
-      );
-
+      const response = await axios.get(`${generalConfig.baseUrl}/professionals`);
       return response.data.body;
     },
   });
@@ -136,7 +135,6 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
     queryKey: ['companies'],
     queryFn: async () => {
       const response = await axios.get(`${generalConfig.baseUrl}/companies`);
-
       return response.data.body;
     },
   });
@@ -148,7 +146,6 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
         const response = await axios.get(
           `${generalConfig.baseUrl}/address-book/getaddresses/${formData.persona}`
         );
-
         return response.data.body;
       } else {
         return null;
@@ -160,22 +157,24 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
     queryKey: ['statuses'],
     queryFn: async () => {
       const response = await axios.get(`${generalConfig.baseUrl}/statuses`);
-
       return response.data.body;
     },
   });
 
+  // Este Query obtiene y setea los detalles de la receta (en caso de edicion)
   const { data: receiptDetails, isLoading: receiptDetailsLoading } = useQuery({
     queryKey: ['details', receipt],
     queryFn: async () => {
+      if (!receipt) return;
       const response = await axios.get(
-        `${generalConfig.baseUrl}/receipt-details/getreceiptdetails/${receipt!._id}`
+        `${generalConfig.baseUrl}/receipt-details/getreceiptdetails/${receipt._id}`
       );
       setDetails(response.data.body);
       return response.data.body;
     },
-  }); //NO BORRAR, SI BIEN NO ESTAN SIENDO USADOS Y LEIDOS, ESTA FUNCION TIENE UNA TAREA DE FETCHEAR LOS DETALLES A LA BASE DE DATOS DE LA RECETA
+  });
 
+  // Manejo de cambios en la lista de detalles
   const handleDetailChange = (
     e: ChangeEvent<HTMLInputElement> | SelectChangeEvent<string>,
     field: 'objeto' | 'dias' | 'intervalo' | 'fraccion',
@@ -185,7 +184,7 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
     const inputValue = e.target.value;
 
     if (field === 'dias') {
-      // Convert the input value to a number
+      // Convertir el valor a número
       const newValue =
         inputValue === '0' || (!isNaN(Number(inputValue)) && inputValue !== '')
           ? Number(inputValue)
@@ -194,7 +193,7 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
       updatedDetails[index][field] = newValue;
       setDetails(updatedDetails);
     } else {
-      updatedDetails[index][field] = e.target.value;
+      updatedDetails[index][field] = inputValue;
       setDetails(updatedDetails);
     }
   };
@@ -204,12 +203,15 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
     try {
       setSubmitting(true);
 
+      // <-- AQUI: en vez de usar new Date(formData.fechaRegistro), parseamos
+      const parsedDate = parse(formData.fechaRegistro, 'yyyy-MM-dd', new Date());
+
       if (receipt) {
         const newData = {
           estado: formData.estado,
           profesional: (user as User).profesionalId,
           empresa: formData.empresa,
-          fechaRegistro: new Date(formData.fechaRegistro),
+          fechaRegistro: parsedDate, // <-- Aquí va la fecha parseada
           direccion: formData.direccion,
           persona: formData.persona,
           detalles: details,
@@ -221,18 +223,20 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
         if (response.data.message === 'success') {
           toast.success('Receta actualizada');
           setSubmitting(false);
+          if (onSuccess) {
+            onSuccess();
+          }
         }
       } else {
         const newData = {
           estado: formData.estado,
           profesional: (user as User).profesionalId,
           empresa: formData.empresa,
-          fechaRegistro: new Date(formData.fechaRegistro),
+          fechaRegistro: parsedDate, // <-- Aquí va la fecha parseada
           direccion: formData.direccion,
           persona: formData.persona,
           detalles: details,
         };
-
         const response = await axios.post(
           `${generalConfig.baseUrl}/receipt`,
           newData
@@ -258,9 +262,9 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
               _id: (Math.random() * 1000).toString(),
             },
           ]);
-        }
-        if (onSuccess) {
-          onSuccess();
+          if (onSuccess) {
+            onSuccess();
+          }
         }
       }
     } catch (error) {
@@ -270,12 +274,14 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
     }
   };
 
+  // Seteo inicial en modo edición
   useEffect(() => {
     if (receipt) {
       setFormData({
         estado: receipt.estado as string,
         profesional: (receipt.profesional as Professional)._id,
         empresa: (receipt.empresa as Company)._id,
+        // Para mostrar en el input date, usamos format
         fechaRegistro: format(new Date(receipt.fechaRegistro), 'yyyy-MM-dd'),
         direccion: receipt.direccion,
         persona: (receipt.persona as Person)._id,
@@ -332,11 +338,9 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
                     </li>
                   )}
                   getOptionLabel={(patient: Person) => {
-                    // Value selected with enter, right from the input
                     if (typeof patient === 'string') {
                       return patient;
                     }
-                    // Regular patient
                     return `${patient.nombre1} ${patient.apellPat} ${patient.rut}-${patient.dv}`;
                   }}
                   onChange={(event, patient: Person | null) => {
@@ -380,6 +384,7 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
               </Select>
             </FormControl>
           </Grid>
+
           <Grid item xs={12}>
             <AppBar position="static">
               <Toolbar
@@ -395,6 +400,7 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
               </Toolbar>
             </AppBar>
           </Grid>
+
           <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
             {professionals && (
               <FormControl fullWidth>
@@ -405,12 +411,6 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
                   label="professional"
                   id="professional-select"
                   labelId="professional-select-label"
-                  onChange={(e: SelectChangeEvent<string>) =>
-                    setFormData((prevState) => ({
-                      ...prevState,
-                      direccion: e.target.value,
-                    }))
-                  }
                   value={(user as User).profesionalId}
                   disabled
                 >
@@ -428,6 +428,7 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
               </FormControl>
             )}
           </Grid>
+
           <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
             {companies && (
               <FormControl fullWidth>
@@ -446,11 +447,9 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
                     </li>
                   )}
                   getOptionLabel={(clinic: Company) => {
-                    // Value selected with enter, right from the input
                     if (typeof clinic === 'string') {
                       return clinic;
                     }
-                    // Regular clinic
                     return `${clinic.razonSocial}`;
                   }}
                   onChange={(event, clinic: Company | null) => {
@@ -464,6 +463,7 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
               </FormControl>
             )}
           </Grid>
+
           <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
             <FormControl fullWidth>
               <TextField
@@ -482,6 +482,7 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
               />
             </FormControl>
           </Grid>
+
           <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
             <FormControl fullWidth>
               <InputLabel id="status-select-label">Estado</InputLabel>
@@ -508,6 +509,7 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
               </Select>
             </FormControl>
           </Grid>
+
           <Grid item xs={12}>
             <AppBar position="static">
               <Toolbar
@@ -535,17 +537,18 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
                     ]);
                   }}
                 >
-                  {' '}
                   Agregar detalle
                 </Button>
               </Toolbar>
             </AppBar>
           </Grid>
+
           {receiptDetailsLoading && (
             <Grid item xs={12}>
               <LinearProgress />
             </Grid>
           )}
+
           <Grid item xs={12}>
             <TableContainer>
               <Table>
@@ -607,7 +610,6 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
                               : 'white',
                         }}
                       >
-                        {' '}
                         Días
                       </Typography>
                     </TableCell>
@@ -615,86 +617,83 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {details.map((d, index) => {
-                    return (
-                      <TableRow key={d._id}>
-                        <TableCell>
-                          <FormControl fullWidth>
-                            <TextField
-                              value={d.objeto}
-                              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                                handleDetailChange(e, 'objeto', index);
-                              }}
-                              required
-                            />
-                          </FormControl>
-                        </TableCell>
-                        <TableCell>
-                          <FormControl fullWidth>
-                            <InputLabel id="fraction-select-label">
-                              Cada cuantas horas
-                            </InputLabel>
-                            <Select
-                              required
-                              label="fraction"
-                              id="fraction-select"
-                              labelId="fraction-select-label"
-                              onChange={(e: SelectChangeEvent<string>) => {
-                                handleDetailChange(e, 'intervalo', index);
-                              }}
-                              value={d.intervalo}
-                            >
-                              {fraction.map((f) => {
-                                return (
-                                  <MenuItem key={f.id} value={f.value}>
-                                    {f.label}
-                                  </MenuItem>
-                                );
-                              })}
-                            </Select>
-                          </FormControl>
-                        </TableCell>
-                        <TableCell>
-                          <FormControl fullWidth>
-                            <TextField
-                              required
-                              value={d.fraccion}
-                              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                                handleDetailChange(e, 'fraccion', index);
-                              }}
-                            />
-                          </FormControl>
-                        </TableCell>
-                        <TableCell>
-                          <FormControl fullWidth>
-                            <TextField
-                              required
-                              value={d.dias}
-                              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                                handleDetailChange(e, 'dias', index);
-                              }}
-                            />
-                          </FormControl>
-                        </TableCell>
-                        <TableCell>
-                          <IconButton
-                            onClick={() => {
-                              const updatedDetails = details.filter(
-                                (dt) => dt._id !== d._id
-                              );
-                              setDetails(updatedDetails);
+                  {details.map((d, index) => (
+                    <TableRow key={d._id}>
+                      <TableCell>
+                        <FormControl fullWidth>
+                          <TextField
+                            value={d.objeto}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                              handleDetailChange(e, 'objeto', index);
                             }}
+                            required
+                          />
+                        </FormControl>
+                      </TableCell>
+                      <TableCell>
+                        <FormControl fullWidth>
+                          <InputLabel id="fraction-select-label">
+                            Cada cuántas horas
+                          </InputLabel>
+                          <Select
+                            required
+                            label="fraction"
+                            id="fraction-select"
+                            labelId="fraction-select-label"
+                            onChange={(e: SelectChangeEvent<string>) => {
+                              handleDetailChange(e, 'intervalo', index);
+                            }}
+                            value={d.intervalo}
                           >
-                            <Delete />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
+                            {fraction.map((f) => (
+                              <MenuItem key={f.id} value={f.value}>
+                                {f.label}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </TableCell>
+                      <TableCell>
+                        <FormControl fullWidth>
+                          <TextField
+                            required
+                            value={d.fraccion}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                              handleDetailChange(e, 'fraccion', index);
+                            }}
+                          />
+                        </FormControl>
+                      </TableCell>
+                      <TableCell>
+                        <FormControl fullWidth>
+                          <TextField
+                            required
+                            value={d.dias}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                              handleDetailChange(e, 'dias', index);
+                            }}
+                          />
+                        </FormControl>
+                      </TableCell>
+                      <TableCell>
+                        <IconButton
+                          onClick={() => {
+                            const updatedDetails = details.filter(
+                              (dt) => dt._id !== d._id
+                            );
+                            setDetails(updatedDetails);
+                          }}
+                        >
+                          <Delete />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </TableContainer>
           </Grid>
+
           <Grid item xs={12}>
             <Button
               variant="contained"
@@ -702,8 +701,7 @@ const RecetaForm = ({ onSuccess, receipt }: Props) => {
               type="submit"
               disabled={isSubmitting}
             >
-              {!receipt && 'Crear receta'}
-              {receipt && 'Editar receta'}
+              {!receipt ? 'Crear receta' : 'Editar receta'}
             </Button>
           </Grid>
         </Grid>

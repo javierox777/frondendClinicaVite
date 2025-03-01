@@ -19,7 +19,6 @@ const BudgetPDF = () => {
       const response = await axios.get(
         `${generalConfig.baseUrl}/contact-book/getcontacts/${budget.persona._id}`
       );
-
       return response.data.body;
     },
   });
@@ -30,7 +29,6 @@ const BudgetPDF = () => {
       const response = await axios.get(
         `${generalConfig.baseUrl}/address-book/getaddresses/${budget.persona._id}`
       );
-
       return response.data.body;
     },
   });
@@ -41,13 +39,11 @@ const BudgetPDF = () => {
       const response = await axios.get(
         `${generalConfig.baseUrl}/budget-details/getdetails/${budget._id}`
       );
-
       return response.data.body;
     },
   });
 
   const validContacts = contacts?.filter((c: any) => c.vigente === '1');
-
   const validAddresses = addresses?.filter((a: any) => a.vigente === '1');
 
   const generatePdf = () => {
@@ -68,7 +64,7 @@ const BudgetPDF = () => {
         },
       });
     } else {
-      console.error('Element with id "pdf" not found.');
+      console.error('Elemento con id "pdf" no encontrado.');
     }
   };
 
@@ -80,138 +76,184 @@ const BudgetPDF = () => {
           Exportar PDF
         </Button>
       </div>
+
       <div
         id="pdf"
-        className="flex-col justify-evenly bg-white p-10 border  border-slate-400 rounded-md text-slate-800 h-screen"
+        className="bg-white text-gray-800 border border-gray-400 rounded-md p-6"
       >
-        {/* cabecera   */}
-        <div className="grid grid-cols-3 mb-4 ">
-          <div className="flex flex-col">
-            <div className="font-bold">Fecha de registro</div>
-            <div>{new Date(budget.fechaRegistro).toLocaleDateString()}</div>
-          </div>
-          <div className="flex flex-col">
-            <div className="font-bold">Tipo presupuesto</div>
-            <div>{budget.presupuestoTipo.nombre}</div>
-          </div>
-          <div className="flex flex-col">
-            <div className="font-bold">Clínica</div>
-            <div>{budget.empresa.razonSocial}</div>
-          </div>
-        </div>
-        {/* cabecera   */}
-        {/* datos de paciente */}
-        <div>
-          <div className="flex flex-col mb-5 py-5  border-b-2 border-slate-300">
-            <div className="text-xl font-extralight">DATOS DEL PACIENTE</div>
-          </div>
-        </div>
-        <div className="grid grid-cols-2">
-          <div className="flex flex-col my-1">
-            <div className="font-bold">Nombre</div>
-            <div>
-              {budget.persona.nombre1} {budget.persona.nombre2}{' '}
-              {budget.persona.apellPat} {budget.persona.apellMat}
-            </div>
-          </div>
-          <div className="flex flex-col my-1">
-            <div className="font-bold">RUT</div>
-            <div>
-              {budget.persona.rut}-{budget.persona.dv}
-            </div>
-          </div>
-          <div className="flex flex-col my-1">
-            <div className="font-bold">Fecha De nacimiento</div>
-            <div>{new Date(budget.persona.fechaNac).toLocaleDateString()}</div>
-          </div>
-          <div className="flex flex-col my-1">
-            <div className="font-bold">Previsión</div>
-            <div>
-              {budget.persona.institucion.prevision.nombre}{' '}
-              {budget.persona.institucion.nombre}
-            </div>
-          </div>
-          <div className="flex flex-col my-1">
-            <div className="font-bold">Contacto</div>
-            {validContacts?.map((c: Contact) => {
-              return (
-                <div key={c._id} className="flex-col my-1">
-                  <div className="font-extralight">{c.contacto.nombre}</div>
-                  <div>{c.descripcion}</div>
-                </div>
-              );
-            })}
-          </div>
-          <div className="flex flex-col my-1">
-            <div className="font-bold">Direccion(es)</div>
-            {validAddresses?.map((a: Address) => {
-              return (
-                <div key={a._id} className="flex-col my-1">
-                  <div className="font-extralight">
-                    {a.tipoDireccion.nombre}
-                  </div>
-                  <div>{a.nombre}</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-        {/* datos de paciente */}
-        {/* detalles del presupuesto */}
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <div>
-          <div className="flex flex-col mb-5">
-            <div className="text-xl font-extralight py-5 border-b-2 border-slate-300">
-              DETALLES PRESUPUESTO
-            </div>
-          </div>
-        </div>
-        <br />
-        <br />
-        <br />
-        <div className="content-center">
-          <table className="w-full">
-            <thead>
-              <tr className="font-bold bg-slate-700">
-                <td className="p-2 text-slate-100">DIENTE</td>
-                <td className="p-2 text-slate-100">PRESTACIÓN/TRATAMIENTO</td>
-                <td className="p-2 text-slate-100">VALOR</td>
-              </tr>
-            </thead>
-            <tbody>
-              {details?.map((d: BudgetDetail) => {
-                return (
-                  <tr key={d._id}>
-                    <td className="p-2">{d.objeto.nombre}</td>
-                    <td className="p-2">{d.prestacion.nombre}</td>
-                    <td className="p-2">{d.valor}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-            <tfoot>
-              <tr>
-                <td className="font-bold text-xl">TOTAL A PAGAR</td>
-                <td></td>
-                <td className="font-bold text-xl">
-                  {details?.reduce((acc: number, d: BudgetDetail) => {
-                    return d.valor + acc;
-                  }, 0)}
-                </td>
-              </tr>
-            </tfoot>
-          </table>
-          <br />
-          <br />
-          <br />
-          <br />
-        </div>
+        {/* ========================================
+            1) CABECERA DEL PRESUPUESTO (Tabla)
+        ========================================= */}
+        <h2 className="text-lg font-semibold mb-3">CABECERA DEL PRESUPUESTO</h2>
+        <table className="w-full border border-gray-300 text-sm mb-6">
+          <thead>
+            <tr className="bg-gray-800 text-white">
+              <th className="py-2 px-3 font-semibold border border-gray-300">
+                Fecha de registro
+              </th>
+              <th className="py-2 px-3 font-semibold border border-gray-300">
+                Tipo presupuesto
+              </th>
+              <th className="py-2 px-3 font-semibold border border-gray-300">
+                Clínica
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="text-center">
+              <td className="py-2 px-3 border border-gray-300">
+                {new Date(budget.fechaRegistro).toLocaleDateString()}
+              </td>
+              <td className="py-2 px-3 border border-gray-300">
+                {budget.presupuestoTipo?.nombre}
+              </td>
+              <td className="py-2 px-3 border border-gray-300">
+                {budget.empresa?.razonSocial}
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-        {/* detalles del presupuesto */}
+        {/* ========================================
+            2) DATOS DEL PACIENTE (Tabla)
+        ========================================= */}
+        <h2 className="text-lg font-semibold mb-3">DATOS DEL PACIENTE</h2>
+        <table className="w-full border border-gray-300 text-sm mb-6">
+          <thead>
+            <tr className="bg-gray-800 text-white">
+              <th className="py-2 px-3 font-semibold border border-gray-300">
+                .
+              </th>
+              <th className="py-2 px-3 font-semibold border border-gray-300">
+                
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {/* Nombre */}
+            <tr>
+              <td className="py-2 px-3 border border-gray-300 font-bold">
+                Nombre
+              </td>
+              <td className="py-2 px-3 border border-gray-300">
+                {budget.persona.nombre1} {budget.persona.nombre2}{' '}
+                {budget.persona.apellPat} {budget.persona.apellMat}
+              </td>
+            </tr>
+            {/* RUT */}
+            <tr>
+              <td className="py-2 px-3 border border-gray-300 font-bold">
+                RUT
+              </td>
+              <td className="py-2 px-3 border border-gray-300">
+                {budget.persona.rut}-{budget.persona.dv}
+              </td>
+            </tr>
+            {/* Fecha de nacimiento */}
+            <tr>
+              <td className="py-2 px-3 border border-gray-300 font-bold">
+                Fecha de nacimiento
+              </td>
+              <td className="py-2 px-3 border border-gray-300">
+                {new Date(budget.persona.fechaNac).toLocaleDateString()}
+              </td>
+            </tr>
+            {/* Previsión */}
+            <tr>
+              <td className="py-2 px-3 border border-gray-300 font-bold">
+                Previsión
+              </td>
+              <td className="py-2 px-3 border border-gray-300">
+                {budget.persona.institucion.prevision?.nombre}{' '}
+                {budget.persona.institucion?.nombre}
+              </td>
+            </tr>
+            {/* Contacto(s) */}
+            <tr>
+              <td className="py-2 px-3 border border-gray-300 font-bold">
+                Contacto(s)
+              </td>
+              <td className="py-2 px-3 border border-gray-300">
+                {validContacts?.length ? (
+                  validContacts.map((c: Contact) => (
+                    <div key={c._id} className="mb-1">
+                      <span className="italic">{c.contacto?.nombre}:</span>{' '}
+                      {c.descripcion}
+                    </div>
+                  ))
+                ) : (
+                  <span>No hay contactos registrados</span>
+                )}
+              </td>
+            </tr>
+            {/* Dirección(es) */}
+            <tr>
+              <td className="py-2 px-3 border border-gray-300 font-bold">
+                Dirección(es)
+              </td>
+              <td className="py-2 px-3 border border-gray-300">
+                {validAddresses?.length ? (
+                  validAddresses.map((a: Address) => (
+                    <div key={a._id} className="mb-1">
+                      <span className="italic">
+                        {a.tipoDireccion?.nombre}:
+                      </span>{' '}
+                      {a.nombre}
+                    </div>
+                  ))
+                ) : (
+                  <span>No hay direcciones registradas</span>
+                )}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        {/* ========================================
+            3) DETALLES DEL PRESUPUESTO (Tabla)
+        ========================================= */}
+        <h2 className="text-lg font-semibold mb-3">DETALLES DEL PRESUPUESTO</h2>
+        <table className="w-full border border-gray-300 text-sm">
+          <thead>
+            <tr className="bg-gray-800 text-white">
+              <th className="py-2 px-3 font-semibold border border-gray-300">
+                DIENTE
+              </th>
+              <th className="py-2 px-3 font-semibold border border-gray-300">
+                PRESTACIÓN / TRATAMIENTO
+              </th>
+              <th className="py-2 px-3 font-semibold border border-gray-300">
+                VALOR
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {details?.map((d: BudgetDetail) => (
+              <tr key={d._id} className="text-center">
+                <td className="py-2 px-3 border border-gray-300">
+                  {d.objeto.nombre}
+                </td>
+                <td className="py-2 px-3 border border-gray-300">
+                  {d.prestacion.nombre}
+                </td>
+                <td className="py-2 px-3 border border-gray-300">{d.valor}</td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr className="bg-gray-100 font-bold">
+              <td className="py-2 px-3 border border-gray-300">
+                TOTAL A PAGAR
+              </td>
+              <td className="py-2 px-3 border border-gray-300"></td>
+              <td className="py-2 px-3 border border-gray-300 text-center">
+                {details?.reduce((acc: number, d: BudgetDetail) => {
+                  return d.valor + acc;
+                }, 0)}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
       </div>
     </>
   );

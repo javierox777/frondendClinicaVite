@@ -72,19 +72,27 @@ const PatientsTable = ({ refetch }: { refetch?: boolean }) => {
       const secondaryColor: [number, number, number] = [220, 220, 220];
       const textColor: [number, number, number] = [40, 40, 40];
 
+      // Simulación de logo base64 (ruta de ejemplo)
       const logoBase64 = '/public/logo.png';
       doc.addImage(logoBase64, 'PNG', 10, 10, 20, 20);
 
-      // Encabezado con título y fecha
+      // Encabezado con título
       doc.setFontSize(16);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...primaryColor);
       doc.text('Formulario del Paciente', 70, 25);
 
+      // Fecha de generación con formato DD/MM/YYYY
       doc.setFontSize(10);
       doc.setFont('helvetica', 'italic');
       doc.setTextColor(...textColor);
-      const today = new Date().toLocaleDateString();
+
+      const currentDate = new Date();
+      const day = String(currentDate.getDate()).padStart(2, '0');
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const year = currentDate.getFullYear();
+      const today = `${day}/${month}/${year}`;
+
       doc.text(`Fecha de generación: ${today}`, 70, 35);
 
       // Línea decorativa
@@ -106,17 +114,21 @@ const PatientsTable = ({ refetch }: { refetch?: boolean }) => {
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(...textColor);
+
+      // Formatear la fecha de nacimiento a DD/MM/YYYY
+      const birthDate = new Date(detailedPatient.fechaNac);
+      const bDay = String(birthDate.getDate()).padStart(2, '0');
+      const bMonth = String(birthDate.getMonth() + 1).padStart(2, '0');
+      const bYear = birthDate.getFullYear();
+      const formattedBirthDate = `${bDay}/${bMonth}/${bYear}`;
+
       doc.text(
         `Nombre Completo: ${detailedPatient.nombre1} ${detailedPatient.nombre2 || ''} ${detailedPatient.apellPat} ${detailedPatient.apellMat}`,
         12,
         70
       );
       doc.text(`RUT: ${detailedPatient.rut}-${detailedPatient.dv}`, 12, 78);
-      doc.text(
-        `Fecha de Nacimiento: ${new Date(detailedPatient.fechaNac).toLocaleDateString()}`,
-        12,
-        86
-      );
+      doc.text(`Fecha de Nacimiento: ${formattedBirthDate}`, 12, 86);
       doc.text(`Nacionalidad: ${detailedPatient.nacionalidad.nombre}`, 12, 94);
 
       // Información Médica

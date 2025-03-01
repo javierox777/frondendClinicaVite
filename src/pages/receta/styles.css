@@ -31,7 +31,7 @@ body {
 /* styles.css */
 
 .table-row {
-  transition: transform 0.3s ease, background-color 0.3s ease;
+  /* transition: transform 0.3s ease, background-color 0.3s ease; */
 }
 
 .table-row:hover {
@@ -55,7 +55,7 @@ body {
   border-radius: 10px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   background-color: #fff;
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  /* transition: transform 0.3s ease, opacity 0.3s ease; */
 }
 
 .modal-content p {
@@ -81,7 +81,7 @@ body {
 }
 
 .table-row {
-  transition: transform 0.3s ease, background-color 0.3s ease;
+  /* transition: transform 0.3s ease, background-color 0.3s ease; */
 }
 
 .table-row:hover {

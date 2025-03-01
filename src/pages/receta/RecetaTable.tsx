@@ -89,9 +89,9 @@ const Receta: React.FC = () => {
   });
 
   const [createAnimation, createAnimationApi] = useSpring(() => ({
-    from: { opacity: 0, transform: 'scale(0.5) translateY(-100%)' },
-    to: { opacity: 1, transform: 'scale(1) translateY(0)' },
-    config: { tension: 280, friction: 60 },
+    // from: { opacity: 0, transform: 'scale(0.5) translateY(-100%)' },
+    // to: { opacity: 1, transform: 'scale(1) translateY(0)' },
+    // config: { tension: 280, friction: 60 },
   }));
 
   const [editAnimation, editAnimationApi] = useSpring(() => ({
