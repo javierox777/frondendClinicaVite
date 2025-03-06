@@ -5,4 +5,5 @@ export interface Agreement {
     _id?:string
     persona: string | Person
     prestacionTipo:string | ServiceType   
+    new?:boolean
 }

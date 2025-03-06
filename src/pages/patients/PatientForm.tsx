@@ -1,4 +1,4 @@
-import { AddCircleOutline, Close, Delete } from '@mui/icons-material';
+import { AddCircleOutline, Close, Delete, Remove } from '@mui/icons-material';
 import {
   AppBar,
   Box,
@@ -6,6 +6,8 @@ import {
   Card,
   Container,
   Dialog,
+  DialogActions,
+  DialogTitle,
   FormControl,
   Grid,
   IconButton,
@@ -30,7 +32,7 @@ import { Person } from '../../interfaces/Person';
 import colors from '../../styles/colors';
 import { useThemeContext } from '../../componemts/themeContext';
 
-import { format } from 'date-fns';
+import { format, set } from 'date-fns';
 import Subform from './subForms/Subform';
 import { ShortModel } from '../../interfaces/ShortModel';
 import { Institution } from '../../interfaces/Institution';
@@ -71,6 +73,10 @@ const badHabits = [
 const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
   const { mode } = useThemeContext();
   const [value, setValue] = useState(0);
+
+  const [openDisableAgreement, setDisableAgreement] = useState(false);
+  const [isDisabling, setDisabling] = useState(false);
+  const [agreementToDisable, setAgreementToDisable] = useState('');
 
   const [firstName, setFirstName] = useState('');
   const [secondName, setSecondName] = useState('');
@@ -126,6 +132,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
       _id: (Math.random() * 1000).toString(),
       prestacionTipo: '',
       persona: '',
+      new: true,
     },
   ]);
 
@@ -249,6 +256,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
         _id: (Math.random() * 1000).toString(), // Genera un ID único
         prestacionTipo: '', // Inicializa sin convenio seleccionado
         persona: '',
+        new: true,
       },
     ]);
   };
@@ -492,7 +500,27 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
     validateRut();
   }, [rut]);
 
-  console.log(agreements);
+  const handleDisableAgreement = async (id: string) => {
+    setDisabling(true);
+    try {
+      const response = await axios.patch(
+        `${generalConfig.baseUrl}/agreements/${id}`,
+        {
+          vigente: '2',
+        }
+      );
+      if (response.data.message === 'success') {
+        toast.success('Convenio deshabilitado');
+      }
+      getPatientAgreements(patient!._id);
+      setDisabling(false);
+      setDisableAgreement(false);
+    } catch (error) {
+      setDisabling(false);
+      setDisableAgreement(false);
+      return toast.error('Error al deshabilitar convenio');
+    }
+  };
 
   return (
     <>
@@ -767,6 +795,7 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                         formData?.serviceTypes.find(
                           (st: any) => st._id === a.prestacionTipo
                         )?.nombre || 'Selecciona un convenio',
+                      new: a.new ? true : false,
                     }))}
                     columns={[
                       { field: 'id', headerName: 'ID', width: 100 },
@@ -812,19 +841,37 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
                         field: 'actions',
                         headerName: 'Acciones',
                         width: 150,
-                        renderCell: (params) => (
-                          <IconButton
-                            onClick={() =>
-                              setAgreements(
-                                agreements.filter(
-                                  (a) => a._id !== params.row._id
-                                )
-                              )
-                            }
-                          >
-                            <Delete />
-                          </IconButton>
-                        ),
+                        renderCell: (params) => {
+                          return (
+                            <>
+                              {!params.row.new && (
+                                <Button
+                                  color="error"
+                                  variant="contained"
+                                  onClick={() => {
+                                    setAgreementToDisable(params.row._id!);
+                                    setDisableAgreement(true);
+                                  }}
+                                >
+                                  Deshabilitar
+                                </Button>
+                              )}
+                              {params.row.new && (
+                                <IconButton
+                                  onClick={() =>
+                                    setAgreements(
+                                      agreements.filter(
+                                        (a) => a._id !== params.row._id
+                                      )
+                                    )
+                                  }
+                                >
+                                  <Remove />
+                                </IconButton>
+                              )}
+                            </>
+                          );
+                        },
                       },
                     ]}
                     // initialState={{
@@ -1164,6 +1211,27 @@ const PatientForm = ({ open, onClose, patient, afterSubmit }: Props) => {
         </form>
       </Dialog>
       <Toaster />
+      <Dialog open={openDisableAgreement}>
+        <DialogTitle>¿Estás seguro de deshabilitar este convenio?</DialogTitle>
+        <DialogActions>
+          <Button
+            onClick={() => setDisableAgreement(false)}
+            color="inherit"
+            variant="contained"
+            disabled={isDisabling}
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={() => handleDisableAgreement(agreementToDisable)}
+            color="error"
+            variant="contained"
+            disabled={isDisabling}
+          >
+            Deshabilitar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
