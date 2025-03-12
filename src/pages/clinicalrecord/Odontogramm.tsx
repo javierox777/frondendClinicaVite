@@ -170,8 +170,8 @@ const items = [
   { title: 'Aparato Ortodontico Fijo', id: 1, color: '#AB9ECD' },
   { title: 'Aparato Ortodontico Removible', id: 2, color: '#FF5241' },
   { title: 'Caries', id: 3, color: '#FF0000' },
-  { title: 'Corona Definitiva', id: 4, color: 'rgb(255, 207, 54)' },
-  { title: 'Corona Provisoria', id: 5, color: 'rgb(255	151	41)' },
+  { title: 'Corona Definitiva', id: 4, color: '#ffd036' },
+  { title: 'Corona Provisoria', id: 5, color: '#ff9829' },
   { title: 'Desgaste Oclusal/Incisal', id: 6, color: '#808080' },
   { title: 'Diastema', id: 7, color: '#00CED1' },
   { title: 'Diente Ausente', id: 8, color: '#000000' },
@@ -199,7 +199,7 @@ const items = [
   { title: 'Tratamiento Pulpar', id: 31, color: '#FF6347' },
   { title: 'Giroversión', id: 32, color: '#B0E0E6' },
   { title: 'Transposición', id: 33, color: '#20B2AA' },
-  { title: 'Diente incluido', id: 34, color: 'rgb(177 ,	23,	32)' },
+  { title: 'Diente incluido', id: 34, color: '#b11721' },
 ];
 
 interface Props {
@@ -811,7 +811,7 @@ const Odontogramm = ({ odontogram }: Props) => {
       currentY += cellHeight1 * 2;
 
       // Dibujar tabla de EVOLUCIÓN
-      const headers = ['FECHA', 'DIENTE', 'EVOLUCIÓN'];
+      const headers = ['FECHA', 'DIENTE', 'TRATAMIENTO/CONDICIÓN'];
       const columnWidths = [40, 30, 120];
 
       // Agregar encabezado
