@@ -28,6 +28,7 @@ import { useThemeContext } from '../../componemts/themeContext';
 import { Budget } from '../../interfaces/Budget';
 import colors from '../../styles/colors';
 import { formatRut } from '../../helpers/formatRut';
+import { format } from 'date-fns';
 
 interface Props {
   budgets: Budget[];
@@ -93,7 +94,6 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
       name.includes(searchText.toLowerCase())
     );
   });
-
 
   if (isLoading) {
     return (
@@ -200,7 +200,7 @@ const BudgetVisualizer = ({ budgets, isLoading }: Props) => {
                           {b.persona.dv}
                         </TableCell>
                         <TableCell>
-                          {new Date(b.fechaRegistro).toLocaleDateString()}
+                          {format(new Date(b.fechaRegistro), 'dd/MM/yyyy')}
                         </TableCell>
                         <TableCell>
                           {b.profesionalValida ? (

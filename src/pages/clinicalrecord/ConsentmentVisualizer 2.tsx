@@ -19,6 +19,7 @@ import { Person } from '../../interfaces/Person';
 import { Professional } from '../../interfaces/Professional';
 import colors from '../../styles/colors';
 import { ConsentmentResponse } from './ConsentmentsTab';
+import { format } from 'date-fns';
 
 interface Props {
   consentment: ConsentmentResponse | undefined;
@@ -77,9 +78,10 @@ const ConsentmentVisualizer = ({ consentment }: Props) => {
       <Grid item xs={6}>
         <Typography variant="body1">
           En atención comenzada el día{' '}
-          {new Date(
-            consentment.consentimiento.fechaRegistro
-          ).toLocaleDateString()}
+          {format(
+            new Date(consentment.consentimiento.fechaRegistro),
+            'dd/MM/yyyy'
+          )}
         </Typography>
       </Grid>
       <Grid item xs={6}>

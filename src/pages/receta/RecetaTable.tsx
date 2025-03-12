@@ -38,6 +38,7 @@ import { useQuery } from '@tanstack/react-query';
 import { generalConfig } from '../../config';
 import { Toaster } from 'react-hot-toast';
 import { formatRut } from '../../helpers/formatRut';
+import { format } from 'date-fns';
 
 const AnimatedDialog = animated(Dialog);
 const AnimatedDialogContent = animated(DialogContent);
@@ -294,7 +295,7 @@ const Receta: React.FC = () => {
                   style={{ textTransform: 'capitalize' }}
                 >{`${(row.persona as Person).nombre1} ${(row.persona as Person).nombre2} ${(row.persona as Person).apellPat} ${(row.persona as Person).apellMat}`}</TableCell>
                 <TableCell>
-                  {new Date(row.fechaRegistro).toLocaleDateString()}
+                  {format(new Date(row.fechaRegistro), 'dd/MM/yyyy')}
                 </TableCell>
                 <TableCell>
                   <Box display="flex" flexDirection="row">

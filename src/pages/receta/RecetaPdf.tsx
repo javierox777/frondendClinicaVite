@@ -9,6 +9,8 @@ import { generalConfig } from '../../config';
 import { LinearProgress, TableContainer } from '@mui/material';
 import { ReceiptDetail } from '../../interfaces/ReceiptDetail';
 import { Address } from '../../interfaces/Address';
+import { format } from 'date-fns';
+import { formatRut } from '../../helpers/formatRut';
 interface IPersona {
   _id: string;
   apellMat: string;
@@ -123,7 +125,7 @@ const RecetaTemplate = ({ receta }: Props) => {
             }}
           >
             Fecha:{' '}
-            {receta && new Date(receta.fechaRegistro).toLocaleDateString()}
+            {receta && format(new Date(receta.fechaRegistro), 'dd/MM/yyyy')}
           </p>
           <div>
             <br />
@@ -141,6 +143,7 @@ const RecetaTemplate = ({ receta }: Props) => {
                 flexGrow: 1,
                 borderBottom: '1px solid blue',
                 marginLeft: '10px',
+                textTransform: 'capitalize',
               }}
             >
               {receta.persona && (receta.persona as Person).nombre1}{' '}
@@ -192,9 +195,12 @@ const RecetaTemplate = ({ receta }: Props) => {
                 flexGrow: 1,
                 borderBottom: '1px solid blue',
                 marginLeft: '10px',
+                textTransform: 'capitalize',
               }}
             >
-              {(receta.persona as Person).rut}
+              {formatRut((receta.persona as Person).rut)}
+              {'-'}
+              {(receta.persona as Person).dv}
             </span>
           </div>
           <div>
@@ -249,6 +255,7 @@ const RecetaTemplate = ({ receta }: Props) => {
                   borderBottom: '1px solid blue',
                   width: '200px',
                   margin: '0 auto',
+                  textTransform: 'capitalize',
                 }}
               >
                 {receta.profesional &&

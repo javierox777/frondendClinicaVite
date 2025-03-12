@@ -28,6 +28,7 @@ import { Person } from '../../interfaces/Person';
 import colors from '../../styles/colors';
 import ConsentForm from '../consent/ConsentPage';
 import ConsentmentVisualizer from './ConsentmentVisualizer';
+import { format } from 'date-fns';
 
 const tableHeadings = [
   { id: 1, label: 'Fecha' },
@@ -49,8 +50,9 @@ const ConsentmentsTab = ({ patient }: Props) => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [formOpen, setFormOpen] = useState(false);
   const [dataUpdated, setUpdated] = useState(false);
-  const [showConsentment, setConsentment] = useState<ConsentmentResponse | undefined>(undefined);
-
+  const [showConsentment, setConsentment] = useState<
+    ConsentmentResponse | undefined
+  >(undefined);
 
   // Referencia al componente ConsentmentVisualizer
   const visualizerRef = useRef<any>(null);
@@ -71,7 +73,6 @@ const ConsentmentsTab = ({ patient }: Props) => {
       visualizerRef.current?.generatePDF();
     }, 100);
   };
-  
 
   return (
     <>
@@ -123,9 +124,10 @@ const ConsentmentsTab = ({ patient }: Props) => {
                     {consentments?.map((c: ConsentmentResponse) => (
                       <TableRow key={c.consentimiento?._id}>
                         <TableCell>
-                          {new Date(
-                            c.consentimiento?.fechaRegistro
-                          ).toLocaleDateString()}
+                          {format(
+                            new Date(c.consentimiento.fechaRegistro),
+                            `dd/MM/yyyy`
+                          )}
                         </TableCell>
                         <TableCell>
                           {(c.consentimiento?.empresa as Company)?.razonSocial}
@@ -160,8 +162,10 @@ const ConsentmentsTab = ({ patient }: Props) => {
               xs={6}
               className="border border-zinc-200 rounded-lg p-3 pl-20 pr-20 ml-5 pt-0"
             >
-             <ConsentmentVisualizer ref={visualizerRef} consentment={showConsentment} />
-
+              <ConsentmentVisualizer
+                ref={visualizerRef}
+                consentment={showConsentment}
+              />
             </Grid>
           </>
         )}

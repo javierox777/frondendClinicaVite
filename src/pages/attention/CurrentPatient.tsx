@@ -22,6 +22,7 @@ import { generalConfig } from '../../config';
 import { Appointment } from '../../interfaces/Appointment';
 import RecetaForm from '../receta/RecetaForm';
 import { formatRut } from '../../helpers/formatRut';
+import { format } from 'date-fns';
 
 const CurrentPatient = () => {
   const [completed, setCompleted] = useState(false);
@@ -118,7 +119,7 @@ const CurrentPatient = () => {
                   Fecha de nacimiento
                 </Typography>
                 <Typography>
-                  {new Date(appointment.persona.fechaNac).toLocaleDateString()}
+                  {format(new Date(appointment.persona.fechaNac), 'dd/MM/yyyy')}
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
@@ -158,7 +159,7 @@ const CurrentPatient = () => {
                   Fecha de cita
                 </Typography>
                 <Typography>
-                  {new Date(appointment.fecha).toLocaleDateString()}
+                  {format(new Date(appointment.fecha), 'dd/MM/yyyy')}
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>

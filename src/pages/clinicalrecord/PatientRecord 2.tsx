@@ -37,6 +37,7 @@ import ConsentmentsTab from './ConsentmentsTab';
 import { formatRut } from '../../helpers/formatRut';
 import PatientAntecedents from './PatientAntecedents';
 import { Toaster } from 'react-hot-toast';
+import { format } from 'date-fns';
 
 const tableHeadings = [
   { id: 1, label: 'Fecha' },
@@ -337,7 +338,7 @@ const PatientRecord = () => {
                           return (
                             <TableRow key={a._id}>
                               <TableCell>
-                                {new Date(a.fecha).toLocaleDateString()}
+                                {format(new Date(a.fecha), 'dd/MM/yyyy')}
                               </TableCell>
                               <TableCell>
                                 {a.profesional.nombre1} {a.profesional.apellPat}

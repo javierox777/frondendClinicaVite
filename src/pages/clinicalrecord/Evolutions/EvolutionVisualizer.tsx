@@ -169,9 +169,10 @@ const EvolutionVisualizer = ({ evolution }: Props) => {
               style={{ paddingLeft: '10px' }}
             >
               {evolution &&
-                new Date(
-                  (evolution.persona as Person).fechaNac
-                ).toLocaleDateString()}
+                format(
+                  new Date((evolution.persona as Person).fechaNac),
+                  'dd/MM/yyyy'
+                )}
             </Typography>
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
@@ -209,7 +210,7 @@ const EvolutionVisualizer = ({ evolution }: Props) => {
               className="border border-black p-1"
               style={{ paddingLeft: '10px' }}
             >
-              {format(new Date(evolution.fecha), 'yyyy/MM/dd')}
+              {format(new Date(evolution.fecha), 'dd/MM/yyyy')}
             </Typography>
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>

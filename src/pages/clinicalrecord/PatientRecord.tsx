@@ -38,6 +38,7 @@ import { formatRut } from '../../helpers/formatRut';
 import PatientAntecedents from './PatientAntecedents';
 import { Toaster } from 'react-hot-toast';
 import PatientEvolutionTable from './Evolutions/PatientEvolutionTable';
+import { format } from 'date-fns';
 
 const tableHeadings = [
   { id: 1, label: 'Fecha' },
@@ -159,6 +160,7 @@ const PatientRecord = () => {
                     mode === 'light'
                       ? colors.ligthModeSoftText
                       : colors.darkModeSoftText,
+                  textTransform: 'capitalize',
                 }}
               >
                 {patient.nombre1} {patient.nombre2} {patient.apellPat}{' '}
@@ -225,7 +227,7 @@ const PatientRecord = () => {
                 Fecha de nacimiento
               </Typography>
               <Typography>
-                {new Date(patient.fechaNac).toLocaleDateString()}
+                {format(new Date(patient.fechaNac), 'dd/MM/yyyy')}
               </Typography>
             </Grid>
             <Divider orientation="vertical" flexItem />
@@ -339,7 +341,7 @@ const PatientRecord = () => {
                           return (
                             <TableRow key={a._id}>
                               <TableCell>
-                                {new Date(a.fecha).toLocaleDateString()}
+                                {format(new Date(a.fecha), 'dd/MM/yyyy')}
                               </TableCell>
                               <TableCell>
                                 {a.profesional.nombre1} {a.profesional.apellPat}

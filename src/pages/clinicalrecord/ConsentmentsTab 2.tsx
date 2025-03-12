@@ -28,6 +28,7 @@ import { Person } from '../../interfaces/Person';
 import colors from '../../styles/colors';
 import ConsentForm from '../consent/ConsentPage';
 import ConsentmentVisualizer from './ConsentmentVisualizer';
+import { format } from 'date-fns';
 
 const tableHeadings = [
   { id: 1, label: 'Fecha' },
@@ -139,9 +140,10 @@ const ConsentmentsTab = ({ patient }: Props) => {
                     return (
                       <TableRow key={c.consentimiento._id}>
                         <TableCell>
-                          {new Date(
-                            c.consentimiento.fechaRegistro
-                          ).toLocaleDateString()}
+                          {format(
+                            new Date(c.consentimiento.fechaRegistro),
+                            `dd/MM/yyyy`
+                          )}
                         </TableCell>
                         <TableCell>
                           {(c.consentimiento.empresa as Company).razonSocial}

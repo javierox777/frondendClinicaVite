@@ -34,6 +34,7 @@ import { ServiceType } from '../../interfaces/ServiceType';
 import colors from '../../styles/colors';
 import { useEffect, useState } from 'react';
 import { formatRut } from '../../helpers/formatRut';
+import { format } from 'date-fns';
 
 interface Props {
   budget: Budget;
@@ -195,7 +196,7 @@ const BudgetDetails = ({ budget }: Props) => {
                   Fecha de registro
                 </Typography>
                 <Typography>
-                  {new Date(fechaRegistro).toLocaleDateString()}
+                  {format(new Date(fechaRegistro), 'dd/MM/yyyy')}
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
@@ -204,7 +205,7 @@ const BudgetDetails = ({ budget }: Props) => {
                 </Typography>
                 <Typography>
                   {budget.fechaRegistroValida
-                    ? new Date(fechaRegistroValida).toLocaleDateString()
+                    ? format(new Date(fechaRegistroValida), 'dd/MM/yyyy')
                     : 'Validación pendiente'}
                 </Typography>
               </Grid>
@@ -298,7 +299,7 @@ const BudgetDetails = ({ budget }: Props) => {
                   Fecha de nacimiento
                 </Typography>
                 <Typography>
-                  {new Date(persona.fechaNac).toLocaleDateString()}
+                  {format(new Date(persona.fechaNac), 'dd/MM/yyyy')}
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>

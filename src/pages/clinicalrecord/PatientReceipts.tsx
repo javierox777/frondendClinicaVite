@@ -34,6 +34,7 @@ import RecetaForm from '../receta/RecetaForm';
 import { Toaster } from 'react-hot-toast';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { format } from 'date-fns';
 
 interface Props {
   patient: Person;
@@ -159,7 +160,7 @@ const PatientReceipts = ({ patient }: Props) => {
                     return (
                       <TableRow key={r._id}>
                         <TableCell>
-                          {new Date(r.fechaRegistro).toLocaleDateString()}
+                          {format(new Date(r.fechaRegistro), 'dd/MM/yyyy')}
                         </TableCell>
                         <TableCell>
                           {(r.profesional as Professional).nombre1}{' '}

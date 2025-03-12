@@ -29,6 +29,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import ScheduleForm from './ScheduleForm';
 import EditIcon from '@mui/icons-material/Edit';
 import AppointmentsCalendar from '../appointments/AppointmentsCalendar';
+import { format } from 'date-fns';
 
 const tableHeadings = [
   { id: 1, label: 'Fecha Inicio' },
@@ -206,8 +207,12 @@ const ScheduleTable = ({ refetch, refetchFn }: Props) => {
                         .map((s: ProfessionalSchedule) => {
                           return (
                             <TableRow key={s._id}>
-                              <TableCell>{s.fechaInicio}</TableCell>
-                              <TableCell>{s.fechaTermino}</TableCell>
+                              <TableCell>
+                                {format(new Date(s.fechaInicio), 'dd/MM/yyyy')}
+                              </TableCell>
+                              <TableCell>
+                                {format(new Date(s.fechaTermino), 'dd/MM/yyyy')}
+                              </TableCell>
                               <TableCell>{s.cupos}</TableCell>
                               <TableCell>{s.intervalo}</TableCell>
                               <TableCell>

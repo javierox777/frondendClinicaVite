@@ -24,6 +24,7 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { generalConfig } from '../../config';
 import { ConsentmentDetail } from '../../interfaces/ConsentmentDetails';
+import { format } from 'date-fns';
 
 interface Props {
   consentment: ConsentmentResponse | undefined;
@@ -205,9 +206,10 @@ const ConsentmentVisualizer = forwardRef(({ consentment }: Props, ref) => {
       <Grid item xs={6}>
         <Typography variant="body1">
           En atención comenzada el día{' '}
-          {new Date(
-            consentment.consentimiento.fechaRegistro
-          ).toLocaleDateString()}
+          {format(
+            new Date(consentment.consentimiento.fechaRegistro),
+            'dd/MM/yyyy'
+          )}
         </Typography>
       </Grid>
       <Grid item xs={6}>

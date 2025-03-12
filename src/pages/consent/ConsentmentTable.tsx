@@ -38,7 +38,8 @@ const ConsentmentTable = ({ consentments, onDownloadPDF }: Props) => {
   const filteredConsentments = consentments?.filter((c: Consentment) => {
     if (!c.persona) return false;
     const rut = (c.persona as Person)?.rut.toLowerCase();
-    const name = `${(c.persona as Person)?.nombre1} ${(c.persona as Person)?.apellPat}`.toLowerCase();
+    const name =
+      `${(c.persona as Person)?.nombre1} ${(c.persona as Person)?.apellPat}`.toLowerCase();
     const date = format(new Date(c.fechaRegistro), 'yyyy/MM/dd');
     return (
       rut.includes(searchText.toLowerCase()) ||
@@ -75,17 +76,20 @@ const ConsentmentTable = ({ consentments, onDownloadPDF }: Props) => {
             }}
           >
             <TableRow>
-              {['Paciente', 'Rut', 'Fecha Registro', 'Acciones'].map((label, index) => (
-                <TableCell
-                  key={index}
-                  style={{
-                    fontWeight: 'bold',
-                    color: mode === 'light' ? colors.lightModeTableText : 'white',
-                  }}
-                >
-                  {label}
-                </TableCell>
-              ))}
+              {['Paciente', 'Rut', 'Fecha Registro', 'Acciones'].map(
+                (label, index) => (
+                  <TableCell
+                    key={index}
+                    style={{
+                      fontWeight: 'bold',
+                      color:
+                        mode === 'light' ? colors.lightModeTableText : 'white',
+                    }}
+                  >
+                    {label}
+                  </TableCell>
+                )
+              )}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -95,13 +99,15 @@ const ConsentmentTable = ({ consentments, onDownloadPDF }: Props) => {
                 .map((c: Consentment) => (
                   <TableRow key={c._id}>
                     <TableCell>
-                      {(c.persona as Person).nombre1} {(c.persona as Person).apellPat}
+                      {(c.persona as Person).nombre1}{' '}
+                      {(c.persona as Person).apellPat}
                     </TableCell>
                     <TableCell>
-                      {formatRut((c.persona as Person).rut)}-{(c.persona as Person).dv}
+                      {formatRut((c.persona as Person).rut)}-
+                      {(c.persona as Person).dv}
                     </TableCell>
                     <TableCell>
-                      {format(new Date(c.fechaRegistro), 'yyyy/MM/dd')}
+                      {format(new Date(c.fechaRegistro), 'dd/MM/yyyy')}
                     </TableCell>
                     <TableCell>
                       <IconButton onClick={() => onDownloadPDF?.(c)}>
