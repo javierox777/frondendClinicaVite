@@ -811,59 +811,154 @@ const Odontogramm = ({ odontogram }: Props) => {
       currentY += cellHeight1 * 2;
 
       // Dibujar tabla de EVOLUCIÓN
-      const headers = ['FECHA', 'DIENTE', 'EVOLUCIÓN'];
-      const columnWidths = [40, 30, 120];
+      const headers = [
+        'FECHA',
+        'DIENTE',
+        'CONDICIÓN/TRATAMIENTO',
+        'OBSERVACIÓN',
+      ];
+      const columnWidths = [40, 30, 60, 60]; // Ajustar tamaños de columna
 
       // Agregar encabezado
       doc.setFont('helvetica', 'bold');
       headers.forEach((header, index) => {
-        doc.rect(
-          startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0),
-          currentY,
-          columnWidths[index],
-          10
-        );
-        doc.text(
-          header,
-          startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0) + 2,
-          currentY + 7
-        );
+        const xPos =
+          startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0);
+        doc.rect(xPos, currentY, columnWidths[index], 10);
+        doc.text(header, xPos + 2, currentY + 7);
       });
       currentY += 10;
+
+      // 1. Definir la función drawCrossInCell en el mismo archivo o dentro del mismo scope:
+      const drawCrossInCell = (
+        cellX: number,
+        cellY: number,
+        cellWidth: number,
+        cellHeight: number,
+        treatment: any,
+        baseSize: number = 2
+      ) => {
+        // Tamaño total de la cruz
+        const totalWidth = 3 * baseSize;
+        const totalHeight = 3 * baseSize;
+        // Posiciona la cruz en la esquina inferior derecha con un pequeño margen (2 unidades)
+        const offsetX = cellX + cellWidth - totalWidth - 2;
+        const offsetY = cellY + cellHeight - totalHeight - 2;
+
+        // Obtiene el color del tratamiento a partir del mapeo
+        const treatmentColor =
+          treatmentColorMap[treatment.detalle] || '#FFFFFF';
+
+        // Define las 5 partes de la cruz (disposición: bucal, distal, oclusal, mesial, lingualpalatino)
+        const parts = [
+          {
+            key: 'bucal',
+            x: offsetX + baseSize,
+            y: offsetY,
+            w: baseSize,
+            h: baseSize,
+          },
+          {
+            key: 'distal',
+            x: offsetX,
+            y: offsetY + baseSize,
+            w: baseSize,
+            h: baseSize,
+          },
+          {
+            key: 'oclusal',
+            x: offsetX + baseSize,
+            y: offsetY + baseSize,
+            w: baseSize,
+            h: baseSize,
+          },
+          {
+            key: 'mesial',
+            x: offsetX + 2 * baseSize,
+            y: offsetY + baseSize,
+            w: baseSize,
+            h: baseSize,
+          },
+          {
+            key: 'lingualpalatino',
+            x: offsetX + baseSize,
+            y: offsetY + 2 * baseSize,
+            w: baseSize,
+            h: baseSize,
+          },
+        ];
+
+        parts.forEach((part) => {
+          // Si la parte coincide con la parte afectada, se pinta con el color obtenido, de lo contrario en blanco.
+          let fillColor = '#FFFFFF';
+          if (treatment.pieza && treatment.pieza.parte === part.key) {
+            fillColor = treatmentColor;
+          }
+          doc.setFillColor(fillColor);
+          doc.rect(part.x, part.y, part.w, part.h, 'FD');
+          doc.setLineWidth(0.2);
+          doc.rect(part.x, part.y, part.w, part.h);
+        });
+      };
 
       // Agregar filas dinámicas desde el estado `treatments`
       treatments.forEach((treatment) => {
         const values = [
-          new Date(treatment.fecha).toLocaleDateString(), // FECHA
-          `${treatment.pieza.diente} ${treatment.pieza.parte}`, // DIENTE
-          treatment.detalle, // EVOLUCIÓN
+          new Date(treatment.fecha).toLocaleDateString() || 'Sin fecha', // FECHA
+          treatment.pieza?.diente
+            ? `${treatment.pieza.diente} ${treatment.pieza.parte || ''}`
+            : 'Sin diente', // DIENTE
+          treatment.detalle || 'Sin evolución', // EVOLUCIÓN
+          treatment.observacion || 'Sin observación', // OBSERVACIÓN
         ];
 
+        // Calcular alturas de las celdas
+        const rowHeights = values.map((value, index) => {
+          if (index === 3) {
+            // Observación - Calcular altura basada en líneas
+            const textLines = doc.splitTextToSize(
+              value.toString(),
+              columnWidths[index] - 2
+            );
+            return textLines.length * 10; // Altura según número de líneas
+          }
+          return 10; // Altura estándar para las otras columnas
+        });
+        const maxRowHeight = Math.max(...rowHeights); // Altura máxima para la fila
+
+        // Dibujar celdas para cada columna
         values.forEach((value, index) => {
-          doc.rect(
-            startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0),
-            currentY,
-            columnWidths[index],
-            10
-          );
-          doc.text(
-            value,
-            startX +
-              columnWidths.slice(0, index).reduce((a, b) => a + b, 0) +
-              2,
-            currentY + 7
-          );
+          const xPos =
+            startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0);
+          doc.rect(xPos, currentY, columnWidths[index], maxRowHeight);
+          if (index === 1) {
+            // Columna DIENTE: imprime el texto y luego dibuja la cruz
+            doc.text(value.toString(), xPos + 2, currentY + 7);
+            drawCrossInCell(
+              xPos,
+              currentY,
+              columnWidths[index],
+              maxRowHeight,
+              treatment,
+              2
+            );
+          } else if (index === 3) {
+            const textLines = doc.splitTextToSize(
+              value.toString(),
+              columnWidths[index] - 2
+            );
+            doc.text(textLines, xPos + 2, currentY + 7);
+          } else {
+            doc.text(value.toString(), xPos + 2, currentY + 7);
+          }
         });
 
-        currentY += 10;
-
-        // Agregar una nueva página si la tabla excede el límite de la página actual
+        currentY += maxRowHeight;
         if (currentY > 280) {
           doc.addPage();
-          currentY = 20; // Reiniciar posición Y
+          currentY = 20;
         }
       });
-
       doc.save('ficha_dental.pdf');
     } catch (error) {
       console.error('Error al generar el PDF:', error);
