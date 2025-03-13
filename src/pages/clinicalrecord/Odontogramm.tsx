@@ -88,6 +88,8 @@ import axios from 'axios';
 import { generalConfig } from '../../config';
 import TreatmentForm from './TreatmentForm';
 import { format } from 'date-fns';
+import { Address } from '../../interfaces/Address';
+import { Contact } from '../../interfaces/Contact';
 
 interface Person {
   _id: string;
@@ -102,6 +104,43 @@ interface Person {
   nombre2: string;
   rut: string;
   sexo: string;
+}
+
+interface Morbido {
+  descripcion: string;
+  detail: string;
+  _id: string;
+}
+
+interface General {
+  descripcion: string;
+  _id: string;
+}
+
+interface Familiar {
+  descripcion: string;
+  _id: string;
+}
+
+interface Alergia {
+  descripcion: string;
+  _id: string;
+}
+
+interface Habito {
+  descripcion: string;
+  _id: string;
+}
+
+interface Antecedents {
+  _id: string;
+  persona: string;
+  morbidos: Morbido[];
+  familiares: Familiar[];
+  generales: General[];
+  habitos: Habito[];
+  alergias: Alergia[];
+  __v: number;
 }
 
 const isPerson = (persona: any): persona is Person => {
@@ -223,11 +262,119 @@ const Odontogramm = ({ odontogram }: Props) => {
     color: '',
   });
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(50);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const [type, setType] = useState('permanent');
 
   const [teeth, setTeeth] = useState<Diente[]>();
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [convenios, setConvenios] = useState<any[]>([]);
+  const [antecedents, setAntecedents] = useState<Antecedents | null>(null);
+  const [contacts, setContacts] = useState<Contact[]>([]);
+
+  // useEffect para obtener los antecedentes
+  useEffect(() => {
+    const fetchAntecedents = async () => {
+      try {
+        if (odontogram && isPerson(odontogram.persona)) {
+          const personId = odontogram.persona._id;
+          const res = await axios.get(
+            `${generalConfig.baseUrl}/antecedents/getantecedents/${personId}`
+          );
+          const data = res.data;
+          if (data && data.message === 'success' && Array.isArray(data.body)) {
+            setAntecedents(data.body[0]); // Asumiendo que siempre hay un objeto en el array
+          } else {
+            setAntecedents([]);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching antecedents:', error);
+        setAntecedents([]);
+      }
+    };
+
+    fetchAntecedents();
+  }, [odontogram]);
+
+  useEffect(() => {
+    const fetchConvenios = async () => {
+      try {
+        // Verificar si existe persona y su _id
+        if (odontogram && isPerson(odontogram.persona)) {
+          const personId = odontogram.persona._id;
+          // Llamar a tu endpoint NestJS: GET /api/persons/convenios/:id
+          const res = await axios.get(
+            `${generalConfig.baseUrl}/persons/convenios/${personId}`
+          );
+          // Respuesta esperada: { message: 'success', body: {..., convenios: [...] } }
+          const data = res.data;
+          if (data && data.body && Array.isArray(data.body.convenios)) {
+            setConvenios(data.body.convenios);
+          } else {
+            setConvenios([]); // en caso de que no vengan convenios
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching convenios:', error);
+        setConvenios([]);
+      }
+    };
+
+    fetchConvenios();
+  }, [odontogram]);
+
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      if (odontogram && isPerson(odontogram.persona)) {
+        try {
+          const response = await axios.get(
+            `${generalConfig.baseUrl}/address-book/getaddresses/${odontogram.persona._id}`
+          );
+
+          // Imprime directamente los datos de la respuesta
+          console.log('addresses from response', response.data.body);
+
+          // Actualiza el estado con los datos obtenidos
+          setAddresses(response.data.body || []);
+        } catch (error) {
+          console.error('Error fetching addresses:', error);
+        }
+      }
+    };
+
+    fetchAddresses();
+  }, [odontogram]);
+
+  useEffect(() => {
+    const fetchContacts = async () => {
+      if (odontogram && isPerson(odontogram.persona)) {
+        try {
+          const response = await axios.get(
+            `${generalConfig.baseUrl}/contact-book/getcontacts/${odontogram.persona._id}`
+          );
+
+          // Imprime directamente los datos de la respuesta
+          console.log('addresses from response', response.data.body);
+
+          // Actualiza el estado con los datos obtenidos
+          setContacts(response.data.body || []);
+        } catch (error) {
+          console.error('Error fetching addresses:', error);
+        }
+      }
+    };
+
+    fetchContacts();
+  }, [odontogram]);
+
+  console.log(contacts);
+
+  useEffect(() => {
+    if (odontogram && odontogram.dientes) {
+      setTeeth(odontogram.dientes);
+    }
+  }, [odontogram]);
 
   useEffect(() => {
     if (odontogram && odontogram.dientes) {
@@ -356,7 +503,6 @@ const Odontogramm = ({ odontogram }: Props) => {
   };
   const generateDentistPDF = async () => {
     try {
-      // Crear un documento PDF
       const doc = new jsPDF('portrait', 'mm', 'a4');
       const persona = odontogram?.persona;
 
@@ -367,599 +513,660 @@ const Odontogramm = ({ odontogram }: Props) => {
 
       const rutCompleto = `${persona.rut}-${persona.dv}`;
       const fechaNacimiento = new Date(persona.fechaNac).toLocaleDateString();
-      const edad = calculateAge(persona.fechaNac);
+      const edad = calculateAge(
+        persona.fechaNac instanceof Date
+          ? persona.fechaNac.toISOString()
+          : persona.fechaNac
+      );
 
-      // Título del documento
       const pageWidth = doc.internal.pageSize.getWidth();
+      // 1. Definir límites de la página
+      const PAGE_HEIGHT = 297; // Altura total de una hoja A4 en mm
+      const MARGIN = 10; // Márgenes en mm
+      const MAX_Y = PAGE_HEIGHT - MARGIN; // Posición Y máxima antes de añadir una nueva página
+
+      // 2. Función de utilidad para añadir texto con verificación de salto de página
+      const addTextWithPageCheck = (
+        text: string,
+        x: number,
+        y: number,
+        lineHeight: number = 8
+      ): number => {
+        if (y + lineHeight > MAX_Y) {
+          doc.addPage();
+          y = MARGIN; // Reiniciar posición Y en la nueva página
+
+          // Repetir encabezados si es necesario
+          doc.setFontSize(18);
+          doc.setTextColor(255, 105, 180);
+          doc.setFont('helvetica', 'bold');
+          doc.text('Clínica Dental', pageWidth / 2 - 20, 20, {
+            align: 'center',
+          });
+
+          doc.setTextColor(0, 102, 204);
+          doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
+
+          doc.setFontSize(16);
+          doc.setTextColor(0, 102, 204);
+          doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' });
+
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'normal');
+
+          return y; // Y se ha reiniciado
+        }
+        doc.text(text, x, y);
+        return y + lineHeight;
+      };
+
+      // 3. Agregar encabezados
       doc.setFontSize(18);
       doc.setTextColor(255, 105, 180);
       doc.setFont('helvetica', 'bold');
       doc.text('Clínica Dental', pageWidth / 2 - 20, 20, { align: 'center' });
 
-      // Título "AMANIA" (color azul)
-      doc.setTextColor(0, 102, 204); // Azul (RGB: 0, 102, 204)
+      doc.setTextColor(0, 102, 204);
       doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
 
-      // Subtítulo "ODONTOGRAMA" (azul también)
       doc.setFontSize(16);
-      doc.setTextColor(0, 102, 204); // Azul (igual que "AMANIA")
+      doc.setTextColor(0, 102, 204);
       doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' });
 
-      // Logo
       const logoUrl = '/logo.png';
       doc.addImage(logoUrl, 'PNG', 10, 10, 30, 30);
 
-      // Crear tabla principal con celdas y bordes
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'normal');
       const cellHeight = 8;
       const startX = 10;
       let currentY = 50;
 
-      // Sección Forma de ingreso y convenio
-      // doc.rect(startX, currentY, 190, cellHeight * 3);
-      // doc.line(startX + 95, currentY, startX + 95, currentY + cellHeight);
-      // doc.text('FORMA DE INGRESO A LA CONSULTA:', startX + 2, currentY + 5);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
 
-      // Primera columna: 1 y 2
-      // doc.rect(startX, currentY, 190, cellHeight);
-      // doc.text('1.- Volante', startX + 2, currentY + 14);
-      // doc.rect(startX, currentY + 8, 45, cellHeight);
-      // doc.rect(startX + 45, currentY + 8, 50, cellHeight); // Rectángulo para Volante
-      // doc.text('2.- Radio', startX + 2, currentY + 22);
-      // doc.rect(startX + 45, currentY + 16, 50, cellHeight); // Rectángulo para Radio
-
-      // Segunda columna: CONVENIO y 3 y 4
-
-      doc.text(
-        `CONVENIO : ${persona.institucion.nombre}`,
-        startX + 2,
-        currentY + 6
-      );
-      doc.rect(startX, currentY + 1, 190, cellHeight);
-      // doc.rect(startX + 140, currentY + 8, 50, cellHeight); // Rectángulo para Recomendación
-      // doc.text('4.- Casualidad/Otro', startX + 97, currentY + 22);
-      // doc.rect(startX + 140, currentY + 16, 50, cellHeight); // R
-
-      // Salto de línea
-      currentY += cellHeight;
-
-      currentY += cellHeight * 2;
-
-      // Salto de línea
-      currentY += cellHeight;
-
-      // Fila 1: APELLIDO PATERNO, APELLIDO MATERNO, NOMBRES
-      doc.rect(startX, currentY, 190, cellHeight); // Encabezado
-      doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight); // Línea entre APELLIDO PATERNO y APELLIDO MATERNO
+      // Fila: Apellido paterno, materno y nombres
+      doc.setTextColor(0, 0, 0);
+      doc.rect(startX, currentY, 190, cellHeight);
+      doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight);
       doc.line(
         startX + 126.66,
         currentY,
         startX + 126.66,
         currentY + cellHeight
-      ); // Línea entre APELLIDO MATERNO y NOMBRES
+      );
       doc.text('APELLIDO PATERNO', startX + 2, currentY + 5);
       doc.text('APELLIDO MATERNO', startX + 65, currentY + 5);
       doc.text('NOMBRES', startX + 130, currentY + 5);
       currentY += cellHeight;
 
-      doc.rect(startX, currentY, 190, cellHeight); // Valores
-      doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight); // Línea entre APELLIDO PATERNO y APELLIDO MATERNO
+      doc.rect(startX, currentY, 190, cellHeight);
+      doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight);
       doc.line(
         startX + 126.66,
         currentY,
         startX + 126.66,
         currentY + cellHeight
-      ); // Línea entre APELLIDO MATERNO y NOMBRES
-      doc.text(`${persona.apellPat}`, startX + 2, currentY + 5);
-      doc.text(`${persona.apellMat}`, startX + 65, currentY + 5);
+      );
+      doc.text(`${persona.apellPat.toUpperCase()}`, startX + 2, currentY + 5);
+      doc.text(`${persona.apellMat.toUpperCase()}`, startX + 65, currentY + 5);
       doc.text(
-        `${persona.nombre1} ${persona.nombre2}`,
+        `${persona.nombre1.toUpperCase()} ${persona.nombre2.toUpperCase()}`,
         startX + 130,
         currentY + 5
       );
       currentY += cellHeight;
 
-      // Fila 2: RUT, EDAD, SEXO, FECHA DE NACIMIENTO
-      doc.rect(startX, currentY, 190, cellHeight); // Encabezado
-      doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight); // Línea entre RUT y EDAD
+      // Fila: Rut, Edad, Sexo, Fecha de Nacimiento
+      doc.rect(startX, currentY, 190, cellHeight);
+      doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight);
+      doc.line(
+        startX + 94.995,
+        currentY,
+        startX + 94.995,
+        currentY + cellHeight
+      );
       doc.line(
         startX + 126.66,
         currentY,
         startX + 126.66,
         currentY + cellHeight
-      ); // Línea entre EDAD y SEXO
+      );
       doc.text('RUT', startX + 2, currentY + 5);
-      doc.line(
-        startX + 94.995,
-        currentY,
-        startX + 94.995,
-        currentY + cellHeight
-      );
       doc.text('EDAD', startX + 65, currentY + 5);
-      doc.line(
-        startX + 198.395,
-        currentY,
-        startX + 198.395,
-        currentY + cellHeight
-      );
       doc.text('SEXO', startX + 96, currentY + 5);
-
       doc.text('FECHA DE NACIMIENTO', startX + 130, currentY + 5);
       currentY += cellHeight;
 
-      doc.rect(startX, currentY, 190, cellHeight); // Valores
-      doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight); // Línea entre RUT y EDAD
-      doc.line(
-        startX + 126.66,
-        currentY,
-        startX + 126.66,
-        currentY + cellHeight
-      ); // Línea entre EDAD y SEXO
-      doc.text(`${rutCompleto}`, startX + 2, currentY + 5);
+      doc.rect(startX, currentY, 190, cellHeight);
+      doc.line(startX + 63.33, currentY, startX + 63.33, currentY + cellHeight);
       doc.line(
         startX + 94.995,
         currentY,
         startX + 94.995,
         currentY + cellHeight
       );
+      doc.line(
+        startX + 126.66,
+        currentY,
+        startX + 126.66,
+        currentY + cellHeight
+      );
+      doc.text(`${rutCompleto}`, startX + 2, currentY + 5);
       doc.text(`${edad} años`, startX + 65, currentY + 5);
-      doc.text(`${'Hombre'}`, startX + 96, currentY + 5);
+      doc.text(`${persona.sexo.nombre}`, startX + 96, currentY + 5);
       doc.text(`${fechaNacimiento}`, startX + 130, currentY + 5);
       currentY += cellHeight;
 
-      // Fila 3: DIRECCIÓN
-      doc.rect(startX, currentY, 190, cellHeight); // Dirección
-      doc.text('DIRECCIÓN:', startX + 2, currentY + 7);
-      doc.text('', startX + 35, currentY + 7);
+      currentY += cellHeight; // Agregar espacio vacío antes del título
+
+      // Celda del título "PREVISIÓN:"
+      doc.rect(startX, currentY, 190, cellHeight); // Dibujar borde de la celda
+      doc.text(`PREVISIÓN:`, startX + 2, currentY + 7); // Texto del título
       currentY += cellHeight;
 
-      // Fila 4: FONO
-      doc.rect(startX, currentY, 190, cellHeight); // Teléfono
-      doc.text('FONO:', startX + 2, currentY + 7);
-      doc.text('', startX + 20, currentY + 7);
+      // Filas dinámicas para los valores de prevision
+      const prevision = persona.institucion?.nombre
+        ? [persona.institucion.nombre]
+        : ['Sin Presión']; // Asegura que haya al menos un valor
+      prevision.forEach((prevision) => {
+        doc.rect(startX, currentY, 190, cellHeight); // Dibujar borde de cada fila
+        doc.text(prevision, startX + 2, currentY + 5); // Texto del convenio
+        currentY += cellHeight; // Avanza a la siguiente fila
+      });
+      currentY += cellHeight; // Agregar espacio vacío antes del título
 
-      currentY += cellHeight * 2;
+      // Celda del título "CONVENIOS:"
+      const conveniosList = convenios.length
+        ? convenios.map((c) => c.prestacionTipo?.nombre || 'Sin convenio')
+        : ['Sin convenios disponibles'];
 
-      // Salto de línea
-
-      // Motivo de consulta
+      // 2. Generamos sección "CONVENIOS"
       doc.rect(startX, currentY, 190, cellHeight);
-      doc.text('MOTIVO DE CONSULTA:', startX + 2, currentY + 7);
+      doc.setTextColor(0, 0, 0);
+
+      // Luego dibujar el texto
+      doc.text('CONVENIOS:', startX + 2, currentY + 7);
       currentY += cellHeight;
+
+      conveniosList.forEach((convenio) => {
+        doc.rect(startX, currentY, 190, cellHeight);
+        doc.text(convenio, startX + 2, currentY + 5);
+        currentY += cellHeight;
+      });
+
+      // Filas dinámicas de direcciones
+      currentY += cellHeight;
+      doc.rect(startX, currentY, 190, cellHeight); // Borde de la celda del título
+      doc.text(`DIRECCIONES:`, startX + 2, currentY + 5); // Texto del título
+      currentY += cellHeight; // Avanza a la siguiente fila
+
+      // Filas dinámicas de direcciones
+      addresses.forEach((address) => {
+        const ciudadNombre = address.ciudad?.nombre || 'Sin ciudad';
+        const direccionNombre = address.nombre || 'Sin dirección';
+
+        // Celda de cada dirección
+        doc.rect(startX, currentY, 190, cellHeight); // Borde de la celda
+        doc.text(
+          `${ciudadNombre.toUpperCase()}, ${direccionNombre.toUpperCase()}`,
+          startX + 2,
+          currentY + 5
+        ); // Texto de la celda
+        currentY += cellHeight; // Avanza a la siguiente fila
+      });
+
+      currentY += cellHeight;
+
+      // doc.text('Direcciones:', 10, 50);
+      // addresses.forEach((address, index) => {
+      //   doc.text(`- ${address}`, 10, 60 + index * 10);
+      // });
+
+      // Fila: Teléfono
       doc.rect(startX, currentY, 190, cellHeight);
-      doc.text(
-        'EVALUACION Y TRATAMIENTO DE ORTODONCIA',
-        startX + 2,
-        currentY + 7
-      );
-
-      currentY += cellHeight * 2;
-
-      // Motivo de consulta
-      doc.rect(startX, currentY, 190, cellHeight);
-      doc.text('ANTECEDENTES PERSONALES:', startX + 2, currentY + 7);
+      doc.text('CONTACTOS:', startX + 2, currentY + 7);
       currentY += cellHeight;
-      doc.rect(startX, currentY, 190, cellHeight);
-      doc.text('ENFERMEDADES ACTUAL Y MEDICAMENTOS', startX + 2, currentY + 7);
+      contacts.forEach((contact) => {
+        const ciudadNombre = contact.contacto?.nombre || 'Sin contacto';
+        const direccionNombre = contact.descripcion || 'Sin descripción';
 
-      currentY += cellHeight;
-      doc.rect(startX, currentY, 190, cellHeight);
-      currentY += cellHeight;
-      // Salto de línea
-
-      // Antecedentes personales
-      doc.line(
-        startX + 94.995,
-        currentY,
-        startX + 94.995,
-        currentY + cellHeight * 3.3
-      );
-      doc.rect(startX, currentY, 190, cellHeight * 3.3);
-      doc.text(
-        'Alergias:               SI    NO    ',
-        startX + 2,
-        currentY + 8
-      );
-      doc.line(startX, currentY + 10, startX + 190, currentY + 10);
-      doc.text(
-        'FRECUENCUA DE CEPILLADO:    SI    NO   ',
-        startX + 102,
-        currentY + 8
-      );
-      currentY += cellHeight;
-      doc.text('Hemorragias:       SI    NO   ', startX + 2, currentY + 8);
-      doc.line(startX, currentY + 10, startX + 190, currentY + 10);
-      doc.text(
-        'CEDA DENTAL:                               SI    NO   ',
-        startX + 102,
-        currentY + 8
-      );
-      currentY += cellHeight;
-      doc.text(
-        'ENGUAGUE BUCAL:                       SI    NO   ',
-        startX + 102,
-        currentY + 8
-      );
-
-      currentY += cellHeight * 3;
-
-      // Hábitos orales
-
-      doc.rect(startX, currentY, 90, cellHeight * 4);
-      doc.text('HÁBITOS ORALES', startX + 2, currentY + 7);
-      doc.line(startX, currentY + 8, startX + 90, currentY + 9);
-      doc.line(
-        startX + 50,
-        currentY + 9,
-        startX + 50,
-        currentY + cellHeight * 4
-      );
-      doc.line(
-        startX + 70,
-        currentY + 9,
-        startX + 70,
-        currentY + cellHeight * 4
-      );
-      doc.line(
-        startX + 90,
-        currentY + 9,
-        startX + 90,
-        currentY + cellHeight * 4
-      );
-      doc.text('BRUXISMO:', startX + 2, currentY + 14);
-      doc.text('SI', startX + 58, currentY + 14);
-      doc.text('NO', startX + 78, currentY + 14);
-      doc.line(startX, currentY + 16, startX + 90, currentY + 16);
-      doc.text('INTERPOSICIÓN LINGUAL:', startX + 2, currentY + 21);
-      doc.text('SI', startX + 58, currentY + 21);
-      doc.text('NO', startX + 78, currentY + 21);
-      doc.line(startX, currentY + 24, startX + 90, currentY + 24);
-
-      doc.text('ONICOFAGIA:', startX + 2, currentY + 28);
-      doc.text('SI', startX + 58, currentY + 28);
-      doc.text('NO', startX + 78, currentY + 28);
-
-      // Examen físico / Alteraciones
-      doc.rect(startX + 100, currentY, 90, cellHeight * 4); // Contenedor principal
-      doc.text('EXAMEN FÍSICO / ALTERACIONES', startX + 102, currentY + 7);
-
-      // Línea horizontal debajo del título
-      doc.line(startX + 100, currentY + 9, startX + 190, currentY + 9);
-
-      // Líneas verticales para dividir las columnas
-      doc.line(
-        startX + 150,
-        currentY + 9,
-        startX + 150,
-        currentY + cellHeight * 4
-      ); // Primera línea vertical
-      doc.line(
-        startX + 170,
-        currentY + 9,
-        startX + 170,
-        currentY + cellHeight * 4
-      ); // Segunda línea vertical
-      doc.line(
-        startX + 190,
-        currentY + 9,
-        startX + 190,
-        currentY + cellHeight * 4
-      ); // Borde derecho
-
-      // Primera fila de contenido
-      doc.text('ATM:', startX + 102, currentY + 14);
-      doc.text('SI', startX + 158, currentY + 14);
-      doc.text('NO', startX + 178, currentY + 14);
-      doc.line(startX + 100, currentY + 16, startX + 190, currentY + 16); // Línea horizontal
-
-      // Segunda fila de contenido
-      doc.text('LABIO:', startX + 102, currentY + 21);
-      doc.text('SI', startX + 158, currentY + 21);
-      doc.text('NO', startX + 178, currentY + 21);
-      doc.line(startX + 100, currentY + 24, startX + 190, currentY + 24); // Línea horizontal
-
-      // Tercera fila de contenido
-      doc.text('PISO DE BOCA:', startX + 102, currentY + 28);
-      doc.text('SI', startX + 158, currentY + 28);
-      doc.text('NO', startX + 178, currentY + 28);
-
-      currentY += cellHeight * 4;
+        // Celda de cada dirección
+        doc.rect(startX, currentY, 190, cellHeight); // Borde de la celda
+        doc.text(
+          `${ciudadNombre}, ${direccionNombre}`,
+          startX + 2,
+          currentY + 5
+        ); // Texto de la celda
+        currentY += cellHeight; // Avanza a la siguiente fila
+      });
       doc.addPage();
 
-      // Odontograma
-      const toothWidth = 7;
-      const toothHeight = 10;
-      const gap = 5;
-      let toothX = startX;
-      let toothY = 20;
-
-      // Encabezado
-      // Título "Clínica Dental" (color rosa)
+      // Reiniciar currentY al margen superior
+      // Margen superior en mm
       doc.setFontSize(18);
       doc.setTextColor(255, 105, 180);
       doc.setFont('helvetica', 'bold');
       doc.text('Clínica Dental', pageWidth / 2 - 20, 20, { align: 'center' });
 
-      // Título "AMANIA" (color azul)
-      doc.setTextColor(0, 102, 204); // Azul (RGB: 0, 102, 204)
+      doc.setTextColor(0, 102, 204);
       doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
 
-      // Subtítulo "ODONTOGRAMA" (azul también)
       doc.setFontSize(16);
-      doc.setTextColor(0, 102, 204); // Azul (igual que "AMANIA")
+      doc.setTextColor(0, 102, 204);
       doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' });
 
-      doc.addImage(logoUrl, 'PNG', 10, 3, 30, 30);
+      doc.addImage(logoUrl, 'PNG', 10, 10, 30, 30);
 
-      // Función para pintar las secciones de la cruz
-      const drawToothShape = (x: number, y: number, toothParts: any) => {
-        const size = 2;
-        const parts = [
-          { key: 'bucal', x: x + size, y: y, w: size, h: size }, // Arriba
-          { key: 'distal', x: x, y: y + size, w: size, h: size }, // Izquierda
-          { key: 'oclusal', x: x + size, y: y + size, w: size, h: size }, // Centro
-          { key: 'mesial', x: x + 2 * size, y: y + size, w: size, h: size }, // Derecha
-          {
-            key: 'lingualpalatino',
-            x: x + size,
-            y: y + 2 * size,
-            w: size,
-            h: size,
-          }, // Abajo
-        ];
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      currentY = 60;
 
-        parts.forEach((part) => {
-          const color = toothParts?.[part.key]?.color || '#FFFFFF';
-          doc.setFillColor(color);
-          doc.rect(part.x, part.y, part.w, part.h, 'FD'); // Pintar sección
+      // 9. Secciones Dinámicas: GENERALES, FAMILIARES, MÓRBIDOS, ALÉRGIAS, HÁBITOS
+      if (antecedents) {
+        const generalesListt = antecedents.generales?.length
+          ? antecedents.generales.map(
+              (g: General) =>
+                g.descripcion.toUpperCase() || 'Sin datos generales'
+            )
+          : ['Sin datos generales'];
+
+        const familiaresList = antecedents.familiares?.length
+          ? antecedents.familiares.map(
+              (f: Familiar) =>
+                f.descripcion.toUpperCase() || 'Sin datos familiares'
+            )
+          : ['Sin datos familiares'];
+
+        const morbidosList = antecedents.morbidos?.length
+          ? antecedents.morbidos.map(
+              (m: Morbido) =>
+                `${m.descripcion.toUpperCase()}: ${m.detail.toUpperCase() || 'Sin detalles'}`
+            )
+          : ['Sin datos mórbidos'];
+
+        const alergiasList = antecedents.alergias?.length
+          ? antecedents.alergias.map(
+              (a: Alergia) =>
+                a.descripcion.toUpperCase() || 'Sin datos de alergias'
+            )
+          : ['Sin datos de alergias'];
+
+        const habitosList = antecedents.habitos?.length
+          ? antecedents.habitos.map(
+              (h: Habito) =>
+                h.descripcion.toUpperCase() || 'Sin datos de hábitos'
+            )
+          : ['Sin datos de hábitos'];
+
+        // -------------------------------
+        // Secciones Dinámicas: GENERALES, FAMILIARES, MÓRBIDOS, ALÉRGIAS, HÁBITOS
+        // -------------------------------
+
+        // 1) GENERALES
+        doc.rect(startX, currentY, 190, cellHeight);
+        doc.setTextColor(0, 0, 0);
+        doc.text('GENERALES:', startX + 2, currentY + 5);
+        currentY += cellHeight;
+
+        generalesListt.forEach((item) => {
+          doc.rect(startX, currentY, 190, cellHeight);
+          doc.text(item, startX + 2, currentY + 5);
+          currentY += cellHeight;
         });
-      };
+        currentY += cellHeight;
+        // 2) FAMILIARES
+        doc.rect(startX, currentY, 190, cellHeight);
+        doc.setTextColor(0, 0, 0);
+        doc.text('FAMILIARES:', startX + 2, currentY + 5);
+        currentY += cellHeight;
 
-      // Función para dibujar una fila de dientes
-      const drawTeethRow = (
-        teeth: Diente[],
-        treatmentsData: any,
-        startY: number,
-        startX: number
-      ) => {
+        familiaresList.forEach((item: any) => {
+          doc.rect(startX, currentY, 190, cellHeight);
+          doc.text(item, startX + 2, currentY + 5);
+          currentY += cellHeight;
+        });
+        currentY += cellHeight;
+        // 3) MÓRBIDOS
+        doc.rect(startX, currentY, 190, cellHeight);
+        doc.setTextColor(0, 0, 0);
+        doc.text('MÓRBIDOS:', startX + 2, currentY + 5);
+        currentY += cellHeight;
+
+        morbidosList.forEach((item: any) => {
+          doc.rect(startX, currentY, 190, cellHeight);
+          doc.text(item, startX + 2, currentY + 5);
+          currentY += cellHeight;
+        });
+        currentY += cellHeight;
+        // 4) ALÉRGIAS
+        doc.rect(startX, currentY, 190, cellHeight);
+        doc.setTextColor(0, 0, 0);
+        doc.text('ALÉRGIAS:', startX + 2, currentY + 5);
+        currentY += cellHeight;
+
+        alergiasList.forEach((item: any) => {
+          doc.rect(startX, currentY, 190, cellHeight);
+          doc.text(item, startX + 2, currentY + 5);
+          currentY += cellHeight;
+        });
+        currentY += cellHeight;
+
+        // 5) HÁBITOS
+        doc.rect(startX, currentY, 190, cellHeight);
+        doc.setTextColor(0, 0, 0);
+        doc.text('HÁBITOS:', startX + 2, currentY + 5);
+        currentY += cellHeight;
+
+        habitosList.forEach((item: any) => {
+          doc.rect(startX, currentY, 190, cellHeight);
+          doc.text(item, startX + 2, currentY + 5);
+          currentY += cellHeight;
+        });
+
+        currentY += cellHeight * 3;
+
+        currentY += cellHeight * 4;
+        doc.addPage();
+
+        // Odontograma
+        const toothWidth = 7;
+        const toothHeight = 10;
+        const gap = 5;
         let toothX = startX;
-        let toothY = startY + 30;
+        let toothY = 20;
 
-        teeth.forEach((tooth) => {
-          if (toothX + toothWidth > pageWidth - startX) {
-            toothX = startX;
-            toothY += toothHeight + gap * 8;
-          }
+        // Encabezado
+        // Título "Clínica Dental" (color rosa)
+        doc.setFontSize(18);
+        doc.setTextColor(255, 105, 180);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Clínica Dental', pageWidth / 2 - 20, 20, { align: 'center' });
 
-          // Dibujar número del diente
-          doc
-            .setFontSize(8)
-            .text(`${tooth.pieza}`, toothX + toothWidth / 3, toothY - 2);
+        // Título "AMANIA" (color azul)
+        doc.setTextColor(0, 102, 204); // Azul (RGB: 0, 102, 204)
+        doc.text('AMANIA', pageWidth / 2 + 20, 20, { align: 'center' });
 
-          // Imagen del diente
-          const toothImage =
-            dientesImages[`diente${tooth.pieza}` as DienteKeys];
-          if (toothImage) {
-            doc.addImage(
-              toothImage,
-              'PNG',
-              toothX,
-              toothY,
-              toothWidth,
-              toothHeight
-            );
-          }
+        // Subtítulo "ODONTOGRAMA" (azul también)
+        doc.setFontSize(16);
+        doc.setTextColor(0, 102, 204); // Azul (igual que "AMANIA")
+        doc.text('Odontograma', pageWidth / 2, 30, { align: 'center' });
 
-          // Obtener tratamiento dinámico del backend
-          const toothParts = tooth.pieza ? treatmentsData[tooth.pieza] : {}; // fallback to an empty object
+        doc.addImage(logoUrl, 'PNG', 10, 3, 30, 30);
 
-          drawToothShape(toothX + 1, toothY + toothHeight + 3, toothParts);
+        // Función para pintar las secciones de la cruz
+        const drawToothShape = (x: number, y: number, toothParts: any) => {
+          const size = 2;
+          const parts = [
+            { key: 'bucal', x: x + size, y: y, w: size, h: size }, // Arriba
+            { key: 'distal', x: x, y: y + size, w: size, h: size }, // Izquierda
+            { key: 'oclusal', x: x + size, y: y + size, w: size, h: size }, // Centro
+            { key: 'mesial', x: x + 2 * size, y: y + size, w: size, h: size }, // Derecha
+            {
+              key: 'lingualpalatino',
+              x: x + size,
+              y: y + 2 * size,
+              w: size,
+              h: size,
+            }, // Abajo
+          ];
 
-          toothX += toothWidth + gap;
-        });
-      };
+          parts.forEach((part) => {
+            let color = toothParts?.[part.key]?.color || '#FFFFFF';
 
-      // Datos dinámicos de tratamientos desde el backend
-      const treatmentsData: any = {};
-      teeth?.forEach((tooth) => {
-        treatmentsData[tooth.pieza!] = {
-          bucal: { color: tooth.bucal.color },
-          mesial: { color: tooth.mesial.color },
-          distal: { color: tooth.distal.color },
-          lingualpalatino: { color: tooth.lingualpalatino.color },
-          oclusal: { color: tooth.oclusal.color },
+            if (color.includes('255\t151\t41')) {
+              color = '#FF9729';
+            }
+            doc.setFillColor(color);
+            doc.rect(part.x, part.y, part.w, part.h, 'FD');
+          });
         };
-      });
 
-      // Definir dientes superiores e inferiores
-      const upperTeeth = teeth!.filter((t: Diente) => parseInt(t.pieza!) < 31);
-      const lowerTeeth = teeth!.filter(
-        (t: Diente) => parseInt(t.pieza!) >= 31 && parseInt(t.pieza!) < 51
-      );
+        // Función para dibujar una fila de dientes
+        const drawTeethRow = (
+          teeth: Diente[],
+          treatmentsData: any,
+          startY: number,
+          startX: number
+        ) => {
+          let toothX = startX;
+          let toothY = startY + 30;
 
-      // Calcular el área total de los dientes
-      const totalWidth =
-        upperTeeth.length * toothWidth + (upperTeeth.length - 1) * gap;
-      const totalHeight = (toothHeight + gap * 3) * 2; // Dos filas de dientes
+          teeth.forEach((tooth) => {
+            if (toothX + toothWidth > pageWidth - startX) {
+              toothX = startX;
+              toothY += toothHeight + gap * 8;
+            }
 
-      // Dibujar el rectángulo envolvente
-      doc.setDrawColor(0); // Color del borde (negro)
-      doc.setLineWidth(0.1); // Grosor del borde
-      doc.rect(startX - 5, 60 - 5, totalWidth + 10, totalHeight + 10); // Rectángulo envolvente
+            // Dibujar número del diente
+            doc
+              .setFontSize(8)
+              .text(`${tooth.pieza}`, toothX + toothWidth / 3, toothY - 2);
 
-      // Dibujar filas de dientes
-      drawTeethRow(upperTeeth, treatmentsData, 30, startX);
-      drawTeethRow(
-        lowerTeeth,
-        treatmentsData,
-        30 + toothHeight + gap * 4,
-        startX
-      );
+            // Imagen del diente
+            const toothImage =
+              dientesImages[`diente${tooth.pieza}` as DienteKeys];
+            if (toothImage) {
+              doc.addImage(
+                toothImage,
+                'PNG',
+                toothX,
+                toothY,
+                toothWidth,
+                toothHeight
+              );
+            }
 
-      const cellHeight1 = 8;
-      const totalRows = 40; // Total de filas para la tabla
+            // Obtener tratamiento dinámico del backend
+            const toothParts = tooth.pieza ? treatmentsData[tooth.pieza] : {}; // fallback to an empty object
 
-      currentY = 100;
+            drawToothShape(toothX + 1, toothY + toothHeight + 3, toothParts);
 
-      currentY += cellHeight1 * 2;
-      // Título de la página
-      doc.setFontSize(8);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(0, 0, 0);
+            toothX += toothWidth + gap;
+          });
+        };
 
-      currentY += cellHeight1 * 2;
-
-      // Dibujar tabla de EVOLUCIÓN
-      const headers = [
-        'FECHA',
-        'DIENTE',
-        'CONDICIÓN/TRATAMIENTO',
-        'OBSERVACIÓN',
-      ];
-      const columnWidths = [40, 30, 60, 60]; // Ajustar tamaños de columna
-
-      // Agregar encabezado
-      doc.setFont('helvetica', 'bold');
-      headers.forEach((header, index) => {
-        const xPos =
-          startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0);
-        doc.rect(xPos, currentY, columnWidths[index], 10);
-        doc.text(header, xPos + 2, currentY + 7);
-      });
-      currentY += 10;
-
-      // 1. Definir la función drawCrossInCell en el mismo archivo o dentro del mismo scope:
-      const drawCrossInCell = (
-        cellX: number,
-        cellY: number,
-        cellWidth: number,
-        cellHeight: number,
-        treatment: any,
-        baseSize: number = 2
-      ) => {
-        // Tamaño total de la cruz
-        const totalWidth = 3 * baseSize;
-        const totalHeight = 3 * baseSize;
-        // Posiciona la cruz en la esquina inferior derecha con un pequeño margen (2 unidades)
-        const offsetX = cellX + cellWidth - totalWidth - 2;
-        const offsetY = cellY + cellHeight - totalHeight - 2;
-
-        // Obtiene el color del tratamiento a partir del mapeo
-        const treatmentColor =
-          treatmentColorMap[treatment.detalle] || '#FFFFFF';
-
-        // Define las 5 partes de la cruz (disposición: bucal, distal, oclusal, mesial, lingualpalatino)
-        const parts = [
-          {
-            key: 'bucal',
-            x: offsetX + baseSize,
-            y: offsetY,
-            w: baseSize,
-            h: baseSize,
-          },
-          {
-            key: 'distal',
-            x: offsetX,
-            y: offsetY + baseSize,
-            w: baseSize,
-            h: baseSize,
-          },
-          {
-            key: 'oclusal',
-            x: offsetX + baseSize,
-            y: offsetY + baseSize,
-            w: baseSize,
-            h: baseSize,
-          },
-          {
-            key: 'mesial',
-            x: offsetX + 2 * baseSize,
-            y: offsetY + baseSize,
-            w: baseSize,
-            h: baseSize,
-          },
-          {
-            key: 'lingualpalatino',
-            x: offsetX + baseSize,
-            y: offsetY + 2 * baseSize,
-            w: baseSize,
-            h: baseSize,
-          },
-        ];
-
-        parts.forEach((part) => {
-          // Si la parte coincide con la parte afectada, se pinta con el color obtenido, de lo contrario en blanco.
-          let fillColor = '#FFFFFF';
-          if (treatment.pieza && treatment.pieza.parte === part.key) {
-            fillColor = treatmentColor;
-          }
-          doc.setFillColor(fillColor);
-          doc.rect(part.x, part.y, part.w, part.h, 'FD');
-          doc.setLineWidth(0.2);
-          doc.rect(part.x, part.y, part.w, part.h);
+        // Datos dinámicos de tratamientos desde el backend
+        const treatmentsData: any = {};
+        teeth?.forEach((tooth) => {
+          treatmentsData[tooth.pieza!] = {
+            bucal: { color: tooth.bucal.color },
+            mesial: { color: tooth.mesial.color },
+            distal: { color: tooth.distal.color },
+            lingualpalatino: { color: tooth.lingualpalatino.color },
+            oclusal: { color: tooth.oclusal.color },
+          };
         });
-      };
 
-      // Agregar filas dinámicas desde el estado `treatments`
-      treatments.forEach((treatment) => {
-        const values = [
-          new Date(treatment.fecha).toLocaleDateString() || 'Sin fecha', // FECHA
-          treatment.pieza?.diente
-            ? `${treatment.pieza.diente} ${treatment.pieza.parte || ''}`
-            : 'Sin diente', // DIENTE
-          treatment.detalle || 'Sin evolución', // EVOLUCIÓN
-          treatment.observacion || 'Sin observación', // OBSERVACIÓN
+        // Definir dientes superiores e inferiores
+        const upperTeeth = teeth!.filter(
+          (t: Diente) => parseInt(t.pieza!) < 31
+        );
+        const lowerTeeth = teeth!.filter(
+          (t: Diente) => parseInt(t.pieza!) >= 31 && parseInt(t.pieza!) < 51
+        );
+
+        // Calcular el área total de los dientes
+        const totalWidth =
+          upperTeeth.length * toothWidth + (upperTeeth.length - 1) * gap;
+        const totalHeight = (toothHeight + gap * 3) * 2; // Dos filas de dientes
+
+        // Dibujar el rectángulo envolvente
+        doc.setDrawColor(0); // Color del borde (negro)
+        doc.setLineWidth(0.1); // Grosor del borde
+        doc.rect(startX - 5, 60 - 5, totalWidth + 10, totalHeight + 10); // Rectángulo envolvente
+
+        // Dibujar filas de dientes
+        drawTeethRow(upperTeeth, treatmentsData, 30, startX);
+        drawTeethRow(
+          lowerTeeth,
+          treatmentsData,
+          30 + toothHeight + gap * 4,
+          startX
+        );
+
+        const cellHeight1 = 8;
+        const totalRows = 40; // Total de filas para la tabla
+
+        currentY = 100;
+
+        currentY += cellHeight1 * 2;
+        // Título de la página
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(0, 0, 0);
+
+        currentY += cellHeight1 * 2;
+
+        // Dibujar tabla de EVOLUCIÓN
+        const headers = [
+          'FECHA',
+          'DIENTE',
+          'CONDICIÓN/TRATAMIENTO',
+          'OBSERVACIÓN',
         ];
+        const columnWidths = [40, 30, 60, 60]; // Ajustar tamaños de columna
 
-        // Calcular alturas de las celdas
-        const rowHeights = values.map((value, index) => {
-          if (index === 3) {
-            // Observación - Calcular altura basada en líneas
-            const textLines = doc.splitTextToSize(
-              value.toString(),
-              columnWidths[index] - 2
-            );
-            return textLines.length * 10; // Altura según número de líneas
-          }
-          return 10; // Altura estándar para las otras columnas
-        });
-        const maxRowHeight = Math.max(...rowHeights); // Altura máxima para la fila
-
-        // Dibujar celdas para cada columna
-        values.forEach((value, index) => {
+        // Agregar encabezado
+        doc.setFont('helvetica', 'bold');
+        headers.forEach((header, index) => {
           const xPos =
             startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0);
-          doc.rect(xPos, currentY, columnWidths[index], maxRowHeight);
-          if (index === 1) {
-            // Columna DIENTE: imprime el texto y luego dibuja la cruz
-            doc.text(value.toString(), xPos + 2, currentY + 7);
-            drawCrossInCell(
-              xPos,
-              currentY,
-              columnWidths[index],
-              maxRowHeight,
-              treatment,
-              2
-            );
-          } else if (index === 3) {
-            const textLines = doc.splitTextToSize(
-              value.toString(),
-              columnWidths[index] - 2
-            );
-            doc.text(textLines, xPos + 2, currentY + 7);
-          } else {
-            doc.text(value.toString(), xPos + 2, currentY + 7);
+          doc.rect(xPos, currentY, columnWidths[index], 10);
+          doc.text(header, xPos + 2, currentY + 7);
+        });
+        currentY += 10;
+
+        // 1. Definir la función drawCrossInCell en el mismo archivo o dentro del mismo scope:
+        const drawCrossInCell = (
+          cellX: number,
+          cellY: number,
+          cellWidth: number,
+          cellHeight: number,
+          treatment: any,
+          baseSize: number = 2
+        ) => {
+          // Tamaño total de la cruz
+          const totalWidth = 3 * baseSize;
+          const totalHeight = 3 * baseSize;
+          // Posiciona la cruz en la esquina inferior derecha con un pequeño margen (2 unidades)
+          const offsetX = cellX + cellWidth - totalWidth - 2;
+          const offsetY = cellY + cellHeight - totalHeight - 2;
+
+          // Obtiene el color del tratamiento a partir del mapeo
+          const treatmentColor =
+            treatmentColorMap[treatment.detalle] || '#FFFFFF';
+
+          // Define las 5 partes de la cruz (disposición: bucal, distal, oclusal, mesial, lingualpalatino)
+          const parts = [
+            {
+              key: 'bucal',
+              x: offsetX + baseSize,
+              y: offsetY,
+              w: baseSize,
+              h: baseSize,
+            },
+            {
+              key: 'distal',
+              x: offsetX,
+              y: offsetY + baseSize,
+              w: baseSize,
+              h: baseSize,
+            },
+            {
+              key: 'oclusal',
+              x: offsetX + baseSize,
+              y: offsetY + baseSize,
+              w: baseSize,
+              h: baseSize,
+            },
+            {
+              key: 'mesial',
+              x: offsetX + 2 * baseSize,
+              y: offsetY + baseSize,
+              w: baseSize,
+              h: baseSize,
+            },
+            {
+              key: 'lingualpalatino',
+              x: offsetX + baseSize,
+              y: offsetY + 2 * baseSize,
+              w: baseSize,
+              h: baseSize,
+            },
+          ];
+
+          parts.forEach((part) => {
+            // Si la parte coincide con la parte afectada, se pinta con el color obtenido, de lo contrario en blanco.
+            let fillColor = '#FFFFFF';
+            if (treatment.pieza && treatment.pieza.parte === part.key) {
+              fillColor = treatmentColor;
+            }
+            doc.setFillColor(fillColor);
+            doc.rect(part.x, part.y, part.w, part.h, 'FD');
+            doc.setLineWidth(0.2);
+            doc.rect(part.x, part.y, part.w, part.h);
+          });
+        };
+
+        // Agregar filas dinámicas desde el estado `treatments`
+        treatments.forEach((treatment) => {
+          const values = [
+            new Date(treatment.fecha).toLocaleDateString() || 'Sin fecha', // FECHA
+            treatment.pieza?.diente
+              ? `${treatment.pieza.diente} ${treatment.pieza.parte || ''}`
+              : 'Sin diente', // DIENTE
+            treatment.detalle || 'Sin evolución', // EVOLUCIÓN
+            treatment.observacion || 'Sin observación', // OBSERVACIÓN
+          ];
+
+          // Calcular alturas de las celdas
+          const rowHeights = values.map((value, index) => {
+            if (index === 3) {
+              // Observación - Calcular altura basada en líneas
+              const textLines = doc.splitTextToSize(
+                value.toString(),
+                columnWidths[index] - 2
+              );
+              return textLines.length * 10; // Altura según número de líneas
+            }
+            return 10; // Altura estándar para las otras columnas
+          });
+          const maxRowHeight = Math.max(...rowHeights); // Altura máxima para la fila
+
+          // Dibujar celdas para cada columna
+          values.forEach((value, index) => {
+            const xPos =
+              startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0);
+            doc.rect(xPos, currentY, columnWidths[index], maxRowHeight);
+            if (index === 1) {
+              // Columna DIENTE: imprime el texto y luego dibuja la cruz
+              doc.text(value.toString(), xPos + 2, currentY + 7);
+              drawCrossInCell(
+                xPos,
+                currentY,
+                columnWidths[index],
+                maxRowHeight,
+                treatment,
+                2
+              );
+            } else if (index === 3) {
+              const textLines = doc.splitTextToSize(
+                value.toString(),
+                columnWidths[index] - 2
+              );
+              doc.text(textLines, xPos + 2, currentY + 7);
+            } else {
+              doc.text(value.toString(), xPos + 2, currentY + 7);
+            }
+          });
+
+          currentY += maxRowHeight;
+          if (currentY > 280) {
+            doc.addPage();
+            currentY = 20;
           }
         });
-
-        currentY += maxRowHeight;
-        if (currentY > 280) {
-          doc.addPage();
-          currentY = 20;
-        }
-      });
-      doc.save('ficha_dental.pdf');
+        doc.save('ficha_dental.pdf');
+      }
     } catch (error) {
       console.error('Error al generar el PDF:', error);
     }
