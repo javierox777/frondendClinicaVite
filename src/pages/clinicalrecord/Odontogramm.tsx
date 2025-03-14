@@ -1184,8 +1184,8 @@ const Odontogramm = ({ odontogram }: Props) => {
   console.log(treatments);
   const treatmentColorMap: Record<string, string> = {
     Caries: '#FF0000',
-    'Corona Definitiva': 'rgb(255, 207, 54)',
-    'Corona Provisoria': 'rgb(255	151	41)',
+    'Corona Definitiva': '#ffd036',
+    'Corona Provisoria': '#ff9829',
     Restauración: '#32CD32',
     Fractura: '#A52A2A',
     Endodoncia: '#00CED1',
@@ -1211,7 +1211,7 @@ const Odontogramm = ({ odontogram }: Props) => {
     'Geminación/Fusión': '#BA55D3',
     Impactación: '#8B0000',
     'Resto Radicular': '#2F4F4F',
-    'Diente incluido': 'rgb(177,	23,	32)',
+    'Diente incluido': '#b11721',
     'Diente Extruido': '#FF69B4',
     'Diente Intruido': '#DB7093',
     'Endentulo Total': '#D3D3D3',
