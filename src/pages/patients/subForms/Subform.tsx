@@ -12,7 +12,7 @@ import {
   Typography,
 } from '@mui/material';
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useState,ReactNode } from 'react';
 import toast from 'react-hot-toast';
 
 const style = {
@@ -31,9 +31,10 @@ interface Props {
   postRoute: string;
   description: string;
   onFinish?: CallableFunction;
+  ButtonComponent?: ReactNode; // se añadio nuevo codigo
 }
 
-const Subform = ({ title, postRoute, description, onFinish }: Props) => {
+const Subform = ({ title, postRoute, description, onFinish,ButtonComponent }: Props) => {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState(false);
   const [isSubmitting, setSubmitting] = useState(false);
@@ -60,12 +61,20 @@ const Subform = ({ title, postRoute, description, onFinish }: Props) => {
       toast.error('No se pudo registrar datos.');
     }
   };
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
   return (
     <div>
-      <Fab size="small" variant="extended" onClick={() => setOpen(true)}>
-        <Add />
-        {title}
-      </Fab>
+      {ButtonComponent ? (
+        <div onClick={handleOpen}>{ButtonComponent}</div>
+      ) : (
+        <Fab size="small" variant="extended" onClick={handleOpen}>
+          <Add />
+          {title}
+        </Fab>
+      )}
       <Modal open={open}>
         <Fade in={open}>
           <Box sx={style}>

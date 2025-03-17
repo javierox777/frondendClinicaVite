@@ -1,4 +1,7 @@
-import { AttachMoney, Close } from '@mui/icons-material';
+import { AttachMoney, 
+  Close,
+  Add as AddIcon, // Importamos el icono Add
+ } from '@mui/icons-material';
 import {
   Autocomplete,
   Box,
@@ -26,7 +29,7 @@ import { TransitionProps } from '@mui/material/transitions';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { format } from 'date-fns';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,ReactNode } from 'react'; // importe ReactNode // codigo nuevo, para ButtonComponent
 import toast, { Toaster } from 'react-hot-toast';
 import { LoggedUser, useUser } from '../../auth/userContext';
 import HeaderBar from '../../componemts/HeaderBar';
@@ -44,11 +47,13 @@ import Subform from '../patients/subForms/Subform';
 import BudgetFormSkeleton from './BudgetFormSkeleton';
 import DetailsForm from './DetailsForm';
 
+
 interface Props {
   open: boolean;
   onClose: CallableFunction;
   budget?: Budget;
   afterSubmit?: CallableFunction;
+  ButtonComponent?: ReactNode; // Añade la prop ButtonComponent aquí
 }
 
 const Transition = React.forwardRef(function Transition(
@@ -158,7 +163,8 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
       estado: statusId,
       profesional: (user as LoggedUser).profesionalId,
       empresa: clinicId,
-      fechaRegistro: new Date(registerDate).toISOString(),
+      //fechaRegistro: new Date(registerDate).toISOString(),
+      fechaRegistro: new Date(registerDate + 'T00:00').toISOString(),
       persona: patientId,
       presupuestoTipo: budgetTypeId,
       budgetDetails,
@@ -325,37 +331,63 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
                     {data && (
                       <>
                         <Box sx={{ marginBottom: 2 }}>
-                          <Subform
+                         {/* <Subform
                             title="Agregar tipo de presupuesto"
                             description="Agrega nuevo tipo de presupuesto"
                             postRoute={`${generalConfig.baseUrl}/budget-type`}
                             onFinish={() =>
                               setSubFormSubmitted(!subFormSubmitted)
                             }
-                          />
+                          />*/}
                         </Box>
                         <FormControl fullWidth>
-                          <InputLabel id="budget-type-label">
-                            Tipo de presupuesto
-                          </InputLabel>
-                          <Select
-                            required
-                            label="budget-types"
-                            id="budget-type-select"
-                            labelId="budget-type-label"
-                            onChange={(e: SelectChangeEvent<string>) =>
-                              setBudgetTypeId(e.target.value)
-                            }
-                            value={budgetTypeId}
-                          >
-                            {data?.budgetTypes.map((t: ShortModel) => {
-                              return (
-                                <MenuItem key={t._id} value={t._id}>
-                                  {t.nombre}
-                                </MenuItem>
-                              );
-                            })}
-                          </Select>
+                        <HeaderBar title="Tipo de presupuesto" /> {/* El HeaderBar aquí */}
+                <Box sx={{ display: 'flex', alignItems: 'center' }}> {/* Contenedor flex */}
+                  <FormControl fullWidth>
+                    <Select
+                      required
+                      label="budget-types"
+                      id="budget-type-select"
+                      labelId="budget-type-label"
+                      onChange={(e: SelectChangeEvent<string>) =>
+                        setBudgetTypeId(e.target.value)
+                      }
+                      value={budgetTypeId}
+                    >
+                      {data?.budgetTypes.map((t: ShortModel) => {
+                        return (
+                          <MenuItem key={t._id} value={t._id}>
+                            {t.nombre}
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
+                  </FormControl>
+                  <Subform
+                    title="Agregar tipo de presupuesto"
+                    description="Agrega nuevo tipo de presupuesto"
+                    postRoute={`${generalConfig.baseUrl}/budget-type`}
+                    onFinish={() =>
+                      setSubFormSubmitted(!subFormSubmitted)
+                    }
+                    ButtonComponent={
+                      <Button
+                        style={{
+                          backgroundColor: '#1976d2',
+                          color: 'white',
+                          width: 48,
+                          height: 48,
+                          minWidth: 48, // Asegura el ancho mínimo
+                          minHeight: 48, // Asegura la altura mínima
+                          padding: 0, // Elimina el padding predeterminado
+                          margin: '0 0 0 16px',
+                        }}
+                      >
+                        <AddIcon />
+                      </Button>
+                    }
+                  />
+                </Box>
                         </FormControl>
                       </>
                     )}
@@ -400,6 +432,7 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
                   <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                     {data && (
                       <FormControl fullWidth>
+                        <HeaderBar title="Paciente" />
                         <Autocomplete
                           disablePortal
                           options={data?.persons}
@@ -492,6 +525,7 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
                   <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                     {data && (
                       <FormControl fullWidth>
+                        <HeaderBar title="Clínica" />
                         <Autocomplete
                           disablePortal
                           defaultValue={budget?.empresa}
@@ -523,6 +557,7 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
                   </Grid>
                   <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
                     <FormControl fullWidth>
+                    <HeaderBar title="Fecha de registro" />
                       <TextField
                         label="Fecha de registro"
                         InputLabelProps={{ shrink: true }}
@@ -548,7 +583,8 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
                       label={`Convenio/ ${agreementSelected ? 'Sí' : 'No'}`}
                     />
                     <FormControl fullWidth>
-                      <InputLabel id="budget-type-label">Convenio</InputLabel>
+                    <HeaderBar title="Convenios" />
+                      {/*<InputLabel id="budget-type-label">Convenio</InputLabel>*/}
                       <Select
                         required
                         label="budget-types"
@@ -592,45 +628,69 @@ const BudgetForm = ({ onClose, open, budget, afterSubmit }: Props) => {
               </Grid>
               {/* DETALLES DE PRESUPUESTO        */}
               {/* FOOTER DE PRESUPUESTO CON LOS PRECIOS A PAGAR */}
-              <Grid item xs={12}>
-                <HeaderBar title="total a pagar" />
-                <Card sx={{ padding: 3 }} elevation={3}>
-                  <Grid container alignItems="center" spacing={3}>
-                    <Grid item xs={12}>
-                      <Grid item xs={6}>
-                        <Typography
-                          sx={{ fontSize: 30, fontWeight: 'lighter' }}
-                        >
-                          <AttachMoney />
-                          {budgetDetails.reduce((acc, d: BudgetDetailType) => {
-                            return d.valor + acc;
-                          }, 0)}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Divider />
-                    </Grid>
-                    {/* <Grid item xs={12}>
-                      <Grid item xs={6}>
-                        <Typography sx={{ fontSize: 20, fontWeight: 'bold' }}>
-                          TOTAL A PAGAR NETO
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Typography
-                          sx={{ fontSize: 30, fontWeight: 'lighter' }}
-                        >
-                          <AttachMoney />
-                          {budgetDetails.reduce((acc, d: BudgetDetailType) => {
-                            return d.valorUniNeto + acc;
-                          }, 0)}
-                        </Typography>
-                      </Grid>
-                    </Grid> */}
-                  </Grid>
-                </Card>
-              </Grid>
+              
+        
+            <Grid item xs={12}>
+            <HeaderBar title="Resumen De Pago" />
+      <Card sx={{ padding: 3, borderRadius: 2, boxShadow: 3 }}>
+        
+{/* 
+        <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
+          Detalle
+        </Typography>
+
+        <Divider sx={{ my: 2 }} />*/}
+
+        <Grid container direction="column" spacing={2}>
+          <Grid item xs={12} container justifyContent="space-between" alignItems="center">
+            <Typography variant="subtitle1" sx={{ fontWeight: 'medium', color: '#333' }}>
+              TOTAL PAGADO:
+            </Typography>
+            <Typography variant="h5" sx={{ fontWeight: 'lighter', color: '#2e7d32' }}>
+              <AttachMoney />
+              {budgetDetails.reduce((acc, d: BudgetDetailType) => {
+                if (d.pagado) {
+                  return d.valor + acc;
+                }
+                return acc;
+              }, 0)}
+            </Typography>
+          </Grid>
+
+          <Divider sx={{ my: 1, borderStyle: 'dashed', borderColor: '#ccc' }} />
+
+          <Grid item xs={12} container justifyContent="space-between" alignItems="center">
+            <Typography variant="subtitle1" sx={{ fontWeight: 'medium', color: '#333' }}>
+              TOTAL PENDIENTE PAGO:
+            </Typography>
+            <Typography variant="h5" sx={{ fontWeight: 'lighter', color: '#d32f2f' }}>
+              <AttachMoney />
+              {budgetDetails.reduce((acc, d: BudgetDetailType) => {
+                if (!d.pagado) {
+                  return d.valor + acc;
+                }
+                return acc;
+              }, 0)}
+            </Typography>
+          </Grid>
+
+          <Divider sx={{ my: 1, borderStyle: 'dashed', borderColor: '#ccc' }} />
+
+          <Grid item xs={12} container justifyContent="space-between" alignItems="center">
+            <Typography variant="subtitle1" sx={{ fontWeight: 'medium', color: '#333'  }}>
+              TOTAL A PAGAR:
+            </Typography>
+            <Typography variant="h5" sx={{ fontWeight: 'lighter', color: '#1976d2' }}>
+              <AttachMoney />
+              {budgetDetails.reduce((acc, d: BudgetDetailType) => {
+                return d.valor + acc;
+              }, 0)}
+            </Typography>
+          </Grid>
+        </Grid>
+      </Card>
+    </Grid>
+
               {/* FOOTER DE PRESUPUESTO CON LOS PRECIOS A PAGAR */}
               <Grid item xs={12}>
                 <FormControl fullWidth>

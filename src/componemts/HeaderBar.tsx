@@ -21,6 +21,7 @@ const HeaderBar = ({ title, button, buttonTitle, buttonFn }: Props) => {
               ? colors.lightModeHeaderColor
               : colors.darkModeHeaderColor,
           justifyContent: 'space-between',
+          minHeight: '40px', // Reduce la altura mínima del Toolbar
         }}
       >
         <Typography variant="h6" className="capitalize">
