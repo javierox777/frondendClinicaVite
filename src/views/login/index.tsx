@@ -54,14 +54,14 @@ const Login: React.FC = () => {
         const userResponse = data.data;
         setUser({
           ...userResponse,
-          vigencia: userResponse.vigencia === "true",
-          role: 'user' // asignas un rol por defecto sin leerlo de userResponse
+          vigencia: userResponse.vigencia === 'true',
+          role: 'user', // asignas un rol por defecto sin leerlo de userResponse
         });
 
         const token = data.token;
         if (token) authStorage.storeToken(token);
 
-        navigate('/inicio');
+        navigate('/');
       }
 
       if (message !== 'Bienvenido') {
@@ -78,8 +78,6 @@ const Login: React.FC = () => {
           showConfirmButton: false,
           timer: 1500,
         });
-
-
       }
     } catch (error) {
       Swal.fire({
