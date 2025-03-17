@@ -98,9 +98,18 @@ const ConsentmentTable = ({ consentments, onDownloadPDF }: Props) => {
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((c: Consentment) => (
                   <TableRow key={c._id}>
-                    <TableCell>
-                      {(c.persona as Person).nombre1}{' '}
-                      {(c.persona as Person).apellPat}
+                    <TableCell
+                      style={{
+                        fontWeight: 'bold',
+                        color:
+                          mode === 'light'
+                            ? colors.lightModeTableText
+                            : 'white',
+                        textTransform: 'capitalize',
+                      }}
+                    >
+                      {(c.persona as Person).nombre1.toLowerCase()}{' '}
+                      {(c.persona as Person).apellPat.toLowerCase()}
                     </TableCell>
                     <TableCell>
                       {formatRut((c.persona as Person).rut)}-

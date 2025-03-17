@@ -177,6 +177,7 @@ const PatientsTableRecord = ({ refetch }: Props) => {
                             mode === 'light'
                               ? colors.lightModeTableText
                               : 'white',
+                          textTransform: 'capitalize',
                         }}
                         className="cursor-pointer hover:scale-[1.003] transition-all"
                         onClick={() => {
@@ -185,7 +186,7 @@ const PatientsTableRecord = ({ refetch }: Props) => {
                           });
                         }}
                       >
-                        {p.nombre1} {p.apellPat}
+                        {p.nombre1.toLowerCase()} {p.apellPat.toLowerCase()}
                       </TableCell>
                       <TableCell>
                         {formatRut(p.rut)}
