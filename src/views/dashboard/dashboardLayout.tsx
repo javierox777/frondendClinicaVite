@@ -174,7 +174,7 @@ const DashboardLayout: React.FC = () => {
       id: 1,
       label: 'Inicio',
       icon: <Dashboard />,
-      path: '/inicio',
+      path: '/',
       roles: ['admin', 'user'],
     },
     {
@@ -602,7 +602,7 @@ const DashboardLayout: React.FC = () => {
         >
           <Toolbar />
           <Routes>
-            <Route path="/inicio" element={<Inicio />} />
+            <Route path="/" element={<Inicio />} />
             <Route path="/administracion" element={<Administracion />} />
             <Route path="/pacientes" element={<PatientsPage />} />
             <Route path="/ingreso" element={<InstitutionForm />} />
