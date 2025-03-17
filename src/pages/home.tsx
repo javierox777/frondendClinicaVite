@@ -78,6 +78,10 @@ const Inicio: React.FC = () => {
   const [tratamientosPorProfesional, setTratamientosPorProfesional] = useState<
     any[]
   >([]);
+
+  const [tratamientosTodosProfesionales, setTratamientosTodosProfesionales] =
+    useState<any[]>([]);
+
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [totalCitas, setTotalCitas] = useState<number>(0);
@@ -167,6 +171,23 @@ const Inicio: React.FC = () => {
           (tratamiento) =>
             tratamiento.profesional._id === loggedUser?.profesionalId
         );
+
+        const tratamientosPorTodosProfesionalesCount =
+          tratamientosAnuales.reduce((acc: any, tratamiento: Tratamiento) => {
+            const profesional = `${tratamiento.profesional.nombre1} ${tratamiento.profesional.apellPat}`;
+            acc[profesional] = (acc[profesional] || 0) + 1;
+            return acc;
+          }, {});
+
+        const dataTratamientosTodosProfesionales = Object.keys(
+          tratamientosPorTodosProfesionalesCount
+        ).map((key) => ({
+          name: key,
+          value: tratamientosPorTodosProfesionalesCount[key],
+          description: `Tratamientos realizados por ${key}: ${tratamientosPorTodosProfesionalesCount[key]}`,
+        }));
+
+        setTratamientosTodosProfesionales(dataTratamientosTodosProfesionales);
 
         // Contar los tratamientos solo del profesional logueado
         const tratamientosPorProfesionalCount = tratamientosFiltrados.reduce(
@@ -321,11 +342,11 @@ const Inicio: React.FC = () => {
               gutterBottom
               sx={{ fontWeight: 'medium', fontSize: '1rem', color: '#555' }}
             >
-              Tratamientos por Profesional
+              Tratamientos por Dentista
             </Typography>
             {loading ? (
               <CircularProgress />
-            ) : (
+            ) : !loading && user.role === 'user' ? (
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart
                   data={tratamientosPorProfesional}
@@ -360,6 +381,33 @@ const Inicio: React.FC = () => {
                   {/* Barras con colores personalizados */}
                   <Bar dataKey="value" fill="#00C49F" barSize={20}>
                     {/* Etiquetas dentro de las barras */}
+                    <LabelList dataKey="value" position="insideRight" />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart
+                  data={tratamientosTodosProfesionales}
+                  layout="vertical"
+                  margin={{
+                    top: 20,
+                    right: 30,
+                    left: 20,
+                    bottom: 10,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <YAxis
+                    type="category"
+                    dataKey="name"
+                    width={150}
+                    tick={{ fontSize: 12 }}
+                  />
+                  <XAxis type="number" />
+                  <Tooltip formatter={(value) => `${value} tratamientos`} />
+                  <Legend verticalAlign="top" />
+                  <Bar dataKey="value" fill="#FFBB28" barSize={20}>
                     <LabelList dataKey="value" position="insideRight" />
                   </Bar>
                 </BarChart>
